@@ -1,8 +1,8 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { GeneralSettings, getGeneralSettings } from '@/services/settings';
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
+import type { GeneralSettings } from '@/services/settings';
 
 type HSLColor = { h: number; s: number; l: number };
 type FontSizes = {
