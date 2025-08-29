@@ -72,16 +72,11 @@ const defaultPromptTemplate = `Du er en ekspert AI-assistent for Digifly, et dig
   - Stil ikke flere spørgsmål.
 `;
 
-const getPromptTemplate = async () => {
-    const settings = await getGeneralSettings();
-    return settings?.aiSystemPrompt || defaultPromptTemplate;
-}
-
 const qualificationPrompt = ai.definePrompt({
     name: 'aiProjectQualificationPrompt',
-    input: { schema: AIProjectQualificationInputSchema.extend({ promptTemplate: z.string() }) },
+    input: { schema: AIProjectQualificationInputSchema },
     output: { schema: AIProjectQualificationOutputSchema },
-    prompt: `{{{promptTemplate}}}
+    prompt: `${defaultPromptTemplate}
 
       **Brugerens nuværende besked:**
       {{{projectIdea}}}
@@ -108,9 +103,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
   },
   async (input) => {
     
-    const promptTemplate = await getPromptTemplate();
-
-    const {output} = await qualificationPrompt({ ...input, promptTemplate });
+    const {output} = await qualificationPrompt(input);
 
     if (!output) {
       throw new Error('No output from prompt');
