@@ -21,14 +21,14 @@ export default async function Home() {
       </Suspense>
       <main className="flex-1">
         <HeroSection />
-        <ServicesSection />
+        <ServicesSection settings={settings} />
         <AiProjectSection />
-        <CasesSection 
-            cases={settings?.cases} 
-            sectionData={settings}
+        <CasesSection
+          cases={settings?.cases}
+          sectionData={settings}
         />
-        <AboutSection />
-        <ContactSection />
+        <AboutSection settings={settings} />
+        <ContactSection settings={settings} />
       </main>
       <Suspense fallback={<div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
         <Footer />

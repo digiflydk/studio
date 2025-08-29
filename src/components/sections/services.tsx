@@ -2,10 +2,9 @@
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getGeneralSettings, type Service, GeneralSettings } from '@/services/settings';
+import { type Service, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useEffect, useState } from 'react';
 
 const defaultServices: Service[] = [
   {
@@ -34,13 +33,12 @@ const defaultServices: Service[] = [
   },
 ];
 
-function ServicesSectionContent() {
-  const isMobile = useIsMobile();
-  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+interface ServicesSectionProps {
+  settings: GeneralSettings | null;
+}
 
-  useEffect(() => {
-    getGeneralSettings().then(setSettings);
-  }, []);
+export default function ServicesSection({ settings }: ServicesSectionProps) {
+  const isMobile = useIsMobile();
 
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
@@ -101,8 +99,4 @@ function ServicesSectionContent() {
       </div>
     </section>
   );
-}
-
-export default function ServicesSection() {
-    return <ServicesSectionContent />;
 }

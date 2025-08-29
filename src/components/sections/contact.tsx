@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { sendContactMessage, getSettingsAction } from '@/app/actions';
+import { sendContactMessage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { GeneralSettings } from '@/services/settings';
@@ -31,19 +31,14 @@ function SubmitButton() {
   );
 }
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  settings: GeneralSettings | null;
+}
+
+export default function ContactSection({ settings }: ContactSectionProps) {
   const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
-  const [settings, setSettings] = useState<GeneralSettings | null>(null);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    async function loadSettings() {
-      const loadedSettings = await getSettingsAction();
-      setSettings(loadedSettings);
-    }
-    loadSettings();
-  }, []);
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {

@@ -5,10 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getGeneralSettings, type TeamMember, type GeneralSettings } from '@/services/settings';
+import { type TeamMember, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useState, useEffect } from 'react';
 
 
 const defaultTeam: TeamMember[] = [
@@ -40,13 +39,12 @@ const defaultTeam: TeamMember[] = [
 
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
-export default function AboutSection() {
-    const isMobile = useIsMobile();
-    const [settings, setSettings] = useState<GeneralSettings | null>(null);
+interface AboutSectionProps {
+  settings: GeneralSettings | null;
+}
 
-    useEffect(() => {
-        getGeneralSettings().then(setSettings);
-    }, []);
+export default function AboutSection({ settings }: AboutSectionProps) {
+    const isMobile = useIsMobile();
 
     const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
     const aboutText = settings?.aboutText || defaultAboutText;
