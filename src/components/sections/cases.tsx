@@ -80,7 +80,7 @@ function CasesSectionContent() {
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {cases.map((caseStudy) => (
-            <Card key={caseStudy.title} className="flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
+            <Card key={caseStudy.title} className="flex flex-col overflow-hidden hover:shadow-lg hover:-translate-y-1">
               <CardHeader>
                 <div className="relative w-full h-48">
                   <Image
