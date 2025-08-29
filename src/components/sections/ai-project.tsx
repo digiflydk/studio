@@ -121,7 +121,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
             <Card className="shadow-lg bg-gray-900/60 backdrop-blur-sm border-primary/20">
                 <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
-                    <div className="h-80 overflow-y-auto space-y-6 scrollbar-gutter-stable">
+                    <div className="h-80 overflow-y-auto space-y-6">
                         {messages.map((message, index) => (
                         <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
@@ -167,7 +167,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Beskriv din idé her..."
-                            className="pr-20 min-h-[60px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
+                            className="pr-20 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
                             onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
