@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import type { GeneralSettings } from '@/services/settings';
-import type { AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
+import type { AIProjectQualificationOutput, AIProjectQualificationInput } from '@/ai/flows/ai-project-qualification';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -22,8 +22,8 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
-  const [isQualified, setIsQualified] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo']>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,9 +34,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   }, []);
   
   useEffect(() => {
-    if (messages.length > 2) {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -51,42 +49,48 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
 
     startTransition(async () => {
         try {
-        const response: AIProjectQualificationOutput = await qualifyProjectAction({
-            projectIdea: currentUserMessage,
-            conversationHistory: messages,
-        });
+            const historyForAi: AIProjectQualificationInput['conversationHistory'] = messages.map(msg => ({ role: msg.role, content: msg.content }));
 
-        let allNewMessages = [...newMessages];
+            const response: AIProjectQualificationOutput = await qualifyProjectAction({
+                projectIdea: currentUserMessage,
+                conversationHistory: historyForAi,
+            });
 
-        if (response.nextQuestion) {
-            allNewMessages.push({ role: 'assistant', content: response.nextQuestion });
-        }
+            let allNewMessages = [...newMessages];
 
-        if (response.shouldBookMeeting) {
-            setIsQualified(true);
-            setIsComplete(true);
-            if (!response.nextQuestion) {
-            allNewMessages.push({
+            if (response.nextQuestion) {
+                allNewMessages.push({ role: 'assistant', content: response.nextQuestion });
+            }
+
+            if (response.collectedInfo) {
+                setCollectedInfo(response.collectedInfo);
+            }
+
+            if (response.shouldBookMeeting) {
+                setIsComplete(true);
+                if (!response.nextQuestion) {
+                allNewMessages.push({
+                    role: 'assistant',
+                    content:
+                    'Tak for informationen! Det lyder som et spændende projekt, vi kan hjælpe med. Book et uforpligtende møde med os nedenfor.',
+                });
+                }
+            } else if (response.qualified === false && !response.nextQuestion) {
+                setIsComplete(true);
+                allNewMessages.push({
                 role: 'assistant',
                 content:
-                'Tak for informationen! Det lyder som et spændende projekt, vi kan hjælpe med. Book et uforpligtende møde med os nedenfor.',
-            });
+                    'Tak for din henvendelse. Ud fra det oplyste ser det desværre ikke ud til, at vi er det rette match for opgaven. Held og lykke med projektet.',
+                });
             }
-        } else if (response.qualified === false && !response.nextQuestion) {
-            setIsComplete(true);
-            allNewMessages.push({
-            role: 'assistant',
-            content:
-                'Tak for din henvendelse. Ud fra det oplyste ser det desværre ikke ud til, at vi er det rette match for opgaven. Held og lykke med projektet.',
-            });
-        }
-        setMessages(allNewMessages);
+            setMessages(allNewMessages);
 
         } catch (error) {
-        setMessages((prev) => [
-            ...prev,
-            { role: 'assistant', content: 'Der opstod en fejl. Prøv venligst igen senere.' },
-        ]);
+            console.error(error);
+            setMessages((prev) => [
+                ...prev,
+                { role: 'assistant', content: 'Der opstod en fejl. Prøv venligst igen senere.' },
+            ]);
         }
     });
   };
@@ -122,7 +126,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
             <Card className="shadow-lg bg-gray-900/60 backdrop-blur-sm border-primary/20">
                 <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
-                    <div className="h-80 overflow-y-auto space-y-6">
+                    <div className="h-80 overflow-y-auto space-y-6 pr-2">
                         {messages.map((message, index) => (
                         <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
@@ -153,7 +157,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {isQualified && (
+                    {isComplete && collectedInfo?.name && (
                         <div className="text-center p-4 border-t border-primary/20">
                         <h3 className="text-xl font-semibold mb-4 text-white">Klar til næste skridt?</h3>
                         <Button asChild size="lg" data-cta="book_meeting_qualified">
