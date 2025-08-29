@@ -1,16 +1,14 @@
-
 'use client';
 
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { Bot, User, CornerDownLeft, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { qualifyProjectAction } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
-import { getGeneralSettings } from '@/services/settings';
 import type { GeneralSettings } from '@/services/settings';
 import type { AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 
@@ -19,25 +17,19 @@ type Message = {
   content: string;
 };
 
-export default function AiProjectSection() {
+export default function AiProjectSection({ settings }: { settings: GeneralSettings | null }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const [isQualified, setIsQualified] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [settings, setSettings] = useState<GeneralSettings | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    async function loadSettings() {
-      const loadedSettings = await getGeneralSettings();
-      setSettings(loadedSettings);
-      setMessages([{
-        role: 'assistant',
-        content: 'Hej! Jeg er din AI-assistent. For at vi kan hjælpe dig bedst muligt, hvad er dit fulde navn?'
-      }])
-    }
-    loadSettings();
+    setMessages([{
+      role: 'assistant',
+      content: 'Hej! Jeg er din AI-assistent. For at vi kan hjælpe dig bedst muligt, hvad er dit fulde navn?'
+    }])
   }, []);
   
   useEffect(() => {

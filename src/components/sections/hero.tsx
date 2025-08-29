@@ -1,11 +1,9 @@
-
 import Image from 'next/image';
-import { getGeneralSettings } from '@/services/settings';
+import { type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { CSSProperties } from 'react';
 
-export default async function HeroSection() {
-  const settings = await getGeneralSettings();
+export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
 
   const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
   const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';

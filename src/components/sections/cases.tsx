@@ -1,4 +1,3 @@
-
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -6,6 +5,8 @@ import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 import type { Case, GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 
 const defaultCases: Case[] = [
   {
@@ -32,46 +33,47 @@ const defaultCases: Case[] = [
 ];
 
 interface CasesSectionProps {
-    cases: Case[] | undefined;
-    sectionData: Partial<Pick<GeneralSettings, 'casesSectionTitle' | 'casesSectionDescription' | 'casesSectionTitleColor' | 'casesSectionTitleSize' | 'casesSectionDescriptionColor' | 'casesSectionDescriptionSize' | 'sectionPadding'>> | null
+    settings: GeneralSettings | null
 }
 
-export default function CasesSection({ cases: propCases, sectionData }: CasesSectionProps) {
-  const cases = propCases && propCases.length > 0 ? propCases : defaultCases;
-  const title = sectionData?.casesSectionTitle || "Vores Arbejde";
-  const description = sectionData?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
+export default function CasesSection({ settings }: CasesSectionProps) {
+  const isMobile = useIsMobile();
+  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
+  const title = settings?.casesSectionTitle || "Vores Arbejde";
+  const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
 
   const titleStyle: React.CSSProperties = {
-    fontSize: sectionData?.casesSectionTitleSize ? `${sectionData.casesSectionTitleSize}px` : undefined,
+    fontSize: settings?.casesSectionTitleSize ? `${settings.casesSectionTitleSize}px` : undefined,
   };
   const descriptionStyle: React.CSSProperties = {
-    fontSize: sectionData?.casesSectionDescriptionSize ? `${sectionData.casesSectionDescriptionSize}px` : undefined,
+    fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
   };
   
-  const sectionPadding = sectionData?.sectionPadding?.cases;
-  const style: React.CSSProperties = sectionPadding ? {
-    '--padding-top': `${sectionPadding.top}px`,
-    '--padding-bottom': `${sectionPadding.bottom}px`,
-    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
-    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
-  } as any : {};
+  const sectionPadding = settings?.sectionPadding?.cases;
+  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
+  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
+
+  const style: React.CSSProperties = {
+    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
+    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  };
 
   return (
     <section 
         id="cases" 
-        className="bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        className="bg-background" 
         style={style}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
            <h2 
-            className={cn("text-h2 font-bold tracking-tight", sectionData?.casesSectionTitleColor || "text-black")}
+            className={cn("text-h2 font-bold tracking-tight", settings?.casesSectionTitleColor || "text-black")}
             style={titleStyle}
           >
             {title}
           </h2>
           <p 
-            className={cn("mt-4 max-w-2xl mx-auto text-body", sectionData?.casesSectionDescriptionColor || "text-muted-foreground")}
+            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground")}
             style={descriptionStyle}
           >
             {description}
@@ -79,7 +81,7 @@ export default function CasesSection({ cases: propCases, sectionData }: CasesSec
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {cases.map((caseStudy) => (
-            <Card key={caseStudy.title} className="flex flex-col overflow-hidden">
+            <Card key={caseStudy.title} className="flex flex-col overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1">
                 <div className="relative w-full h-48">
                   <Image
                     src={caseStudy.imageUrl}
@@ -90,12 +92,10 @@ export default function CasesSection({ cases: propCases, sectionData }: CasesSec
                     className="object-cover"
                   />
                 </div>
-              <CardHeader>
-                <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
+              <CardHeader className="flex-grow">
+                <CardTitle className="mb-2 text-h4">{caseStudy.title}</CardTitle>
                 <CardDescription>{caseStudy.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
-              </CardContent>
               <CardFooter>
                  <Link href={caseStudy.link} className={cn(buttonVariants({ variant: 'link' }), 'pl-0')}>
                     Læs mere

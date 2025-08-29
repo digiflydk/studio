@@ -4,7 +4,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { getGeneralSettings, GeneralSettings } from '@/services/settings';
+import { GeneralSettings } from '@/services/settings';
 
 declare global {
   interface Window {
@@ -15,6 +15,7 @@ declare global {
 
 // Helper to push events to dataLayer
 function pushToDataLayer(event: object) {
+    if (typeof window === 'undefined') return;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push(event);
 }
@@ -72,18 +73,9 @@ function GA4Declarations({ gaId }: { gaId: string }) {
     )
 }
 
-export default function Analytics() {
-    const [settings, setSettings] = useState<Partial<GeneralSettings> | null>(null);
+export default function Analytics({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
-
-    useEffect(() => {
-        async function loadSettings() {
-            const loadedSettings = await getGeneralSettings();
-            setSettings(loadedSettings);
-        }
-        loadSettings();
-    }, []);
 
     // Pageview event on path change
     useEffect(() => {
@@ -94,8 +86,8 @@ export default function Analytics() {
                 page_title: document.title,
             });
 
-            if (settings.enableFacebookPixel && settings.facebookPixelId) {
-                window.fbq?.('track', 'PageView');
+            if (settings.enableFacebookPixel && settings.facebookPixelId && window.fbq) {
+                window.fbq('track', 'PageView');
             }
         }
     }, [pathname, searchParams, settings]);

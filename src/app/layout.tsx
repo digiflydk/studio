@@ -1,4 +1,3 @@
-
 import type { Metadata, ResolvingMetadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -26,6 +25,7 @@ export async function generateMetadata(
 
 
   const metadata: Metadata = {
+    metadataBase: process.env.VERCEL_URL ? new URL(`https://${process.env.VERCEL_URL}`) : new URL('http://localhost:9002'),
     title: title,
     description: description,
     openGraph: {
@@ -132,19 +132,15 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <Analytics />
+        <Analytics settings={settings} />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider settings={settings}>
-            <div className="flex flex-col min-h-screen">
-                <Header settings={settings}/>
-                <main className="flex-1">
-                    {children}
-                </main>
-                <Footer settings={settings}/>
-            </div>
-            <Toaster />
-        </ThemeProvider>
+        <Header settings={settings} />
+        <main className="flex-1">
+            {children}
+        </main>
+        <Footer settings={settings}/>
+        <Toaster />
       </body>
     </html>
   );

@@ -1,4 +1,3 @@
-
 import HeroSection from '@/components/sections/hero';
 import ServicesSection from '@/components/sections/services';
 import AiProjectSection from '@/components/sections/ai-project';
@@ -13,12 +12,11 @@ export default async function Home() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection settings={settings} />
       <ServicesSection settings={settings} />
-      <AiProjectSection />
+      <AiProjectSection settings={settings} />
       <CasesSection
-        cases={settings?.cases}
-        sectionData={settings}
+        settings={settings}
       />
       <AboutSection settings={settings} />
       <ContactSection settings={settings} />
