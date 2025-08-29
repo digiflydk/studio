@@ -96,7 +96,7 @@ const defaultTeam: TeamMember[] = [
 
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
-const defaultPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
+const defaultPadding: SectionPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
 
 const themeColorOptions = [
     { value: 'text-primary', label: 'Primary' },
