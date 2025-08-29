@@ -3,6 +3,8 @@ import { useTheme } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -17,31 +19,99 @@ function hslToHex(h: number, s: number, l: number) {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return null;
+
+  let r = parseInt(result[1], 16) / 255;
+  let g = parseInt(result[2], 16) / 255;
+  let b = parseInt(result[3], 16) / 255;
+
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+
 function ColorPicker({ label, colorName }: { label: string; colorName: keyof ReturnType<typeof useTheme>['theme']['colors'] }) {
   const { theme, setThemeColor } = useTheme();
   const color = theme.colors[colorName];
-  const hexColor = hslToHex(color.h, color.s, color.l);
+  const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
+
+  useEffect(() => {
+    setHexInputValue(hslToHex(color.h, color.s, color.l));
+  }, [color]);
 
   const handleColorChange = (part: 'h' | 's' | 'l', value: number) => {
     setThemeColor(colorName, { ...color, [part]: value });
   };
+  
+  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHexInputValue(e.target.value);
+  }
+
+  const handleHexBlur = () => {
+    const newHsl = hexToHsl(hexInputValue);
+    if(newHsl) {
+        setThemeColor(colorName, newHsl);
+    } else {
+        // If invalid hex, reset input to current valid color
+        setHexInputValue(hslToHex(color.h, color.s, color.l));
+    }
+  }
+  
+  const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+        handleHexBlur();
+        (e.target as HTMLInputElement).blur();
+    }
+  }
+
 
   return (
     <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
        <div className="flex justify-between items-center">
         <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
-        <span className="font-mono text-sm" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{hexColor}</span>
+        <div className="flex items-center gap-2">
+            <span className="font-mono text-sm uppercase" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>HEX</span>
+            <Input 
+                value={hexInputValue}
+                onChange={handleHexChange}
+                onBlur={handleHexBlur}
+                onKeyDown={handleHexKeyPress}
+                className="w-24 font-mono"
+                style={{
+                    backgroundColor: 'hsla(0, 0%, 100%, 0.2)',
+                    color: color.l > 50 ? '#000' : '#FFF',
+                    borderColor: 'hsla(0, 0%, 100%, 0.3)'
+                }}
+            />
+        </div>
       </div>
       <div className="space-y-2">
-        <Label>Hue ({color.h})</Label>
+        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Hue ({color.h})</Label>
         <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} />
       </div>
       <div className="space-y-2">
-        <Label>Saturation ({color.s}%)</Label>
+        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Saturation ({color.s}%)</Label>
         <Slider value={[color.s]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} />
       </div>
       <div className="space-y-2">
-        <Label>Lightness ({color.l}%)</Label>
+        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Lightness ({color.l}%)</Label>
         <Slider value={[color.l]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} />
       </div>
     </div>
