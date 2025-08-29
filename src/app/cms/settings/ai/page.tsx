@@ -11,6 +11,9 @@ import { GeneralSettings } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, AlertTriangle, Lightbulb } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+
+const defaultGreeting = 'Hej! Jeg er din AI-assistent. Fortæl mig kort om din projektidé, så kan jeg vurdere, om vi er det rette match.';
 
 const defaultPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
 
@@ -57,17 +60,21 @@ export default function AiSettingsPage() {
       if (loadedSettings) {
         setSettings({
             aiSystemPrompt: loadedSettings.aiSystemPrompt ?? defaultPrompt,
+            aiGreetingMessage: loadedSettings.aiGreetingMessage ?? defaultGreeting,
         });
       } else {
-        setSettings({ aiSystemPrompt: defaultPrompt });
+        setSettings({ 
+            aiSystemPrompt: defaultPrompt,
+            aiGreetingMessage: defaultGreeting 
+        });
       }
       setIsLoading(false);
     }
     loadSettings();
   }, []);
 
-  const handleInputChange = (value: string) => {
-    setSettings((prev) => ({ ...prev, aiSystemPrompt: value }));
+  const handleInputChange = (field: keyof GeneralSettings, value: string) => {
+    setSettings((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSaveChanges = () => {
@@ -104,26 +111,37 @@ export default function AiSettingsPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>AI System Prompt</CardTitle>
+          <CardTitle>AI Assistent</CardTitle>
           <CardDescription>
-            Dette er den centrale instruktion, der definerer AI-assistentens mål, tone og regler. Juster den for at ændre, hvordan den interagerer med brugerne.
+            Styr den indledende besked og de overordnede instruktioner for AI-assistenten.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="ai-greeting">AI Startbesked</Label>
+            <Input
+              id="ai-greeting"
+              value={settings.aiGreetingMessage || ''}
+              onChange={(e) => handleInputChange('aiGreetingMessage', e.target.value)}
+              placeholder="Indtast den første besked AI'en skal sende."
+            />
+            <p className="text-sm text-muted-foreground">Dette er den allerførste besked, brugeren ser i chat-vinduet.</p>
+          </div>
+          <hr />
           <div className="space-y-2">
             <Label htmlFor="ai-prompt">System Prompt</Label>
             <Textarea
               id="ai-prompt"
               value={settings.aiSystemPrompt || ''}
-              onChange={(e) => handleInputChange(e.target.value)}
+              onChange={(e) => handleInputChange('aiSystemPrompt', e.target.value)}
               className="min-h-[400px] font-mono text-xs"
             />
           </div>
            <Alert>
               <Lightbulb className="h-4 w-4" />
-              <AlertTitle>Hvordan virker det?</AlertTitle>
+              <AlertTitle>Hvordan virker System Prompten?</AlertTitle>
               <AlertDescription>
-                Hver gang en bruger sender en besked, sender vi hele samtalen sammen med denne prompt til AI'en. Prompten er en instruktion, der tvinger AI'en til at følge dine regler, spørge om de rigtige ting og svare på den måde, du ønsker. Vær specifik for at få de bedste resultater.
+                Dette er den centrale instruktion, der definerer AI-assistentens mål, tone og regler. Hver gang en bruger sender en besked, sendes hele samtalen sammen med denne prompt til AI'en. Vær specifik for at få de bedste resultater.
               </AlertDescription>
             </Alert>
         </CardContent>

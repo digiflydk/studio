@@ -87,6 +87,7 @@ export interface GeneralSettings {
     googleAdsId?: string;
 
     // AI Settings
+    aiGreetingMessage?: string;
     aiSystemPrompt?: string;
 
     // Design Settings
