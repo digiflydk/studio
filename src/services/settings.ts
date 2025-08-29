@@ -1,7 +1,8 @@
 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
+const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
 export interface GeneralSettings {
@@ -23,7 +24,8 @@ export interface GeneralSettings {
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
     try {
-        const docRef = doc(db, 'settings', SETTINGS_DOC_ID);
+        const settingsCollection = collection(db, SETTINGS_COLLECTION_ID);
+        const docRef = doc(settingsCollection, SETTINGS_DOC_ID);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -40,7 +42,8 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
 
 export async function saveGeneralSettings(settings: GeneralSettings): Promise<void> {
     try {
-        const docRef = doc(db, 'settings', SETTINGS_DOC_ID);
+        const settingsCollection = collection(db, SETTINGS_COLLECTION_ID);
+        const docRef = doc(settingsCollection, SETTINGS_DOC_ID);
         await setDoc(docRef, settings, { merge: true });
     } catch (error) {
         console.error("Error writing document:", error);
