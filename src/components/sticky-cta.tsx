@@ -2,7 +2,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function StickyCta() {
@@ -19,6 +18,13 @@ export default function StickyCta() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+  
+  const handleClick = () => {
+    const section = document.getElementById('ai-project');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   if (!isClient || !isMobile) {
     return null;
@@ -26,8 +32,13 @@ export default function StickyCta() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
-      <Button asChild className="w-full shadow-lg" size="lg" data-cta="tell_us_about_project_sticky">
-        <Link href="#ai-project">Fortæl os om dit projekt</Link>
+      <Button 
+        className="w-full shadow-lg" 
+        size="lg" 
+        data-cta="tell_us_about_project_sticky"
+        onClick={handleClick}
+      >
+        Fortæl os om dit projekt
       </Button>
     </div>
   );
