@@ -73,25 +73,6 @@ export default async function RootLayout({
             });
           `}
         </Script>
-        <Script id="debug-scroll-trace" strategy="beforeInteractive">
-            {`(function(){
-              function logTrace(label){
-                try { console.log(label, new Error().stack); } catch(_) {}
-              }
-              var _siv = Element.prototype.scrollIntoView;
-              Element.prototype.scrollIntoView = function(){
-                console.log('[SCROLL DEBUG] scrollIntoView on', this, arguments);
-                logTrace('Trace scrollIntoView');
-                return _siv.apply(this, arguments);
-              };
-              var _sto = window.scrollTo;
-              window.scrollTo = function(){
-                console.log('[SCROLL DEBUG] window.scrollTo', arguments);
-                logTrace('Trace scrollTo');
-                return _sto.apply(window, arguments);
-              };
-            })();`}
-        </Script>
         <Script id="autoscroll-killer" strategy="beforeInteractive">
 {`(function(){
   try {

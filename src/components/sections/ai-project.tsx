@@ -41,7 +41,7 @@ export default function AiProjectSection() {
   }, []);
   
   useEffect(() => {
-    if (messages.length > 1) {
+    if (messages.length > 2) {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
@@ -112,7 +112,7 @@ export default function AiProjectSection() {
         className="relative w-full bg-gray-900 text-white py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
         style={style}>
       <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 opacity-20"></div>
-      <div className="absolute inset-0 bg-[url(/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+      <div className="absolute inset-0 bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-4 text-center md:text-left">
