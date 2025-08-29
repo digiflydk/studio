@@ -204,83 +204,96 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
 }
 
 function SpacingEditor({
-    label,
-    padding,
-    onPaddingChange,
-    previewMode,
+  label,
+  padding,
+  onPaddingChange,
+  previewMode,
 }: {
-    label: string;
-    padding: SectionPadding;
-    onPaddingChange: (padding: SectionPadding) => void;
-    previewMode: 'desktop' | 'mobile';
+  label: string;
+  padding: SectionPadding;
+  onPaddingChange: (padding: SectionPadding) => void;
+  previewMode: 'desktop' | 'mobile';
 }) {
-    return (
-        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
-            <h3 className="font-semibold">{label}</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                {previewMode === 'desktop' ? (
-                <>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i toppen</Label>
-                            <span className="text-sm text-muted-foreground">{padding.top}px</span>
-                        </div>
-                        <Slider 
-                            value={[padding.top]} 
-                            onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
-                            min={0}
-                            max={200}
-                            step={4}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i bunden</Label>
-                            <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
-                        </div>
-                        <Slider 
-                            value={[padding.bottom]} 
-                            onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
-                            min={0}
-                            max={200}
-                            step={4}
-                        />
-                    </div>
-                </>
-                ) : (
-                <>
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i toppen</Label>
-                            <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
-                        </div>
-                        <Slider 
-                            value={[padding.topMobile]} 
-                            onValueChange={([v]) => onPaddingChange({ ...padding, topMobile: v })}
-                            min={0}
-                            max={150}
-                            step={4}
-                        />
-                    </div>
-                     <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i bunden</Label>
-                            <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
-                        </div>
-                        <Slider 
-                            value={[padding.bottomMobile]} 
-                            onValueChange={([v]) => onPaddingChange({ ...padding, bottomMobile: v })}
-                            min={0}
-                            max={150}
-                            step={4}
-                        />
-                    </div>
-                </>
-                )}
-             </div>
-        </div>
-    );
+  const handleValueChange = (part: keyof SectionPadding, value: number) => {
+    onPaddingChange({ ...padding, [part]: value });
+  };
+
+  return (
+    <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+      <h3 className="font-semibold">{label}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        {previewMode === 'desktop' ? (
+          <>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4" /> Afstand i toppen
+                </Label>
+                <span className="text-sm text-muted-foreground">{padding.top}px</span>
+              </div>
+              <Slider
+                value={[padding.top]}
+                onValueChange={([v]) => handleValueChange('top', v)}
+                min={0}
+                max={200}
+                step={4}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4" /> Afstand i bunden
+                </Label>
+                <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+              </div>
+              <Slider
+                value={[padding.bottom]}
+                onValueChange={([v]) => handleValueChange('bottom', v)}
+                min={0}
+                max={200}
+                step={4}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4" /> Afstand i toppen
+                </Label>
+                <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
+              </div>
+              <Slider
+                value={[padding.topMobile]}
+                onValueChange={([v]) => handleValueChange('topMobile', v)}
+                min={0}
+                max={150}
+                step={4}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4" /> Afstand i bunden
+                </Label>
+                <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
+              </div>
+              <Slider
+                value={[padding.bottomMobile]}
+                onValueChange={([v]) => handleValueChange('bottomMobile', v)}
+                min={0}
+                max={150}
+                step={4}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
+
 
 export default function CmsHomePage() {
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
@@ -296,8 +309,10 @@ export default function CmsHomePage() {
       const initialSettings = loadedSettings || {};
 
       const ensurePadding = (padding: Partial<SectionPadding> | undefined): SectionPadding => ({
-        ...defaultPadding,
-        ...padding,
+        top: padding?.top ?? defaultPadding.top,
+        bottom: padding?.bottom ?? defaultPadding.bottom,
+        topMobile: padding?.topMobile ?? defaultPadding.topMobile,
+        bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
       });
 
       setSettings({
@@ -703,5 +718,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
-    
