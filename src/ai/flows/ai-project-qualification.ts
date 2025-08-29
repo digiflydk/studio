@@ -14,9 +14,9 @@ import {z} from 'genkit';
 import { saveLead } from '@/services/leads';
 
 const CollectedInfoSchema = z.object({
-  name: z.string().optional().describe("The user's full name."),
-  email: z.string().optional().describe("The user's email address."),
-  phone: z.string().optional().describe("The user's phone number."),
+  name: z.string().nullable().describe("The user's full name."),
+  email: z.string().nullable().describe("The user's email address."),
+  phone: z.string().nullable().describe("The user's phone number."),
 });
 
 const AIProjectQualificationInputSchema = z.object({
