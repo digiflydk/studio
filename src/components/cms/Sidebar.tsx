@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -15,7 +16,7 @@ const mainNavLinks = [
 
 const settingsNavLinks = [
     { href: "/cms/settings/general", label: "General", icon: Settings },
-    { href: "#", label: "SEO", icon: Search },
+    { href: "/cms/settings/seo", label: "SEO", icon: Search },
     { href: "#", label: "Social Share", icon: Share2 },
     { href: "#", label: "Tracking", icon: MousePointerClick },
     { href: "#", label: "Cookies", icon: Cookie },

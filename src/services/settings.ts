@@ -20,6 +20,7 @@ export interface GeneralSettings {
     cvr?: string;
     country?: string;
     openingHours?: Record<string, { from: string; to: string; isOpen: boolean }>;
+    allowSearchEngineIndexing?: boolean;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {

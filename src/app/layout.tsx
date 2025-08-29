@@ -1,20 +1,40 @@
-import type { Metadata } from 'next';
+
+import type { Metadata, ResolvingMetadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { getGeneralSettings } from '@/services/settings';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(
+  {},
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   const settings = await getGeneralSettings();
+  const previousImages = (await parent).openGraph?.images || [];
 
   const icons = settings?.faviconUrl ? [{ rel: 'icon', url: settings.faviconUrl }] : [];
 
-  return {
+  const metadata: Metadata = {
     title: settings?.websiteTitle || 'Digifly',
     description: 'Flow. Automatisér. Skalér. Vi hjælper virksomheder med at bygge skalerbare digitale løsninger.',
     icons,
+    openGraph: {
+      images: [...previousImages],
+    },
+    robots: {},
   };
+
+  if (settings?.allowSearchEngineIndexing === false) {
+    metadata.robots!.index = false;
+    metadata.robots!.follow = false;
+  } else {
+    metadata.robots!.index = true;
+    metadata.robots!.follow = true;
+  }
+
+  return metadata;
 }
+
 
 export default function RootLayout({
   children,
