@@ -218,41 +218,83 @@ function NavLinkStyleEditor({
     );
 }
 
-function EditableListItem({ index, item, updateItem, removeItem, fields, titleField }: { 
-    index: number, 
-    item: any, 
-    updateItem: (index: number, data: any) => void, 
-    removeItem: (index: number) => void,
-    fields: {key: string, label: string, type?: 'textarea'}[],
-    titleField: string
-}) {
-    const handleFieldChange = (field: string, value: string) => {
-        updateItem(index, { ...item, [field]: value });
+const sectionLinks = [
+    { value: '#hero', label: 'Hero Sektion' },
+    { value: '#services', label: 'Services' },
+    { value: '#ai-project', label: 'AI Projekt' },
+    { value: '#cases', label: 'Cases' },
+    { value: '#om-os', label: 'Om Os' },
+    { value: '#kontakt', label: 'Kontakt' },
+    { value: 'custom', label: 'Brugerdefineret link' },
+]
+
+function NavLinkEditor({ item, updateItem }: { item: NavLink, updateItem: (data: NavLink) => void }) {
+    const isCustomLink = !sectionLinks.some(l => l.value === item.href);
+    const selectValue = isCustomLink ? 'custom' : item.href;
+
+    const handleSelectChange = (value: string) => {
+        if (value === 'custom') {
+            updateItem({ ...item, href: '' });
+        } else {
+            updateItem({ ...item, href: value });
+        }
     };
     
     return (
+        <div className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor={`label-${item.label}`}>Tekst</Label>
+                <Input
+                    id={`label-${item.label}`}
+                    value={item.label}
+                    onChange={e => updateItem({ ...item, label: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`href-select-${item.label}`}>Link til</Label>
+                <Select value={selectValue} onValueChange={handleSelectChange}>
+                    <SelectTrigger id={`href-select-${item.label}`}><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                        {sectionLinks.map(link => (
+                            <SelectItem key={link.value} value={link.value}>{link.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            {selectValue === 'custom' && (
+                <div className="space-y-2">
+                    <Label htmlFor={`href-input-${item.label}`}>Brugerdefineret Link</Label>
+                     <Input
+                        id={`href-input-${item.label}`}
+                        value={item.href}
+                        placeholder="f.eks. https://eksempel.dk"
+                        onChange={e => updateItem({ ...item, href: e.target.value })}
+                    />
+                </div>
+            )}
+        </div>
+    );
+}
+
+
+function EditableNavLinkItem({ index, item, updateItem, removeItem }: { 
+    index: number, 
+    item: NavLink, 
+    updateItem: (index: number, data: NavLink) => void, 
+    removeItem: (index: number) => void
+}) {
+    return (
         <AccordionItem value={`item-${index}`}>
-            <div className="flex justify-between w-full items-center pl-4">
-                <AccordionTrigger className="flex-1 pr-4">
-                    <span>{item[titleField] || `Element ${index + 1}`}</span>
+            <div className="flex justify-between w-full items-center">
+                <AccordionTrigger className="flex-1 pr-4 text-left">
+                    <span>{item.label || `Nyt Link`}</span>
                 </AccordionTrigger>
                 <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
             </div>
             <AccordionContent className="p-4 border-t">
-                <div className="space-y-4">
-                    {fields.map(field => (
-                        <div key={field.key} className="space-y-2">
-                            <Label htmlFor={`item-${index}-${field.key}`}>{field.label}</Label>
-                            <Input
-                                id={`item-${index}-${field.key}`}
-                                value={item[field.key] || ''}
-                                onChange={e => handleFieldChange(field.key, e.target.value)}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <NavLinkEditor item={item} updateItem={(data) => updateItem(index, data)} />
             </AccordionContent>
         </AccordionItem>
     );
@@ -421,18 +463,13 @@ export default function CmsHeaderPage() {
                     <Label>Navigationslinks</Label>
                     <Accordion type="multiple" className="w-full border rounded-md">
                         {(settings.headerNavLinks || []).map((link, index) => (
-                            <EditableListItem 
+                           <EditableNavLinkItem
                                 key={index}
                                 index={index}
                                 item={link}
                                 updateItem={(i, data) => handleListUpdate('headerNavLinks', i, data)}
                                 removeItem={(i) => handleListRemove('headerNavLinks', i)}
-                                fields={[
-                                    {key: 'label', label: 'Tekst'},
-                                    {key: 'href', label: 'Link (f.eks. #services eller https://eksempel.dk)'},
-                                ]}
-                                titleField="label"
-                            />
+                           />
                         ))}
                     </Accordion>
                     <Button variant="outline" onClick={() => handleListAdd('headerNavLinks', { label: 'Nyt Link', href: '#' })}>Tilføj Link</Button>
