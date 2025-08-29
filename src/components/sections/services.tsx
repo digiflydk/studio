@@ -34,7 +34,7 @@ export default function ServicesSection() {
     <section id="services" className="bg-secondary">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">Vores Services</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Vores Services</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
             Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.
           </p>

@@ -52,7 +52,7 @@ export default function ContactSection() {
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">Kom i kontakt</CardTitle>
+            <CardTitle className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Kom i kontakt</CardTitle>
             <CardDescription className="mt-4 text-lg text-muted-foreground">
               Har du et projekt, eller vil du bare sige hej? Udfyld formularen, så vender vi tilbage.
             </CardDescription>

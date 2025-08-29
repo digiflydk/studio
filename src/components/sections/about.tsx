@@ -38,7 +38,7 @@ export default function AboutSection() {
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
           <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">Hvem er Digifly?</h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Hvem er Digifly?</h2>
             <p className="mt-6 text-lg text-muted-foreground">
               Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.
             </p>
