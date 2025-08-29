@@ -6,11 +6,60 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { GeneralSettings } from "@/services/settings";
 import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 import { Loader2, AlertTriangle, Lightbulb } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+function TrackingIntegration({
+  title,
+  description,
+  idField,
+  enableField,
+  placeholder,
+  settings,
+  handleInputChange,
+  handleToggle,
+}: {
+  title: string;
+  description: string;
+  idField: keyof GeneralSettings;
+  enableField: keyof GeneralSettings;
+  placeholder: string;
+  settings: Partial<GeneralSettings>;
+  handleInputChange: (field: keyof GeneralSettings, value: string) => void;
+  handleToggle: (field: keyof GeneralSettings, value: boolean) => void;
+}) {
+  const isEnabled = !!settings[enableField];
+
+  return (
+    <div className="space-y-4 rounded-lg border p-4">
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <h4 className="text-base font-semibold">{title}</h4>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <Switch
+          checked={isEnabled}
+          onCheckedChange={(value) => handleToggle(enableField, value)}
+        />
+      </div>
+      {isEnabled && (
+        <div className="space-y-2">
+          <Label htmlFor={idField}>{title} ID</Label>
+          <Input
+            id={idField}
+            placeholder={placeholder}
+            value={(settings[idField] as string) || ""}
+            onChange={(e) => handleInputChange(idField, e.target.value)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TrackingSettingsPage() {
     const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
@@ -33,6 +82,10 @@ export default function TrackingSettingsPage() {
     const handleInputChange = (field: keyof GeneralSettings, value: string) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
+    
+    const handleToggle = (field: keyof GeneralSettings, value: boolean) => {
+        setSettings(prev => ({...prev, [field]: value}));
+    }
 
     const handleSaveChanges = () => {
         startSaving(async () => {
@@ -55,62 +108,72 @@ export default function TrackingSettingsPage() {
 
   return (
     <div className="space-y-8 max-w-4xl">
-       <div className="flex justify-end">
+       <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Tracking & Analytics</h1>
             <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Gem Ændringer
             </Button>
        </div>
+       <p className="text-muted-foreground">Administrer dine sporings-ID'er og aktiver/deaktiver integrationer.</p>
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Tracking & Analytics</CardTitle>
-          <CardDescription>Indtast dine sporings-ID'er for at aktivere analytics på din hjemmeside.</CardDescription>
+          <CardTitle>Sporings-integrationer</CardTitle>
+          <CardDescription>Indtast dine sporings-ID'er og aktiver de tjenester, du vil bruge.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="gtm-id">Google Tag Manager ID</Label>
-                <Input 
-                    id="gtm-id" 
-                    placeholder="GTM-XXXXXXX"
-                    value={settings.gtmId || ''}
-                    onChange={(e) => handleInputChange('gtmId', e.target.value)}
-                />
-            </div>
             <Alert>
               <Lightbulb className="h-4 w-4" />
               <AlertTitle>Anbefaling</AlertTitle>
               <AlertDescription>
-                Vi anbefaler at bruge Google Tag Manager til at administrere alle dine tracking-scripts (inkl. GA4, Facebook Pixel osv.) for at opnå den bedste ydeevne og fleksibilitet.
+                Vi anbefaler at bruge Google Tag Manager til at administrere alle dine tracking-scripts for at opnå den bedste ydeevne og fleksibilitet.
               </AlertDescription>
             </Alert>
-            <div className="space-y-2">
-                <Label htmlFor="ga-id">Google Analytics ID</Label>
-                <Input 
-                    id="ga-id" 
-                    placeholder="G-XXXXXXXXXX"
-                    value={settings.googleAnalyticsId || ''}
-                    onChange={(e) => handleInputChange('googleAnalyticsId', e.target.value)}
-                />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="pixel-id">Facebook Pixel ID</Label>
-                <Input 
-                    id="pixel-id" 
-                    placeholder="Indtast dit Facebook Pixel ID"
-                    value={settings.facebookPixelId || ''}
-                    onChange={(e) => handleInputChange('facebookPixelId', e.target.value)}
-                />
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="google-ads-id">Google Ads Tag ID</Label>
-                <Input 
-                    id="google-ads-id" 
-                    placeholder="AW-XXXXXXXXX"
-                    value={settings.googleAdsId || ''}
-                    onChange={(e) => handleInputChange('googleAdsId', e.target.value)}
-                />
-            </div>
+            
+            <TrackingIntegration
+              title="Google Tag Manager"
+              description="Administrer alle dine tracking tags fra ét sted."
+              idField="gtmId"
+              enableField="enableGtm"
+              placeholder="GTM-XXXXXXX"
+              settings={settings}
+              handleInputChange={handleInputChange}
+              handleToggle={handleToggle}
+            />
+
+            <TrackingIntegration
+              title="Google Analytics"
+              description="Få indsigt i din webstedstrafik."
+              idField="googleAnalyticsId"
+              enableField="enableGoogleAnalytics"
+              placeholder="G-XXXXXXXXXX"
+              settings={settings}
+              handleInputChange={handleInputChange}
+              handleToggle={handleToggle}
+            />
+            
+            <TrackingIntegration
+              title="Meta Pixel (Facebook)"
+              description="Mål, optimer og opbyg målgrupper for dine annoncekampagner."
+              idField="facebookPixelId"
+              enableField="enableFacebookPixel"
+              placeholder="Indtast dit Facebook Pixel ID"
+              settings={settings}
+              handleInputChange={handleInputChange}
+              handleToggle={handleToggle}
+            />
+
+             <TrackingIntegration
+              title="Google Ads"
+              description="Mål konverteringer fra dine Google Ads-kampagner."
+              idField="googleAdsId"
+              enableField="enableGoogleAds"
+              placeholder="AW-XXXXXXXXX"
+              settings={settings}
+              handleInputChange={handleInputChange}
+              handleToggle={handleToggle}
+            />
 
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />

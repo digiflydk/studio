@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -126,14 +127,14 @@ export default function AiProjectSection() {
               {isQualified && (
                 <div className="text-center p-4 border-t">
                   <h3 className="text-xl font-semibold mb-4">Klar til næste skridt?</h3>
-                  <Button asChild size="lg">
+                  <Button asChild size="lg" data-cta="book_meeting_qualified">
                     <Link href="#kontakt">Book Møde Med En Konsulent</Link>
                   </Button>
                 </div>
               )}
 
               {!isComplete && (
-                <form onSubmit={handleSendMessage} className="relative">
+                <form onSubmit={handleSendMessage} className="relative" data-form="project_qualifier">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

@@ -29,9 +29,15 @@ export interface GeneralSettings {
     instagramUrl?: string;
     twitterUrl?: string;
     tiktokUrl?: string;
+    
+    // Tracking settings
+    enableGtm?: boolean;
     gtmId?: string;
+    enableGoogleAnalytics?: boolean;
     googleAnalyticsId?: string;
+    enableFacebookPixel?: boolean;
     facebookPixelId?: string;
+    enableGoogleAds?: boolean;
     googleAdsId?: string;
 }
 

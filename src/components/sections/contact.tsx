@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useActionState, useEffect } from 'react';
@@ -21,7 +22,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
+    <Button type="submit" className="w-full" disabled={pending} data-cta="send_contact_message">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
       Send Besked
     </Button>
@@ -58,7 +59,7 @@ export default function ContactSection() {
               Har du et projekt, eller vil du bare sige hej? Udfyld formularen, så vender vi tilbage.
             </CardDescription>
           </CardHeader>
-          <form action={formAction}>
+          <form action={formAction} data-form="contact">
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Navn</Label>

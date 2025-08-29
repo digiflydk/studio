@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
 import { Suspense } from 'react';
+import Script from 'next/script';
 
 export async function generateMetadata(
   {},
@@ -57,6 +58,20 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <Script id="datalayer-init" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            
+            // Default consent mode
+            gtag('consent', 'default', {
+              'ad_storage': 'denied',
+              'analytics_storage': 'denied',
+              'ad_user_data': 'denied',
+              'ad_personalization': 'denied'
+            });
+          `}
+        </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
