@@ -16,7 +16,7 @@ const socialIcons = {
 export default async function Footer() {
   const settings = await getGeneralSettings();
 
-  const fullAddress = [settings?.streetAddress, settings?.postalCode, settings?.city].filter(Boolean).join(', ');
+  const addressLine2 = [settings?.postalCode, settings?.city].filter(Boolean).join(' ');
   const fullPhoneNumber = settings?.countryCode && settings.phoneNumber ? `${settings.countryCode} ${settings.phoneNumber}` : settings?.phoneNumber;
   
   const socialLinks = Object.entries(socialIcons)
@@ -67,21 +67,28 @@ export default async function Footer() {
           <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
              <div className="space-y-1">
                 {settings?.companyName && <p className={cn("font-semibold", settings.footerCompanyNameColor)} style={companyNameStyle}>{settings.companyName}</p>}
-                {fullAddress && <p className={cn(settings.footerAddressColor)} style={addressStyle}>{fullAddress}</p>}
+                <div className={cn(settings.footerAddressColor)} style={addressStyle}>
+                  {settings?.streetAddress && <p>{settings.streetAddress}</p>}
+                  {addressLine2 && <p>{addressLine2}</p>}
+                </div>
              </div>
-            <div className={cn("flex items-center gap-4", settings.footerContactColor)} style={contactStyle}>
-              {settings?.cvr && <span>CVR: {settings.cvr}</span>}
-              {settings?.businessEmail && (
-                 <Link href={`mailto:${settings.businessEmail}`} className="hover:text-primary transition-colors">{settings.businessEmail}</Link>
-              )}
-               {fullPhoneNumber && (
-                  <Link href={`tel:${fullPhoneNumber.replace(/\s/g, '')}`} className="hover:text-primary transition-colors">
-                    Tlf: {fullPhoneNumber}
-                  </Link>
+            <div className="flex flex-col items-center gap-2 md:items-end">
+                <div className={cn("flex items-center gap-4 flex-wrap justify-center", settings.footerContactColor)} style={contactStyle}>
+                {settings?.businessEmail && (
+                    <Link href={`mailto:${settings.businessEmail}`} className="hover:text-primary transition-colors">{settings.businessEmail}</Link>
                 )}
+                {fullPhoneNumber && (
+                    <Link href={`tel:${fullPhoneNumber.replace(/\s/g, '')}`} className="hover:text-primary transition-colors">
+                        Tlf: {fullPhoneNumber}
+                    </Link>
+                    )}
+                </div>
+                 <div className={cn(settings.footerContactColor)} style={contactStyle}>
+                     {settings?.cvr && <span>CVR: {settings.cvr}</span>}
+                 </div>
             </div>
              {socialLinks.length > 0 && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 mt-2">
                 {socialLinks.map(({ url, icon: Icon, label }) => (
                   <Link key={label} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}>
                     <Icon className={cn("h-6 w-6 hover:text-primary transition-colors", mutedTextColorClass)} />
@@ -89,7 +96,7 @@ export default async function Footer() {
                 ))}
               </div>
             )}
-            <p className={cn("text-xs", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
+            <p className={cn("text-xs mt-4", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
           </div>
         </div>
       </div>
