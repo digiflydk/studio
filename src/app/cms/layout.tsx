@@ -7,7 +7,7 @@ export default function CmsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-muted/40">
+    <div className="flex min-h-screen bg-white">
       <Sidebar />
       <div className="flex flex-col flex-1">
         <CmsHeader />
