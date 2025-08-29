@@ -23,7 +23,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
   const [isComplete, setIsComplete] = useState(false);
-  const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo']>(null);
+  const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo'] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
             <Card className="shadow-lg bg-gray-900/60 backdrop-blur-sm border-primary/20">
                 <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
-                    <div className="h-80 overflow-y-auto space-y-6">
+                    <div className="max-h-80 overflow-y-auto space-y-6">
                         {messages.map((message, index) => (
                         <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
