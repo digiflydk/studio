@@ -86,6 +86,7 @@ export default function CasesSection({ cases: propCases, sectionData }: CasesSec
                     alt={caseStudy.title}
                     data-ai-hint={caseStudy.aiHint}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover rounded-t-lg"
                   />
                 </div>
