@@ -12,7 +12,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { getGeneralSettings } from '@/services/settings';
 import type { GeneralSettings } from '@/services/settings';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -27,7 +26,6 @@ export default function AiProjectSection() {
   const [isComplete, setIsComplete] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function loadSettings() {
@@ -94,15 +92,19 @@ export default function AiProjectSection() {
     }
   };
 
-  const sectionStyle: React.CSSProperties = {};
-  if (settings?.sectionPadding?.aiProject) {
-      const padding = settings.sectionPadding.aiProject;
-      sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-      sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-  }
+  const sectionPadding = settings?.sectionPadding?.aiProject;
+  const style: React.CSSProperties = sectionPadding ? {
+    '--padding-top': `${sectionPadding.top}px`,
+    '--padding-bottom': `${sectionPadding.bottom}px`,
+    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
+    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
+  } as any : {};
 
   return (
-    <section id="ai-project" className="relative w-full bg-gray-900 text-white" style={sectionStyle}>
+    <section 
+        id="ai-project" 
+        className="relative w-full bg-gray-900 text-white py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        style={style}>
       <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 opacity-20"></div>
       <div className="absolute inset-0 bg-[url(/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto max-w-7xl px-4 md:px-6 relative z-10">

@@ -5,9 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type TeamMember, type GeneralSettings } from '@/services/settings';
+import { type TeamMember, type GeneralSettings, type SectionPadding } from '@/services/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 
 const defaultTeam: TeamMember[] = [
@@ -44,8 +43,6 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ settings }: AboutSectionProps) {
-    const isMobile = useIsMobile();
-
     const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
     const aboutText = settings?.aboutText || defaultAboutText;
     const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
@@ -57,15 +54,20 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
     };
     
-    const sectionStyle: React.CSSProperties = {};
-    if (settings?.sectionPadding?.about) {
-        const padding = settings.sectionPadding.about;
-        sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-        sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-    }
+    const sectionPadding = settings?.sectionPadding?.about;
+    const style: React.CSSProperties = sectionPadding ? {
+        '--padding-top': `${sectionPadding.top}px`,
+        '--padding-bottom': `${sectionPadding.bottom}px`,
+        '--padding-top-mobile': `${sectionPadding.topMobile}px`,
+        '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
+    } as any : {};
 
     return (
-        <section id="om-os" className="bg-secondary" style={sectionStyle}>
+        <section 
+            id="om-os" 
+            className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]"
+            style={style}
+        >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
                     <div className="text-center lg:text-left">

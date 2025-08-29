@@ -5,7 +5,6 @@ import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 import type { Case, GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const defaultCases: Case[] = [
   {
@@ -32,42 +31,46 @@ const defaultCases: Case[] = [
 ];
 
 interface CasesSectionProps {
-    settings: GeneralSettings | null;
+    cases: Case[] | undefined;
+    sectionData: Partial<Pick<GeneralSettings, 'casesSectionTitle' | 'casesSectionDescription' | 'casesSectionTitleColor' | 'casesSectionTitleSize' | 'casesSectionDescriptionColor' | 'casesSectionDescriptionSize' | 'sectionPadding'>> | null
 }
 
-export default function CasesSection({ settings }: CasesSectionProps) {
-  const isMobile = useIsMobile();
-  
-  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
-  const title = settings?.casesSectionTitle || "Vores Arbejde";
-  const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
+export default function CasesSection({ cases: propCases, sectionData }: CasesSectionProps) {
+  const cases = propCases && propCases.length > 0 ? propCases : defaultCases;
+  const title = sectionData?.casesSectionTitle || "Vores Arbejde";
+  const description = sectionData?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
 
   const titleStyle: React.CSSProperties = {
-    fontSize: settings?.casesSectionTitleSize ? `${settings.casesSectionTitleSize}px` : undefined,
+    fontSize: sectionData?.casesSectionTitleSize ? `${sectionData.casesSectionTitleSize}px` : undefined,
   };
   const descriptionStyle: React.CSSProperties = {
-    fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
+    fontSize: sectionData?.casesSectionDescriptionSize ? `${sectionData.casesSectionDescriptionSize}px` : undefined,
   };
   
-  const sectionStyle: React.CSSProperties = {};
-    if (settings?.sectionPadding?.cases) {
-        const padding = settings.sectionPadding.cases;
-        sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-        sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-    }
+  const sectionPadding = sectionData?.sectionPadding?.cases;
+  const style: React.CSSProperties = sectionPadding ? {
+    '--padding-top': `${sectionPadding.top}px`,
+    '--padding-bottom': `${sectionPadding.bottom}px`,
+    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
+    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
+  } as any : {};
 
   return (
-    <section id="cases" className="bg-background" style={sectionStyle}>
+    <section 
+        id="cases" 
+        className="bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        style={style}
+    >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
            <h2 
-            className={cn("text-h2 font-bold tracking-tight", settings?.casesSectionTitleColor || "text-black")}
+            className={cn("text-h2 font-bold tracking-tight", sectionData?.casesSectionTitleColor || "text-black")}
             style={titleStyle}
           >
             {title}
           </h2>
           <p 
-            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground")}
+            className={cn("mt-4 max-w-2xl mx-auto text-body", sectionData?.casesSectionDescriptionColor || "text-muted-foreground")}
             style={descriptionStyle}
           >
             {description}
@@ -88,7 +91,7 @@ export default function CasesSection({ settings }: CasesSectionProps) {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle>{caseStudy.title}</CardTitle>
+                <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
                 <CardDescription>{caseStudy.description}</CardDescription>
               </CardContent>
               <CardFooter>

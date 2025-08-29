@@ -13,7 +13,6 @@ import { sendContactMessage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { GeneralSettings } from '@/services/settings';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const initialState = {
   message: '',
@@ -38,7 +37,6 @@ interface ContactSectionProps {
 export default function ContactSection({ settings }: ContactSectionProps) {
   const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -56,15 +54,20 @@ export default function ContactSection({ settings }: ContactSectionProps) {
     }
   }, [state, toast]);
 
-  const sectionStyle: React.CSSProperties = {};
-  if (settings?.sectionPadding?.contact) {
-    const padding = settings.sectionPadding.contact;
-    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-  }
+  const sectionPadding = settings?.sectionPadding?.contact;
+  const style: React.CSSProperties = sectionPadding ? {
+    '--padding-top': `${sectionPadding.top}px`,
+    '--padding-bottom': `${sectionPadding.bottom}px`,
+    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
+    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
+  } as any : {};
 
   return (
-    <section id="kontakt" className="w-full bg-background" style={sectionStyle}>
+    <section 
+        id="kontakt" 
+        className="w-full bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        style={style}
+    >
       <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Service, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const defaultServices: Service[] = [
   {
@@ -38,8 +37,6 @@ interface ServicesSectionProps {
 }
 
 export default function ServicesSection({ settings }: ServicesSectionProps) {
-  const isMobile = useIsMobile();
-
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
@@ -51,15 +48,21 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
     fontSize: settings?.servicesSectionDescriptionSize ? `${settings.servicesSectionDescriptionSize}px` : undefined,
   };
 
-  const sectionStyle: React.CSSProperties = {};
-  if (settings?.sectionPadding?.services) {
-    const padding = settings.sectionPadding.services;
-    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-  }
+  const sectionPadding = settings?.sectionPadding?.services;
+  const style: React.CSSProperties = sectionPadding ? {
+    '--padding-top': `${sectionPadding.top}px`,
+    '--padding-bottom': `${sectionPadding.bottom}px`,
+    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
+    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
+  } as any : {};
+
 
   return (
-    <section id="services" className="bg-secondary" style={sectionStyle}>
+    <section 
+        id="services" 
+        className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        style={style}
+    >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
           <h2 
