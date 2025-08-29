@@ -3,6 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function StickyCta() {
   const [isClient, setIsClient] = useState(false);
@@ -31,7 +32,7 @@ export default function StickyCta() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] md:hidden">
       <Button 
         className="w-full shadow-lg" 
         size="lg" 
