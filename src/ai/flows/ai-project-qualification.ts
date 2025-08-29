@@ -45,49 +45,24 @@ const qualificationPrompt = ai.definePrompt({
     input: { schema: AIProjectQualificationInputSchema },
     output: { schema: AIProjectQualificationOutputSchema },
     model: 'googleai/gemini-2.5-flash',
-    prompt: `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
+    prompt: `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit mål er at kvalificere et projekt baseret på en kort beskrivelse.
 
-**Regler for samtale-flow:**
-1.  **Prioritet #1: Indsaml kontaktoplysninger.**
-    - Start med at spørge om brugerens fulde navn.
-    - Når du har navnet, spørg om deres e-mailadresse.
-    - Når du har e-mailen, spørg om deres telefonnummer.
-    - Spørg IKKE ind til projektdetaljer, før du har navn, e-mail og telefon.
+**Regler:**
+1.  **Analyser projektidéen:** Læs brugerens projektidé.
+2.  **Kvalificér:** Hvis projektet handler om software, AI, eller automatisering, er det et godt match.
+    - Sæt \`qualified\` til \`true\`.
+    - Sæt \`shouldBookMeeting\` til \`true\`.
+    - Sæt \`nextQuestion\` til: "Tak for informationen! Det lyder som et spændende projekt, vi kan hjælpe med. Book et uforpligtende møde med os nedenfor."
+3.  **Diskvalificér:** Hvis projektet handler om noget andet (f.eks. marketing, grafisk design, etc.), er det IKKE et match.
+    - Sæt \`qualified\` til \`false\`.
+    - Sæt \`shouldBookMeeting\` til \`false\`.
+    - Sæt \`nextQuestion\` til: "Tak for din henvendelse. Ud fra det oplyste ser det desværre ikke ud til, at vi er det rette match for opgaven. Held og lykke med projektet."
+4.  **Ignorer alt andet:** Du skal IKKE spørge om navn, e-mail, telefon, budget eller tidslinje. Du skal IKKE forsøge at indsamle oplysninger. Returner kun ét svar baseret på den oprindelige idé.
 
-2.  **Prioritet #2: Kvalificér projektet.**
-    - Først efter du har indsamlet alle kontaktoplysninger, fortsæt med at spørge om projektet.
-    - Du SKAL indsamle oplysninger om følgende nøgleområder:
-        - **Nøglefunktioner & Mål:** Hvad er de vigtigste funktioner? Hvad er det primære mål?
-        - **Budget:** Hvad er det omtrentlige budget? (f.eks. "< 50.000 kr.", "50.000-150.000 kr.", "> 150.000 kr.").
-        - **Tidslinje:** Hvad er den ønskede tidslinje?
-    - Stil ET spørgsmål ad gangen.
-
-**Beslutningslogik & Output-formatering:**
-- **Hvis du mangler NOGEN oplysninger (Navn, E-mail, Telefon, Funktioner, Budget, eller Tidslinje):**
-  - Sæt \`qualified\` til \`false\`.
-  - Formuler \`nextQuestion\` for at få den næste manglende oplysning.
-  - Udfyld \`collectedInfo\`-objektet med de oplysninger, du har indsamlet indtil videre.
-  - Sæt IKKE \`shouldBookMeeting\`.
-
-- **Når du har ALLE nødvendige oplysninger (Navn, E-mail, Telefon, Funktioner, Budget, Tidslinje):**
-  - Analyser projektet. Hvis det virker som et godt match (software, AI, automatisering med et rimeligt budget/tidslinje), sæt \`qualified\` til \`true\` og \`shouldBookMeeting\` til \`true\`.
-  - Hvis det er et klart mismatch (f.eks. marketing, grafisk design), sæt \`qualified\` til \`false\`.
-  - Udfyld \`collectedInfo\`-objektet med alle indsamlede oplysninger.
-  - Stil ikke flere spørgsmål.
-
-**Brugerens nuværende besked:**
+**Brugerens projektidé:**
 {{{projectIdea}}}
 
-**Samtalehistorik:**
-{{#each conversationHistory}}
-{{#if (eq role "user")}}
-Bruger: {{{content}}}
-{{else}}
-Assistent: {{{content}}}
-{{/if}}
-{{/each}}
-
-Følg skema-instruktionerne nøje for at formatere outputtet.
+**VIGTIGT:** Følg output-skemaet NØJE. Svar altid med et komplet objekt, der opfylder skemaet.
     `,
 });
 
@@ -106,25 +81,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
       throw new Error('No output from prompt');
     }
 
-    const isComplete = !output.nextQuestion;
-
-    if (isComplete && output.collectedInfo?.name && output.collectedInfo?.email && output.collectedInfo?.phone) {
-      const fullConversation = [
-        ...input.conversationHistory,
-        { role: 'user' as const, content: input.projectIdea },
-      ];
-      const projectDescription = fullConversation.map(m => `${m.role}: ${m.content}`).join('\n');
-      
-      await saveLead({
-        name: output.collectedInfo.name,
-        email: output.collectedInfo.email,
-        phone: output.collectedInfo.phone,
-        projectIdea: projectDescription,
-        status: output.qualified ? 'Qualified' : 'Not Qualified',
-        createdAt: new Date(),
-      });
-    }
-
     return output;
   }
 );
+
