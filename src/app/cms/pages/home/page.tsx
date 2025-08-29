@@ -151,20 +151,6 @@ function TextStyleEditor({
     );
 }
 
-function SectionCard({ title, description, children }: { title: string, description: string, children: React.ReactNode }) {
-    return (
-        <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                {children}
-            </CardContent>
-        </Card>
-    )
-}
-
 function EditableListItem({ index, item, updateItem, removeItem, fields, titleField }: { 
     index: number, 
     item: any, 
@@ -366,7 +352,7 @@ export default function CmsHomePage() {
     setSettings(prev => ({
         ...prev,
         sectionPadding: {
-            ...prev.sectionPadding,
+            ...prev!.sectionPadding,
             [section]: value,
         }
     }));
@@ -422,211 +408,274 @@ export default function CmsHomePage() {
         </Button>
       </div>
 
-      <SectionCard title="Hero Sektion" description="Indholdet i toppen af siden.">
-        <div className="space-y-2">
-            <Label htmlFor="hero-headline">Overskrift</Label>
-            <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Overskrift"
-            colorValue={settings.heroHeadlineColor as ThemeColor || 'text-white'}
-            onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
-            sizeValue={settings.heroHeadlineSize || 64}
-            onSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
-        />
-        <div className="space-y-2">
-            <Label htmlFor="hero-description">Beskrivelse</Label>
-            <Textarea id="hero-description" value={settings.heroDescription || ''} onChange={e => handleInputChange('heroDescription', e.target.value)} />
-        </div>
-         <TextStyleEditor 
-            label="Design for Beskrivelse"
-            colorValue={settings.heroDescriptionColor as ThemeColor || 'text-primary-foreground/80'}
-            onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
-            sizeValue={settings.heroDescriptionSize || 18}
-            onSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}
-        />
-        <div className="space-y-2">
-            <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
-            <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} />
-        </div>
-      </SectionCard>
+      <Accordion type="multiple" className="w-full space-y-4" defaultValue={['hero']}>
+        <Card className="shadow-lg">
+            <AccordionItem value="hero">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <CardTitle>Hero Sektion</CardTitle>
+                        <CardDescription className="mt-1">Indholdet i toppen af siden.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="space-y-6">
+                         <div className="space-y-2">
+                            <Label htmlFor="hero-headline">Overskrift</Label>
+                            <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Overskrift"
+                            colorValue={settings.heroHeadlineColor as ThemeColor || 'text-white'}
+                            onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
+                            sizeValue={settings.heroHeadlineSize || 64}
+                            onSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="hero-description">Beskrivelse</Label>
+                            <Textarea id="hero-description" value={settings.heroDescription || ''} onChange={e => handleInputChange('heroDescription', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Beskrivelse"
+                            colorValue={settings.heroDescriptionColor as ThemeColor || 'text-primary-foreground/80'}
+                            onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
+                            sizeValue={settings.heroDescriptionSize || 18}
+                            onSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
+                            <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} />
+                        </div>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
 
-      <SectionCard title="Services Sektion" description="Administrer de viste services.">
-        <div className="space-y-2">
-            <Label htmlFor="services-title">Sektionstitel</Label>
-            <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Sektionstitel"
-            colorValue={settings.servicesSectionTitleColor as ThemeColor || 'text-black'}
-            onColorChange={(v) => handleInputChange('servicesSectionTitleColor', v)}
-            sizeValue={settings.servicesSectionTitleSize || 36}
-            onSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
-        />
-        <div className="space-y-2">
-            <Label htmlFor="services-description">Sektionsbeskrivelse</Label>
-            <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Sektionsbeskrivelse"
-            colorValue={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
-            onColorChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}
-            sizeValue={settings.servicesSectionDescriptionSize || 18}
-            onSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
-        />
-        <Label>Service-kort</Label>
-        <Accordion type="multiple" className="w-full">
-            {(settings.services || []).map((service, index) => (
-                <EditableListItem 
-                    key={index}
-                    index={index}
-                    item={service}
-                    updateItem={(i, data) => handleListUpdate('services', i, data)}
-                    removeItem={(i) => handleListRemove('services', i)}
-                    fields={[
-                        {key: 'title', label: 'Titel'},
-                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
-                        {key: 'imageUrl', label: 'Billede URL'},
-                        {key: 'aiHint', label: 'AI Billede Hint'},
-                    ]}
-                    titleField="title"
-                />
-            ))}
-        </Accordion>
-        <Button variant="outline" onClick={() => handleListAdd('services', { title: 'Ny Service', description: '', imageUrl: '', aiHint: '' })}>Tilføj Service</Button>
-      </SectionCard>
+        <Card className="shadow-lg">
+            <AccordionItem value="services">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <CardTitle>Services Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer de viste services.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="services-title">Sektionstitel</Label>
+                            <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.servicesSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('servicesSectionTitleColor', v)}
+                            sizeValue={settings.servicesSectionTitleSize || 36}
+                            onSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="services-description">Sektionsbeskrivelse</Label>
+                            <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionsbeskrivelse"
+                            colorValue={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                            onColorChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}
+                            sizeValue={settings.servicesSectionDescriptionSize || 18}
+                            onSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
+                        />
+                        <Label>Service-kort</Label>
+                        <Accordion type="multiple" className="w-full">
+                            {(settings.services || []).map((service, index) => (
+                                <EditableListItem 
+                                    key={index}
+                                    index={index}
+                                    item={service}
+                                    updateItem={(i, data) => handleListUpdate('services', i, data)}
+                                    removeItem={(i) => handleListRemove('services', i)}
+                                    fields={[
+                                        {key: 'title', label: 'Titel'},
+                                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
+                                        {key: 'imageUrl', label: 'Billede URL'},
+                                        {key: 'aiHint', label: 'AI Billede Hint'},
+                                    ]}
+                                    titleField="title"
+                                />
+                            ))}
+                        </Accordion>
+                        <Button variant="outline" onClick={() => handleListAdd('services', { title: 'Ny Service', description: '', imageUrl: '', aiHint: '' })}>Tilføj Service</Button>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
       
-      <SectionCard title="Cases Sektion" description="Administrer de viste cases.">
-        <div className="space-y-2">
-            <Label htmlFor="cases-title">Sektionstitel</Label>
-            <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Sektionstitel"
-            colorValue={settings.casesSectionTitleColor as ThemeColor || 'text-black'}
-            onColorChange={(v) => handleInputChange('casesSectionTitleColor', v)}
-            sizeValue={settings.casesSectionTitleSize || 36}
-            onSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
-        />
-        <div className="space-y-2">
-            <Label htmlFor="cases-description">Sektionsbeskrivelse</Label>
-            <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Sektionsbeskrivelse"
-            colorValue={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
-            onColorChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}
-            sizeValue={settings.casesSectionDescriptionSize || 18}
-            onSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
-        />
-        <Label>Case-kort</Label>
-        <Accordion type="multiple" className="w-full">
-            {(settings.cases || []).map((caseItem, index) => (
-                <EditableListItem 
-                    key={index}
-                    index={index}
-                    item={caseItem}
-                    updateItem={(i, data) => handleListUpdate('cases', i, data)}
-                    removeItem={(i) => handleListRemove('cases', i)}
-                    fields={[
-                        {key: 'title', label: 'Titel'},
-                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
-                        {key: 'imageUrl', label: 'Billede URL'},
-                        {key: 'link', label: 'Link URL'},
-                        {key: 'aiHint', label: 'AI Billede Hint'},
-                    ]}
-                    titleField="title"
-                />
-            ))}
-        </Accordion>
-        <Button variant="outline" onClick={() => handleListAdd('cases', { title: 'Ny Case', description: '', imageUrl: '', link: '#', aiHint: '' })}>Tilføj Case</Button>
-      </SectionCard>
+        <Card className="shadow-lg">
+            <AccordionItem value="cases">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <CardTitle>Cases Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer de viste cases.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="cases-title">Sektionstitel</Label>
+                            <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.casesSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('casesSectionTitleColor', v)}
+                            sizeValue={settings.casesSectionTitleSize || 36}
+                            onSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="cases-description">Sektionsbeskrivelse</Label>
+                            <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionsbeskrivelse"
+                            colorValue={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                            onColorChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}
+                            sizeValue={settings.casesSectionDescriptionSize || 18}
+                            onSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
+                        />
+                        <Label>Case-kort</Label>
+                        <Accordion type="multiple" className="w-full">
+                            {(settings.cases || []).map((caseItem, index) => (
+                                <EditableListItem 
+                                    key={index}
+                                    index={index}
+                                    item={caseItem}
+                                    updateItem={(i, data) => handleListUpdate('cases', i, data)}
+                                    removeItem={(i) => handleListRemove('cases', i)}
+                                    fields={[
+                                        {key: 'title', label: 'Titel'},
+                                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
+                                        {key: 'imageUrl', label: 'Billede URL'},
+                                        {key: 'link', label: 'Link URL'},
+                                        {key: 'aiHint', label: 'AI Billede Hint'},
+                                    ]}
+                                    titleField="title"
+                                />
+                            ))}
+                        </Accordion>
+                        <Button variant="outline" onClick={() => handleListAdd('cases', { title: 'Ny Case', description: '', imageUrl: '', link: '#', aiHint: '' })}>Tilføj Case</Button>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
 
-      <SectionCard title="Om Os Sektion" description="Administrer tekst og teammedlemmer.">
-         <div className="space-y-2">
-            <Label htmlFor="about-title">Sektionstitel</Label>
-            <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Sektionstitel"
-            colorValue={settings.aboutSectionTitleColor as ThemeColor || 'text-black'}
-            onColorChange={(v) => handleInputChange('aboutSectionTitleColor', v)}
-            sizeValue={settings.aboutSectionTitleSize || 36}
-            onSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
-        />
-        <div className="space-y-2">
-            <Label htmlFor="about-text">Intro tekst</Label>
-            <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} />
-        </div>
-        <TextStyleEditor 
-            label="Design for Intro Tekst"
-            colorValue={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'}
-            onColorChange={(v) => handleInputChange('aboutTextColor', v)}
-            sizeValue={settings.aboutTextSize || 18}
-            onSizeChange={(v) => handleInputChange('aboutTextSize', v)}
-        />
-        <Label>Team</Label>
-         <Accordion type="multiple" className="w-full">
-            {(settings.teamMembers || []).map((member, index) => (
-                <EditableListItem 
-                    key={index}
-                    index={index}
-                    item={member}
-                    updateItem={(i, data) => handleListUpdate('teamMembers', i, data)}
-                    removeItem={(i) => handleListRemove('teamMembers', i)}
-                    fields={[
-                        {key: 'name', label: 'Navn'},
-                        {key: 'title', label: 'Titel'},
-                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
-                        {key: 'imageUrl', label: 'Billede URL'},
-                        {key: 'linkedinUrl', label: 'LinkedIn URL'},
-                        {key: 'aiHint', label: 'AI Billede Hint'},
-                    ]}
-                    titleField="name"
-                />
-            ))}
-        </Accordion>
-        <Button variant="outline" onClick={() => handleListAdd('teamMembers', { name: 'Nyt Medlem', title: '', description: '', imageUrl: '', linkedinUrl: '#', aiHint: '' })}>Tilføj Medlem</Button>
-      </SectionCard>
-       <SectionCard title="Sektionsafstand" description="Juster den vertikale afstand (padding) for hver sektion.">
-        <div className="space-y-4">
-            {settings.sectionPadding?.services && (
-                <SpacingEditor
-                    label="Services"
-                    padding={settings.sectionPadding.services}
-                    onPaddingChange={(p) => handlePaddingChange('services', p)}
-                />
-            )}
-             {settings.sectionPadding?.aiProject && (
-                <SpacingEditor
-                    label="Fortæl os om dit projekt"
-                    padding={settings.sectionPadding.aiProject}
-                    onPaddingChange={(p) => handlePaddingChange('aiProject', p)}
-                />
-            )}
-             {settings.sectionPadding?.cases && (
-                <SpacingEditor
-                    label="Cases"
-                    padding={settings.sectionPadding.cases}
-                    onPaddingChange={(p) => handlePaddingChange('cases', p)}
-                />
-            )}
-             {settings.sectionPadding?.about && (
-                <SpacingEditor
-                    label="Om Os"
-                    padding={settings.sectionPadding.about}
-                    onPaddingChange={(p) => handlePaddingChange('about', p)}
-                />
-            )}
-             {settings.sectionPadding?.contact && (
-                <SpacingEditor
-                    label="Kontakt"
-                    padding={settings.sectionPadding.contact}
-                    onPaddingChange={(p) => handlePaddingChange('contact', p)}
-                />
-            )}
-        </div>
-      </SectionCard>
+        <Card className="shadow-lg">
+            <AccordionItem value="about">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <CardTitle>Om Os Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer tekst og teammedlemmer.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="about-title">Sektionstitel</Label>
+                            <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.aboutSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('aboutSectionTitleColor', v)}
+                            sizeValue={settings.aboutSectionTitleSize || 36}
+                            onSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="about-text">Intro tekst</Label>
+                            <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} />
+                        </div>
+                        <TextStyleEditor 
+                            label="Design for Intro Tekst"
+                            colorValue={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'}
+                            onColorChange={(v) => handleInputChange('aboutTextColor', v)}
+                            sizeValue={settings.aboutTextSize || 18}
+                            onSizeChange={(v) => handleInputChange('aboutTextSize', v)}
+                        />
+                        <Label>Team</Label>
+                        <Accordion type="multiple" className="w-full">
+                            {(settings.teamMembers || []).map((member, index) => (
+                                <EditableListItem 
+                                    key={index}
+                                    index={index}
+                                    item={member}
+                                    updateItem={(i, data) => handleListUpdate('teamMembers', i, data)}
+                                    removeItem={(i) => handleListRemove('teamMembers', i)}
+                                    fields={[
+                                        {key: 'name', label: 'Navn'},
+                                        {key: 'title', label: 'Titel'},
+                                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
+                                        {key: 'imageUrl', label: 'Billede URL'},
+                                        {key: 'linkedinUrl', label: 'LinkedIn URL'},
+                                        {key: 'aiHint', label: 'AI Billede Hint'},
+                                    ]}
+                                    titleField="name"
+                                />
+                            ))}
+                        </Accordion>
+                        <Button variant="outline" onClick={() => handleListAdd('teamMembers', { name: 'Nyt Medlem', title: '', description: '', imageUrl: '', linkedinUrl: '#', aiHint: '' })}>Tilføj Medlem</Button>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+        
+        <Card className="shadow-lg">
+            <AccordionItem value="spacing">
+                <AccordionTrigger className="px-6">
+                    <div className="text-left">
+                        <CardTitle>Sektionsafstand</CardTitle>
+                        <CardDescription className="mt-1">Juster den vertikale afstand (padding) for hver sektion.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="space-y-4">
+                        {settings.sectionPadding?.services && (
+                            <SpacingEditor
+                                label="Services"
+                                padding={settings.sectionPadding.services}
+                                onPaddingChange={(p) => handlePaddingChange('services', p)}
+                            />
+                        )}
+                        {settings.sectionPadding?.aiProject && (
+                            <SpacingEditor
+                                label="Fortæl os om dit projekt"
+                                padding={settings.sectionPadding.aiProject}
+                                onPaddingChange={(p) => handlePaddingChange('aiProject', p)}
+                            />
+                        )}
+                        {settings.sectionPadding?.cases && (
+                            <SpacingEditor
+                                label="Cases"
+                                padding={settings.sectionPadding.cases}
+                                onPaddingChange={(p) => handlePaddingChange('cases', p)}
+                            />
+                        )}
+                        {settings.sectionPadding?.about && (
+                            <SpacingEditor
+                                label="Om Os"
+                                padding={settings.sectionPadding.about}
+                                onPaddingChange={(p) => handlePaddingChange('about', p)}
+                            />
+                        )}
+                        {settings.sectionPadding?.contact && (
+                            <SpacingEditor
+                                label="Kontakt"
+                                padding={settings.sectionPadding.contact}
+                                onPaddingChange={(p) => handlePaddingChange('contact', p)}
+                            />
+                        )}
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+      </Accordion>
     </div>
   );
 }
+
+    
