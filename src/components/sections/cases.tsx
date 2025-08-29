@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -79,7 +80,6 @@ export default function CasesSection({ cases: propCases, sectionData }: CasesSec
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {cases.map((caseStudy) => (
             <Card key={caseStudy.title} className="flex flex-col overflow-hidden">
-              <CardHeader>
                 <div className="relative w-full h-48">
                   <Image
                     src={caseStudy.imageUrl}
@@ -87,13 +87,14 @@ export default function CasesSection({ cases: propCases, sectionData }: CasesSec
                     data-ai-hint={caseStudy.aiHint}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover rounded-t-lg"
+                    className="object-cover"
                   />
                 </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
+              <CardHeader>
                 <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
                 <CardDescription>{caseStudy.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
               </CardContent>
               <CardFooter>
                  <Link href={caseStudy.link} className={cn(buttonVariants({ variant: 'link' }), 'pl-0')}>

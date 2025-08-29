@@ -81,17 +81,17 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service) => (
             <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-              <CardHeader>
-                <div className="relative w-full h-40 mb-4">
+              <div className="relative w-full h-40">
                   <Image
                     src={service.imageUrl}
                     alt={service.title}
                     data-ai-hint={service.aiHint}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover rounded-t-lg"
+                    className="object-cover"
                   />
                 </div>
+              <CardHeader>
                 <CardTitle className="text-h4">{service.title}</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
