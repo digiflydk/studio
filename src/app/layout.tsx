@@ -6,7 +6,6 @@ import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
 import { ReactNode } from 'react';
 import Script from 'next/script';
-import ScrollManager from '@/components/scroll-manager';
 
 export async function generateMetadata(
   {},
@@ -34,7 +33,7 @@ export async function generateMetadata(
     },
     robots: {},
     icons: {
-      icon: settings?.faviconUrl || '/favicon.ico',
+      icon: '/favicon.ico',
     },
   };
 
@@ -155,7 +154,6 @@ export default async function RootLayout({
         <Analytics />
       </head>
       <body className="font-body antialiased">
-        <ScrollManager />
         {children}
         <Toaster />
       </body>
