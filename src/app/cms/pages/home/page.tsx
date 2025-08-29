@@ -211,13 +211,9 @@ function SpacingEditor({
 }: {
   label: string;
   padding: SectionPadding;
-  onPaddingChange: (padding: SectionPadding) => void;
+  onPaddingChange: (value: number, part: keyof SectionPadding) => void;
   previewMode: 'desktop' | 'mobile';
 }) {
-  const handleValueChange = (part: keyof SectionPadding, value: number) => {
-    onPaddingChange({ ...padding, [part]: value });
-  };
-
   return (
     <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
       <h3 className="font-semibold">{label}</h3>
@@ -233,7 +229,7 @@ function SpacingEditor({
               </div>
               <Slider
                 value={[padding.top]}
-                onValueChange={([v]) => handleValueChange('top', v)}
+                onValueChange={([v]) => onPaddingChange(v, 'top')}
                 min={0}
                 max={200}
                 step={4}
@@ -248,7 +244,7 @@ function SpacingEditor({
               </div>
               <Slider
                 value={[padding.bottom]}
-                onValueChange={([v]) => handleValueChange('bottom', v)}
+                onValueChange={([v]) => onPaddingChange(v, 'bottom')}
                 min={0}
                 max={200}
                 step={4}
@@ -266,7 +262,7 @@ function SpacingEditor({
               </div>
               <Slider
                 value={[padding.topMobile]}
-                onValueChange={([v]) => handleValueChange('topMobile', v)}
+                onValueChange={([v]) => onPaddingChange(v, 'topMobile')}
                 min={0}
                 max={150}
                 step={4}
@@ -281,7 +277,7 @@ function SpacingEditor({
               </div>
               <Slider
                 value={[padding.bottomMobile]}
-                onValueChange={([v]) => handleValueChange('bottomMobile', v)}
+                onValueChange={([v]) => onPaddingChange(v, 'bottomMobile')}
                 min={0}
                 max={150}
                 step={4}
@@ -314,48 +310,51 @@ export default function CmsHomePage() {
         topMobile: padding?.topMobile ?? defaultPadding.topMobile,
         bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
       });
+      
+      const sections = ['services', 'aiProject', 'cases', 'about', 'contact'];
+      const newSectionPadding: GeneralSettings['sectionPadding'] = {
+        services: ensurePadding(initialSettings.sectionPadding?.services),
+        aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
+        cases: ensurePadding(initialSettings.sectionPadding?.cases),
+        about: ensurePadding(initialSettings.sectionPadding?.about),
+        contact: ensurePadding(initialSettings.sectionPadding?.contact),
+      };
 
       setSettings({
           ...initialSettings,
-          heroHeadline: initialSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
-          heroHeadlineColor: initialSettings.heroHeadlineColor || 'text-white',
-          heroHeadlineSize: initialSettings.heroHeadlineSize || 64,
-          heroDescription: initialSettings.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
-          heroDescriptionColor: initialSettings.heroDescriptionColor || 'text-primary-foreground/80',
-          heroDescriptionSize: initialSettings.heroDescriptionSize || 18,
-          heroImageUrl: initialSettings.heroImageUrl || 'https://picsum.photos/1920/1280',
+          heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
+          heroHeadlineColor: initialSettings.heroHeadlineColor ?? 'text-white',
+          heroHeadlineSize: initialSettings.heroHeadlineSize ?? 64,
+          heroDescription: initialSettings.heroDescription ?? 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
+          heroDescriptionColor: initialSettings.heroDescriptionColor ?? 'text-primary-foreground/80',
+          heroDescriptionSize: initialSettings.heroDescriptionSize ?? 18,
+          heroImageUrl: initialSettings.heroImageUrl ?? 'https://picsum.photos/1920/1280',
           
-          servicesSectionTitle: initialSettings.servicesSectionTitle || "Vores Services",
-          servicesSectionTitleColor: initialSettings.servicesSectionTitleColor || "text-black",
-          servicesSectionTitleSize: initialSettings.servicesSectionTitleSize || 36,
-          servicesSectionDescription: initialSettings.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
-          servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor || "text-muted-foreground",
-          servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize || 18,
+          servicesSectionTitle: initialSettings.servicesSectionTitle ?? "Vores Services",
+          servicesSectionTitleColor: initialSettings.servicesSectionTitleColor ?? "text-black",
+          servicesSectionTitleSize: initialSettings.servicesSectionTitleSize ?? 36,
+          servicesSectionDescription: initialSettings.servicesSectionDescription ?? "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
+          servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor ?? "text-muted-foreground",
+          servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize ?? 18,
           services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
           
-          casesSectionTitle: initialSettings.casesSectionTitle || "Vores Arbejde",
-          casesSectionTitleColor: initialSettings.casesSectionTitleColor || "text-black",
-          casesSectionTitleSize: initialSettings.casesSectionTitleSize || 36,
-          casesSectionDescription: initialSettings.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
-          casesSectionDescriptionColor: initialSettings.casesSectionDescriptionColor || "text-muted-foreground",
-          casesSectionDescriptionSize: initialSettings.casesSectionDescriptionSize || 18,
+          casesSectionTitle: initialSettings.casesSectionTitle ?? "Vores Arbejde",
+          casesSectionTitleColor: initialSettings.casesSectionTitleColor ?? "text-black",
+          casesSectionTitleSize: initialSettings.casesSectionTitleSize ?? 36,
+          casesSectionDescription: initialSettings.casesSectionDescription ?? "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
+          casesSectionDescriptionColor: initialSettings.casesSectionDescriptionColor ?? "text-muted-foreground",
+          casesSectionDescriptionSize: initialSettings.casesSectionDescriptionSize ?? 18,
           cases: initialSettings.cases && initialSettings.cases.length > 0 ? initialSettings.cases : defaultCases,
           
-          aboutSectionTitle: initialSettings.aboutSectionTitle || "Hvem er Digifly?",
-          aboutSectionTitleColor: initialSettings.aboutSectionTitleColor || "text-black",
-          aboutSectionTitleSize: initialSettings.aboutSectionTitleSize || 36,
-          aboutText: initialSettings.aboutText || defaultAboutText,
-          aboutTextColor: initialSettings.aboutTextColor || "text-muted-foreground",
-          aboutTextSize: initialSettings.aboutTextSize || 18,
+          aboutSectionTitle: initialSettings.aboutSectionTitle ?? "Hvem er Digifly?",
+          aboutSectionTitleColor: initialSettings.aboutSectionTitleColor ?? "text-black",
+          aboutSectionTitleSize: initialSettings.aboutSectionTitleSize ?? 36,
+          aboutText: initialSettings.aboutText ?? defaultAboutText,
+          aboutTextColor: initialSettings.aboutTextColor ?? "text-muted-foreground",
+          aboutTextSize: initialSettings.aboutTextSize ?? 18,
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
           
-          sectionPadding: {
-              services: ensurePadding(initialSettings.sectionPadding?.services),
-              aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
-              cases: ensurePadding(initialSettings.sectionPadding?.cases),
-              about: ensurePadding(initialSettings.sectionPadding?.about),
-              contact: ensurePadding(initialSettings.sectionPadding?.contact),
-          },
+          sectionPadding: newSectionPadding,
       });
 
       setIsLoading(false);
@@ -367,14 +366,18 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: SectionPadding) => {
-    setSettings(prev => ({
-        ...prev,
-        sectionPadding: {
-            ...prev.sectionPadding,
-            [section]: value,
-        }
-    }));
+  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: number, part: keyof SectionPadding) => {
+    setSettings(prev => {
+        const newSectionPadding = { ...prev.sectionPadding };
+        newSectionPadding[section] = {
+            ...newSectionPadding[section],
+            [part]: value,
+        };
+        return {
+            ...prev,
+            sectionPadding: newSectionPadding
+        };
+    });
   };
 
   const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
@@ -674,7 +677,7 @@ export default function CmsHomePage() {
                             <SpacingEditor
                                 label="Services"
                                 padding={settings.sectionPadding.services}
-                                onPaddingChange={(p) => handlePaddingChange('services', p)}
+                                onPaddingChange={(v, p) => handlePaddingChange('services', v, p)}
                                 previewMode={previewMode}
                             />
                         )}
@@ -682,7 +685,7 @@ export default function CmsHomePage() {
                             <SpacingEditor
                                 label="Fortæl os om dit projekt"
                                 padding={settings.sectionPadding.aiProject}
-                                onPaddingChange={(p) => handlePaddingChange('aiProject', p)}
+                                onPaddingChange={(v, p) => handlePaddingChange('aiProject', v, p)}
                                 previewMode={previewMode}
                             />
                         )}
@@ -690,7 +693,7 @@ export default function CmsHomePage() {
                             <SpacingEditor
                                 label="Cases"
                                 padding={settings.sectionPadding.cases}
-                                onPaddingChange={(p) => handlePaddingChange('cases', p)}
+                                onPaddingChange={(v, p) => handlePaddingChange('cases', v, p)}
                                 previewMode={previewMode}
                             />
                         )}
@@ -698,7 +701,7 @@ export default function CmsHomePage() {
                             <SpacingEditor
                                 label="Om Os"
                                 padding={settings.sectionPadding.about}
-                                onPaddingChange={(p) => handlePaddingChange('about', p)}
+                                onPaddingChange={(v, p) => handlePaddingChange('about', v, p)}
                                 previewMode={previewMode}
                             />
                         )}
@@ -706,7 +709,7 @@ export default function CmsHomePage() {
                             <SpacingEditor
                                 label="Kontakt"
                                 padding={settings.sectionPadding.contact}
-                                onPaddingChange={(p) => handlePaddingChange('contact', p)}
+                                onPaddingChange={(v, p) => handlePaddingChange('contact', v, p)}
                                 previewMode={previewMode}
                             />
                         )}
