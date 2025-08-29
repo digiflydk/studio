@@ -3,7 +3,6 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getGeneralSettings } from '@/services/settings';
-import Analytics from '@/components/analytics';
 import { ReactNode } from 'react';
 import Script from 'next/script';
 import Header from '@/components/layout/header';
@@ -62,20 +61,6 @@ export default async function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <Script id="datalayer-init" strategy="beforeInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            
-            // Default consent mode
-            gtag('consent', 'default', {
-              'ad_storage': 'denied',
-              'analytics_storage': 'denied',
-              'ad_user_data': 'denied',
-              'ad_personalization': 'denied'
-            });
-          `}
-        </Script>
         <Script id="scroll-restoration" strategy="beforeInteractive">
           {`
             try {
@@ -88,7 +73,6 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <Analytics settings={settings} />
       </head>
       <body className="font-body antialiased">
         <Header settings={settings} />
