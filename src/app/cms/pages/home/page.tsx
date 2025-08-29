@@ -168,7 +168,7 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
     return (
         <AccordionItem value={`item-${index}`}>
             <div className="flex justify-between w-full items-center">
-                <AccordionTrigger className="flex-1 pr-4">
+                <AccordionTrigger className="flex-1 pr-4 text-left">
                     <span>{item[titleField] || `Element ${index + 1}`}</span>
                 </AccordionTrigger>
                 <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
@@ -342,7 +342,7 @@ export default function CmsHomePage() {
     setSettings(prev => ({
         ...prev,
         sectionPadding: {
-            ...prev!.sectionPadding,
+            ...prev.sectionPadding,
             [section]: value,
         }
     }));
@@ -401,14 +401,14 @@ export default function CmsHomePage() {
       <Accordion type="multiple" className="w-full space-y-4" defaultValue={['hero']}>
         <Card className="shadow-lg">
             <AccordionItem value="hero">
-                <AccordionTrigger className="px-6">
+                <AccordionTrigger className="px-6 py-4">
                     <div className="text-left">
                         <CardTitle>Hero Sektion</CardTitle>
                         <CardDescription className="mt-1">Indholdet i toppen af siden.</CardDescription>
                     </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                    <CardContent className="space-y-6">
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
                          <div className="space-y-2">
                             <Label htmlFor="hero-headline">Overskrift</Label>
                             <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} />
@@ -442,14 +442,14 @@ export default function CmsHomePage() {
 
         <Card className="shadow-lg">
             <AccordionItem value="services">
-                <AccordionTrigger className="px-6">
+                <AccordionTrigger className="px-6 py-4">
                     <div className="text-left">
                         <CardTitle>Services Sektion</CardTitle>
                         <CardDescription className="mt-1">Administrer de viste services.</CardDescription>
                     </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                    <CardContent className="space-y-6">
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
                             <Label htmlFor="services-title">Sektionstitel</Label>
                             <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} />
@@ -473,7 +473,7 @@ export default function CmsHomePage() {
                             onSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
                         />
                         <Label>Service-kort</Label>
-                        <Accordion type="multiple" className="w-full">
+                        <Accordion type="multiple" className="w-full border rounded-md">
                             {(settings.services || []).map((service, index) => (
                                 <EditableListItem 
                                     key={index}
@@ -499,14 +499,14 @@ export default function CmsHomePage() {
       
         <Card className="shadow-lg">
             <AccordionItem value="cases">
-                <AccordionTrigger className="px-6">
+                <AccordionTrigger className="px-6 py-4">
                     <div className="text-left">
                         <CardTitle>Cases Sektion</CardTitle>
                         <CardDescription className="mt-1">Administrer de viste cases.</CardDescription>
                     </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                    <CardContent className="space-y-6">
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
                             <Label htmlFor="cases-title">Sektionstitel</Label>
                             <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} />
@@ -530,7 +530,7 @@ export default function CmsHomePage() {
                             onSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
                         />
                         <Label>Case-kort</Label>
-                        <Accordion type="multiple" className="w-full">
+                        <Accordion type="multiple" className="w-full border rounded-md">
                             {(settings.cases || []).map((caseItem, index) => (
                                 <EditableListItem 
                                     key={index}
@@ -557,14 +557,14 @@ export default function CmsHomePage() {
 
         <Card className="shadow-lg">
             <AccordionItem value="about">
-                <AccordionTrigger className="px-6">
+                <AccordionTrigger className="px-6 py-4">
                     <div className="text-left">
                         <CardTitle>Om Os Sektion</CardTitle>
                         <CardDescription className="mt-1">Administrer tekst og teammedlemmer.</CardDescription>
                     </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                    <CardContent className="space-y-6">
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
                             <Label htmlFor="about-title">Sektionstitel</Label>
                             <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} />
@@ -588,7 +588,7 @@ export default function CmsHomePage() {
                             onSizeChange={(v) => handleInputChange('aboutTextSize', v)}
                         />
                         <Label>Team</Label>
-                        <Accordion type="multiple" className="w-full">
+                        <Accordion type="multiple" className="w-full border rounded-md">
                             {(settings.teamMembers || []).map((member, index) => (
                                 <EditableListItem 
                                     key={index}
@@ -616,14 +616,14 @@ export default function CmsHomePage() {
         
         <Card className="shadow-lg">
             <AccordionItem value="spacing">
-                <AccordionTrigger className="px-6">
+                <AccordionTrigger className="px-6 py-4">
                     <div className="text-left">
                         <CardTitle>Sektionsafstand</CardTitle>
                         <CardDescription className="mt-1">Juster den vertikale afstand (padding) for hver sektion.</CardDescription>
                     </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                    <CardContent className="space-y-4">
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-4 pt-6">
                         {settings.sectionPadding?.services && (
                             <SpacingEditor
                                 label="Services"
