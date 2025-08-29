@@ -7,6 +7,7 @@ import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
 import { Suspense } from 'react';
 import Script from 'next/script';
+import ScrollManager from '@/components/scroll-manager';
 
 export async function generateMetadata(
   {},
@@ -82,6 +83,7 @@ export default async function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider settings={settings}>
+          <ScrollManager />
           {children}
           <Toaster />
         </ThemeProvider>

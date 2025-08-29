@@ -1,11 +1,15 @@
 
+'use client';
+
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
-import { getGeneralSettings, type NavLink } from '@/services/settings';
+import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { getGeneralSettings } from '@/services/settings';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -14,8 +18,16 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-export default async function Header() {
-  const settings = await getGeneralSettings();
+export default function Header() {
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+  
+  useEffect(() => {
+    async function load() {
+        const s = await getGeneralSettings();
+        setSettings(s);
+    }
+    load();
+  }, [])
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
 
@@ -48,6 +60,17 @@ export default async function Header() {
     "h-6 w-6",
     settings?.headerMenuIconColor || "text-foreground"
   );
+  
+  const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const el = document.querySelector(href);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      history.replaceState(null, '', '/');
+    }
+  }
 
 
   return (
@@ -72,14 +95,24 @@ export default async function Header() {
 
         <nav className="hidden md:flex md:items-center md:gap-6">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={navLinkClasses}
-              style={linkStyle}
+             <a
+                key={link.href}
+                href={link.href}
+                className={navLinkClasses}
+                style={linkStyle}
+                onClick={(e) => {
+                    if (link.href?.startsWith('#')) {
+                      e.preventDefault();
+                      const el = document.querySelector(link.href);
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                      history.replaceState(null, '', '/');
+                    }
+                  }}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
@@ -102,14 +135,24 @@ export default async function Header() {
                 </div>
                 <nav className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={mobileNavLinkClasses}
-                      style={linkStyle}
+                     <a
+                        key={link.href}
+                        href={link.href}
+                        className={mobileNavLinkClasses}
+                        style={linkStyle}
+                        onClick={(e) => {
+                            if (link.href?.startsWith('#')) {
+                              e.preventDefault();
+                              const el = document.querySelector(link.href);
+                              if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }
+                              history.replaceState(null, '', '/');
+                            }
+                          }}
                     >
                       {link.label}
-                    </Link>
+                    </a>
                   ))}
                 </nav>
               </div>
