@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
+import * as React from 'react';
 import type { GeneralSettings } from '@/services/settings';
 
 type HSLColor = { h: number; s: number; l: number };
@@ -45,18 +45,18 @@ export const defaultTheme: Theme = {
   },
 };
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ settings, children }: { settings: GeneralSettings | null, children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
+export const ThemeProvider = ({ settings, children }: { settings: GeneralSettings | null, children: React.ReactNode }) => {
+  const [theme, setTheme] = React.useState<Theme>(() => {
     return {
         colors: settings?.themeColors || defaultTheme.colors,
         fontSizes: settings?.themeFontSizes || defaultTheme.fontSizes,
     }
   });
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
-  const applyTheme = useCallback((themeToApply: Theme) => {
+  const applyTheme = React.useCallback((themeToApply: Theme) => {
     const root = document.documentElement;
     // Colors
     Object.entries(themeToApply.colors).forEach(([name, hsl]) => {
@@ -68,7 +68,7 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
     });
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     applyTheme(theme);
     setIsLoaded(true);
   }, [theme, applyTheme]);
@@ -95,7 +95,7 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
 };
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
+  const context = React.useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
