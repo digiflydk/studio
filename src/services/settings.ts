@@ -39,6 +39,11 @@ export interface TeamMember {
     aiHint: string;
 }
 
+export interface NavLink {
+    label: string;
+    href: string;
+}
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -83,6 +88,7 @@ export interface GeneralSettings {
     themeFontSizes?: FontSizes;
     
     // Header Settings
+    headerNavLinks?: NavLink[];
     headerLogoWidth?: number;
     headerBackgroundColor?: HSLColor;
     headerBackgroundOpacity?: number;

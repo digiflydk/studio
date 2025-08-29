@@ -4,10 +4,10 @@ import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
-import { getGeneralSettings } from '@/services/settings';
+import { getGeneralSettings, type NavLink } from '@/services/settings';
 import { cn } from '@/lib/utils';
 
-const navLinks = [
+const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
   { href: '#cases', label: 'Cases' },
   { href: '#om-os', label: 'Om os' },
@@ -16,6 +16,8 @@ const navLinks = [
 
 export default async function Header() {
   const settings = await getGeneralSettings();
+  
+  const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
 
   const isSticky = settings?.headerIsSticky ?? true;
   const opacity = (settings?.headerBackgroundOpacity ?? 95) / 100;

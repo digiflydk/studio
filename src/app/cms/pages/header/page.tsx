@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings } from '@/services/settings';
+import { GeneralSettings, NavLink } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -63,7 +64,7 @@ function HslColorPicker({
   color: { h: number; s: number; l: number };
   onChange: (hsl: { h: number; s: number; l: number }) => void;
 }) {
-    const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
+    const [hexInputValue, setHexInputValue] = useState('');
     
     useEffect(() => {
         setHexInputValue(hslToHex(color.h, color.s, color.l));
@@ -217,6 +218,53 @@ function NavLinkStyleEditor({
     );
 }
 
+function EditableListItem({ index, item, updateItem, removeItem, fields, titleField }: { 
+    index: number, 
+    item: any, 
+    updateItem: (index: number, data: any) => void, 
+    removeItem: (index: number) => void,
+    fields: {key: string, label: string, type?: 'textarea'}[],
+    titleField: string
+}) {
+    const handleFieldChange = (field: string, value: string) => {
+        updateItem(index, { ...item, [field]: value });
+    };
+    
+    return (
+        <AccordionItem value={`item-${index}`}>
+            <div className="flex justify-between w-full items-center pl-4">
+                <AccordionTrigger className="flex-1 pr-4">
+                    <span>{item[titleField] || `Element ${index + 1}`}</span>
+                </AccordionTrigger>
+                <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+            </div>
+            <AccordionContent className="p-4 border-t">
+                <div className="space-y-4">
+                    {fields.map(field => (
+                        <div key={field.key} className="space-y-2">
+                            <Label htmlFor={`item-${index}-${field.key}`}>{field.label}</Label>
+                            <Input
+                                id={`item-${index}-${field.key}`}
+                                value={item[field.key] || ''}
+                                onChange={e => handleFieldChange(field.key, e.target.value)}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </AccordionContent>
+        </AccordionItem>
+    );
+}
+
+const defaultNavLinks: NavLink[] = [
+  { href: '#services', label: 'Services' },
+  { href: '#cases', label: 'Cases' },
+  { href: '#om-os', label: 'Om os' },
+  { href: '#kontakt', label: 'Kontakt' },
+];
+
 export default function CmsHeaderPage() {
     const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -230,6 +278,7 @@ export default function CmsHeaderPage() {
             if (loadedSettings) {
                 setSettings({
                     ...loadedSettings,
+                    headerNavLinks: loadedSettings.headerNavLinks && loadedSettings.headerNavLinks.length > 0 ? loadedSettings.headerNavLinks : defaultNavLinks,
                     headerBackgroundColor: loadedSettings.headerBackgroundColor || { h: 210, s: 100, l: 95 },
                     headerBackgroundOpacity: loadedSettings.headerBackgroundOpacity ?? 95,
                     headerIsSticky: loadedSettings.headerIsSticky ?? true,
@@ -239,6 +288,18 @@ export default function CmsHeaderPage() {
                     headerLinkSize: loadedSettings.headerLinkSize || 14,
                     headerMenuIconColor: loadedSettings.headerMenuIconColor || 'text-foreground',
                 });
+            } else {
+                 setSettings({
+                    headerNavLinks: defaultNavLinks,
+                    headerBackgroundColor: { h: 210, s: 100, l: 95 },
+                    headerBackgroundOpacity: 95,
+                    headerIsSticky: true,
+                    headerLogoWidth: 96,
+                    headerLinkColor: 'text-foreground',
+                    headerLinkHoverColor: 'text-primary',
+                    headerLinkSize: 14,
+                    headerMenuIconColor: 'text-foreground',
+                 })
             }
             setIsLoading(false);
         }
@@ -247,6 +308,24 @@ export default function CmsHeaderPage() {
 
     const handleInputChange = (field: keyof GeneralSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
+        const list = (settings[listName] as T[] || []);
+        const newList = [...list];
+        newList[index] = data;
+        handleInputChange(listName, newList);
+    };
+
+    const handleListAdd = <T extends object,>(listName: keyof GeneralSettings, newItem: T) => {
+        const list = (settings[listName] as T[] || []);
+        handleInputChange(listName, [...list, newItem]);
+    }
+  
+    const handleListRemove = (listName: keyof GeneralSettings, index: number) => {
+        const list = (settings[listName] as any[] || []);
+        const newList = list.filter((_, i) => i !== index);
+        handleInputChange(listName, newList);
     };
 
     const handleSaveChanges = () => {
@@ -336,9 +415,28 @@ export default function CmsHeaderPage() {
             <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle>Navigationslinks & Menu</CardTitle>
-                    <CardDescription>Tilpas udseendet af links og ikoner i headeren.</CardDescription>
+                    <CardDescription>Tilpas udseendet og indholdet af links og ikoner i headeren.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    <Label>Navigationslinks</Label>
+                    <Accordion type="multiple" className="w-full border rounded-md">
+                        {(settings.headerNavLinks || []).map((link, index) => (
+                            <EditableListItem 
+                                key={index}
+                                index={index}
+                                item={link}
+                                updateItem={(i, data) => handleListUpdate('headerNavLinks', i, data)}
+                                removeItem={(i) => handleListRemove('headerNavLinks', i)}
+                                fields={[
+                                    {key: 'label', label: 'Tekst'},
+                                    {key: 'href', label: 'Link (f.eks. #services eller https://eksempel.dk)'},
+                                ]}
+                                titleField="label"
+                            />
+                        ))}
+                    </Accordion>
+                    <Button variant="outline" onClick={() => handleListAdd('headerNavLinks', { label: 'Nyt Link', href: '#' })}>Tilføj Link</Button>
+                    <hr/>
                    {settings.headerLinkColor && typeof settings.headerLinkSize !== 'undefined' && settings.headerLinkHoverColor && settings.headerMenuIconColor &&
                         <NavLinkStyleEditor 
                             label="Styling for links og ikoner"
