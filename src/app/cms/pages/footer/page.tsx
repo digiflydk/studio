@@ -268,24 +268,22 @@ export default function CmsFooterPage() {
                     placeholder="Flow. Automatisér. Skalér."
                 />
             </div>
-             <div className="space-y-4 rounded-lg border p-4">
-                <div className="space-y-2">
-                    <Label htmlFor="footer-description">Beskrivelse</Label>
-                    <Textarea
-                        id="footer-description" 
-                        value={settings.footerDescription || ''} 
-                        onChange={e => handleInputChange('footerDescription', e.target.value)}
-                        placeholder="Kort beskrivelse under tagline..."
-                    />
-                </div>
-                 <TextStyleEditor 
-                    label="Design for Beskrivelse"
-                    colorValue={settings.footerDescriptionColor as ThemeColor || 'text-muted-foreground'}
-                    onColorChange={(v) => handleInputChange('footerDescriptionColor', v)}
-                    sizeValue={settings.footerDescriptionSize || 14}
-                    onSizeChange={(v) => handleInputChange('footerDescriptionSize', v)}
+            <div className="space-y-2">
+                <Label htmlFor="footer-description">Beskrivelse</Label>
+                <Textarea
+                    id="footer-description" 
+                    value={settings.footerDescription || ''} 
+                    onChange={e => handleInputChange('footerDescription', e.target.value)}
+                    placeholder="Kort beskrivelse under tagline..."
                 />
             </div>
+            <TextStyleEditor 
+                label="Design for Beskrivelse"
+                colorValue={settings.footerDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerDescriptionColor', v)}
+                sizeValue={settings.footerDescriptionSize || 14}
+                onSizeChange={(v) => handleInputChange('footerDescriptionSize', v)}
+            />
         </CardContent>
       </Card>
       <Card className="shadow-lg">
