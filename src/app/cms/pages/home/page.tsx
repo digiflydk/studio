@@ -368,9 +368,10 @@ export default function CmsHomePage() {
 
   const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: number, part: keyof SectionPadding) => {
     setSettings(prev => {
+        const currentPadding = prev.sectionPadding?.[section] || defaultPadding;
         const newSectionPadding = { ...prev.sectionPadding };
         newSectionPadding[section] = {
-            ...newSectionPadding[section],
+            ...currentPadding,
             [part]: value,
         };
         return {
@@ -421,7 +422,7 @@ export default function CmsHomePage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Forside Indhold</h1>
+          <h1 className="text-2xl font-bold capitalize">Forside Indhold {previewMode}</h1>
           <p className="text-muted-foreground">Administrer indholdet på din forside.</p>
         </div>
         <div className="flex items-center gap-4">
