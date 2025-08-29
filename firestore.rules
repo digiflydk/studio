@@ -1,0 +1,11 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to the settings collection for your app
+    match /settings/{setting} {
+      allow read, write: if true;
+    }
+  }
+}
