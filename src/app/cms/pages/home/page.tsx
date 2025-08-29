@@ -14,6 +14,7 @@ import { Loader2, Trash2, Monitor, Smartphone } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const defaultServices: Service[] = [
   {
@@ -205,68 +206,77 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
 function SpacingEditor({
     label,
     padding,
-    onPaddingChange
+    onPaddingChange,
+    previewMode,
 }: {
     label: string;
     padding: SectionPadding;
     onPaddingChange: (padding: SectionPadding) => void;
+    previewMode: 'desktop' | 'mobile';
 }) {
     return (
         <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
             <h3 className="font-semibold">{label}</h3>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i toppen (Desktop)</Label>
-                        <span className="text-sm text-muted-foreground">{padding.top}px</span>
+                {previewMode === 'desktop' ? (
+                <>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i toppen</Label>
+                            <span className="text-sm text-muted-foreground">{padding.top}px</span>
+                        </div>
+                        <Slider 
+                            value={[padding.top]} 
+                            onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
+                            min={0}
+                            max={200}
+                            step={4}
+                        />
                     </div>
-                    <Slider 
-                        value={[padding.top]} 
-                        onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
-                        min={0}
-                        max={200}
-                        step={4}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i toppen (Mobil)</Label>
-                        <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i bunden</Label>
+                            <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                        </div>
+                        <Slider 
+                            value={[padding.bottom]} 
+                            onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
+                            min={0}
+                            max={200}
+                            step={4}
+                        />
                     </div>
-                    <Slider 
-                        value={[padding.topMobile]} 
-                        onValueChange={([v]) => onPaddingChange({ ...padding, topMobile: v })}
-                        min={0}
-                        max={150}
-                        step={4}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i bunden (Desktop)</Label>
-                        <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                </>
+                ) : (
+                <>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i toppen</Label>
+                            <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
+                        </div>
+                        <Slider 
+                            value={[padding.topMobile]} 
+                            onValueChange={([v]) => onPaddingChange({ ...padding, topMobile: v })}
+                            min={0}
+                            max={150}
+                            step={4}
+                        />
                     </div>
-                    <Slider 
-                        value={[padding.bottom]} 
-                        onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
-                        min={0}
-                        max={200}
-                        step={4}
-                    />
-                </div>
-                 <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i bunden (Mobil)</Label>
-                        <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
+                     <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i bunden</Label>
+                            <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
+                        </div>
+                        <Slider 
+                            value={[padding.bottomMobile]} 
+                            onValueChange={([v]) => onPaddingChange({ ...padding, bottomMobile: v })}
+                            min={0}
+                            max={150}
+                            step={4}
+                        />
                     </div>
-                    <Slider 
-                        value={[padding.bottomMobile]} 
-                        onValueChange={([v]) => onPaddingChange({ ...padding, bottomMobile: v })}
-                        min={0}
-                        max={150}
-                        step={4}
-                    />
-                </div>
+                </>
+                )}
              </div>
         </div>
     );
@@ -277,12 +287,18 @@ export default function CmsHomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
     async function loadSettings() {
       setIsLoading(true);
       const loadedSettings = await getSettingsAction();
       const initialSettings = loadedSettings || {};
+
+      const ensurePadding = (padding: Partial<SectionPadding> | undefined): SectionPadding => ({
+        ...defaultPadding,
+        ...padding,
+      });
 
       setSettings({
           ...initialSettings,
@@ -319,11 +335,11 @@ export default function CmsHomePage() {
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
           
           sectionPadding: {
-              services: initialSettings.sectionPadding?.services || defaultPadding,
-              aiProject: initialSettings.sectionPadding?.aiProject || defaultPadding,
-              cases: initialSettings.sectionPadding?.cases || defaultPadding,
-              about: initialSettings.sectionPadding?.about || defaultPadding,
-              contact: initialSettings.sectionPadding?.contact || defaultPadding,
+              services: ensurePadding(initialSettings.sectionPadding?.services),
+              aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
+              cases: ensurePadding(initialSettings.sectionPadding?.cases),
+              about: ensurePadding(initialSettings.sectionPadding?.about),
+              contact: ensurePadding(initialSettings.sectionPadding?.contact),
           },
       });
 
@@ -390,10 +406,27 @@ export default function CmsHomePage() {
           <h1 className="text-2xl font-bold">Forside Indhold</h1>
           <p className="text-muted-foreground">Administrer indholdet på din forside.</p>
         </div>
-        <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
-          {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Gem Ændringer
-        </Button>
+        <div className="flex items-center gap-4">
+            <ToggleGroup 
+                type="single" 
+                value={previewMode}
+                onValueChange={(value: 'desktop' | 'mobile') => value && setPreviewMode(value)}
+                aria-label="Vælg visning"
+                variant="outline"
+            >
+                <ToggleGroupItem value="desktop" aria-label="Desktop visning">
+                    <Monitor className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="mobile" aria-label="Mobil visning">
+                    <Smartphone className="h-4 w-4" />
+                </ToggleGroupItem>
+            </ToggleGroup>
+
+            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Gem Ændringer
+            </Button>
+        </div>
       </div>
 
       <Accordion type="multiple" className="w-full space-y-4" defaultValue={['hero']}>
@@ -627,6 +660,7 @@ export default function CmsHomePage() {
                                 label="Services"
                                 padding={settings.sectionPadding.services}
                                 onPaddingChange={(p) => handlePaddingChange('services', p)}
+                                previewMode={previewMode}
                             />
                         )}
                         {settings.sectionPadding?.aiProject && (
@@ -634,6 +668,7 @@ export default function CmsHomePage() {
                                 label="Fortæl os om dit projekt"
                                 padding={settings.sectionPadding.aiProject}
                                 onPaddingChange={(p) => handlePaddingChange('aiProject', p)}
+                                previewMode={previewMode}
                             />
                         )}
                         {settings.sectionPadding?.cases && (
@@ -641,6 +676,7 @@ export default function CmsHomePage() {
                                 label="Cases"
                                 padding={settings.sectionPadding.cases}
                                 onPaddingChange={(p) => handlePaddingChange('cases', p)}
+                                previewMode={previewMode}
                             />
                         )}
                         {settings.sectionPadding?.about && (
@@ -648,6 +684,7 @@ export default function CmsHomePage() {
                                 label="Om Os"
                                 padding={settings.sectionPadding.about}
                                 onPaddingChange={(p) => handlePaddingChange('about', p)}
+                                previewMode={previewMode}
                             />
                         )}
                         {settings.sectionPadding?.contact && (
@@ -655,6 +692,7 @@ export default function CmsHomePage() {
                                 label="Kontakt"
                                 padding={settings.sectionPadding.contact}
                                 onPaddingChange={(p) => handlePaddingChange('contact', p)}
+                                previewMode={previewMode}
                             />
                         )}
                     </CardContent>
