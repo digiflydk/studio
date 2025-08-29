@@ -121,7 +121,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
             <Card className="shadow-lg bg-gray-900/60 backdrop-blur-sm border-primary/20">
                 <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
-                    <div className="h-80 overflow-y-auto space-y-6 scrollbar-gutter-stable pr-2">
+                    <div className="h-80 overflow-y-auto space-y-6 scrollbar-gutter-stable">
                         {messages.map((message, index) => (
                         <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
