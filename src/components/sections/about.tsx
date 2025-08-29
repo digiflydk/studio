@@ -7,6 +7,7 @@ import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { type TeamMember, type GeneralSettings, type SectionPadding } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 const defaultTeam: TeamMember[] = [
@@ -43,6 +44,7 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ settings }: AboutSectionProps) {
+    const isMobile = useIsMobile();
     const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
     const aboutText = settings?.aboutText || defaultAboutText;
     const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
@@ -54,18 +56,30 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
     };
     
+    const teamMemberNameStyle: React.CSSProperties = {
+        fontSize: settings?.teamMemberNameSize ? `${settings.teamMemberNameSize}px` : undefined,
+    };
+    const teamMemberTitleStyle: React.CSSProperties = {
+        fontSize: settings?.teamMemberTitleSize ? `${settings.teamMemberTitleSize}px` : undefined,
+    };
+    const teamMemberDescriptionStyle: React.CSSProperties = {
+        fontSize: settings?.teamMemberDescriptionSize ? `${settings.teamMemberDescriptionSize}px` : undefined,
+    };
+
     const sectionPadding = settings?.sectionPadding?.about;
-    const style: React.CSSProperties = sectionPadding ? {
-        '--padding-top': `${sectionPadding.top}px`,
-        '--padding-bottom': `${sectionPadding.bottom}px`,
-        '--padding-top-mobile': `${sectionPadding.topMobile}px`,
-        '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
-    } as any : {};
+    const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
+    const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
+
+    const style: React.CSSProperties = {
+        paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
+        paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+    };
+
 
     return (
         <section 
             id="om-os" 
-            className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]"
+            className="bg-secondary"
             style={style}
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
@@ -94,14 +108,14 @@ export default function AboutSection({ settings }: AboutSectionProps) {
                             <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                <h3 className="text-h3 font-semibold">{member.name}</h3>
-                                <p className="text-sm text-primary">{member.title}</p>
+                                <h3 className={cn("font-semibold", settings?.teamMemberNameColor)} style={teamMemberNameStyle}>{member.name}</h3>
+                                <p className={cn("text-sm", settings?.teamMemberTitleColor)} style={teamMemberTitleStyle}>{member.title}</p>
                                 </div>
                                 <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
                                     <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
                                 </Link>
                             </div>
-                            <p className="mt-2 text-sm text-muted-foreground">{member.description}</p>
+                            <p className={cn("mt-2 text-sm", settings?.teamMemberDescriptionColor)} style={teamMemberDescriptionStyle}>{member.description}</p>
                             </div>
                         </div>
                         ))}

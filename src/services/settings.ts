@@ -152,6 +152,12 @@ export interface GeneralSettings {
     aboutTextColor?: string;
     aboutTextSize?: number;
     teamMembers?: TeamMember[];
+    teamMemberNameColor?: string;
+    teamMemberNameSize?: number;
+    teamMemberTitleColor?: string;
+    teamMemberTitleSize?: number;
+    teamMemberDescriptionColor?: string;
+    teamMemberDescriptionSize?: number;
 
     // Spacing
     sectionPadding?: {

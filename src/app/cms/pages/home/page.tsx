@@ -378,6 +378,12 @@ export default function CmsHomePage() {
           aboutTextColor: initialSettings.aboutTextColor ?? "text-muted-foreground",
           aboutTextSize: initialSettings.aboutTextSize ?? 18,
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
+          teamMemberNameColor: initialSettings.teamMemberNameColor ?? 'text-foreground',
+          teamMemberNameSize: initialSettings.teamMemberNameSize ?? 18,
+          teamMemberTitleColor: initialSettings.teamMemberTitleColor ?? 'text-primary',
+          teamMemberTitleSize: initialSettings.teamMemberTitleSize ?? 14,
+          teamMemberDescriptionColor: initialSettings.teamMemberDescriptionColor ?? 'text-muted-foreground',
+          teamMemberDescriptionSize: initialSettings.teamMemberDescriptionSize ?? 14,
           
           sectionPadding: newSectionPadding,
       });
@@ -730,7 +736,55 @@ export default function CmsHomePage() {
                                 <Slider value={[settings.aboutTextSize || 18]} onValueChange={([v]) => handleInputChange('aboutTextSize', v)} min={10} max={120} step={1} />
                             </div>
                         </div>
-                        <Label>Team</Label>
+                        <div className="space-y-2">
+                             <Label>Team</Label>
+                             <div className="p-4 border rounded-lg bg-muted/20 space-y-4">
+                                <h3 className="font-semibold">Design for teammedlemmer</h3>
+                                <div className="space-y-2">
+                                    <Label>Navn farve</Label>
+                                    <Select value={settings.teamMemberNameColor as ThemeColor || 'text-foreground'} onValueChange={(v) => handleInputChange('teamMemberNameColor', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                     <div className="flex justify-between items-center">
+                                        <Label>Navn Tekststørrelse</Label>
+                                        <span className="text-sm text-muted-foreground">{settings.teamMemberNameSize || 18}px</span>
+                                    </div>
+                                    <Slider value={[settings.teamMemberNameSize || 18]} onValueChange={([v]) => handleInputChange('teamMemberNameSize', v)} min={12} max={32} step={1} />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label>Titel farve</Label>
+                                    <Select value={settings.teamMemberTitleColor as ThemeColor || 'text-primary'} onValueChange={(v) => handleInputChange('teamMemberTitleColor', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                     <div className="flex justify-between items-center">
+                                        <Label>Titel Tekststørrelse</Label>
+                                        <span className="text-sm text-muted-foreground">{settings.teamMemberTitleSize || 14}px</span>
+                                    </div>
+                                    <Slider value={[settings.teamMemberTitleSize || 14]} onValueChange={([v]) => handleInputChange('teamMemberTitleSize', v)} min={10} max={24} step={1} />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label>Beskrivelse farve</Label>
+                                    <Select value={settings.teamMemberDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('teamMemberDescriptionColor', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                     <div className="flex justify-between items-center">
+                                        <Label>Beskrivelse Tekststørrelse</Label>
+                                        <span className="text-sm text-muted-foreground">{settings.teamMemberDescriptionSize || 14}px</span>
+                                    </div>
+                                    <Slider value={[settings.teamMemberDescriptionSize || 14]} onValueChange={([v]) => handleInputChange('teamMemberDescriptionSize', v)} min={10} max={24} step={1} />
+                                </div>
+                             </div>
+                        </div>
+
                         <Accordion type="multiple" className="w-full border rounded-md">
                             {(settings.teamMembers || []).map((member, index) => (
                                 <EditableListItem 
