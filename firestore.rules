@@ -1,14 +1,20 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to the 'settings' collection.
-    // This rule allows anyone to read or write to any document in the 'settings' collection.
-    // For a production app, you would want to restrict this further, for example:
-    // allow read: if true;
-    // allow write: if request.auth != null; // Only authenticated users
-    match /settings/{setting} {
+    match /settings/{document=**} {
       allow read, write: if true;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /uploads/{allPaths=**} {
+      allow read;
+      allow write: if true; 
     }
   }
 }

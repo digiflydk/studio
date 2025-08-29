@@ -2,15 +2,16 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, Copy, Loader2 } from "lucide-react";
+import { Upload, Copy, Loader2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { GeneralSettings } from "@/services/settings";
-import { getSettingsAction, saveSettingsAction } from "@/app/actions";
+import { getSettingsAction, saveSettingsAction, uploadFileAction } from "@/app/actions";
 
 const weekDays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
 
@@ -25,11 +26,14 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
   return acc;
 }, {} as Record<string, OpeningTime>);
 
+type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 export default function GeneralSettingsPage() {
     const [settings, setSettings] = useState<GeneralSettings>({ openingHours: initialOpeningHours });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, startSaving] = useTransition();
+    const [logoUploadStatus, setLogoUploadStatus] = useState<UploadStatus>('idle');
+    const [faviconUploadStatus, setFaviconUploadStatus] = useState<UploadStatus>('idle');
     const { toast } = useToast();
 
     useEffect(() => {
@@ -50,6 +54,51 @@ export default function GeneralSettingsPage() {
     const handleInputChange = (field: keyof GeneralSettings, value: string) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
+
+    const handleFileUpload = async (file: File, type: 'logo' | 'favicon') => {
+        const setStatus = type === 'logo' ? setLogoUploadStatus : setFaviconUploadStatus;
+        setStatus('uploading');
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const result = await uploadFileAction(formData);
+
+        if (result.success && result.url) {
+            const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
+            setSettings(prev => ({ ...prev, [fieldName]: result.url }));
+            setStatus('success');
+            toast({ title: "Upload Succes!", description: result.message });
+            // Automatically save after successful upload
+            startSaving(async () => {
+                await saveSettingsAction({ ...settings, [fieldName]: result.url });
+            });
+        } else {
+            setStatus('error');
+            toast({ title: "Upload Fejl!", description: result.message, variant: 'destructive' });
+        }
+    }
+    
+    const removeImage = (type: 'logo' | 'favicon') => {
+        const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
+        const altFieldName = 'logoAlt';
+
+        const updatedSettings = { ...settings, [fieldName]: undefined };
+        if (type === 'logo') {
+            updatedSettings[altFieldName] = undefined;
+        }
+
+        setSettings(updatedSettings);
+
+        startSaving(async () => {
+            const result = await saveSettingsAction(updatedSettings);
+            toast({
+                title: result.success ? "Billede fjernet!" : "Fejl!",
+                description: result.message,
+                variant: result.success ? "default" : "destructive",
+            });
+        });
+    }
 
     const handleTimeChange = (day: string, part: 'from' | 'to', value: string) => {
         setSettings(prev => ({
@@ -114,30 +163,46 @@ export default function GeneralSettingsPage() {
           </div>
 
           <div className="space-y-6">
-             <div className="space-y-2">
+             <div className="space-y-4">
                 <Label>Logo</Label>
-                 <div className="flex items-center gap-4">
-                    <Button variant="outline" asChild>
+                {settings.logoUrl ? (
+                    <div className="relative w-48 h-12 bg-muted rounded-md p-2 flex items-center justify-center">
+                        <Image src={settings.logoUrl} alt={settings.logoAlt || 'Logo preview'} layout="fill" objectFit="contain" />
+                         <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white" onClick={() => removeImage('logo')}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ): (
+                    <Button variant="outline" asChild disabled={logoUploadStatus === 'uploading'}>
                         <label htmlFor="logo-upload" className="cursor-pointer">
-                            <Upload className="mr-2 h-4 w-4" />
+                            {logoUploadStatus === 'uploading' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                             Upload billede
-                            <input id="logo-upload" type="file" className="sr-only" />
+                            <input id="logo-upload" type="file" className="sr-only" accept="image/*" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'logo')} />
                         </label>
                     </Button>
-                    <Input id="logo-alt" placeholder="Alt text for logo" value={settings.logoAlt || ''} onChange={e => handleInputChange('logoAlt', e.target.value)} />
-                </div>
-                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels.</p>
+                )}
+                 <Input id="logo-alt" placeholder="Alt text for logo" value={settings.logoAlt || ''} onChange={e => handleInputChange('logoAlt', e.target.value)} />
+                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels. PNG med transparent baggrund foretrækkes.</p>
             </div>
              <div className="space-y-2">
                 <Label>Favicon</Label>
-                 <Button variant="outline" asChild>
-                    <label htmlFor="favicon-upload" className="cursor-pointer">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload favicon
-                        <input id="favicon-upload" type="file" className="sr-only" />
-                    </label>
-                </Button>
-                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 32x32 pixels.</p>
+                {settings.faviconUrl ? (
+                     <div className="relative w-8 h-8 bg-muted rounded-md p-1 flex items-center justify-center">
+                        <Image src={settings.faviconUrl} alt="Favicon preview" layout="fill" objectFit="contain" />
+                         <Button variant="ghost" size="icon" className="absolute -top-2 -right-2 h-6 w-6 bg-black/50 hover:bg-black/70 text-white rounded-full" onClick={() => removeImage('favicon')}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ) : (
+                    <Button variant="outline" asChild disabled={faviconUploadStatus === 'uploading'}>
+                        <label htmlFor="favicon-upload" className="cursor-pointer">
+                             {faviconUploadStatus === 'uploading' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                            Upload favicon
+                            <input id="favicon-upload" type="file" className="sr-only" accept="image/x-icon, image/png, image/svg+xml" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'favicon')} />
+                        </label>
+                    </Button>
+                )}
+                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 32x32 pixels. ICO, PNG or SVG.</p>
             </div>
           </div>
         </CardContent>
@@ -156,28 +221,25 @@ export default function GeneralSettingsPage() {
                      <Input placeholder="Vejnavn og nummer" value={settings.streetAddress || ''} onChange={e => handleInputChange('streetAddress', e.target.value)} />
                      <Input placeholder="Postnummer" value={settings.postalCode || ''} onChange={e => handleInputChange('postalCode', e.target.value)} />
                      <Input placeholder="By" value={settings.city || ''} onChange={e => handleInputChange('city', e.target.value)} />
-                     <Input id="country" placeholder="Danmark" value={settings.country || ''} onChange={e => handleInputChange('country', e.target.value)}/>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <Label htmlFor="business-email">Business Email</Label>
-                    <Input id="business-email" type="email" placeholder="kontakt@virksomhed.dk" value={settings.businessEmail || ''} onChange={e => handleInputChange('businessEmail', e.target.value)} />
-                </div>
-                 <div className="space-y-2">
-                    <Label>Telefon</Label>
-                     <div className="flex gap-2">
-                         <Select value={settings.countryCode || '+45'} onValueChange={value => handleInputChange('countryCode', value)}>
-                            <SelectTrigger className="w-[80px]">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="+45">+45</SelectItem>
-                                <SelectItem value="+46">+46</SelectItem>
-                                <SelectItem value="+47">+47</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Input id="phone-number" placeholder="12 34 56 78" value={settings.phoneNumber || ''} onChange={e => handleInputChange('phoneNumber', e.target.value)}/>
+                      <div className="space-y-2">
+                        <Label htmlFor="business-email">Business Email</Label>
+                        <Input id="business-email" type="email" placeholder="kontakt@virksomhed.dk" value={settings.businessEmail || ''} onChange={e => handleInputChange('businessEmail', e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Telefon</Label>
+                         <div className="flex gap-2">
+                             <Select value={settings.countryCode || '+45'} onValueChange={value => handleInputChange('countryCode', value)}>
+                                <SelectTrigger className="w-[80px]">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="+45">+45</SelectItem>
+                                    <SelectItem value="+46">+46</SelectItem>
+                                    <SelectItem value="+47">+47</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Input id="phone-number" placeholder="12 34 56 78" value={settings.phoneNumber || ''} onChange={e => handleInputChange('phoneNumber', e.target.value)}/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -185,6 +247,10 @@ export default function GeneralSettingsPage() {
                 <div className="space-y-2">
                     <Label htmlFor="cvr">CVR-nummer</Label>
                     <Input id="cvr" placeholder="12345678" value={settings.cvr || ''} onChange={e => handleInputChange('cvr', e.target.value)} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="country">Land</Label>
+                    <Input id="country" placeholder="Danmark" value={settings.country || ''} onChange={e => handleInputChange('country', e.target.value)}/>
                 </div>
             </div>
         </CardContent>
