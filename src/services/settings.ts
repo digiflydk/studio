@@ -30,6 +30,7 @@ export interface GeneralSettings {
     twitterUrl?: string;
     tiktokUrl?: string;
     gtmId?: string;
+    googleAnalyticsId?: string;
     facebookPixelId?: string;
     googleAdsId?: string;
 }

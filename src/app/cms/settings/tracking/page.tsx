@@ -85,6 +85,15 @@ export default function TrackingSettingsPage() {
               </AlertDescription>
             </Alert>
             <div className="space-y-2">
+                <Label htmlFor="ga-id">Google Analytics ID</Label>
+                <Input 
+                    id="ga-id" 
+                    placeholder="G-XXXXXXXXXX"
+                    value={settings.googleAnalyticsId || ''}
+                    onChange={(e) => handleInputChange('googleAnalyticsId', e.target.value)}
+                />
+            </div>
+            <div className="space-y-2">
                 <Label htmlFor="pixel-id">Facebook Pixel ID</Label>
                 <Input 
                     id="pixel-id" 

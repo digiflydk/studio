@@ -52,6 +52,25 @@ function FBPixelDeclarations({ pixelId }: { pixelId: string }) {
     )
 }
 
+function GA4Declarations({ gaId }: { gaId: string }) {
+    return (
+        <>
+            <Script 
+                strategy="afterInteractive"
+                src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+                {`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${gaId}');
+                `}
+            </Script>
+        </>
+    )
+}
+
 export default function Analytics() {
     const [settings, setSettings] = useState<Partial<GeneralSettings> | null>(null);
     const pathname = usePathname();
@@ -93,8 +112,8 @@ export default function Analytics() {
     return (
         <Suspense fallback={null}>
             {settings.gtmId && <GTMDeclarations gtmId={settings.gtmId} />}
+            {settings.googleAnalyticsId && <GA4Declarations gaId={settings.googleAnalyticsId} />}
             {settings.facebookPixelId && <FBPixelDeclarations pixelId={settings.facebookPixelId} />}
         </Suspense>
     );
 }
-
