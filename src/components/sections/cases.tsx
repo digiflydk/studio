@@ -1,10 +1,15 @@
 
+'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getGeneralSettings, type Case } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useState } from 'react';
+import { GeneralSettings } from '@/services/settings';
+
 
 const defaultCases: Case[] = [
   {
@@ -30,10 +35,15 @@ const defaultCases: Case[] = [
   },
 ];
 
-export default async function CasesSection() {
-  const settings = await getGeneralSettings();
-  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
+function CasesSectionContent() {
+  const isMobile = useIsMobile();
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+  useEffect(() => {
+    getGeneralSettings().then(setSettings);
+  }, []);
   
+  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
 
@@ -46,8 +56,9 @@ export default async function CasesSection() {
 
   const sectionStyle: React.CSSProperties = {};
   if (settings?.sectionPadding?.cases) {
-    sectionStyle.paddingTop = `${settings.sectionPadding.cases.top}px`;
-    sectionStyle.paddingBottom = `${settings.sectionPadding.cases.bottom}px`;
+    const padding = settings.sectionPadding.cases;
+    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
   }
 
   return (
@@ -96,4 +107,8 @@ export default async function CasesSection() {
       </div>
     </section>
   );
+}
+
+export default function CasesSection() {
+    return <CasesSectionContent />;
 }

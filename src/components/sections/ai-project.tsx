@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { getGeneralSettings } from '@/services/settings';
 import type { GeneralSettings } from '@/services/settings';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -26,6 +27,7 @@ export default function AiProjectSection() {
   const [isComplete, setIsComplete] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function loadSettings() {
@@ -33,6 +35,9 @@ export default function AiProjectSection() {
       setSettings(loadedSettings);
     }
     loadSettings();
+  }, []);
+  
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -91,8 +96,9 @@ export default function AiProjectSection() {
 
   const sectionStyle: React.CSSProperties = {};
   if (settings?.sectionPadding?.aiProject) {
-    sectionStyle.paddingTop = `${settings.sectionPadding.aiProject.top}px`;
-    sectionStyle.paddingBottom = `${settings.sectionPadding.aiProject.bottom}px`;
+      const padding = settings.sectionPadding.aiProject;
+      sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+      sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
   }
 
   return (

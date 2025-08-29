@@ -1,11 +1,16 @@
 
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getGeneralSettings, type TeamMember } from '@/services/settings';
+import { getGeneralSettings, type TeamMember, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useState, useEffect } from 'react';
+
 
 const defaultTeam: TeamMember[] = [
   {
@@ -36,69 +41,77 @@ const defaultTeam: TeamMember[] = [
 
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
-export default async function AboutSection() {
-  const settings = await getGeneralSettings();
-  const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
-  const aboutText = settings?.aboutText || defaultAboutText;
-  const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
+export default function AboutSection() {
+    const isMobile = useIsMobile();
+    const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
-  const titleStyle: React.CSSProperties = {
-    fontSize: settings?.aboutSectionTitleSize ? `${settings.aboutSectionTitleSize}px` : undefined,
-  };
-  const textStyle: React.CSSProperties = {
-    fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
-  };
+    useEffect(() => {
+        getGeneralSettings().then(setSettings);
+    }, []);
 
-  const sectionStyle: React.CSSProperties = {};
-  if (settings?.sectionPadding?.about) {
-    sectionStyle.paddingTop = `${settings.sectionPadding.about.top}px`;
-    sectionStyle.paddingBottom = `${settings.sectionPadding.about.bottom}px`;
-  }
-  
-  return (
-    <section id="om-os" className="bg-secondary" style={sectionStyle}>
-      <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
-          <div className="text-center lg:text-left">
-            <h2 
-              className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
-              style={titleStyle}
-            >
-              {title}
-            </h2>
-            <p 
-              className={cn("mt-6 text-body", settings?.aboutTextColor || "text-muted-foreground")}
-              style={textStyle}
-            >
-              {aboutText}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-8">
-            {team.map((member) => (
-              <div key={member.name} className="flex items-start space-x-4">
-                <Avatar className="w-16 h-16 border-2 border-primary">
-                  <AvatarImage src={member.imageUrl} alt={`${member.name} - ${member.title}`} data-ai-hint={member.aiHint} />
-                  <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-h3 font-semibold">{member.name}</h3>
-                      <p className="text-sm text-primary">{member.title}</p>
+    const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
+    const aboutText = settings?.aboutText || defaultAboutText;
+    const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
+
+    const titleStyle: React.CSSProperties = {
+        fontSize: settings?.aboutSectionTitleSize ? `${settings.aboutSectionTitleSize}px` : undefined,
+    };
+    const textStyle: React.CSSProperties = {
+        fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
+    };
+    
+    const sectionStyle: React.CSSProperties = {};
+    if (settings?.sectionPadding?.about) {
+        const padding = settings.sectionPadding.about;
+        sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+        sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
+    }
+
+    return (
+        <section id="om-os" className="bg-secondary" style={sectionStyle}>
+            <div className="container mx-auto max-w-7xl px-4 md:px-6">
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
+                    <div className="text-center lg:text-left">
+                        <h2 
+                        className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
+                        style={titleStyle}
+                        >
+                        {title}
+                        </h2>
+                        <p 
+                        className={cn("mt-6 text-body", settings?.aboutTextColor || "text-muted-foreground")}
+                        style={textStyle}
+                        >
+                        {aboutText}
+                        </p>
                     </div>
-                    <Button asChild variant="ghost" size="icon">
-                      <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
-                        <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" />
-                      </Link>
-                    </Button>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{member.description}</p>
+                    <div className="grid grid-cols-1 gap-8">
+                        {team.map((member) => (
+                        <div key={member.name} className="flex items-start space-x-4">
+                            <Avatar className="w-16 h-16 border-2 border-primary">
+                            <AvatarImage src={member.imageUrl} alt={`${member.name} - ${member.title}`} data-ai-hint={member.aiHint} />
+                            <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                <h3 className="text-h3 font-semibold">{member.name}</h3>
+                                <p className="text-sm text-primary">{member.title}</p>
+                                </div>
+                                <Button asChild variant="ghost" size="icon">
+                                <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
+                                    <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                                </Link>
+                                </Button>
+                            </div>
+                            <p className="mt-2 text-sm text-muted-foreground">{member.description}</p>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+            </div>
+        </section>
+    );
 }
+

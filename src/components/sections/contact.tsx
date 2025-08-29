@@ -13,6 +13,7 @@ import { sendContactMessage, getSettingsAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { GeneralSettings } from '@/services/settings';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const initialState = {
   message: '',
@@ -34,6 +35,7 @@ export default function ContactSection() {
   const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function loadSettings() {
@@ -61,13 +63,14 @@ export default function ContactSection() {
 
   const sectionStyle: React.CSSProperties = {};
   if (settings?.sectionPadding?.contact) {
-    sectionStyle.paddingTop = `${settings.sectionPadding.contact.top}px`;
-    sectionStyle.paddingBottom = `${settings.sectionPadding.contact.bottom}px`;
+    const padding = settings.sectionPadding.contact;
+    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
   }
 
   return (
     <section id="kontakt" className="w-full bg-background" style={sectionStyle}>
-      <div className="container mx-auto max-w-3xl px-4 md:px-6">
+      <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-h2 font-bold tracking-tight text-black">Kom i kontakt</CardTitle>

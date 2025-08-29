@@ -33,7 +33,7 @@ export interface Case {
 export interface TeamMember {
     name: string;
     title: string;
-    description: string;
+    description:string;
     imageUrl: string;
     linkedinUrl: string;
     aiHint: string;
@@ -42,6 +42,13 @@ export interface TeamMember {
 export interface NavLink {
     label: string;
     href: string;
+}
+
+export type SectionPadding = {
+    top: number;
+    bottom: number;
+    topMobile: number;
+    bottomMobile: number;
 }
 
 export interface GeneralSettings {
@@ -146,11 +153,11 @@ export interface GeneralSettings {
 
     // Spacing
     sectionPadding?: {
-        services: { top: number; bottom: number };
-        aiProject: { top: number; bottom: number };
-        cases: { top: number; bottom: number };
-        about: { top: number; bottom: number };
-        contact: { top: number; bottom: number };
+        services: SectionPadding;
+        aiProject: SectionPadding;
+        cases: SectionPadding;
+        about: SectionPadding;
+        contact: SectionPadding;
     };
 }
 

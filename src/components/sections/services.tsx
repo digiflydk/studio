@@ -1,8 +1,11 @@
 
+'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getGeneralSettings, type Service } from '@/services/settings';
+import { getGeneralSettings, type Service, GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useState } from 'react';
 
 const defaultServices: Service[] = [
   {
@@ -31,10 +34,15 @@ const defaultServices: Service[] = [
   },
 ];
 
-export default async function ServicesSection() {
-  const settings = await getGeneralSettings();
+function ServicesSectionContent() {
+  const isMobile = useIsMobile();
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+  useEffect(() => {
+    getGeneralSettings().then(setSettings);
+  }, []);
+
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
-  
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
 
@@ -47,8 +55,9 @@ export default async function ServicesSection() {
 
   const sectionStyle: React.CSSProperties = {};
   if (settings?.sectionPadding?.services) {
-    sectionStyle.paddingTop = `${settings.sectionPadding.services.top}px`;
-    sectionStyle.paddingBottom = `${settings.sectionPadding.services.bottom}px`;
+    const padding = settings.sectionPadding.services;
+    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
   }
 
   return (
@@ -92,4 +101,8 @@ export default async function ServicesSection() {
       </div>
     </section>
   );
+}
+
+export default function ServicesSection() {
+    return <ServicesSectionContent />;
 }

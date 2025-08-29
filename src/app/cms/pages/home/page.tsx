@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember } from '@/services/settings';
+import { GeneralSettings, Service, Case, TeamMember, SectionPadding } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -94,6 +94,8 @@ const defaultTeam: TeamMember[] = [
 ];
 
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
+
+const defaultPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
 
 const themeColorOptions = [
     { value: 'text-primary', label: 'Primary' },
@@ -206,38 +208,66 @@ function SpacingEditor({
     onPaddingChange
 }: {
     label: string;
-    padding: { top: number; bottom: number };
-    onPaddingChange: (padding: { top: number; bottom: number }) => void;
+    padding: SectionPadding;
+    onPaddingChange: (padding: SectionPadding) => void;
 }) {
     return (
         <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
             <h3 className="font-semibold">{label}</h3>
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <Label>Afstand i toppen</Label>
-                    <span className="text-sm text-muted-foreground">{padding.top}px</span>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i toppen (Desktop)</Label>
+                        <span className="text-sm text-muted-foreground">{padding.top}px</span>
+                    </div>
+                    <Slider 
+                        value={[padding.top]} 
+                        onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
+                        min={0}
+                        max={200}
+                        step={4}
+                    />
                 </div>
-                <Slider 
-                    value={[padding.top]} 
-                    onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
-                    min={0}
-                    max={200}
-                    step={4}
-                />
-            </div>
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <Label>Afstand i bunden</Label>
-                    <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i toppen (Mobil)</Label>
+                        <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
+                    </div>
+                    <Slider 
+                        value={[padding.topMobile]} 
+                        onValueChange={([v]) => onPaddingChange({ ...padding, topMobile: v })}
+                        min={0}
+                        max={150}
+                        step={4}
+                    />
                 </div>
-                <Slider 
-                    value={[padding.bottom]} 
-                    onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
-                    min={0}
-                    max={200}
-                    step={4}
-                />
-            </div>
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <Label className="flex items-center gap-2"><Monitor className="h-4 w-4" /> Afstand i bunden (Desktop)</Label>
+                        <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                    </div>
+                    <Slider 
+                        value={[padding.bottom]} 
+                        onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
+                        min={0}
+                        max={200}
+                        step={4}
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <Label className="flex items-center gap-2"><Smartphone className="h-4 w-4" /> Afstand i bunden (Mobil)</Label>
+                        <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
+                    </div>
+                    <Slider 
+                        value={[padding.bottomMobile]} 
+                        onValueChange={([v]) => onPaddingChange({ ...padding, bottomMobile: v })}
+                        min={0}
+                        max={150}
+                        step={4}
+                    />
+                </div>
+             </div>
         </div>
     );
 }
@@ -252,93 +282,53 @@ export default function CmsHomePage() {
     async function loadSettings() {
       setIsLoading(true);
       const loadedSettings = await getSettingsAction();
-      if (loadedSettings) {
-        setSettings({
-            ...loadedSettings,
-            heroHeadline: loadedSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
-            heroHeadlineColor: loadedSettings.heroHeadlineColor || 'text-white',
-            heroHeadlineSize: loadedSettings.heroHeadlineSize || 64,
-            heroDescription: loadedSettings.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
-            heroDescriptionColor: loadedSettings.heroDescriptionColor || 'text-primary-foreground/80',
-            heroDescriptionSize: loadedSettings.heroDescriptionSize || 18,
-            heroImageUrl: loadedSettings.heroImageUrl || 'https://picsum.photos/1920/1280',
-            
-            servicesSectionTitle: loadedSettings.servicesSectionTitle || "Vores Services",
-            servicesSectionTitleColor: loadedSettings.servicesSectionTitleColor || "text-black",
-            servicesSectionTitleSize: loadedSettings.servicesSectionTitleSize || 36,
-            servicesSectionDescription: loadedSettings.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
-            servicesSectionDescriptionColor: loadedSettings.servicesSectionDescriptionColor || "text-muted-foreground",
-            servicesSectionDescriptionSize: loadedSettings.servicesSectionDescriptionSize || 18,
-            services: loadedSettings.services && loadedSettings.services.length > 0 ? loadedSettings.services : defaultServices,
-            
-            casesSectionTitle: loadedSettings.casesSectionTitle || "Vores Arbejde",
-            casesSectionTitleColor: loadedSettings.casesSectionTitleColor || "text-black",
-            casesSectionTitleSize: loadedSettings.casesSectionTitleSize || 36,
-            casesSectionDescription: loadedSettings.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
-            casesSectionDescriptionColor: loadedSettings.casesSectionDescriptionColor || "text-muted-foreground",
-            casesSectionDescriptionSize: loadedSettings.casesSectionDescriptionSize || 18,
-            cases: loadedSettings.cases && loadedSettings.cases.length > 0 ? loadedSettings.cases : defaultCases,
-            
-            aboutSectionTitle: loadedSettings.aboutSectionTitle || "Hvem er Digifly?",
-            aboutSectionTitleColor: loadedSettings.aboutSectionTitleColor || "text-black",
-            aboutSectionTitleSize: loadedSettings.aboutSectionTitleSize || 36,
-            aboutText: loadedSettings.aboutText || defaultAboutText,
-            aboutTextColor: loadedSettings.aboutTextColor || "text-muted-foreground",
-            aboutTextSize: loadedSettings.aboutTextSize || 18,
-            teamMembers: loadedSettings.teamMembers && loadedSettings.teamMembers.length > 0 ? loadedSettings.teamMembers : defaultTeam,
-            
-            sectionPadding: loadedSettings.sectionPadding || {
-                services: { top: 96, bottom: 96 },
-                aiProject: { top: 96, bottom: 96 },
-                cases: { top: 96, bottom: 96 },
-                about: { top: 96, bottom: 96 },
-                contact: { top: 96, bottom: 96 },
-            },
-        });
-      } else {
-        // If no settings are loaded at all, populate with all defaults
-        setSettings({
-            heroHeadline: 'Flow. Automatisér. Skalér.',
-            heroHeadlineColor: 'text-white',
-            heroHeadlineSize: 64,
-            heroDescription: 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
-            heroDescriptionColor: 'text-primary-foreground/80',
-            heroDescriptionSize: 18,
-            heroImageUrl: 'https://picsum.photos/1920/1280',
+      const initialSettings = loadedSettings || {};
 
-            servicesSectionTitle: "Vores Services",
-            servicesSectionTitleColor: "text-black",
-            servicesSectionTitleSize: 36,
-            servicesSectionDescription: "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
-            servicesSectionDescriptionColor: "text-muted-foreground",
-            servicesSectionDescriptionSize: 18,
-            services: defaultServices,
+      const sectionPadding = {
+          services: initialSettings.sectionPadding?.services || defaultPadding,
+          aiProject: initialSettings.sectionPadding?.aiProject || defaultPadding,
+          cases: initialSettings.sectionPadding?.cases || defaultPadding,
+          about: initialSettings.sectionPadding?.about || defaultPadding,
+          contact: initialSettings.sectionPadding?.contact || defaultPadding,
+      };
 
-            casesSectionTitle: "Vores Arbejde",
-            casesSectionTitleColor: "text-black",
-            casesSectionTitleSize: 36,
-            casesSectionDescription: "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
-            casesSectionDescriptionColor: "text-muted-foreground",
-            casesSectionDescriptionSize: 18,
-            cases: defaultCases,
-            
-            aboutSectionTitle: "Hvem er Digifly?",
-            aboutSectionTitleColor: "text-black",
-            aboutSectionTitleSize: 36,
-            aboutText: defaultAboutText,
-            aboutTextColor: "text-muted-foreground",
-            aboutTextSize: 18,
-            teamMembers: defaultTeam,
+      setSettings({
+          ...initialSettings,
+          heroHeadline: initialSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
+          heroHeadlineColor: initialSettings.heroHeadlineColor || 'text-white',
+          heroHeadlineSize: initialSettings.heroHeadlineSize || 64,
+          heroDescription: initialSettings.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
+          heroDescriptionColor: initialSettings.heroDescriptionColor || 'text-primary-foreground/80',
+          heroDescriptionSize: initialSettings.heroDescriptionSize || 18,
+          heroImageUrl: initialSettings.heroImageUrl || 'https://picsum.photos/1920/1280',
+          
+          servicesSectionTitle: initialSettings.servicesSectionTitle || "Vores Services",
+          servicesSectionTitleColor: initialSettings.servicesSectionTitleColor || "text-black",
+          servicesSectionTitleSize: initialSettings.servicesSectionTitleSize || 36,
+          servicesSectionDescription: initialSettings.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
+          servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor || "text-muted-foreground",
+          servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize || 18,
+          services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
+          
+          casesSectionTitle: initialSettings.casesSectionTitle || "Vores Arbejde",
+          casesSectionTitleColor: initialSettings.casesSectionTitleColor || "text-black",
+          casesSectionTitleSize: initialSettings.casesSectionTitleSize || 36,
+          casesSectionDescription: initialSettings.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
+          casesSectionDescriptionColor: initialSettings.casesSectionDescriptionColor || "text-muted-foreground",
+          casesSectionDescriptionSize: initialSettings.casesSectionDescriptionSize || 18,
+          cases: initialSettings.cases && initialSettings.cases.length > 0 ? initialSettings.cases : defaultCases,
+          
+          aboutSectionTitle: initialSettings.aboutSectionTitle || "Hvem er Digifly?",
+          aboutSectionTitleColor: initialSettings.aboutSectionTitleColor || "text-black",
+          aboutSectionTitleSize: initialSettings.aboutSectionTitleSize || 36,
+          aboutText: initialSettings.aboutText || defaultAboutText,
+          aboutTextColor: initialSettings.aboutTextColor || "text-muted-foreground",
+          aboutTextSize: initialSettings.aboutTextSize || 18,
+          teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
+          
+          sectionPadding,
+      });
 
-            sectionPadding: {
-                services: { top: 96, bottom: 96 },
-                aiProject: { top: 96, bottom: 96 },
-                cases: { top: 96, bottom: 96 },
-                about: { top: 96, bottom: 96 },
-                contact: { top: 96, bottom: 96 },
-            },
-        })
-      }
       setIsLoading(false);
     }
     loadSettings();
@@ -348,7 +338,7 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: { top: number; bottom: number }) => {
+  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: SectionPadding) => {
     setSettings(prev => ({
         ...prev,
         sectionPadding: {
@@ -677,5 +667,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
-    
