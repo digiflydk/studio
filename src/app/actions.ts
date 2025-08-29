@@ -5,7 +5,7 @@ import { aiProjectQualification, type AIProjectQualificationInput, type AIProjec
 import { getGeneralSettings, saveGeneralSettings, GeneralSettings } from '@/services/settings';
 import { revalidatePath } from 'next/cache';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from '@/lib/firebase'; // Ensure storage is exported from firebase.ts
+import { storage } from '@/lib/firebase';
 
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
@@ -78,7 +78,14 @@ export async function uploadFileAction(formData: FormData): Promise<{ success: b
 
     try {
         const storageRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
-        const snapshot = await uploadBytes(storageRef, file);
+        
+        // Convert file to ArrayBuffer
+        const arrayBuffer = await file.arrayBuffer();
+
+        const snapshot = await uploadBytes(storageRef, arrayBuffer, {
+          contentType: file.type,
+        });
+        
         const downloadURL = await getDownloadURL(snapshot.ref);
         return { success: true, url: downloadURL, message: 'Filen blev uploadet.' };
     } catch (error) {
