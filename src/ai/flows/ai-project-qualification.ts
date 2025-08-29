@@ -11,7 +11,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getGeneralSettings } from '@/services/settings';
 import { saveLead } from '@/services/leads';
 
 const CollectedInfoSchema = z.object({
@@ -111,7 +110,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
 
     const isComplete = !output.nextQuestion;
 
-    if (isComplete && output.collectedInfo) {
+    if (isComplete && output.collectedInfo?.name && output.collectedInfo?.email && output.collectedInfo?.phone) {
       const fullConversation = [
         ...input.conversationHistory,
         { role: 'user' as const, content: input.projectIdea },
@@ -119,9 +118,9 @@ const aiProjectQualificationFlow = ai.defineFlow(
       const projectDescription = fullConversation.map(m => `${m.role}: ${m.content}`).join('\n');
       
       await saveLead({
-        name: output.collectedInfo.name || 'N/A',
-        email: output.collectedInfo.email || 'N/A',
-        phone: output.collectedInfo.phone || 'N/A',
+        name: output.collectedInfo.name,
+        email: output.collectedInfo.email,
+        phone: output.collectedInfo.phone,
         projectIdea: projectDescription,
         status: output.qualified ? 'Qualified' : 'Not Qualified',
         createdAt: new Date(),
