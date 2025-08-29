@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload, Copy } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 const weekDays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
 
@@ -24,6 +25,7 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
 
 export default function GeneralSettingsPage() {
     const [openingHours, setOpeningHours] = useState(initialOpeningHours);
+    const { toast } = useToast();
 
     const handleTimeChange = (day: string, part: 'from' | 'to', value: string) => {
         setOpeningHours(prev => ({
@@ -47,6 +49,15 @@ export default function GeneralSettingsPage() {
         });
         setOpeningHours(newHours);
     };
+    
+    const handleSaveChanges = () => {
+        // Here you would typically save the settings to a backend.
+        // For now, we'll just show a toast notification.
+        toast({
+            title: "Gemt!",
+            description: "Dine indstillinger er blevet gemt.",
+        });
+    }
 
   return (
     <div className="space-y-8">
@@ -170,7 +181,7 @@ export default function GeneralSettingsPage() {
       </Card>
 
        <div className="flex justify-end pt-4">
-            <Button size="lg">Gem Ændringer</Button>
+            <Button size="lg" onClick={handleSaveChanges}>Gem Ændringer</Button>
        </div>
     </div>
   );
