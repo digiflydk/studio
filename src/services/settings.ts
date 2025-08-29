@@ -21,6 +21,8 @@ export interface GeneralSettings {
     country?: string;
     openingHours?: Record<string, { from: string; to: string; isOpen: boolean }>;
     allowSearchEngineIndexing?: boolean;
+    seoTitle?: string;
+    metaDescription?: string;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {

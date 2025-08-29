@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,7 @@ export default function AboutSection() {
             {team.map((member) => (
               <div key={member.name} className="flex items-start space-x-4">
                 <Avatar className="w-16 h-16 border-2 border-primary">
-                  <AvatarImage src={member.imageUrl} alt={member.name} data-ai-hint={member.aiHint} />
+                  <AvatarImage src={member.imageUrl} alt={`${member.name} - ${member.title}`} data-ai-hint={member.aiHint} />
                   <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">

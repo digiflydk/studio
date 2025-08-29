@@ -14,11 +14,16 @@ export async function generateMetadata(
 
   const icons = settings?.faviconUrl ? [{ rel: 'icon', url: settings.faviconUrl }] : [];
 
+  const defaultTitle = 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
+  const defaultDescription = 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger. Book et møde i dag.';
+
   const metadata: Metadata = {
-    title: settings?.websiteTitle || 'Digifly',
-    description: 'Flow. Automatisér. Skalér. Vi hjælper virksomheder med at bygge skalerbare digitale løsninger.',
+    title: settings?.seoTitle || defaultTitle,
+    description: settings?.metaDescription || defaultDescription,
     icons,
     openGraph: {
+      title: settings?.seoTitle || defaultTitle,
+      description: settings?.metaDescription || defaultDescription,
       images: [...previousImages],
     },
     robots: {},
