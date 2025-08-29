@@ -9,6 +9,7 @@ import Script from 'next/script';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Loader2 } from 'lucide-react';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export async function generateMetadata(
   {},
@@ -55,6 +56,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const settings = await getGeneralSettings();
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -134,18 +136,16 @@ export default async function RootLayout({
         <Analytics />
       </head>
       <body className="font-body antialiased">
-        <div className="flex flex-col min-h-screen">
-            <Suspense fallback={<div className="h-16 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+        <ThemeProvider settings={settings}>
+            <div className="flex flex-col min-h-screen">
                 <Header />
-            </Suspense>
-            <main className="flex-1">
-                {children}
-            </main>
-            <Suspense fallback={<div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+                <main className="flex-1">
+                    {children}
+                </main>
                 <Footer />
-            </Suspense>
-        </div>
-        <Toaster />
+            </div>
+            <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
