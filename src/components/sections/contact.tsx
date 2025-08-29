@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,7 @@ function SubmitButton() {
 }
 
 export default function ContactSection() {
-  const [state, formAction] = useFormState(sendContactMessage, initialState);
+  const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
