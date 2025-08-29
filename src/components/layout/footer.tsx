@@ -59,7 +59,7 @@ export default async function Footer() {
     <footer style={footerStyle} className={cn(defaultTextColorClass)}>
       <div className="container mx-auto max-w-7xl px-4 py-12 md:px-6">
         <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
-          <div className="flex flex-col items-center md:items-start space-y-2">
+          <div className="flex flex-col items-center md:items-start space-y-2 text-center md:text-left">
             <Logo 
                 logoUrl={settings?.footerLogoUrl || settings?.logoUrl} 
                 logoAlt={settings?.footerLogoAlt || settings?.logoAlt} 
@@ -67,7 +67,7 @@ export default async function Footer() {
                 isDark={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50}
             />
             {settings?.footerTagline && <p className={cn("mt-2 text-sm", mutedTextColorClass)}>{settings.footerTagline}</p>}
-            {settings?.footerDescription && <p className={cn("text-sm", settings.footerDescriptionColor)} style={descriptionStyle}>{settings.footerDescription}</p>}
+            {settings?.footerDescription && <p className={cn("text-sm max-w-sm", settings.footerDescriptionColor)} style={descriptionStyle}>{settings.footerDescription}</p>}
           </div>
           <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
              <div className="space-y-1">
