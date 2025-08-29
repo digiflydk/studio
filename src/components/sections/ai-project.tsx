@@ -28,7 +28,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   useEffect(() => {
     setMessages([{
       role: 'assistant',
-      content: 'Hej! Jeg er din AI-assistent. For at vi kan hjælpe dig bedst muligt, hvad er dit fulde navn?'
+      content: 'Hej! Jeg er din AI-assistent. Fortæl mig kort om din projektidé, så kan jeg vurdere, om vi er det rette match.'
     }])
   }, []);
   
@@ -166,7 +166,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                         <Textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={messages.length <= 1 ? 'Indtast dit navn...' : 'Dit svar...'}
+                            placeholder="Beskriv din idé her..."
                             className="pr-20 min-h-[60px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
                             onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
