@@ -8,7 +8,6 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
 import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
