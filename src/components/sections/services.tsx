@@ -1,0 +1,66 @@
+import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
+
+const services = [
+  {
+    title: 'Digital Strategi',
+    description: 'Vi lægger en køreplan for jeres digitale transformation med fokus på ROI og forretningsmål.',
+    imageUrl: 'https://picsum.photos/600/400?random=1',
+    aiHint: 'strategy business',
+  },
+  {
+    title: 'Softwareudvikling',
+    description: 'Skræddersyede softwareløsninger, fra web-apps til komplekse systemintegrationer.',
+    imageUrl: 'https://picsum.photos/600/400?random=2',
+    aiHint: 'software development',
+  },
+  {
+    title: 'AI & Automatisering',
+    description: 'Implementering af kunstig intelligens og automatisering for at optimere jeres workflows.',
+    imageUrl: 'https://picsum.photos/600/400?random=3',
+    aiHint: 'artificial intelligence',
+  },
+  {
+    title: 'Cloud Løsninger',
+    description: 'Sikker og skalerbar cloud-infrastruktur, der understøtter jeres vækstambitioner.',
+    imageUrl: 'https://picsum.photos/600/400?random=4',
+    aiHint: 'cloud infrastructure',
+  },
+];
+
+export default function ServicesSection() {
+  return (
+    <section id="services" className="bg-secondary">
+      <div className="container mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">Vores Services</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {services.map((service) => (
+            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
+              <CardHeader>
+                <div className="relative w-full h-40 mb-4">
+                  <Image
+                    src={service.imageUrl}
+                    alt={service.title}
+                    data-ai-hint={service.aiHint}
+                    fill
+                    className="object-cover rounded-t-lg"
+                  />
+                </div>
+                <CardTitle>{service.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-muted-foreground">{service.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
