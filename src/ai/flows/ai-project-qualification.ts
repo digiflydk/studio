@@ -44,6 +44,7 @@ const qualificationPrompt = ai.definePrompt({
     name: 'aiProjectQualificationPrompt',
     input: { schema: AIProjectQualificationInputSchema },
     output: { schema: AIProjectQualificationOutputSchema },
+    model: 'googleai/gemini-2.5-flash',
     prompt: `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
 
 **Regler for samtale-flow:**
