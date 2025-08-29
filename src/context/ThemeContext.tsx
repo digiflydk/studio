@@ -2,6 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { GeneralSettings, getGeneralSettings } from '@/services/settings';
 
 type HSLColor = { h: number; s: number; l: number };
 type FontSizes = {
@@ -12,7 +13,7 @@ type FontSizes = {
   body: number;
 };
 
-interface Theme {
+export interface Theme {
   colors: {
     primary: HSLColor;
     background: HSLColor;
@@ -26,10 +27,10 @@ interface ThemeContextType {
   setTheme: (theme: Theme) => void;
   setThemeColor: (colorName: keyof Theme['colors'], hsl: HSLColor) => void;
   setFontSize: (sizeName: keyof FontSizes, sizeInRem: number) => void;
-  resetTheme: () => void;
+  isLoaded: boolean;
 }
 
-const defaultTheme: Theme = {
+export const defaultTheme: Theme = {
   colors: {
     primary: { h: 211, s: 100, l: 50 },
     background: { h: 210, s: 100, l: 95 },
@@ -46,19 +47,14 @@ const defaultTheme: Theme = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, _setTheme] = useState<Theme>(defaultTheme);
-
-  useEffect(() => {
-    try {
-      const storedTheme = localStorage.getItem('digifly-theme');
-      if (storedTheme) {
-        _setTheme(JSON.parse(storedTheme));
-      }
-    } catch (error) {
-      console.error("Failed to parse theme from localStorage", error)
+export const ThemeProvider = ({ settings, children }: { settings: GeneralSettings | null, children: ReactNode }) => {
+  const [theme, setTheme] = useState<Theme>(() => {
+    return {
+        colors: settings?.themeColors || defaultTheme.colors,
+        fontSizes: settings?.themeFontSizes || defaultTheme.fontSizes,
     }
-  }, []);
+  });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const applyTheme = useCallback((themeToApply: Theme) => {
     const root = document.documentElement;
@@ -74,34 +70,25 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     applyTheme(theme);
+    setIsLoaded(true);
   }, [theme, applyTheme]);
-
-  const setTheme = (newTheme: Theme) => {
-    try {
-      localStorage.setItem('digifly-theme', JSON.stringify(newTheme));
-      _setTheme(newTheme);
-    } catch (error) {
-       console.error("Failed to save theme to localStorage", error)
-    }
+  
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme);
   };
   
   const setThemeColor = (colorName: keyof Theme['colors'], hsl: HSLColor) => {
     const newTheme = { ...theme, colors: { ...theme.colors, [colorName]: hsl } };
-    setTheme(newTheme);
+    handleSetTheme(newTheme);
   };
   
   const setFontSize = (sizeName: keyof FontSizes, sizeInRem: number) => {
      const newTheme = { ...theme, fontSizes: { ...theme.fontSizes, [sizeName]: sizeInRem } };
-     setTheme(newTheme);
+     handleSetTheme(newTheme);
   };
 
-  const resetTheme = () => {
-    localStorage.removeItem('digifly-theme');
-    _setTheme(defaultTheme);
-  }
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, setThemeColor, setFontSize, resetTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, setThemeColor, setFontSize, isLoaded }}>
       {children}
     </ThemeContext.Provider>
   );

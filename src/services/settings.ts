@@ -5,6 +5,15 @@ import { db } from '@/lib/firebase';
 const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
+type HSLColor = { h: number; s: number; l: number };
+type FontSizes = {
+  h1: number;
+  h2: number;
+  h3: number;
+  h4: number;
+  body: number;
+};
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -39,6 +48,14 @@ export interface GeneralSettings {
     facebookPixelId?: string;
     enableGoogleAds?: boolean;
     googleAdsId?: string;
+
+    // Design Settings
+    themeColors?: {
+        primary: HSLColor;
+        background: HSLColor;
+        accent: HSLColor;
+    };
+    themeFontSizes?: FontSizes;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
@@ -61,7 +78,7 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
     }
 }
 
-export async function saveGeneralSettings(settings: GeneralSettings): Promise<void> {
+export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<void> {
     try {
         const settingsCollection = collection(db, SETTINGS_COLLECTION_ID);
         const docRef = doc(settingsCollection, SETTINGS_DOC_ID);

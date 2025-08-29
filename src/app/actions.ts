@@ -55,11 +55,10 @@ export async function getSettingsAction(): Promise<GeneralSettings | null> {
     return getGeneralSettings();
 }
 
-export async function saveSettingsAction(settings: GeneralSettings): Promise<{ success: boolean; message: string }> {
+export async function saveSettingsAction(settings: Partial<GeneralSettings>): Promise<{ success: boolean; message: string }> {
     try {
         await saveGeneralSettings(settings);
-        revalidatePath('/cms/settings/general');
-        revalidatePath('/');
+        revalidatePath('/cms', 'layout');
         return { success: true, message: 'Indstillinger er blevet gemt.' };
     } catch (error) {
         console.error(error);

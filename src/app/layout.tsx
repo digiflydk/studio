@@ -50,11 +50,12 @@ export async function generateMetadata(
 }
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getGeneralSettings();
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -80,7 +81,7 @@ export default function RootLayout({
         </Suspense>
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider>
+        <ThemeProvider settings={settings}>
           {children}
           <Toaster />
         </ThemeProvider>

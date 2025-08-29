@@ -1,10 +1,16 @@
+
 "use client";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme, defaultTheme } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect, useTransition } from "react";
+import { saveSettingsAction } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -145,35 +151,74 @@ function FontSizeSlider({ label, sizeName }: { label: string; sizeName: keyof Re
 }
 
 export default function CmsPage() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      {/* Color Settings */}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>Farver</CardTitle>
-          <CardDescription>Juster sidens primære farver. Ændringer gemmes automatisk.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <ColorPicker label="Primær farve" colorName="primary" />
-          <ColorPicker label="Baggrundsfarve" colorName="background" />
-          <ColorPicker label="Accent farve" colorName="accent" />
-        </CardContent>
-      </Card>
+  const { theme, isLoaded, setTheme } = useTheme();
+  const [isSaving, startSaving] = useTransition();
+  const { toast } = useToast();
 
-      {/* Font Size Settings */}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>Tekststørrelser</CardTitle>
-          <CardDescription>Juster størrelsen på overskrifter og brødtekst i pixels.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <FontSizeSlider label="Heading 1" sizeName="h1" />
-          <FontSizeSlider label="Heading 2" sizeName="h2" />
-          <FontSizeSlider label="Heading 3" sizeName="h3" />
-          <FontSizeSlider label="Heading 4" sizeName="h4" />
-          <FontSizeSlider label="Body" sizeName="body" />
-        </CardContent>
-      </Card>
+  const handleSaveChanges = () => {
+    startSaving(async () => {
+        const result = await saveSettingsAction({
+            themeColors: theme.colors,
+            themeFontSizes: theme.fontSizes
+        });
+        toast({
+            title: result.success ? "Gemt!" : "Fejl!",
+            description: result.message,
+            variant: result.success ? "default" : "destructive",
+        });
+    });
+  }
+
+  const handleReset = () => {
+      setTheme(defaultTheme);
+  }
+
+  if (!isLoaded) {
+      return (
+        <div className="flex justify-center items-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      );
+  }
+
+  return (
+    <div className="space-y-8">
+        <div className="flex justify-end gap-4">
+            <Button variant="outline" onClick={handleReset} disabled={isSaving}>Nulstil</Button>
+            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Gem Ændringer
+            </Button>
+       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Color Settings */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Farver</CardTitle>
+            <CardDescription>Juster sidens primære farver.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ColorPicker label="Primær farve" colorName="primary" />
+            <ColorPicker label="Baggrundsfarve" colorName="background" />
+            <ColorPicker label="Accent farve" colorName="accent" />
+          </CardContent>
+        </Card>
+
+        {/* Font Size Settings */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Tekststørrelser</CardTitle>
+            <CardDescription>Juster størrelsen på overskrifter og brødtekst.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FontSizeSlider label="Heading 1" sizeName="h1" />
+            <FontSizeSlider label="Heading 2" sizeName="h2" />
+            <FontSizeSlider label="Heading 3" sizeName="h3" />
+            <FontSizeSlider label="Heading 4" sizeName="h4" />
+            <FontSizeSlider label="Body" sizeName="body" />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
