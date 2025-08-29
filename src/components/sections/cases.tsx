@@ -1,8 +1,7 @@
-
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 import { getGeneralSettings, type Case } from '@/services/settings';
 import { cn } from '@/lib/utils';
@@ -80,7 +79,7 @@ function CasesSectionContent() {
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {cases.map((caseStudy) => (
-            <Card key={caseStudy.title} className="flex flex-col overflow-hidden hover:shadow-lg hover:-translate-y-1">
+            <Card key={caseStudy.title} className="flex flex-col overflow-hidden transition-all duration-300">
               <CardHeader>
                 <div className="relative w-full h-48">
                   <Image
@@ -93,13 +92,13 @@ function CasesSectionContent() {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="mb-2 text-h4">{caseStudy.title}</CardTitle>
+                <h3 className="mb-2 text-h4 font-semibold">{caseStudy.title}</h3>
                 <p className="text-muted-foreground">{caseStudy.description}</p>
               </CardContent>
               <CardFooter>
-                <Button asChild variant="link" className="pl-0">
-                  <Link href={caseStudy.link}>Læs mere</Link>
-                </Button>
+                 <Link href={caseStudy.link} className={cn(buttonVariants({ variant: 'link' }), 'pl-0')}>
+                    Læs mere
+                </Link>
               </CardFooter>
             </Card>
           ))}
