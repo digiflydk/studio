@@ -40,7 +40,11 @@ export async function aiProjectQualification(input: AIProjectQualificationInput)
   return aiProjectQualificationFlow(input);
 }
 
-const defaultPromptTemplate = `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
+const qualificationPrompt = ai.definePrompt({
+    name: 'aiProjectQualificationPrompt',
+    input: { schema: AIProjectQualificationInputSchema },
+    output: { schema: AIProjectQualificationOutputSchema },
+    prompt: `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
 
 **Regler for samtale-flow:**
 1.  **Prioritet #1: Indsaml kontaktoplysninger.**
@@ -69,27 +73,20 @@ const defaultPromptTemplate = `Du er en ekspert AI-assistent for Digifly, et dig
   - Hvis det er et klart mismatch (f.eks. marketing, grafisk design), sæt \`qualified\` til \`false\`.
   - Udfyld \`collectedInfo\`-objektet med alle indsamlede oplysninger.
   - Stil ikke flere spørgsmål.
-`;
 
-const qualificationPrompt = ai.definePrompt({
-    name: 'aiProjectQualificationPrompt',
-    input: { schema: AIProjectQualificationInputSchema },
-    output: { schema: AIProjectQualificationOutputSchema },
-    prompt: `${defaultPromptTemplate}
+**Brugerens nuværende besked:**
+{{{projectIdea}}}
 
-      **Brugerens nuværende besked:**
-      {{{projectIdea}}}
+**Samtalehistorik:**
+{{#each conversationHistory}}
+{{#if (eq role "user")}}
+Bruger: {{{content}}}
+{{else}}
+Assistent: {{{content}}}
+{{/if}}
+{{/each}}
 
-      **Samtalehistorik:**
-      {{#each conversationHistory}}
-      {{#if (eq role "user")}}
-      Bruger: {{{content}}}
-      {{else}}
-      Assistent: {{{content}}}
-      {{/if}}
-      {{/each}}
-
-      Følg skema-instruktionerne nøje for at formatere outputtet.
+Følg skema-instruktionerne nøje for at formatere outputtet.
     `,
 });
 
