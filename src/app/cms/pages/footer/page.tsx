@@ -284,6 +284,27 @@ export default function CmsFooterPage() {
                 sizeValue={settings.footerDescriptionSize || 14}
                 onSizeChange={(v) => handleInputChange('footerDescriptionSize', v)}
             />
+            <TextStyleEditor 
+                label="Virksomhedsnavn"
+                colorValue={settings.footerCompanyNameColor as ThemeColor || 'text-foreground'}
+                onColorChange={(v) => handleInputChange('footerCompanyNameColor', v)}
+                sizeValue={settings.footerCompanyNameSize || 16}
+                onSizeChange={(v) => handleInputChange('footerCompanyNameSize', v)}
+            />
+            <TextStyleEditor 
+                label="Adresse"
+                colorValue={settings.footerAddressColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerAddressColor', v)}
+                sizeValue={settings.footerAddressSize || 14}
+                onSizeChange={(v) => handleInputChange('footerAddressSize', v)}
+            />
+            <TextStyleEditor 
+                label="Kontakt (Tlf, Email, CVR)"
+                colorValue={settings.footerContactColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerContactColor', v)}
+                sizeValue={settings.footerContactSize || 14}
+                onSizeChange={(v) => handleInputChange('footerContactSize', v)}
+            />
         </CardContent>
       </Card>
       <Card className="shadow-lg">
@@ -311,27 +332,6 @@ export default function CmsFooterPage() {
                     onChange={(hsl) => handleInputChange('footerBackgroundColor', hsl)}
                 />
             </div>
-             <TextStyleEditor 
-                label="Virksomhedsnavn"
-                colorValue={settings.footerCompanyNameColor as ThemeColor || 'text-foreground'}
-                onColorChange={(v) => handleInputChange('footerCompanyNameColor', v)}
-                sizeValue={settings.footerCompanyNameSize || 16}
-                onSizeChange={(v) => handleInputChange('footerCompanyNameSize', v)}
-            />
-            <TextStyleEditor 
-                label="Adresse"
-                colorValue={settings.footerAddressColor as ThemeColor || 'text-muted-foreground'}
-                onColorChange={(v) => handleInputChange('footerAddressColor', v)}
-                sizeValue={settings.footerAddressSize || 14}
-                onSizeChange={(v) => handleInputChange('footerAddressSize', v)}
-            />
-            <TextStyleEditor 
-                label="Kontakt (Tlf, Email, CVR)"
-                colorValue={settings.footerContactColor as ThemeColor || 'text-muted-foreground'}
-                onColorChange={(v) => handleInputChange('footerContactColor', v)}
-                sizeValue={settings.footerContactSize || 14}
-                onSizeChange={(v) => handleInputChange('footerContactSize', v)}
-            />
         </CardContent>
       </Card>
     </div>
