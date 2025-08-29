@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { Bot, User, CornerDownLeft, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { getGeneralSettings } from '@/services/settings';
 import type { GeneralSettings } from '@/services/settings';
+import type { AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -21,7 +22,7 @@ type Message = {
 export default function AiProjectSection() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isQualified, setIsQualified] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
@@ -31,6 +32,10 @@ export default function AiProjectSection() {
     async function loadSettings() {
       const loadedSettings = await getGeneralSettings();
       setSettings(loadedSettings);
+      setMessages([{
+        role: 'assistant',
+        content: 'Hej! Jeg er din AI-assistent. For at vi kan hjælpe dig bedst muligt, hvad er dit fulde navn?'
+      }])
     }
     loadSettings();
   }, []);
@@ -41,55 +46,54 @@ export default function AiProjectSection() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || isComplete) return;
+    if (!input.trim() || isPending || isComplete) return;
 
     const currentUserMessage = input;
     const newMessages: Message[] = [...messages, { role: 'user', content: currentUserMessage }];
     
     setMessages(newMessages);
     setInput('');
-    setIsLoading(true);
 
-    try {
-      const response = await qualifyProjectAction({
-        projectIdea: currentUserMessage,
-        conversationHistory: messages,
-      });
+    startTransition(async () => {
+        try {
+        const response: AIProjectQualificationOutput = await qualifyProjectAction({
+            projectIdea: currentUserMessage,
+            conversationHistory: messages,
+        });
 
-      let allNewMessages = [...newMessages];
+        let allNewMessages = [...newMessages];
 
-      if (response.nextQuestion) {
-        allNewMessages.push({ role: 'assistant', content: response.nextQuestion });
-      }
+        if (response.nextQuestion) {
+            allNewMessages.push({ role: 'assistant', content: response.nextQuestion });
+        }
 
-      if (response.shouldBookMeeting) {
-        setIsQualified(true);
-        setIsComplete(true);
-        if (!response.nextQuestion) {
-          allNewMessages.push({
+        if (response.shouldBookMeeting) {
+            setIsQualified(true);
+            setIsComplete(true);
+            if (!response.nextQuestion) {
+            allNewMessages.push({
+                role: 'assistant',
+                content:
+                'Tak for informationen! Det lyder som et spændende projekt, vi kan hjælpe med. Book et uforpligtende møde med os nedenfor.',
+            });
+            }
+        } else if (response.qualified === false && !response.nextQuestion) {
+            setIsComplete(true);
+            allNewMessages.push({
             role: 'assistant',
             content:
-              'Tak for informationen! Det lyder som et spændende projekt, vi kan hjælpe med. Book et uforpligtende møde med os nedenfor.',
-          });
+                'Tak for din henvendelse. Ud fra det oplyste ser det desværre ikke ud til, at vi er det rette match for opgaven. Held og lykke med projektet.',
+            });
         }
-      } else if (response.qualified === false && !response.nextQuestion) {
-        setIsComplete(true);
-        allNewMessages.push({
-          role: 'assistant',
-          content:
-            'Tak for din henvendelse. Ud fra det oplyste ser det desværre ikke ud til, at vi er det rette match for opgaven. Held og lykke med projektet.',
-        });
-      }
-      setMessages(allNewMessages);
+        setMessages(allNewMessages);
 
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: 'Der opstod en fejl. Prøv venligst igen senere.' },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
+        } catch (error) {
+        setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: 'Der opstod en fejl. Prøv venligst igen senere.' },
+        ]);
+        }
+    });
   };
 
   const sectionPadding = settings?.sectionPadding?.aiProject;
@@ -124,12 +128,6 @@ export default function AiProjectSection() {
                 <CardContent className="p-6">
                     <div className="flex flex-col space-y-4">
                     <div className="pr-4 h-80 overflow-y-auto space-y-6">
-                        {messages.length === 0 && (
-                            <div className="text-center text-gray-400 pt-16">
-                                <Bot size={40} className="mx-auto mb-4" />
-                                <p>Start med at beskrive dit projekt eller din udfordring nedenfor.</p>
-                            </div>
-                        )}
                         {messages.map((message, index) => (
                         <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
@@ -147,7 +145,7 @@ export default function AiProjectSection() {
                             )}
                         </div>
                         ))}
-                        {isLoading && (
+                        {isPending && (
                         <div className="flex items-start gap-4 justify-start">
                             <Avatar className="w-8 h-8 border border-primary/50">
                                 <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
@@ -174,7 +172,7 @@ export default function AiProjectSection() {
                         <Textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={messages.length === 0 ? 'F.eks. "Jeg vil bygge en app, der..."' : 'Dit svar...'}
+                            placeholder={messages.length <= 1 ? 'Indtast dit navn...' : 'Dit svar...'}
                             className="pr-20 min-h-[60px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
                             onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -183,7 +181,7 @@ export default function AiProjectSection() {
                             }
                             }}
                         />
-                        <Button type="submit" size="icon" className="absolute bottom-3 right-3" disabled={isLoading || !input.trim()}>
+                        <Button type="submit" size="icon" className="absolute bottom-3 right-3" disabled={isPending || !input.trim()}>
                             <CornerDownLeft className="h-4 w-4" />
                         </Button>
                         </form>

@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles } from "lucide-react";
+import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -23,7 +23,6 @@ const settingsNavLinks = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
-  const [isPagesOpen, setIsPagesOpen] = useState(pathname.startsWith('/cms/pages'));
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
   useEffect(() => {
@@ -33,12 +32,6 @@ export default function Sidebar() {
       }
       loadSettings();
   }, []);
-
-  const pageLinks = [
-    { href: "/cms/pages/home", label: "Home" },
-    { href: "/cms/pages/header", label: "Header" },
-    { href: "/cms/pages/footer", label: "Footer" },
-  ];
 
   return (
     <aside className="hidden border-r bg-black text-white md:block">
@@ -68,6 +61,16 @@ export default function Sidebar() {
             >
               <Brush className="h-4 w-4" />
               Design
+            </Link>
+             <Link
+              href="/cms/leads"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                { "bg-gray-800 text-white": pathname.startsWith('/cms/leads') }
+              )}
+            >
+              <Users className="h-4 w-4" />
+              Cust. Leads
             </Link>
             <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800">

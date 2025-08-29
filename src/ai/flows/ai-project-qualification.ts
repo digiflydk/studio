@@ -12,6 +12,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { getGeneralSettings } from '@/services/settings';
+import { saveLead } from '@/services/leads';
+
+const CollectedInfoSchema = z.object({
+  name: z.string().optional().describe("The user's full name."),
+  email: z.string().optional().describe("The user's email address."),
+  phone: z.string().optional().describe("The user's phone number."),
+});
 
 const AIProjectQualificationInputSchema = z.object({
   projectIdea: z.string().describe('The initial project idea provided by the user.'),
@@ -26,10 +33,7 @@ const AIProjectQualificationOutputSchema = z.object({
   qualified: z.boolean().describe('Whether the project idea is qualified for a consultation.'),
   nextQuestion: z.string().optional().describe('The next question to ask the user, if qualification is not yet complete.'),
   shouldBookMeeting: z.boolean().optional().describe('Whether to prompt the user to book a meeting with a consultant.'),
-  conversationHistory: z.array(z.object({
-    role: z.enum(['user', 'assistant']),
-    content: z.string(),
-  })),
+  collectedInfo: CollectedInfoSchema.optional().describe('Information collected from the user so far.'),
 });
 export type AIProjectQualificationOutput = z.infer<typeof AIProjectQualificationOutputSchema>;
 
@@ -37,24 +41,36 @@ export async function aiProjectQualification(input: AIProjectQualificationInput)
   return aiProjectQualificationFlow(input);
 }
 
-const defaultPromptTemplate = `You are an expert AI assistant for Digifly, a digital consulting company. Your primary goal is to qualify potential client projects by asking clarifying questions in a friendly and professional manner.
+const defaultPromptTemplate = `You are an expert AI assistant for Digifly, a digital consulting company. Your primary goal is to qualify potential client projects by gathering information in a friendly and professional manner.
 
-  **Your Task:**
-  Based on the user's project idea and the conversation history, your task is to determine if the project is a good fit for Digifly. To do this, you MUST gather information about the following key areas:
+**Conversation Flow Rules:**
+1.  **Priority #1: Gather Contact Information.**
+    - Start by asking for the user's name.
+    - Once you have the name, ask for their email address.
+    - Once you have the email, ask for their phone number.
+    - DO NOT ask for project details until you have name, email, and phone.
 
-  1.  **Key Features & Goals:** What are the most important features of the project? What is the main goal the user wants to achieve?
-  2.  **Budget:** What is the user's approximate budget? (e.g., "< 50.000 DKK", "50.000-150.000 DKK", "> 150.000 DKK").
-  3.  **Timeline:** What is the desired timeline for the project?
+2.  **Priority #2: Qualify the Project.**
+    - Only after you have collected all contact information, proceed to ask about the project.
+    - You MUST gather information about the following key areas:
+        - **Key Features & Goals:** What are the most important features? What is the main goal?
+        - **Budget:** What is the approximate budget? (e.g., "< 50.000 DKK", "50.000-150.000 DKK", "> 150.000 DKK").
+        - **Timeline:** What is the desired timeline?
+    - Ask ONE question at a time.
 
-  **Conversation Flow Rules:**
-  - Ask ONE question at a time.
-  - Analyze the conversation history to see which of the three key areas you still need information about.
-  - Formulate your next question to cover one of the missing areas. Be concise and easy to understand.
+**Decision Logic & Output Formatting:**
+- **If you are missing ANY information (Name, Email, Phone, Features, Budget, or Timeline):**
+  - Set \`qualified\` to \`false\`.
+  - Formulate the \`nextQuestion\` to get the next piece of missing information.
+  - Populate the \`collectedInfo\` object with any information you have gathered so far.
+  - Do NOT set \`shouldBookMeeting\`.
 
-  **Decision Logic:**
-  1.  **If you are missing information** on any of the three key areas (Features, Budget, Timeline), you MUST set \`qualified\` to \`false\` and formulate the \`nextQuestion\` to gather the missing information. Do not set \`shouldBookMeeting\`.
-  2.  **Once you have answers for all three areas**, and the project seems like a good fit (e.g., involves software development, AI, automation, and has a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`. Do not ask more questions.
-  3.  **If you have all the information** and the project is clearly not a fit (e.g., it's about marketing, graphic design, or something outside of Digifly's expertise), set \`qualified\` to \`false\` and do not set \`shouldBookMeeting\`.`;
+- **Once you have ALL required information (Name, Email, Phone, Features, Budget, Timeline):**
+  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`.
+  - If it's a clear misfit (e.g., marketing, graphic design), set \`qualified\` to \`false\`.
+  - Populate the \`collectedInfo\` object with all gathered information.
+  - Do not ask more questions.
+`;
 
 
 const getPromptTemplate = async () => {
@@ -79,7 +95,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
       output: {schema: AIProjectQualificationOutputSchema},
       prompt: `${promptTemplate}
 
-        **User's Initial Idea:**
+        **User's Current Message:**
         {{{projectIdea}}}
 
         **Conversation History:**
@@ -101,21 +117,25 @@ const aiProjectQualificationFlow = ai.defineFlow(
       throw new Error('No output from prompt');
     }
 
-    const newAssistantMessage = output.nextQuestion 
-        ? output.nextQuestion 
-        : output.shouldBookMeeting 
-            ? 'Great, based on your answers, it seems like we could be a good fit. Please book a meeting with us.' 
-            : 'Thank you for the information. Based on what you\'ve told me, it doesn\'t look like we are the right fit for this project.';
+    const isComplete = !output.nextQuestion;
 
-    const conversationHistory = [
-      ...input.conversationHistory ?? [],
-      { role: 'user', content: input.projectIdea },
-      { role: 'assistant', content: newAssistantMessage },
-    ];
+    if (isComplete && output.collectedInfo) {
+      const fullConversation = [
+        ...input.conversationHistory,
+        { role: 'user' as const, content: input.projectIdea },
+      ];
+      const projectDescription = fullConversation.map(m => `${m.role}: ${m.content}`).join('\n');
+      
+      await saveLead({
+        name: output.collectedInfo.name || 'N/A',
+        email: output.collectedInfo.email || 'N/A',
+        phone: output.collectedInfo.phone || 'N/A',
+        projectIdea: projectDescription,
+        status: output.qualified ? 'Qualified' : 'Not Qualified',
+        createdAt: new Date(),
+      });
+    }
 
-    return {
-      ...output,
-      conversationHistory,
-    };
+    return output;
   }
 );

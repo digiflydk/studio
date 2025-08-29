@@ -2,7 +2,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles } from "lucide-react";
+import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -22,16 +22,9 @@ const settingsNavLinks = [
     { href: "#", label: "Business listing", icon: Building },
 ]
 
-const pageLinks = [
-    { href: "/cms/pages/home", label: "Home" },
-    { href: "/cms/pages/header", label: "Header" },
-    { href: "/cms/pages/footer", label: "Footer" },
-  ];
-
 export default function CmsHeader() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
-  const [isPagesOpen, setIsPagesOpen] = useState(pathname.startsWith('/cms/pages'));
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
   useEffect(() => {
@@ -71,6 +64,10 @@ export default function CmsHeader() {
                     <Link href="/cms" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms' })}>
                         <Brush className="h-5 w-5" />
                         Design
+                    </Link>
+                    <Link href="/cms/leads" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/leads') })}>
+                        <Users className="h-5 w-5" />
+                        Cust. Leads
                     </Link>
                     <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">

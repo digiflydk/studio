@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 import { getGeneralSettings, saveGeneralSettings, GeneralSettings } from '@/services/settings';
 import { revalidatePath } from 'next/cache';
+import { getAllLeads, Lead } from '@/services/leads';
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
   // Here you could add server-side validation or logging if needed
@@ -59,9 +60,14 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
     try {
         await saveGeneralSettings(settings);
         revalidatePath('/cms', 'layout');
+        revalidatePath('/', 'layout');
         return { success: true, message: 'Indstillinger er blevet gemt.' };
     } catch (error) {
         console.error(error);
         return { success: false, message: 'Der opstod en fejl under lagring.' };
     }
+}
+
+export async function getLeadsAction(): Promise<Lead[]> {
+    return getAllLeads();
 }
