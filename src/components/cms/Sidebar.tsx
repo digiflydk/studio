@@ -6,7 +6,8 @@ import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerCli
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getGeneralSettings, GeneralSettings } from "@/services/settings";
 
 const mainNavLinks = [
   { href: "/cms", label: "Design", icon: Brush },
@@ -24,12 +25,21 @@ const settingsNavLinks = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+  useEffect(() => {
+      async function loadSettings() {
+          const loadedSettings = await getGeneralSettings();
+          setSettings(loadedSettings);
+      }
+      loadSettings();
+  }, []);
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-black sm:flex text-white">
       <div className="flex h-16 items-center border-b border-gray-800 px-6">
         <Link href="/cms">
-          <Logo />
+          <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
         </Link>
       </div>
       <nav className="flex-1 overflow-auto py-4">

@@ -2,11 +2,19 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { getGeneralSettings } from '@/services/settings';
 
-export const metadata: Metadata = {
-  title: 'Digifly',
-  description: 'Flow. Automatisér. Skalér. Vi hjælper virksomheder med at bygge skalerbare digitale løsninger.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getGeneralSettings();
+
+  const icons = settings?.faviconUrl ? [{ rel: 'icon', url: settings.faviconUrl }] : [];
+
+  return {
+    title: settings?.websiteTitle || 'Digifly',
+    description: 'Flow. Automatisér. Skalér. Vi hjælper virksomheder med at bygge skalerbare digitale løsninger.',
+    icons,
+  };
+}
 
 export default function RootLayout({
   children,

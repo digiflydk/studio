@@ -7,11 +7,15 @@ import AboutSection from '@/components/sections/about';
 import ContactSection from '@/components/sections/contact';
 import Footer from '@/components/layout/footer';
 import StickyCta from '@/components/sticky-cta';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+       <Suspense fallback={<div className="h-16 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+        <Header />
+      </Suspense>
       <main className="flex-1">
         <HeroSection />
         <ServicesSection />
@@ -20,7 +24,9 @@ export default function Home() {
         <AboutSection />
         <ContactSection />
       </main>
-      <Footer />
+      <Suspense fallback={<div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+        <Footer />
+      </Suspense>
       <StickyCta />
     </div>
   );

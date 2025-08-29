@@ -1,11 +1,9 @@
-'use client';
-
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
+import { getGeneralSettings } from '@/services/settings';
 
 const navLinks = [
   { href: '#services', label: 'Services' },
@@ -14,15 +12,15 @@ const navLinks = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default async function Header() {
+  const settings = await getGeneralSettings();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
           <Link href="/" className="flex items-center gap-2">
-            <Logo />
+            <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
           </Link>
         </div>
 
@@ -39,7 +37,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center md:hidden">
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
@@ -49,19 +47,17 @@ export default function Header() {
             <SheetContent side="right">
               <div className="flex flex-col p-6">
                 <div className="mb-8">
-                  <Logo />
+                  <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
                 </div>
                 <nav className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
-                    <SheetClose key={link.href} asChild>
-                      <Link
-                        href={link.href}
-                        className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {link.label}
-                      </Link>
-                    </SheetClose>
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
                   ))}
                 </nav>
               </div>
