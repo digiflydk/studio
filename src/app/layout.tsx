@@ -4,8 +4,11 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import Script from 'next/script';
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+import { Loader2 } from 'lucide-react';
 
 export async function generateMetadata(
   {},
@@ -32,9 +35,6 @@ export async function generateMetadata(
       type: 'website',
     },
     robots: {},
-    icons: {
-      icon: '/favicon.ico',
-    },
   };
 
 
@@ -55,7 +55,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const settings = await getGeneralSettings();
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -135,7 +134,17 @@ export default async function RootLayout({
         <Analytics />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <div className="flex flex-col min-h-screen">
+            <Suspense fallback={<div className="h-16 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+                <Header />
+            </Suspense>
+            <main className="flex-1">
+                {children}
+            </main>
+            <Suspense fallback={<div className="h-48 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+                <Footer />
+            </Suspense>
+        </div>
         <Toaster />
       </body>
     </html>
