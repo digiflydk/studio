@@ -5,12 +5,13 @@
  * @fileOverview A flow for qualifying project ideas using AI.
  *
  * - aiProjectQualification - A function that initiates the AI project qualification process.
- * - AIProjectQualificationInput - The input type for the aiProjectQualification function.
+ * - AIProjectQualificationInput - The input type for the aiProjectqualification function.
  * - AIProjectQualificationOutput - The return type for the aiProjectQualification function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getGeneralSettings } from '@/services/settings';
 
 const CollectedInfoSchema = z.object({
   name: z.string().nullable().describe("The user's full name."),
@@ -39,12 +40,7 @@ export async function aiProjectQualification(input: AIProjectQualificationInput)
   return aiProjectQualificationFlow(input);
 }
 
-const qualificationPrompt = ai.definePrompt({
-    name: 'aiProjectQualificationPrompt',
-    input: { schema: AIProjectQualificationInputSchema },
-    output: { schema: AIProjectQualificationOutputSchema },
-    model: 'googleai/gemini-1.5-flash',
-    prompt: `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
+const defaultSystemPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
 
 **Regler for samtale-flow:**
 1.  **Prioritet #1: Indsaml kontaktoplysninger.**
@@ -83,8 +79,7 @@ const qualificationPrompt = ai.definePrompt({
 {{{projectIdea}}}
 
 **VIGTIGT:** Følg output-skemaet NØJE. Svar altid med et komplet JSON-objekt, der opfylder skemaet.
-`,
-});
+`;
 
 
 const aiProjectQualificationFlow = ai.defineFlow(
@@ -94,6 +89,17 @@ const aiProjectQualificationFlow = ai.defineFlow(
     outputSchema: AIProjectQualificationOutputSchema,
   },
   async (input) => {
+
+    const settings = await getGeneralSettings();
+    const systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
+
+    const qualificationPrompt = ai.definePrompt({
+        name: 'aiProjectQualificationPrompt',
+        input: { schema: AIProjectQualificationInputSchema },
+        output: { schema: AIProjectQualificationOutputSchema },
+        model: 'googleai/gemini-1.5-flash',
+        prompt: systemPrompt,
+    });
     
     const {output} = await qualificationPrompt(input);
 
