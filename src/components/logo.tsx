@@ -21,6 +21,7 @@ const Logo = ({ logoUrl, logoAlt, width = 96, height = 28, isDark = false, ...pr
           src={logoUrl}
           alt={logoAlt || 'Company Logo'}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{ objectFit: 'contain' }}
           priority
         />
