@@ -56,7 +56,7 @@ function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
 function ColorPicker({ label, colorName }: { label: string; colorName: keyof ReturnType<typeof useTheme>['theme']['colors'] }) {
   const { theme, setThemeColor } = useTheme();
   const color = theme.colors[colorName];
-  const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
+  const [hexInputValue, setHexInputValue] = useState('');
 
   useEffect(() => {
     setHexInputValue(hslToHex(color.h, color.s, color.l));
