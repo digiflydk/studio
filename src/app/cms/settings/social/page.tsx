@@ -92,7 +92,7 @@ export default function SocialSettingsPage() {
                 <Label>Preview</Label>
                 <div className="border rounded-lg p-4 bg-muted/50 w-full aspect-[1.91/1] flex flex-col justify-center items-center">
                     {settings.socialShareImageUrl ? (
-                        <Image src={settings.socialShareImageUrl} alt="Social share preview" width={1200} height={630} className="rounded-md object-cover max-w-full max-h-full" />
+                        <Image src={settings.socialShareImageUrl} alt="Preview af social delingsbillede" width={1200} height={630} className="rounded-md object-cover max-w-full max-h-full" />
                     ) : (
                         <p className="text-muted-foreground text-center">Intet billede valgt</p>
                     )}
