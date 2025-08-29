@@ -16,10 +16,10 @@ export default function HeroSection() {
       />
       <div className="container px-4 md:px-6 text-white">
         <div className="flex flex-col items-center space-y-6">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl font-headline">
+          <h1 className="text-h1 font-bold tracking-tight font-headline">
             Flow. Automatisér. Skalér.
           </h1>
-          <p className="max-w-[700px] text-lg md:text-xl text-primary-foreground/80">
+          <p className="max-w-[700px] text-body text-primary-foreground/80">
             Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.
           </p>
         </div>

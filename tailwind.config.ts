@@ -14,6 +14,13 @@ export default {
         headline: ['Inter', 'sans-serif'],
         code: ['monospace'],
       },
+      fontSize: {
+        'h1': ['4rem', { lineHeight: '1.1', fontWeight: '700' }],
+        'h2': ['2.25rem', { lineHeight: '2.5rem', fontWeight: '700' }],
+        'h3': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '600' }],
+        'h4': ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],
+        'body': ['1.125rem', { lineHeight: '1.75rem' }],
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

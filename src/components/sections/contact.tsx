@@ -38,6 +38,7 @@ export default function ContactSection() {
         title: "Besked sendt!",
         description: state.message,
       });
+      // TODO: Reset form
     } else if (state.message && Object.keys(state.errors).length > 0) {
         toast({
             title: "Fejl",
@@ -52,8 +53,8 @@ export default function ContactSection() {
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Kom i kontakt</CardTitle>
-            <CardDescription className="mt-4 text-lg text-muted-foreground">
+            <CardTitle className="text-h2 font-bold tracking-tight text-black">Kom i kontakt</CardTitle>
+            <CardDescription className="mt-4 text-body text-muted-foreground">
               Har du et projekt, eller vil du bare sige hej? Udfyld formularen, så vender vi tilbage.
             </CardDescription>
           </CardHeader>

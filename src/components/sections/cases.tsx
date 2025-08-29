@@ -32,8 +32,8 @@ export default function CasesSection() {
     <section id="cases" className="bg-background">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Vores Arbejde</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+          <h2 className="text-h2 font-bold tracking-tight text-black">Vores Arbejde</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-body text-muted-foreground">
             Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function CasesSection() {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
+                <CardTitle className="mb-2 text-h4">{caseStudy.title}</CardTitle>
                 <p className="text-muted-foreground">{caseStudy.description}</p>
               </CardContent>
               <CardFooter>

@@ -85,8 +85,8 @@ export default function AiProjectSection() {
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight sm:text-4xl font-headline text-black">Fortæl os om dit projekt</CardTitle>
-            <CardDescription className="mt-4 text-lg text-muted-foreground">
+            <CardTitle className="text-h2 font-bold tracking-tight text-black">Fortæl os om dit projekt</CardTitle>
+            <CardDescription className="mt-4 text-body text-muted-foreground">
               Vores AI-assistent hjælper med at afklare din idé. Beskriv dit projekt, så stiller vi et par opfølgende spørgsmål.
             </CardDescription>
           </CardHeader>
