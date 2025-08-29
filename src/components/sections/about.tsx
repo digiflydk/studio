@@ -2,7 +2,6 @@
 'use client';
 
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -98,11 +97,9 @@ export default function AboutSection() {
                                 <h3 className="text-h3 font-semibold">{member.name}</h3>
                                 <p className="text-sm text-primary">{member.title}</p>
                                 </div>
-                                <Button asChild variant="ghost" size="icon">
                                 <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
-                                    <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                                    <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
                                 </Link>
-                                </Button>
                             </div>
                             <p className="mt-2 text-sm text-muted-foreground">{member.description}</p>
                             </div>
@@ -114,4 +111,3 @@ export default function AboutSection() {
         </section>
     );
 }
-
