@@ -1,13 +1,12 @@
 'use client';
 import Image from 'next/image';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
-import { getGeneralSettings, type Case } from '@/services/settings';
+import { getGeneralSettings, type Case, GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { GeneralSettings } from '@/services/settings';
 
 
 const defaultCases: Case[] = [
@@ -35,13 +34,12 @@ const defaultCases: Case[] = [
 ];
 
 function CasesSectionContent() {
-  const isMobile = useIsMobile();
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
   useEffect(() => {
     getGeneralSettings().then(setSettings);
   }, []);
-  
+
   const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
@@ -53,15 +51,24 @@ function CasesSectionContent() {
     fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
   };
 
-  const sectionStyle: React.CSSProperties = {};
-  if (settings?.sectionPadding?.cases) {
-    const padding = settings.sectionPadding.cases;
-    sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
-    sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
-  }
-
   return (
-    <section id="cases" className="bg-background" style={sectionStyle}>
+    <section id="cases" className="bg-background">
+       <style>
+        {`
+          @media (max-width: 767px) {
+            #cases {
+              padding-top: ${settings?.sectionPadding?.cases?.topMobile ?? 64}px !important;
+              padding-bottom: ${settings?.sectionPadding?.cases?.bottomMobile ?? 64}px !important;
+            }
+          }
+           @media (min-width: 768px) {
+            #cases {
+              padding-top: ${settings?.sectionPadding?.cases?.top ?? 96}px !important;
+              padding-bottom: ${settings?.sectionPadding?.cases?.bottom ?? 96}px !important;
+            }
+          }
+        `}
+      </style>
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
            <h2 
@@ -79,7 +86,7 @@ function CasesSectionContent() {
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {cases.map((caseStudy) => (
-            <Card key={caseStudy.title} className="flex flex-col overflow-hidden transition-all duration-300">
+            <Card key={caseStudy.title} className="flex flex-col overflow-hidden">
               <CardHeader>
                 <div className="relative w-full h-48">
                   <Image
@@ -92,8 +99,8 @@ function CasesSectionContent() {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <h3 className="mb-2 text-h4 font-semibold">{caseStudy.title}</h3>
-                <p className="text-muted-foreground">{caseStudy.description}</p>
+                <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
+                <CardDescription>{caseStudy.description}</CardDescription>
               </CardContent>
               <CardFooter>
                  <Link href={caseStudy.link} className={cn(buttonVariants({ variant: 'link' }), 'pl-0')}>
