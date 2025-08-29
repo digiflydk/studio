@@ -313,6 +313,24 @@ export default function CmsFooterPage() {
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="space-y-2">
+                <Label htmlFor="footer-logo-url">Footer Logo URL</Label>
+                <Input 
+                    id="footer-logo-url" 
+                    value={settings.footerLogoUrl || ''} 
+                    onChange={e => handleInputChange('footerLogoUrl', e.target.value)}
+                    placeholder="Indsæt URL til footer logo (efterlad tom for at bruge standard logo)"
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="footer-logo-alt">Footer Logo Alt Tekst</Label>
+                <Input 
+                    id="footer-logo-alt" 
+                    value={settings.footerLogoAlt || ''} 
+                    onChange={e => handleInputChange('footerLogoAlt', e.target.value)}
+                    placeholder="Beskrivende tekst til logoet"
+                />
+            </div>
+            <div className="space-y-2">
                  <div className="flex justify-between items-center">
                     <Label>Logo Bredde</Label>
                     <span className="text-sm text-muted-foreground">{settings.footerLogoWidth || 96}px</span>
@@ -337,4 +355,3 @@ export default function CmsFooterPage() {
     </div>
   );
 }
-

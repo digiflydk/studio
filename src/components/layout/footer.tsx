@@ -61,8 +61,8 @@ export default async function Footer() {
         <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
           <div className="flex flex-col items-center md:items-start space-y-2">
             <Logo 
-                logoUrl={settings?.logoUrl} 
-                logoAlt={settings?.logoAlt} 
+                logoUrl={settings?.footerLogoUrl || settings?.logoUrl} 
+                logoAlt={settings?.footerLogoAlt || settings?.logoAlt} 
                 width={settings?.footerLogoWidth || 96}
                 isDark={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50}
             />

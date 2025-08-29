@@ -97,6 +97,8 @@ export interface GeneralSettings {
     footerDescription?: string;
     footerDescriptionColor?: string;
     footerDescriptionSize?: number;
+    footerLogoUrl?: string;
+    footerLogoAlt?: string;
     footerLogoWidth?: number;
     footerBackgroundColor?: HSLColor;
     footerCompanyNameColor?: string;
