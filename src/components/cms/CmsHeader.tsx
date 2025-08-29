@@ -63,10 +63,6 @@ export default function CmsHeader() {
                     </SheetDescription>
                 </SheetHeader>
                 <nav className="grid gap-4 text-base font-medium">
-                    <Link href="/cms" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms' })}>
-                        <Brush className="h-5 w-5" />
-                        Design
-                    </Link>
                     <Collapsible open={isPagesOpen} onOpenChange={setIsPagesOpen}>
                         <CollapsibleTrigger className={cn("flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white", {"text-white": pathname.startsWith('/cms/pages')})} asChild>
                            <Link href="/cms/pages">
@@ -89,6 +85,10 @@ export default function CmsHeader() {
                             </ul>
                         </CollapsibleContent>
                     </Collapsible>
+                    <Link href="/cms" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms' })}>
+                        <Brush className="h-5 w-5" />
+                        Design
+                    </Link>
                     <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
                             <div className="flex items-center gap-4">
