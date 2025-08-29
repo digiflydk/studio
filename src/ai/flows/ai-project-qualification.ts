@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getGeneralSettings } from '@/services/settings';
 
 const AIProjectQualificationInputSchema = z.object({
   projectIdea: z.string().describe('The initial project idea provided by the user.'),
@@ -36,11 +37,7 @@ export async function aiProjectQualification(input: AIProjectQualificationInput)
   return aiProjectQualificationFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'aiProjectQualificationPrompt',
-  input: {schema: AIProjectQualificationInputSchema},
-  output: {schema: AIProjectQualificationOutputSchema},
-  prompt: `You are an expert AI assistant for Digifly, a digital consulting company. Your primary goal is to qualify potential client projects by asking clarifying questions in a friendly and professional manner.
+const defaultPromptTemplate = `You are an expert AI assistant for Digifly, a digital consulting company. Your primary goal is to qualify potential client projects by asking clarifying questions in a friendly and professional manner.
 
   **Your Task:**
   Based on the user's project idea and the conversation history, your task is to determine if the project is a good fit for Digifly. To do this, you MUST gather information about the following key areas:
@@ -57,23 +54,14 @@ const prompt = ai.definePrompt({
   **Decision Logic:**
   1.  **If you are missing information** on any of the three key areas (Features, Budget, Timeline), you MUST set \`qualified\` to \`false\` and formulate the \`nextQuestion\` to gather the missing information. Do not set \`shouldBookMeeting\`.
   2.  **Once you have answers for all three areas**, and the project seems like a good fit (e.g., involves software development, AI, automation, and has a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`. Do not ask more questions.
-  3.  **If you have all the information** and the project is clearly not a fit (e.g., it's about marketing, graphic design, or something outside of Digifly's expertise), set \`qualified\` to \`false\` and do not set \`shouldBookMeeting\`.
+  3.  **If you have all the information** and the project is clearly not a fit (e.g., it's about marketing, graphic design, or something outside of Digifly's expertise), set \`qualified\` to \`false\` and do not set \`shouldBookMeeting\`.`;
 
-  **User's Initial Idea:**
-  {{{projectIdea}}}
 
-  **Conversation History:**
-  {{#each conversationHistory}}
-  {{#if (eq role "user")}}
-  User: {{{content}}}
-  {{else}}
-  Assistant: {{{content}}}
-  {{/if}}
-  {{/each}}
+const getPromptTemplate = async () => {
+    const settings = await getGeneralSettings();
+    return settings?.aiSystemPrompt || defaultPromptTemplate;
+}
 
-  Follow the schema instructions closely for formatting the output.
-  `,
-});
 
 const aiProjectQualificationFlow = ai.defineFlow(
   {
@@ -81,17 +69,48 @@ const aiProjectQualificationFlow = ai.defineFlow(
     inputSchema: AIProjectQualificationInputSchema,
     outputSchema: AIProjectQualificationOutputSchema,
   },
-  async input => {
+  async (input) => {
+    
+    const promptTemplate = await getPromptTemplate();
+
+    const prompt = ai.definePrompt({
+      name: 'aiProjectQualificationPrompt',
+      input: {schema: AIProjectQualificationInputSchema},
+      output: {schema: AIProjectQualificationOutputSchema},
+      prompt: `${promptTemplate}
+
+        **User's Initial Idea:**
+        {{{projectIdea}}}
+
+        **Conversation History:**
+        {{#each conversationHistory}}
+        {{#if (eq role "user")}}
+        User: {{{content}}}
+        {{else}}
+        Assistant: {{{content}}}
+        {{/if}}
+        {{/each}}
+
+        Follow the schema instructions closely for formatting the output.
+      `,
+    });
+
     const {output} = await prompt(input);
 
     if (!output) {
       throw new Error('No output from prompt');
     }
 
+    const newAssistantMessage = output.nextQuestion 
+        ? output.nextQuestion 
+        : output.shouldBookMeeting 
+            ? 'Great, based on your answers, it seems like we could be a good fit. Please book a meeting with us.' 
+            : 'Thank you for the information. Based on what you\'ve told me, it doesn\'t look like we are the right fit for this project.';
+
     const conversationHistory = [
       ...input.conversationHistory ?? [],
       { role: 'user', content: input.projectIdea },
-      { role: 'assistant', content: output.nextQuestion || (output.shouldBookMeeting ? 'Great, based on your answers, it seems like we could be a good fit. Please book a meeting with us.' : 'Thank you for the information. Based on what you\'ve told me, it doesn\'t look like we are the right fit for this project.')},
+      { role: 'assistant', content: newAssistantMessage },
     ];
 
     return {

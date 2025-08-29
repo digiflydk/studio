@@ -86,6 +86,9 @@ export interface GeneralSettings {
     enableGoogleAds?: boolean;
     googleAdsId?: string;
 
+    // AI Settings
+    aiSystemPrompt?: string;
+
     // Design Settings
     themeColors?: {
         primary: HSLColor;
