@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
 import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -17,6 +18,7 @@ const defaultNavLinks: NavLink[] = [
 ];
 
 export default function Header({ settings }: { settings: GeneralSettings | null }) {
+  const pathname = usePathname();
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
 
   const isSticky = settings?.headerIsSticky ?? true;
@@ -52,13 +54,22 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
-      const el = document.querySelector(href);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+          const headerOffset = 80; // Adjust as needed for your sticky header's height
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth"
+          });
+      } else if (pathname !== '/') {
+         window.location.href = `/${href}`;
       }
-      history.replaceState(null, '', location.pathname + location.search);
     }
-  }
+  };
 
 
   return (

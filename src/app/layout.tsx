@@ -76,62 +76,15 @@ export default async function RootLayout({
             });
           `}
         </Script>
-        <Script id="autoscroll-killer" strategy="beforeInteractive">
-{`(function(){
-  try {
-    // 1) PRE-PAINT LOCK: deaktiver browserens auto-justering
-    var _siv = Element.prototype.scrollIntoView;
-    var _sto = window.scrollTo;
-    var unlocked = false;
-
-    if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
-
-    // Fjern hash globalt (uanset sti) og gå til top
-    if (location.hash) {
-      history.replaceState(null, '', location.pathname + location.search);
-    }
-    _sto.call(window, 0, 0);
-
-    // Bloker programmatisk scroll i den helt tidlige fase
-    Element.prototype.scrollIntoView = function(){
-      if (unlocked) return _siv.apply(this, arguments);
-      // Ignorer kaldet indtil unlock
-    };
-    window.scrollTo = function(){
-      if (unlocked) return _sto.apply(window, arguments);
-      // Ignorer kaldet indtil unlock
-    };
-
-    // 2) HASHCHANGE GUARD: hvis noget sætter hash, fjern den igen
-    window.addEventListener('hashchange', function(ev){
-      try {
-        if (location.hash) {
-          history.replaceState(null, '', location.pathname + location.search);
-          _sto.call(window, 0, 0);
-        }
-        if (ev && ev.preventDefault) ev.preventDefault();
-      } catch(_) {}
-    }, { passive: false });
-
-    // 3) LOAD/PAGESHOW GUARD: sikre top efter resource-load / bfcache
-    window.addEventListener('load', function(){
-      try { _sto.call(window, 0, 0); } catch(_) {}
-    }, { once: true });
-    window.addEventListener('pageshow', function(e){
-      try { if (e && e.persisted) _sto.call(window, 0, 0); } catch(_) {}
-    });
-
-    // 4) UNLOCK: genaktiver scroll efter 2 frames (brugeren kan nu klikke i menu)
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        Element.prototype.scrollIntoView = _siv;
-        window.scrollTo = _sto;
-        unlocked = true;
-      });
-    });
-  } catch(_) {}
-})();`}
-</Script>
+        <Script id="scroll-restoration" strategy="beforeInteractive">
+          {`
+            try {
+              if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+              }
+            } catch (e) {}
+          `}
+        </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
