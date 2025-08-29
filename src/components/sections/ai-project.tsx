@@ -83,7 +83,7 @@ export default function AiProjectSection() {
 
   return (
     <section id="ai-project" className="w-full">
-      <div className="container mx-auto max-w-3xl px-4 md:px-6">
+      <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-h2 font-bold tracking-tight text-black">Fortæl os om dit projekt</CardTitle>
