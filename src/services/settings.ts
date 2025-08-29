@@ -125,9 +125,11 @@ export interface GeneralSettings {
     heroHeadline?: string;
     heroHeadlineColor?: string;
     heroHeadlineSize?: number;
+    heroHeadlineSizeMobile?: number;
     heroDescription?: string;
     heroDescriptionColor?: string;
     heroDescriptionSize?: number;
+    heroDescriptionSizeMobile?: number;
     heroImageUrl?: string;
     servicesSectionTitle?: string;
     servicesSectionTitleColor?: string;
