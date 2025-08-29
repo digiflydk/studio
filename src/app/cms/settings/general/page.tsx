@@ -66,12 +66,15 @@ export default function GeneralSettingsPage() {
 
         if (result.success && result.url) {
             const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
-            setSettings(prev => ({ ...prev, [fieldName]: result.url }));
+            
+            const updatedSettings = { ...settings, [fieldName]: result.url };
+            setSettings(updatedSettings);
             setStatus('success');
             toast({ title: "Upload Succes!", description: result.message });
+            
             // Automatically save after successful upload
             startSaving(async () => {
-                await saveSettingsAction({ ...settings, [fieldName]: result.url });
+                await saveSettingsAction(updatedSettings);
             });
         } else {
             setStatus('error');
@@ -81,11 +84,9 @@ export default function GeneralSettingsPage() {
     
     const removeImage = (type: 'logo' | 'favicon') => {
         const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
-        const altFieldName = 'logoAlt';
-
-        const updatedSettings = { ...settings, [fieldName]: undefined };
+        const updatedSettings: GeneralSettings = { ...settings, [fieldName]: undefined };
         if (type === 'logo') {
-            updatedSettings[altFieldName] = undefined;
+            updatedSettings.logoAlt = undefined;
         }
 
         setSettings(updatedSettings);
