@@ -14,6 +14,30 @@ type FontSizes = {
   body: number;
 };
 
+export interface Service {
+    title: string;
+    description: string;
+    imageUrl: string;
+    aiHint: string;
+}
+
+export interface Case {
+    title: string;
+    description: string;
+    imageUrl: string;
+    link: string;
+    aiHint: string;
+}
+
+export interface TeamMember {
+    name: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    linkedinUrl: string;
+    aiHint: string;
+}
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -80,6 +104,15 @@ export interface GeneralSettings {
     footerAddressSize?: number;
     footerContactColor?: string;
     footerContactSize?: number;
+
+    // Home Page Content
+    heroHeadline?: string;
+    heroDescription?: string;
+    heroImageUrl?: string;
+    services?: Service[];
+    cases?: Case[];
+    aboutText?: string;
+    teamMembers?: TeamMember[];
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
@@ -112,4 +145,3 @@ export async function saveGeneralSettings(settings: Partial<GeneralSettings>): P
         throw new Error("Could not save settings to database.");
     }
 }
-

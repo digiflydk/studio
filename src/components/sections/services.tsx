@@ -1,8 +1,9 @@
+
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { getGeneralSettings, type Service } from '@/services/settings';
 
-const services = [
+const defaultServices: Service[] = [
   {
     title: 'Digital Strategi',
     description: 'Vi lægger en køreplan for jeres digitale transformation med fokus på ROI og forretningsmål.',
@@ -29,7 +30,10 @@ const services = [
   },
 ];
 
-export default function ServicesSection() {
+export default async function ServicesSection() {
+  const settings = await getGeneralSettings();
+  const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
+
   return (
     <section id="services" className="bg-secondary">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">

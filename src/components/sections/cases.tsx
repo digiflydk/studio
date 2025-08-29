@@ -1,9 +1,11 @@
+
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { getGeneralSettings, type Case } from '@/services/settings';
 
-const cases = [
+const defaultCases: Case[] = [
   {
     title: 'Automatiseret Fakturering',
     description: 'Udvikling af et system der sparede en mellemstor virksomhed for 20+ timer i manuelt tastearbejde om ugen.',
@@ -27,7 +29,10 @@ const cases = [
   },
 ];
 
-export default function CasesSection() {
+export default async function CasesSection() {
+  const settings = await getGeneralSettings();
+  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
+
   return (
     <section id="cases" className="bg-background">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">

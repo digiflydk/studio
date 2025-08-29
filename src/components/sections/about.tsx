@@ -1,12 +1,12 @@
 
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getGeneralSettings, type TeamMember } from '@/services/settings';
 
-const team = [
+const defaultTeam: TeamMember[] = [
   {
     name: 'Alex Andersen',
     title: 'Lead Developer & Arkitekt',
@@ -33,7 +33,13 @@ const team = [
   },
 ];
 
-export default function AboutSection() {
+const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
+
+export default async function AboutSection() {
+  const settings = await getGeneralSettings();
+  const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
+  const aboutText = settings?.aboutText || defaultAboutText;
+  
   return (
     <section id="om-os" className="bg-secondary">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
@@ -41,7 +47,7 @@ export default function AboutSection() {
           <div className="text-center lg:text-left">
             <h2 className="text-h2 font-bold tracking-tight text-black">Hvem er Digifly?</h2>
             <p className="mt-6 text-body text-muted-foreground">
-              Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.
+              {aboutText}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-8">
