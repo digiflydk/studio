@@ -131,7 +131,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                             </Avatar>
                             )}
                             <div className={cn('rounded-lg p-3 text-sm break-words', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-gray-800 text-gray-200')}>
-                            <p>{message.content}</p>
+                                <p>{message.content}</p>
                             </div>
                             {message.role === 'user' && (
                             <Avatar className="w-8 h-8">
