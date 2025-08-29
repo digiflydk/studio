@@ -2,7 +2,6 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/context/ThemeContext';
 import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
 import { ReactNode } from 'react';
@@ -72,22 +71,6 @@ export default async function RootLayout({
             });
           `}
         </Script>
-        <Script id="debug-scroll" strategy="beforeInteractive">
-{`(function(){
-  try {
-    var _siv = Element.prototype.scrollIntoView;
-    Element.prototype.scrollIntoView = function(){
-      try { console.log('[SCROLL DEBUG] scrollIntoView on', this, arguments); } catch(_){}
-      return _siv.apply(this, arguments);
-    };
-    var _sto = window.scrollTo;
-    window.scrollTo = function(){
-      try { console.log('[SCROLL DEBUG] window.scrollTo', arguments); } catch(_){}
-      return _sto.apply(window, arguments);
-    };
-  } catch(_) {}
-})();`}
-</Script>
         <Script id="autoscroll-killer" strategy="beforeInteractive">
 {`(function(){
   try {
@@ -150,11 +133,9 @@ export default async function RootLayout({
         <Analytics />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider settings={settings}>
-          <ScrollManager />
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <ScrollManager />
+        {children}
+        <Toaster />
       </body>
     </html>
   );

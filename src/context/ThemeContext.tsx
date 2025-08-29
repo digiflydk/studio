@@ -1,7 +1,7 @@
 
 "use client";
 
-import * as React from 'react';
+import React from 'react';
 import type { GeneralSettings } from '@/services/settings';
 
 type HSLColor = { h: number; s: number; l: number };
