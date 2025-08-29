@@ -16,8 +16,6 @@ export async function generateMetadata(
   const settings = await getGeneralSettings();
   const previousImages = (await parent).openGraph?.images || [];
 
-  const icons = settings?.faviconUrl ? [{ rel: 'icon', url: settings.faviconUrl }] : [];
-
   const defaultTitle = 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
   const defaultDescription = 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger. Book et møde i dag.';
   
@@ -29,7 +27,6 @@ export async function generateMetadata(
   const metadata: Metadata = {
     title: title,
     description: description,
-    icons,
     openGraph: {
       title: title,
       description: description,
@@ -38,6 +35,11 @@ export async function generateMetadata(
     },
     robots: {},
   };
+
+  if (settings?.faviconUrl) {
+    metadata.icons = [{ rel: 'icon', url: settings.faviconUrl }];
+  }
+
 
   if (settings?.allowSearchEngineIndexing === false) {
     metadata.robots!.index = false;
@@ -76,16 +78,27 @@ export default async function RootLayout({
         </Script>
         <Script id="hash-clean" strategy="beforeInteractive">
         {`(function(){
-          try {
-            // Kun på forsiden: tilpas hvis I har locales/basepath senere
-            if (location.pathname === '/' && location.hash) {
-              // Bevar sti + query, fjern kun hash
-              history.replaceState(null, '', location.pathname + location.search);
-              if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-              window.scrollTo(0, 0);
-            }
-          } catch(_) {}
-        })();`}
+  try {
+    // Slå al smooth scroll fra præ-paint, så browseren ikke anker-hopper
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    // Gør scrollRestoration manual med det samme
+    if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+
+    // Hvis der findes et hash ved landing på HVILKEN SOM HELST sti → fjern det
+    if (location.hash) {
+      history.replaceState(null, '', location.pathname + location.search);
+      // Sikr top både nu og efter ressource-load
+      window.scrollTo(0, 0);
+      window.addEventListener('load', function(){ try { window.scrollTo(0, 0); } catch(_){} }, { once: true });
+    }
+
+    // Gendan smooth scroll efter første frame
+    requestAnimationFrame(function(){
+      document.documentElement.style.scrollBehavior = '';
+    });
+  } catch(_) {}
+})();`}
         </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

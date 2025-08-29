@@ -10,8 +10,7 @@ export default function ScrollManager() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (pathname === '/' && window.location.hash) {
-      // Fjern kun hash – bevar sti + query, undgå fremtidige basepath issues
+    if (window.location.hash) {
       history.replaceState(null, '', window.location.pathname + window.location.search);
       window.history.scrollRestoration = 'manual';
       window.scrollTo(0, 0);
