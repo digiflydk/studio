@@ -15,11 +15,11 @@ export default {
         code: ['monospace'],
       },
       fontSize: {
-        'h1': ['4rem', { lineHeight: '1.1', fontWeight: '700' }],
-        'h2': ['2.25rem', { lineHeight: '2.5rem', fontWeight: '700' }],
-        'h3': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '600' }],
-        'h4': ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],
-        'body': ['1.125rem', { lineHeight: '1.75rem' }],
+        'h1': ['var(--font-size-h1)', { lineHeight: '1.1', fontWeight: '700' }],
+        'h2': ['var(--font-size-h2)', { lineHeight: '2.5rem', fontWeight: '700' }],
+        'h3': ['var(--font-size-h3)', { lineHeight: '2.25rem', fontWeight: '600' }],
+        'h4': ['var(--font-size-h4)', { lineHeight: '2rem', fontWeight: '600' }],
+        'body': ['var(--font-size-body)', { lineHeight: '1.75rem' }],
       },
       colors: {
         background: 'hsl(var(--background))',
