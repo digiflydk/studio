@@ -13,6 +13,47 @@ import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
+function hslToHex(h: number, s: number, l: number) {
+  l /= 100;
+  const a = (s * Math.min(l, 1 - l)) / 100;
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return null;
+
+  let r = parseInt(result[1], 16) / 255;
+  let g = parseInt(result[2], 16) / 255;
+  let b = parseInt(result[3], 16) / 255;
+
+  let max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+
 function HslColorPicker({
   label,
   color,
@@ -22,13 +63,58 @@ function HslColorPicker({
   color: { h: number; s: number; l: number };
   onChange: (hsl: { h: number; s: number; l: number }) => void;
 }) {
+    const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
+    
+    useEffect(() => {
+        setHexInputValue(hslToHex(color.h, color.s, color.l));
+    }, [color]);
+
     const handleColorChange = (part: 'h' | 's' | 'l', value: number) => {
         onChange({ ...color, [part]: value });
     };
 
+    const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setHexInputValue(e.target.value);
+    }
+
+    const handleHexBlur = () => {
+        const newHsl = hexToHsl(hexInputValue);
+        if(newHsl) {
+            onChange(newHsl);
+        } else {
+            // If invalid hex, reset input to current valid color
+            setHexInputValue(hslToHex(color.h, color.s, color.l));
+        }
+    }
+  
+    const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleHexBlur();
+            (e.target as HTMLInputElement).blur();
+        }
+    }
+
+
     return (
         <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
-            <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+            <div className="flex justify-between items-center">
+                 <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+                 <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm uppercase" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>HEX</span>
+                    <Input 
+                        value={hexInputValue}
+                        onChange={handleHexChange}
+                        onBlur={handleHexBlur}
+                        onKeyDown={handleHexKeyPress}
+                        className="w-24 font-mono"
+                        style={{
+                            backgroundColor: 'hsla(0, 0%, 100%, 0.2)',
+                            color: color.l > 50 ? '#000' : '#FFF',
+                            borderColor: 'hsla(0, 0%, 100%, 0.3)'
+                        }}
+                    />
+                </div>
+            </div>
             <div className="space-y-2">
                 <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Hue ({color.h})</Label>
                 <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} />
