@@ -31,12 +31,14 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
         if (docSnap.exists()) {
             return docSnap.data() as GeneralSettings;
         } else {
-            console.log("No such document!");
+            console.log("No settings document found, returning null.");
             return null;
         }
     } catch (error) {
-        console.error("Error getting document:", error);
-        throw new Error("Could not fetch settings from database.");
+        console.error("Error getting settings document:", error);
+        // Return null instead of throwing an error to prevent the app from crashing.
+        // The page will load with initial/empty state.
+        return null;
     }
 }
 
