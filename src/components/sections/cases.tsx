@@ -32,14 +32,13 @@ const defaultCases: Case[] = [
 ];
 
 interface CasesSectionProps {
-    cases: Case[] | undefined;
-    sectionData: GeneralSettings | null;
+    settings: GeneralSettings | null;
 }
 
-export default function CasesSection({ cases: initialCases, sectionData: settings }: CasesSectionProps) {
+export default function CasesSection({ settings }: CasesSectionProps) {
   const isMobile = useIsMobile();
   
-  const cases = initialCases && initialCases.length > 0 ? initialCases : defaultCases;
+  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
 
@@ -89,7 +88,7 @@ export default function CasesSection({ cases: initialCases, sectionData: setting
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="mb-2">{caseStudy.title}</CardTitle>
+                <CardTitle>{caseStudy.title}</CardTitle>
                 <CardDescription>{caseStudy.description}</CardDescription>
               </CardContent>
               <CardFooter>
