@@ -1,5 +1,6 @@
 
-import { doc, getDoc, setDoc, collection } from 'firebase/firestore';
+'use server';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 const SETTINGS_COLLECTION_ID = 'settings';
@@ -107,41 +108,57 @@ export interface GeneralSettings {
 
     // Home Page Content
     heroHeadline?: string;
+    heroHeadlineColor?: string;
+    heroHeadlineSize?: number;
     heroDescription?: string;
+    heroDescriptionColor?: string;
+    heroDescriptionSize?: number;
     heroImageUrl?: string;
+    servicesSectionTitle?: string;
+    servicesSectionTitleColor?: string;
+    servicesSectionTitleSize?: number;
+    servicesSectionDescription?: string;
+    servicesSectionDescriptionColor?: string;
+    servicesSectionDescriptionSize?: number;
     services?: Service[];
+    casesSectionTitle?: string;
+    casesSectionTitleColor?: string;
+    casesSectionTitleSize?: number;
+    casesSectionDescription?: string;
+    casesSectionDescriptionColor?: string;
+    casesSectionDescriptionSize?: number;
     cases?: Case[];
+    aboutSectionTitle?: string;
+    aboutSectionTitleColor?: string;
+    aboutSectionTitleSize?: number;
     aboutText?: string;
+    aboutTextColor?: string;
+    aboutTextSize?: number;
     teamMembers?: TeamMember[];
 }
 
+
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
     try {
-        const settingsCollection = collection(db, SETTINGS_COLLECTION_ID);
-        const docRef = doc(settingsCollection, SETTINGS_DOC_ID);
-        const docSnap = await getDoc(docRef);
-
+        const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
+        const docSnap = await getDoc(settingsDocRef);
         if (docSnap.exists()) {
             return docSnap.data() as GeneralSettings;
-        } else {
-            console.log("No settings document found, returning null.");
-            return null;
         }
+        return null;
     } catch (error) {
-        console.error("Error getting settings document:", error);
-        // Return null instead of throwing an error to prevent the app from crashing.
-        // The page will load with initial/empty state.
+        console.error("Error fetching general settings: ", error);
         return null;
     }
 }
 
+
 export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<void> {
     try {
-        const settingsCollection = collection(db, SETTINGS_COLLECTION_ID);
-        const docRef = doc(settingsCollection, SETTINGS_DOC_ID);
-        await setDoc(docRef, settings, { merge: true });
+        const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
+        await setDoc(settingsDocRef, settings, { merge: true });
     } catch (error) {
-        console.error("Error writing document:", error);
-        throw new Error("Could not save settings to database.");
+        console.error("Error saving general settings: ", error);
+        throw new Error("Could not save settings.");
     }
 }

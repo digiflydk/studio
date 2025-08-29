@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getGeneralSettings, type Case } from '@/services/settings';
+import { cn } from '@/lib/utils';
 
 const defaultCases: Case[] = [
   {
@@ -32,14 +33,32 @@ const defaultCases: Case[] = [
 export default async function CasesSection() {
   const settings = await getGeneralSettings();
   const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
+  
+  const title = settings?.casesSectionTitle || "Vores Arbejde";
+  const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.casesSectionTitleSize ? `${settings.casesSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
+  };
 
   return (
     <section id="cases" className="bg-background">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-h2 font-bold tracking-tight text-black">Vores Arbejde</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-body text-muted-foreground">
-            Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.
+           <h2 
+            className={cn("text-h2 font-bold tracking-tight", settings?.casesSectionTitleColor || "text-black")}
+            style={titleStyle}
+          >
+            {title}
+          </h2>
+          <p 
+            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground")}
+            style={descriptionStyle}
+          >
+            {description}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">

@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getGeneralSettings, type Service } from '@/services/settings';
+import { cn } from '@/lib/utils';
 
 const defaultServices: Service[] = [
   {
@@ -33,14 +34,32 @@ const defaultServices: Service[] = [
 export default async function ServicesSection() {
   const settings = await getGeneralSettings();
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
+  
+  const title = settings?.servicesSectionTitle || "Vores Services";
+  const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.servicesSectionTitleSize ? `${settings.servicesSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.servicesSectionDescriptionSize ? `${settings.servicesSectionDescriptionSize}px` : undefined,
+  };
 
   return (
     <section id="services" className="bg-secondary">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-h2 font-bold tracking-tight text-black">Vores Services</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-body text-muted-foreground">
-            Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.
+          <h2 
+            className={cn("text-h2 font-bold tracking-tight", settings?.servicesSectionTitleColor || "text-black")}
+            style={titleStyle}
+          >
+            {title}
+          </h2>
+          <p 
+            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.servicesSectionDescriptionColor || "text-muted-foreground")}
+            style={descriptionStyle}
+          >
+            {description}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">

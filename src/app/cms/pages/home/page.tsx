@@ -12,6 +12,8 @@ import { GeneralSettings, Service, Case, TeamMember } from '@/services/settings'
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 
 const defaultServices: Service[] = [
   {
@@ -93,6 +95,61 @@ const defaultTeam: TeamMember[] = [
 
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
+const themeColorOptions = [
+    { value: 'text-primary', label: 'Primary' },
+    { value: 'text-secondary-foreground', label: 'Secondary' },
+    { value: 'text-accent', label: 'Accent' },
+    { value: 'text-foreground', label: 'Default Text' },
+    { value: 'text-muted-foreground', label: 'Muted Text' },
+    { value: 'text-white', label: 'White' },
+    { value: 'text-black', label: 'Black' },
+] as const;
+
+type ThemeColor = typeof themeColorOptions[number]['value'];
+
+function TextStyleEditor({
+    label,
+    colorValue,
+    onColorChange,
+    sizeValue,
+    onSizeChange
+}: {
+    label: string;
+    colorValue: ThemeColor;
+    onColorChange: (value: ThemeColor) => void;
+    sizeValue: number;
+    onSizeChange: (value: number) => void;
+}) {
+    return (
+        <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/20">
+            <h3 className="font-semibold md:col-span-2">{label}</h3>
+            <div className="space-y-2">
+                <Label>Farve</Label>
+                <Select value={colorValue} onValueChange={onColorChange}>
+                    <SelectTrigger><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                        {themeColorOptions.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>Tekststørrelse</Label>
+                    <span className="text-sm text-muted-foreground">{sizeValue}px</span>
+                </div>
+                <Slider 
+                    value={[sizeValue]} 
+                    onValueChange={([v]) => onSizeChange(v)}
+                    min={10}
+                    max={120}
+                    step={1}
+                />
+            </div>
+        </div>
+    );
+}
 
 function SectionCard({ title, description, children }: { title: string, description: string, children: React.ReactNode }) {
     return (
@@ -171,22 +228,70 @@ export default function CmsHomePage() {
         setSettings({
             ...loadedSettings,
             heroHeadline: loadedSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
+            heroHeadlineColor: loadedSettings.heroHeadlineColor || 'text-white',
+            heroHeadlineSize: loadedSettings.heroHeadlineSize || 64,
             heroDescription: loadedSettings.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
+            heroDescriptionColor: loadedSettings.heroDescriptionColor || 'text-primary-foreground/80',
+            heroDescriptionSize: loadedSettings.heroDescriptionSize || 18,
             heroImageUrl: loadedSettings.heroImageUrl || 'https://picsum.photos/1920/1280',
+            
+            servicesSectionTitle: loadedSettings.servicesSectionTitle || "Vores Services",
+            servicesSectionTitleColor: loadedSettings.servicesSectionTitleColor || "text-black",
+            servicesSectionTitleSize: loadedSettings.servicesSectionTitleSize || 36,
+            servicesSectionDescription: loadedSettings.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
+            servicesSectionDescriptionColor: loadedSettings.servicesSectionDescriptionColor || "text-muted-foreground",
+            servicesSectionDescriptionSize: loadedSettings.servicesSectionDescriptionSize || 18,
             services: loadedSettings.services && loadedSettings.services.length > 0 ? loadedSettings.services : defaultServices,
+            
+            casesSectionTitle: loadedSettings.casesSectionTitle || "Vores Arbejde",
+            casesSectionTitleColor: loadedSettings.casesSectionTitleColor || "text-black",
+            casesSectionTitleSize: loadedSettings.casesSectionTitleSize || 36,
+            casesSectionDescription: loadedSettings.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
+            casesSectionDescriptionColor: loadedSettings.casesSectionDescriptionColor || "text-muted-foreground",
+            casesSectionDescriptionSize: loadedSettings.casesSectionDescriptionSize || 18,
             cases: loadedSettings.cases && loadedSettings.cases.length > 0 ? loadedSettings.cases : defaultCases,
+            
+            aboutSectionTitle: loadedSettings.aboutSectionTitle || "Hvem er Digifly?",
+            aboutSectionTitleColor: loadedSettings.aboutSectionTitleColor || "text-black",
+            aboutSectionTitleSize: loadedSettings.aboutSectionTitleSize || 36,
             aboutText: loadedSettings.aboutText || defaultAboutText,
+            aboutTextColor: loadedSettings.aboutTextColor || "text-muted-foreground",
+            aboutTextSize: loadedSettings.aboutTextSize || 18,
             teamMembers: loadedSettings.teamMembers && loadedSettings.teamMembers.length > 0 ? loadedSettings.teamMembers : defaultTeam,
         });
       } else {
         // If no settings are loaded at all, populate with all defaults
         setSettings({
             heroHeadline: 'Flow. Automatisér. Skalér.',
+            heroHeadlineColor: 'text-white',
+            heroHeadlineSize: 64,
             heroDescription: 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
+            heroDescriptionColor: 'text-primary-foreground/80',
+            heroDescriptionSize: 18,
             heroImageUrl: 'https://picsum.photos/1920/1280',
+
+            servicesSectionTitle: "Vores Services",
+            servicesSectionTitleColor: "text-black",
+            servicesSectionTitleSize: 36,
+            servicesSectionDescription: "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
+            servicesSectionDescriptionColor: "text-muted-foreground",
+            servicesSectionDescriptionSize: 18,
             services: defaultServices,
+
+            casesSectionTitle: "Vores Arbejde",
+            casesSectionTitleColor: "text-black",
+            casesSectionTitleSize: 36,
+            casesSectionDescription: "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
+            casesSectionDescriptionColor: "text-muted-foreground",
+            casesSectionDescriptionSize: 18,
             cases: defaultCases,
+            
+            aboutSectionTitle: "Hvem er Digifly?",
+            aboutSectionTitleColor: "text-black",
+            aboutSectionTitleSize: 36,
             aboutText: defaultAboutText,
+            aboutTextColor: "text-muted-foreground",
+            aboutTextSize: 18,
             teamMembers: defaultTeam,
         })
       }
@@ -254,10 +359,24 @@ export default function CmsHomePage() {
             <Label htmlFor="hero-headline">Overskrift</Label>
             <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} />
         </div>
+        <TextStyleEditor 
+            label="Design for Overskrift"
+            colorValue={settings.heroHeadlineColor as ThemeColor || 'text-white'}
+            onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
+            sizeValue={settings.heroHeadlineSize || 64}
+            onSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
+        />
         <div className="space-y-2">
             <Label htmlFor="hero-description">Beskrivelse</Label>
             <Textarea id="hero-description" value={settings.heroDescription || ''} onChange={e => handleInputChange('heroDescription', e.target.value)} />
         </div>
+         <TextStyleEditor 
+            label="Design for Beskrivelse"
+            colorValue={settings.heroDescriptionColor as ThemeColor || 'text-primary-foreground/80'}
+            onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
+            sizeValue={settings.heroDescriptionSize || 18}
+            onSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}
+        />
         <div className="space-y-2">
             <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
             <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} />
@@ -265,6 +384,29 @@ export default function CmsHomePage() {
       </SectionCard>
 
       <SectionCard title="Services Sektion" description="Administrer de viste services.">
+        <div className="space-y-2">
+            <Label htmlFor="services-title">Sektionstitel</Label>
+            <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} />
+        </div>
+        <TextStyleEditor 
+            label="Design for Sektionstitel"
+            colorValue={settings.servicesSectionTitleColor as ThemeColor || 'text-black'}
+            onColorChange={(v) => handleInputChange('servicesSectionTitleColor', v)}
+            sizeValue={settings.servicesSectionTitleSize || 36}
+            onSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
+        />
+        <div className="space-y-2">
+            <Label htmlFor="services-description">Sektionsbeskrivelse</Label>
+            <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} />
+        </div>
+        <TextStyleEditor 
+            label="Design for Sektionsbeskrivelse"
+            colorValue={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+            onColorChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}
+            sizeValue={settings.servicesSectionDescriptionSize || 18}
+            onSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
+        />
+        <Label>Service-kort</Label>
         <Accordion type="multiple" className="w-full">
             {(settings.services || []).map((service, index) => (
                 <EditableListItem 
@@ -287,6 +429,29 @@ export default function CmsHomePage() {
       </SectionCard>
       
       <SectionCard title="Cases Sektion" description="Administrer de viste cases.">
+        <div className="space-y-2">
+            <Label htmlFor="cases-title">Sektionstitel</Label>
+            <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} />
+        </div>
+        <TextStyleEditor 
+            label="Design for Sektionstitel"
+            colorValue={settings.casesSectionTitleColor as ThemeColor || 'text-black'}
+            onColorChange={(v) => handleInputChange('casesSectionTitleColor', v)}
+            sizeValue={settings.casesSectionTitleSize || 36}
+            onSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
+        />
+        <div className="space-y-2">
+            <Label htmlFor="cases-description">Sektionsbeskrivelse</Label>
+            <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} />
+        </div>
+        <TextStyleEditor 
+            label="Design for Sektionsbeskrivelse"
+            colorValue={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+            onColorChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}
+            sizeValue={settings.casesSectionDescriptionSize || 18}
+            onSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
+        />
+        <Label>Case-kort</Label>
         <Accordion type="multiple" className="w-full">
             {(settings.cases || []).map((caseItem, index) => (
                 <EditableListItem 
@@ -310,10 +475,29 @@ export default function CmsHomePage() {
       </SectionCard>
 
       <SectionCard title="Om Os Sektion" description="Administrer tekst og teammedlemmer.">
+         <div className="space-y-2">
+            <Label htmlFor="about-title">Sektionstitel</Label>
+            <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} />
+        </div>
+        <TextStyleEditor 
+            label="Design for Sektionstitel"
+            colorValue={settings.aboutSectionTitleColor as ThemeColor || 'text-black'}
+            onColorChange={(v) => handleInputChange('aboutSectionTitleColor', v)}
+            sizeValue={settings.aboutSectionTitleSize || 36}
+            onSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
+        />
         <div className="space-y-2">
             <Label htmlFor="about-text">Intro tekst</Label>
             <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} />
         </div>
+        <TextStyleEditor 
+            label="Design for Intro Tekst"
+            colorValue={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'}
+            onColorChange={(v) => handleInputChange('aboutTextColor', v)}
+            sizeValue={settings.aboutTextSize || 18}
+            onSizeChange={(v) => handleInputChange('aboutTextSize', v)}
+        />
+        <Label>Team</Label>
          <Accordion type="multiple" className="w-full">
             {(settings.teamMembers || []).map((member, index) => (
                 <EditableListItem 

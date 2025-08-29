@@ -1,6 +1,7 @@
 
 import Image from 'next/image';
 import { getGeneralSettings } from '@/services/settings';
+import { cn } from '@/lib/utils';
 
 export default async function HeroSection() {
   const settings = await getGeneralSettings();
@@ -8,7 +9,13 @@ export default async function HeroSection() {
   const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
   const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
   const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
-
+  
+  const headlineStyle: React.CSSProperties = {
+    fontSize: settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.heroDescriptionSize ? `${settings.heroDescriptionSize}px` : undefined,
+  };
 
   return (
     <section
@@ -25,10 +32,16 @@ export default async function HeroSection() {
       />
       <div className="container px-4 md:px-6 text-white">
         <div className="flex flex-col items-center space-y-6">
-          <h1 className="text-h1 font-bold tracking-tight font-headline">
+          <h1 
+            className={cn("text-h1 font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
+            style={headlineStyle}
+          >
             {headline}
           </h1>
-          <p className="max-w-[700px] text-body text-primary-foreground/80">
+          <p 
+            className={cn("max-w-[700px] text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+            style={descriptionStyle}
+          >
             {description}
           </p>
         </div>

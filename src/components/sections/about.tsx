@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getGeneralSettings, type TeamMember } from '@/services/settings';
+import { cn } from '@/lib/utils';
 
 const defaultTeam: TeamMember[] = [
   {
@@ -39,14 +40,30 @@ export default async function AboutSection() {
   const settings = await getGeneralSettings();
   const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
   const aboutText = settings?.aboutText || defaultAboutText;
+  const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.aboutSectionTitleSize ? `${settings.aboutSectionTitleSize}px` : undefined,
+  };
+  const textStyle: React.CSSProperties = {
+    fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
+  };
   
   return (
     <section id="om-os" className="bg-secondary">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
           <div className="text-center lg:text-left">
-            <h2 className="text-h2 font-bold tracking-tight text-black">Hvem er Digifly?</h2>
-            <p className="mt-6 text-body text-muted-foreground">
+            <h2 
+              className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
+              style={titleStyle}
+            >
+              {title}
+            </h2>
+            <p 
+              className={cn("mt-6 text-body", settings?.aboutTextColor || "text-muted-foreground")}
+              style={textStyle}
+            >
               {aboutText}
             </p>
           </div>
