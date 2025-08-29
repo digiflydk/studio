@@ -96,7 +96,7 @@ export default function AiProjectSection() {
   }
 
   return (
-    <section id="ai-project" className="w-full" style={sectionStyle}>
+    <section id="ai-project" className="w-full bg-secondary" style={sectionStyle}>
       <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">

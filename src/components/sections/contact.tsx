@@ -66,7 +66,7 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="kontakt" className="w-full" style={sectionStyle}>
+    <section id="kontakt" className="w-full bg-background" style={sectionStyle}>
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
