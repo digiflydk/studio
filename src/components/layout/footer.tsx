@@ -2,7 +2,7 @@
 import { Linkedin, Facebook, Instagram, Twitter, Clapperboard } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/logo';
-import { getGeneralSettings } from '@/services/settings';
+import { type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 
 const socialIcons = {
@@ -13,9 +13,7 @@ const socialIcons = {
   tiktokUrl: { icon: Clapperboard, label: 'TikTok' },
 } as const;
 
-export default async function Footer() {
-  const settings = await getGeneralSettings();
-
+export default function Footer({ settings }: { settings: GeneralSettings | null }) {
   const addressLine2 = [settings?.postalCode, settings?.city].filter(Boolean).join(' ');
   const fullPhoneNumber = settings?.countryCode && settings.phoneNumber ? `${settings.countryCode} ${settings.phoneNumber}` : settings?.phoneNumber;
   

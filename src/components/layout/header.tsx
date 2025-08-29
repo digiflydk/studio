@@ -9,7 +9,6 @@ import Logo from '@/components/logo';
 import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import { getGeneralSettings } from '@/services/settings';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -18,17 +17,7 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-export default function Header() {
-  const [settings, setSettings] = useState<GeneralSettings | null>(null);
-  
-  useEffect(() => {
-    async function load() {
-        const s = await getGeneralSettings();
-        setSettings(s);
-    }
-    load();
-  }, [])
-  
+export default function Header({ settings }: { settings: GeneralSettings | null }) {
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
 
   const isSticky = settings?.headerIsSticky ?? true;

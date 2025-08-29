@@ -4,11 +4,10 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode } from 'react';
 import Script from 'next/script';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { Loader2 } from 'lucide-react';
 import { ThemeProvider } from '@/context/ThemeContext';
 
 export async function generateMetadata(
@@ -138,11 +137,11 @@ export default async function RootLayout({
       <body className="font-body antialiased">
         <ThemeProvider settings={settings}>
             <div className="flex flex-col min-h-screen">
-                <Header />
+                <Header settings={settings}/>
                 <main className="flex-1">
                     {children}
                 </main>
-                <Footer />
+                <Footer settings={settings}/>
             </div>
             <Toaster />
         </ThemeProvider>
