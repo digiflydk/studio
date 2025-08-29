@@ -23,6 +23,12 @@ export interface GeneralSettings {
     allowSearchEngineIndexing?: boolean;
     seoTitle?: string;
     metaDescription?: string;
+    socialShareImageUrl?: string;
+    linkedinUrl?: string;
+    facebookUrl?: string;
+    instagramUrl?: string;
+    twitterUrl?: string;
+    tiktokUrl?: string;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {

@@ -16,15 +16,21 @@ export async function generateMetadata(
 
   const defaultTitle = 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
   const defaultDescription = 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger. Book et møde i dag.';
+  
+  const title = settings?.seoTitle || defaultTitle;
+  const description = settings?.metaDescription || defaultDescription;
+  const openGraphImages = settings?.socialShareImageUrl ? [settings.socialShareImageUrl] : [];
+
 
   const metadata: Metadata = {
-    title: settings?.seoTitle || defaultTitle,
-    description: settings?.metaDescription || defaultDescription,
+    title: title,
+    description: description,
     icons,
     openGraph: {
-      title: settings?.seoTitle || defaultTitle,
-      description: settings?.metaDescription || defaultDescription,
-      images: [...previousImages],
+      title: title,
+      description: description,
+      images: [...openGraphImages, ...previousImages],
+      type: 'website',
     },
     robots: {},
   };
