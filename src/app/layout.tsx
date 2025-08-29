@@ -74,6 +74,19 @@ export default async function RootLayout({
             });
           `}
         </Script>
+        <Script id="hash-clean" strategy="beforeInteractive">
+        {`(function(){
+          try {
+            // Kun på forsiden: tilpas hvis I har locales/basepath senere
+            if (location.pathname === '/' && location.hash) {
+              // Bevar sti + query, fjern kun hash
+              history.replaceState(null, '', location.pathname + location.search);
+              if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+              window.scrollTo(0, 0);
+            }
+          } catch(_) {}
+        })();`}
+        </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />

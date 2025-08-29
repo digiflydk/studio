@@ -68,7 +68,7 @@ export default function Header() {
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      history.replaceState(null, '', '/');
+      history.replaceState(null, '', location.pathname + location.search);
     }
   }
 
@@ -100,16 +100,7 @@ export default function Header() {
                 href={link.href}
                 className={navLinkClasses}
                 style={linkStyle}
-                onClick={(e) => {
-                    if (link.href?.startsWith('#')) {
-                      e.preventDefault();
-                      const el = document.querySelector(link.href);
-                      if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                      history.replaceState(null, '', '/');
-                    }
-                  }}
+                onClick={(e) => handleScrollLinkClick(e, link.href)}
             >
               {link.label}
             </a>
@@ -140,16 +131,7 @@ export default function Header() {
                         href={link.href}
                         className={mobileNavLinkClasses}
                         style={linkStyle}
-                        onClick={(e) => {
-                            if (link.href?.startsWith('#')) {
-                              e.preventDefault();
-                              const el = document.querySelector(link.href);
-                              if (el) {
-                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                              }
-                              history.replaceState(null, '', '/');
-                            }
-                          }}
+                        onClick={(e) => handleScrollLinkClick(e, link.href)}
                     >
                       {link.label}
                     </a>

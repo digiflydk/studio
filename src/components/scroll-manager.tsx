@@ -1,21 +1,17 @@
+
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 export default function ScrollManager() {
   const pathname = usePathname();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
-
-    // Kun på forsiden og kun hvis der er hash i URL (fx #cases)
     if (pathname === '/' && window.location.hash) {
-      // Fjern hash uden reload
-      history.replaceState(null, '', '/');
-      // Undgå at browseren selv "genopretter" scrollposition
+      history.replaceState(null, '', window.location.pathname + window.location.search);
       window.history.scrollRestoration = 'manual';
-      // Sikr top
       window.scrollTo(0, 0);
     }
   }, [pathname]);
