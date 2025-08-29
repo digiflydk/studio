@@ -72,7 +72,7 @@ export default function GeneralSettingsPage() {
             <Input id="website-title" placeholder="F.eks. Min Fantastiske Hjemmeside" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
              <div className="space-y-2">
                 <Label>Logo</Label>
                  <div className="flex items-center gap-4">
@@ -85,6 +85,7 @@ export default function GeneralSettingsPage() {
                     </Button>
                     <Input id="logo-alt" placeholder="Alt text for logo" />
                 </div>
+                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels.</p>
             </div>
              <div className="space-y-2">
                 <Label>Favicon</Label>
@@ -95,6 +96,7 @@ export default function GeneralSettingsPage() {
                         <input id="favicon-upload" type="file" className="sr-only" />
                     </label>
                 </Button>
+                <p className="text-sm text-muted-foreground">Anbefalet størrelse: 32x32 pixels.</p>
             </div>
           </div>
         </CardContent>
@@ -106,15 +108,15 @@ export default function GeneralSettingsPage() {
           <CardDescription>Kontaktoplysninger og adresse for din virksomhed.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <Label htmlFor="business-email">Business Email</Label>
-                    <Input id="business-email" type="email" placeholder="kontakt@virksomhed.dk" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="phone-number">Phone Number</Label>
-                    <div className="flex gap-2">
-                        <Select defaultValue="+45">
+            <div className="space-y-2">
+                <Label>Adresse</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <Input placeholder="Virksomhedsnavn" className="md:col-span-2"/>
+                     <Input placeholder="Vejnavn og nummer" />
+                     <Input placeholder="Postnummer" />
+                     <Input placeholder="By" />
+                     <div className="flex gap-2">
+                         <Select defaultValue="+45">
                             <SelectTrigger className="w-[80px]">
                                 <SelectValue />
                             </SelectTrigger>
@@ -128,19 +130,21 @@ export default function GeneralSettingsPage() {
                     </div>
                 </div>
             </div>
-            <div className="space-y-2">
-                <Label>Adresse</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <Input placeholder="Virksomhedsnavn" />
-                     <Input placeholder="Vejnavn og nummer" />
-                     <Input placeholder="Postnummer" />
-                     <Input placeholder="By" />
-                     <Input placeholder="Land" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <Label htmlFor="business-email">Business Email</Label>
+                    <Input id="business-email" type="email" placeholder="kontakt@virksomhed.dk" />
                 </div>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="cvr">CVR-nummer</Label>
-                <Input id="cvr" placeholder="12345678" className="max-w-xs"/>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="cvr">CVR-nummer</Label>
+                    <Input id="cvr" placeholder="12345678"/>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="country">Land</Label>
+                    <Input id="country" placeholder="Danmark" />
+                </div>
             </div>
         </CardContent>
       </Card>
@@ -160,7 +164,7 @@ export default function GeneralSettingsPage() {
             {weekDays.map(day => (
                 <div key={day} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <span className="font-semibold w-24">{day}</span>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                         {openingHours[day].isOpen ? (
                             <>
                                 <Input type="time" value={openingHours[day].from} onChange={e => handleTimeChange(day, 'from', e.target.value)} className="w-32" />
