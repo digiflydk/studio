@@ -1,6 +1,9 @@
+
 'use server';
 import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
+import { getGeneralSettings, saveGeneralSettings, GeneralSettings } from '@/services/settings';
+import { revalidatePath } from 'next/cache';
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
   // Here you could add server-side validation or logging if needed
@@ -46,4 +49,19 @@ export async function sendContactMessage(prevState: any, formData: FormData) {
     message: 'Tak for din besked! Vi vender tilbage hurtigst muligt.',
     errors: {},
   };
+}
+
+export async function getSettingsAction(): Promise<GeneralSettings | null> {
+    return getGeneralSettings();
+}
+
+export async function saveSettingsAction(settings: GeneralSettings): Promise<{ success: boolean; message: string }> {
+    try {
+        await saveGeneralSettings(settings);
+        revalidatePath('/cms/settings/general');
+        return { success: true, message: 'Indstillinger er blevet gemt.' };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Der opstod en fejl under lagring.' };
+    }
 }
