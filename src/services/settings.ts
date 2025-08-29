@@ -56,6 +56,13 @@ export interface GeneralSettings {
         accent: HSLColor;
     };
     themeFontSizes?: FontSizes;
+    
+    // Header Settings
+    headerLogoWidth?: number;
+    headerBackgroundColor?: HSLColor;
+    headerLinkColor?: string;
+    headerLinkHoverColor?: string;
+    headerLinkSize?: number;
 
     // Footer Settings
     footerTagline?: string;
