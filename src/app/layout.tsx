@@ -72,6 +72,22 @@ export default async function RootLayout({
             });
           `}
         </Script>
+        <Script id="debug-scroll" strategy="beforeInteractive">
+{`(function(){
+  try {
+    var _siv = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function(){
+      try { console.log('[SCROLL DEBUG] scrollIntoView on', this, arguments); } catch(_){}
+      return _siv.apply(this, arguments);
+    };
+    var _sto = window.scrollTo;
+    window.scrollTo = function(){
+      try { console.log('[SCROLL DEBUG] window.scrollTo', arguments); } catch(_){}
+      return _sto.apply(window, arguments);
+    };
+  } catch(_) {}
+})();`}
+</Script>
         <Script id="autoscroll-killer" strategy="beforeInteractive">
 {`(function(){
   try {
