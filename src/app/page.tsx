@@ -9,8 +9,11 @@ import Footer from '@/components/layout/footer';
 import StickyCta from '@/components/sticky-cta';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import { getGeneralSettings } from '@/services/settings';
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getGeneralSettings();
+
   return (
     <div className="flex flex-col min-h-screen">
        <Suspense fallback={<div className="h-16 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
@@ -20,7 +23,10 @@ export default function Home() {
         <HeroSection />
         <ServicesSection />
         <AiProjectSection />
-        <CasesSection />
+        <CasesSection 
+            cases={settings?.cases} 
+            sectionData={settings}
+        />
         <AboutSection />
         <ContactSection />
       </main>

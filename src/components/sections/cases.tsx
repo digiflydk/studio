@@ -3,11 +3,9 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
-import { getGeneralSettings, type Case, GeneralSettings } from '@/services/settings';
+import type { Case, GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useEffect, useState } from 'react';
-
 
 const defaultCases: Case[] = [
   {
@@ -33,14 +31,15 @@ const defaultCases: Case[] = [
   },
 ];
 
-function CasesSectionContent() {
-  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+interface CasesSectionProps {
+    cases: Case[] | undefined;
+    sectionData: GeneralSettings | null;
+}
 
-  useEffect(() => {
-    getGeneralSettings().then(setSettings);
-  }, []);
-
-  const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
+export default function CasesSection({ cases: initialCases, sectionData: settings }: CasesSectionProps) {
+  const isMobile = useIsMobile();
+  
+  const cases = initialCases && initialCases.length > 0 ? initialCases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
 
@@ -50,25 +49,16 @@ function CasesSectionContent() {
   const descriptionStyle: React.CSSProperties = {
     fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
   };
+  
+  const sectionStyle: React.CSSProperties = {};
+    if (settings?.sectionPadding?.cases) {
+        const padding = settings.sectionPadding.cases;
+        sectionStyle.paddingTop = `${isMobile ? padding.topMobile : padding.top}px`;
+        sectionStyle.paddingBottom = `${isMobile ? padding.bottomMobile : padding.bottom}px`;
+    }
 
   return (
-    <section id="cases" className="bg-background">
-       <style>
-        {`
-          @media (max-width: 767px) {
-            #cases {
-              padding-top: ${settings?.sectionPadding?.cases?.topMobile ?? 64}px !important;
-              padding-bottom: ${settings?.sectionPadding?.cases?.bottomMobile ?? 64}px !important;
-            }
-          }
-           @media (min-width: 768px) {
-            #cases {
-              padding-top: ${settings?.sectionPadding?.cases?.top ?? 96}px !important;
-              padding-bottom: ${settings?.sectionPadding?.cases?.bottom ?? 96}px !important;
-            }
-          }
-        `}
-      </style>
+    <section id="cases" className="bg-background" style={sectionStyle}>
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
            <h2 
@@ -113,8 +103,4 @@ function CasesSectionContent() {
       </div>
     </section>
   );
-}
-
-export default function CasesSection() {
-    return <CasesSectionContent />;
 }
