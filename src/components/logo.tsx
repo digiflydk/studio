@@ -1,15 +1,22 @@
+
 import * as React from 'react';
 import Image from 'next/image';
 
 interface LogoProps extends React.SVGProps<SVGSVGElement> {
   logoUrl?: string;
   logoAlt?: string;
+  width?: number;
+  height?: number;
+  isDark?: boolean;
 }
 
-const Logo = ({ logoUrl, logoAlt, ...props }: LogoProps) => {
+const Logo = ({ logoUrl, logoAlt, width = 96, height = 28, isDark = false, ...props }: LogoProps) => {
+  const aspectRatio = width / height;
+  const calculatedHeight = Math.round(width / (96 / 28));
+
   if (logoUrl) {
     return (
-      <div className="relative h-7 w-24">
+      <div style={{ width: `${width}px`, height: `${calculatedHeight}px` }} className="relative">
         <Image
           src={logoUrl}
           alt={logoAlt || 'Company Logo'}
@@ -22,12 +29,12 @@ const Logo = ({ logoUrl, logoAlt, ...props }: LogoProps) => {
   }
 
   return (
-    <svg width="100" height="28" viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width={width} height={calculatedHeight} viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <text
         fontFamily="'Inter', sans-serif"
         fontSize="24"
         fontWeight="600"
-        fill="hsl(var(--foreground))"
+        fill={isDark ? "hsl(var(--primary-foreground))" : "hsl(var(--foreground))"}
         x="0"
         y="21"
       >

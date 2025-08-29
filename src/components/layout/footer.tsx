@@ -28,13 +28,27 @@ export default async function Footer() {
     })
     .filter((link): link is { url: string; icon: React.ElementType; label: string } => link !== null);
 
+  const footerStyle: React.CSSProperties = {};
+  if (settings?.footerBackgroundColor) {
+    const { h, s, l } = settings.footerBackgroundColor;
+    footerStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  }
+
+  const currentYear = new Date().getFullYear();
+  const companyName = settings?.companyName || 'Digifly';
+
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer style={footerStyle} className={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50 ? "text-white" : "text-secondary-foreground"}>
       <div className="container mx-auto max-w-7xl px-4 py-12 md:px-6">
         <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
           <div className="flex flex-col items-center md:items-start">
-            <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
-            <p className="mt-2 text-sm text-muted-foreground">Flow. Automatisér. Skalér.</p>
+            <Logo 
+                logoUrl={settings?.logoUrl} 
+                logoAlt={settings?.logoAlt} 
+                width={settings?.footerLogoWidth || 96}
+                isDark={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50}
+            />
+            <p className="mt-2 text-sm text-muted-foreground">{settings?.footerTagline || 'Flow. Automatisér. Skalér.'}</p>
           </div>
           <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
              <div className="space-y-1 text-sm">
@@ -61,7 +75,7 @@ export default async function Footer() {
                 ))}
               </div>
             )}
-            <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} {settings?.companyName || 'Digifly'}. Alle rettigheder forbeholdes.</p>
+            <p className="text-xs text-muted-foreground">&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
           </div>
         </div>
       </div>

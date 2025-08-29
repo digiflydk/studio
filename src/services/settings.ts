@@ -56,6 +56,11 @@ export interface GeneralSettings {
         accent: HSLColor;
     };
     themeFontSizes?: FontSizes;
+
+    // Footer Settings
+    footerTagline?: string;
+    footerLogoWidth?: number;
+    footerBackgroundColor?: HSLColor;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
