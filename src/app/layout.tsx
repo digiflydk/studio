@@ -1,3 +1,4 @@
+
 import type { Metadata, ResolvingMetadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -7,7 +8,6 @@ import { ReactNode } from 'react';
 import Script from 'next/script';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { ThemeProvider } from '@/context/ThemeContext';
 
 export async function generateMetadata(
   {},
@@ -35,6 +35,9 @@ export async function generateMetadata(
       type: 'website',
     },
     robots: {},
+    icons: {
+      icon: '/favicon.ico',
+    },
   };
 
 
