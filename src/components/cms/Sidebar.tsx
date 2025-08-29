@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie } from "lucide-react";
+import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -12,6 +12,7 @@ import { getGeneralSettings, GeneralSettings } from "@/services/settings";
 
 const mainNavLinks = [
   { href: "/cms", label: "Design", icon: Brush },
+  { href: "/cms/pages", label: "Pages", icon: FileText },
 ];
 
 const settingsNavLinks = [
@@ -51,7 +52,7 @@ export default function Sidebar() {
                 href={link.href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
-                  { "bg-gray-800 text-white": pathname === link.href }
+                  { "bg-gray-800 text-white": pathname.startsWith(link.href) && (link.href !== '/cms' || pathname === '/cms') }
                 )}
               >
                 <link.icon className="h-4 w-4" />
