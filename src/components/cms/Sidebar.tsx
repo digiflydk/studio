@@ -10,11 +10,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useState, useEffect } from "react";
 import { getGeneralSettings, GeneralSettings } from "@/services/settings";
 
-const mainNavLinks = [
-  { href: "/cms", label: "Design", icon: Brush },
-  { href: "/cms/pages", label: "Pages", icon: FileText },
-];
-
 const settingsNavLinks = [
     { href: "/cms/settings/general", label: "General", icon: Settings },
     { href: "/cms/settings/seo", label: "SEO", icon: Search },
@@ -45,15 +40,14 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden w-64 flex-col border-r bg-black sm:flex text-white">
-      <div className="flex h-16 items-center border-b border-gray-800 px-6">
-        <Link href="/cms">
+    <aside className="hidden border-r bg-black text-white md:block">
+      <div className="flex h-14 items-center border-b border-gray-800 px-4 lg:h-[60px] lg:px-6">
+        <Link href="/cms" className="flex items-center gap-2 font-semibold">
           <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
         </Link>
       </div>
-      <nav className="flex-1 overflow-auto py-4">
-        <ul className="grid items-start px-4 text-sm font-medium">
-          <li>
+      <div className="flex-1">
+        <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <Link
               href="/cms"
               className={cn(
@@ -64,8 +58,6 @@ export default function Sidebar() {
               <Brush className="h-4 w-4" />
               Design
             </Link>
-          </li>
-           <li>
             <Collapsible open={isPagesOpen} onOpenChange={setIsPagesOpen}>
                 <CollapsibleTrigger 
                     className={cn("flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
@@ -99,8 +91,6 @@ export default function Sidebar() {
                     </ul>
                 </CollapsibleContent>
             </Collapsible>
-          </li>
-           <li>
             <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800">
                     <div className="flex items-center gap-3">
@@ -128,9 +118,8 @@ export default function Sidebar() {
                     </ul>
                 </CollapsibleContent>
             </Collapsible>
-          </li>
-        </ul>
-      </nav>
+        </nav>
+      </div>
     </aside>
   );
 }

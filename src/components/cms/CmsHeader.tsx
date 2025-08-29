@@ -1,19 +1,119 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { useState, useEffect } from "react";
+import Logo from "../logo";
+import { getGeneralSettings, GeneralSettings } from "@/services/settings";
+
+
+const settingsNavLinks = [
+    { href: "/cms/settings/general", label: "General", icon: Settings },
+    { href: "/cms/settings/seo", label: "SEO", icon: Search },
+    { href: "/cms/settings/social", label: "Social Share", icon: Share2 },
+    { href: "/cms/settings/tracking", label: "Tracking", icon: MousePointerClick },
+    { href: "#", label: "Cookies", icon: Cookie },
+    { href: "#", label: "Business listing", icon: Building },
+]
+
+const pageLinks = [
+    { href: "/cms/pages/home", label: "Home" },
+    { href: "/cms/pages/header", label: "Header" },
+    { href: "/cms/pages/footer", label: "Footer" },
+  ];
 
 export default function CmsHeader() {
+  const pathname = usePathname();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
+  const [isPagesOpen, setIsPagesOpen] = useState(pathname.startsWith('/cms/pages'));
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+  useEffect(() => {
+      async function loadSettings() {
+          const loadedSettings = await getGeneralSettings();
+          setSettings(loadedSettings);
+      }
+      loadSettings();
+  }, []);
+
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-      <h1 className="text-xl font-bold">Design Indstillinger</h1>
-      <div className="ml-auto flex items-center gap-2">
-        <Button asChild variant="outline" size="icon">
-          <Link href="/" aria-label="Gå til forside">
-            <Home className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
+        <Sheet>
+            <SheetTrigger asChild>
+                <Button size="icon" variant="outline" className="sm:hidden">
+                    <PanelLeft className="h-5 w-5" />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs bg-black text-white border-gray-800">
+                <nav className="grid gap-6 text-lg font-medium">
+                    <Link href="/cms" className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base">
+                         <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
+                         <span className="sr-only">Digifly CMS</span>
+                    </Link>
+                    <Link href="/cms" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms' })}>
+                        <Brush className="h-5 w-5" />
+                        Design
+                    </Link>
+                    <Collapsible open={isPagesOpen} onOpenChange={setIsPagesOpen}>
+                        <CollapsibleTrigger className={cn("flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white", {"text-white": pathname.startsWith('/cms/pages')})} asChild>
+                           <Link href="/cms/pages">
+                                <div className="flex items-center gap-4">
+                                    <FileText className="h-5 w-5" />
+                                    <span>Pages</span>
+                                </div>
+                                <ChevronDown className={cn("h-5 w-5 transition-transform", { "rotate-180": isPagesOpen })} />
+                            </Link>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-10">
+                            <ul className="grid items-start py-2 text-sm font-medium">
+                               {pageLinks.map(link => (
+                                 <li key={link.label}>
+                                    <Link href={link.href} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white", { "bg-gray-800 text-white": pathname === link.href })}>
+                                        {link.label}
+                                    </Link>
+                                 </li>
+                               ))}
+                            </ul>
+                        </CollapsibleContent>
+                    </Collapsible>
+                    <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                        <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
+                            <div className="flex items-center gap-4">
+                                <Settings className="h-5 w-5" />
+                                <span>Settings</span>
+                            </div>
+                            <ChevronDown className={cn("h-5 w-5 transition-transform", { "rotate-180": isSettingsOpen })} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-10">
+                            <ul className="grid items-start py-2 text-sm font-medium">
+                               {settingsNavLinks.map(link => (
+                                 <li key={link.label}>
+                                    <Link href={link.href} className={cn("flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white", { "bg-gray-800 text-white": pathname.startsWith(link.href) && link.href !== "#" })}>
+                                        <link.icon className="h-4 w-4" />
+                                        {link.label}
+                                    </Link>
+                                 </li>
+                               ))}
+                            </ul>
+                        </CollapsibleContent>
+                    </Collapsible>
+                </nav>
+            </SheetContent>
+        </Sheet>
+        <h1 className="text-xl font-bold">Design Indstillinger</h1>
+        <div className="ml-auto flex items-center gap-2">
+            <Button asChild variant="outline" size="icon">
+                <Link href="/" aria-label="Gå til forside">
+                    <Home className="h-4 w-4" />
+                </Link>
+            </Button>
+        </div>
     </header>
   );
 }
