@@ -63,11 +63,42 @@ export default async function RootLayout({
       <head>
         <Script id="scroll-restoration" strategy="beforeInteractive">
           {`
+            console.log('AUTOSCROLL KILLER: Script loaded. Setting history.scrollRestoration to manual.');
             try {
               if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual';
               }
-            } catch (e) {}
+            } catch (e) {
+              console.error('AUTOSCROLL KILLER: Error setting scrollRestoration:', e);
+            }
+          `}
+        </Script>
+        <Script id="scroll-debug" strategy="afterInteractive">
+          {`
+            const killScroll = () => {
+                console.log('AUTOSCROLL KILLER: Forcing scroll to top at ' + new Date().toLocaleTimeString());
+                window.scrollTo(0, 0);
+            };
+            
+            // Re-kill on popstate (browser back/forward)
+            window.addEventListener('popstate', () => {
+              console.log('AUTOSCROLL KILLER: Popstate event detected.');
+              killScroll();
+            });
+            
+            // Re-kill after a short delay to fight any late-loading scripts
+            setTimeout(() => {
+              console.log('AUTOSCROLL KILLER: Initial timeout (100ms) fired.');
+              killScroll();
+            }, 100);
+            setTimeout(() => {
+              console.log('AUTOSCROLL KILLER: Second timeout (500ms) fired.');
+              killScroll();
+            }, 500);
+             setTimeout(() => {
+              console.log('AUTOSCROLL KILLER: Third timeout (1000ms) fired.');
+              killScroll();
+            }, 1000);
           `}
         </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
