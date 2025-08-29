@@ -4,9 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
+function hslToHex(h: number, s: number, l: number) {
+  l /= 100;
+  const a = (s * Math.min(l, 1 - l)) / 100;
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 function ColorPicker({ label, colorName }: { label: string; colorName: keyof ReturnType<typeof useTheme>['theme']['colors'] }) {
   const { theme, setThemeColor } = useTheme();
   const color = theme.colors[colorName];
+  const hexColor = hslToHex(color.h, color.s, color.l);
 
   const handleColorChange = (part: 'h' | 's' | 'l', value: number) => {
     setThemeColor(colorName, { ...color, [part]: value });
@@ -14,7 +28,10 @@ function ColorPicker({ label, colorName }: { label: string; colorName: keyof Ret
 
   return (
     <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
-      <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+       <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+        <span className="font-mono text-sm" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{hexColor}</span>
+      </div>
       <div className="space-y-2">
         <Label>Hue ({color.h})</Label>
         <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} />
@@ -33,20 +50,25 @@ function ColorPicker({ label, colorName }: { label: string; colorName: keyof Ret
 
 function FontSizeSlider({ label, sizeName }: { label: string; sizeName: keyof ReturnType<typeof useTheme>['theme']['fontSizes'] }) {
     const { theme, setFontSize } = useTheme();
-    const size = theme.fontSizes[sizeName];
+    const sizeInRem = theme.fontSizes[sizeName];
+    const sizeInPx = Math.round(sizeInRem * 16);
+
+    const handleSliderChange = (pxValue: number) => {
+        setFontSize(sizeName, pxValue / 16);
+    }
 
     return (
         <div className="space-y-2">
             <div className="flex justify-between items-center">
                 <Label>{label}</Label>
-                <span className="text-sm text-muted-foreground">{size.toFixed(2)}rem</span>
+                <span className="text-sm text-muted-foreground">{sizeInPx}px</span>
             </div>
             <Slider
-                value={[size]}
-                onValueChange={([v]) => setFontSize(sizeName, v)}
-                min={0.5}
-                max={sizeName === 'h1' ? 8 : 4}
-                step={0.05}
+                value={[sizeInPx]}
+                onValueChange={([v]) => handleSliderChange(v)}
+                min={8}
+                max={sizeName === 'h1' ? 128 : 64}
+                step={1}
             />
         </div>
     )
@@ -72,7 +94,7 @@ export default function CmsPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Tekststørrelser</CardTitle>
-          <CardDescription>Juster størrelsen på overskrifter og brødtekst.</CardDescription>
+          <CardDescription>Juster størrelsen på overskrifter og brødtekst i pixels.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <FontSizeSlider label="Heading 1" sizeName="h1" />

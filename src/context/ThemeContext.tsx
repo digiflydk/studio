@@ -24,7 +24,7 @@ interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   setThemeColor: (colorName: keyof Theme['colors'], hsl: HSLColor) => void;
-  setFontSize: (sizeName: keyof FontSizes, size: number) => void;
+  setFontSize: (sizeName: keyof FontSizes, sizeInRem: number) => void;
   resetTheme: () => void;
 }
 
@@ -89,8 +89,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     setTheme(newTheme);
   };
   
-  const setFontSize = (sizeName: keyof FontSizes, size: number) => {
-     const newTheme = { ...theme, fontSizes: { ...theme.fontSizes, [sizeName]: size } };
+  const setFontSize = (sizeName: keyof FontSizes, sizeInRem: number) => {
+     const newTheme = { ...theme, fontSizes: { ...theme.fontSizes, [sizeName]: sizeInRem } };
      setTheme(newTheme);
   };
 
