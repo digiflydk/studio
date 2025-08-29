@@ -179,14 +179,14 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
     
     return (
         <AccordionItem value={`item-${index}`}>
-            <AccordionTrigger>
-                <div className="flex justify-between w-full pr-4 items-center">
+            <div className="flex justify-between w-full items-center">
+                <AccordionTrigger className="flex-1 pr-4">
                     <span>{item[titleField] || `Element ${index + 1}`}</span>
-                     <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); removeItem(index); }}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                </div>
-            </AccordionTrigger>
+                </AccordionTrigger>
+                <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+            </div>
             <AccordionContent className="p-4 border-t">
                 <div className="space-y-4">
                     {fields.map(field => (
