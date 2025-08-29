@@ -4,6 +4,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { getGeneralSettings } from '@/services/settings';
+import Analytics from '@/components/analytics';
+import { Suspense } from 'react';
 
 export async function generateMetadata(
   {},
@@ -58,6 +60,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <Suspense fallback={null}>
+            <Analytics />
+        </Suspense>
       </head>
       <body className="font-body antialiased">
         <ThemeProvider>

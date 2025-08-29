@@ -18,7 +18,7 @@ const settingsNavLinks = [
     { href: "/cms/settings/general", label: "General", icon: Settings },
     { href: "/cms/settings/seo", label: "SEO", icon: Search },
     { href: "/cms/settings/social", label: "Social Share", icon: Share2 },
-    { href: "#", label: "Tracking", icon: MousePointerClick },
+    { href: "/cms/settings/tracking", label: "Tracking", icon: MousePointerClick },
     { href: "#", label: "Cookies", icon: Cookie },
     { href: "#", label: "Business listing", icon: Building },
 ]

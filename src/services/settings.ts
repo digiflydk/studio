@@ -29,6 +29,9 @@ export interface GeneralSettings {
     instagramUrl?: string;
     twitterUrl?: string;
     tiktokUrl?: string;
+    gtmId?: string;
+    facebookPixelId?: string;
+    googleAdsId?: string;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
