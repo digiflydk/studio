@@ -61,6 +61,13 @@ export default function SeoSettingsPage() {
 
   return (
     <div className="space-y-8 max-w-4xl">
+       <div className="flex justify-end">
+            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Gem Ændringer
+            </Button>
+       </div>
+
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>SEO (Search Engine Optimization)</CardTitle>
@@ -90,13 +97,6 @@ export default function SeoSettingsPage() {
             </Alert>
         </CardContent>
       </Card>
-
-       <div className="flex justify-end pt-4">
-            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Gem Ændringer
-            </Button>
-       </div>
     </div>
   );
 }
