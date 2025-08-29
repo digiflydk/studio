@@ -44,6 +44,10 @@ export default async function Footer() {
    const contactStyle: React.CSSProperties = {
      fontSize: settings?.footerContactSize ? `${settings.footerContactSize}px` : undefined,
   };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.footerDescriptionSize ? `${settings.footerDescriptionSize}px` : undefined,
+  };
+
 
   const currentYear = new Date().getFullYear();
   const companyName = settings?.companyName || 'Digifly';
@@ -55,14 +59,15 @@ export default async function Footer() {
     <footer style={footerStyle} className={cn(defaultTextColorClass)}>
       <div className="container mx-auto max-w-7xl px-4 py-12 md:px-6">
         <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center md:items-start space-y-2">
             <Logo 
                 logoUrl={settings?.logoUrl} 
                 logoAlt={settings?.logoAlt} 
                 width={settings?.footerLogoWidth || 96}
                 isDark={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50}
             />
-            <p className={cn("mt-2 text-sm", mutedTextColorClass)}>{settings?.footerTagline || 'Flow. Automatisér. Skalér.'}</p>
+            {settings?.footerTagline && <p className={cn("mt-2 text-sm", mutedTextColorClass)}>{settings.footerTagline}</p>}
+            {settings?.footerDescription && <p className={cn("text-sm", settings.footerDescriptionColor)} style={descriptionStyle}>{settings.footerDescription}</p>}
           </div>
           <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
              <div className="space-y-1">

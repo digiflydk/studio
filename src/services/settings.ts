@@ -59,6 +59,9 @@ export interface GeneralSettings {
 
     // Footer Settings
     footerTagline?: string;
+    footerDescription?: string;
+    footerDescriptionColor?: string;
+    footerDescriptionSize?: number;
     footerLogoWidth?: number;
     footerBackgroundColor?: HSLColor;
     footerCompanyNameColor?: string;

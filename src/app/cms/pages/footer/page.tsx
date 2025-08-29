@@ -13,6 +13,7 @@ import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -209,6 +210,8 @@ export default function CmsFooterPage() {
             footerAddressSize: loadedSettings.footerAddressSize || 14,
             footerContactColor: loadedSettings.footerContactColor || 'text-muted-foreground',
             footerContactSize: loadedSettings.footerContactSize || 14,
+            footerDescriptionColor: loadedSettings.footerDescriptionColor || 'text-muted-foreground',
+            footerDescriptionSize: loadedSettings.footerDescriptionSize || 14,
         });
       }
       setIsLoading(false);
@@ -265,6 +268,15 @@ export default function CmsFooterPage() {
                     placeholder="Flow. Automatisér. Skalér."
                 />
             </div>
+             <div className="space-y-2">
+                <Label htmlFor="footer-description">Beskrivelse</Label>
+                <Textarea
+                    id="footer-description" 
+                    value={settings.footerDescription || ''} 
+                    onChange={e => handleInputChange('footerDescription', e.target.value)}
+                    placeholder="Kort beskrivelse under tagline..."
+                />
+            </div>
         </CardContent>
       </Card>
       <Card className="shadow-lg">
@@ -292,6 +304,13 @@ export default function CmsFooterPage() {
                     onChange={(hsl) => handleInputChange('footerBackgroundColor', hsl)}
                 />
             </div>
+            <TextStyleEditor 
+                label="Beskrivelse"
+                colorValue={settings.footerDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerDescriptionColor', v)}
+                sizeValue={settings.footerDescriptionSize || 14}
+                onSizeChange={(v) => handleInputChange('footerDescriptionSize', v)}
+            />
              <TextStyleEditor 
                 label="Virksomhedsnavn"
                 colorValue={settings.footerCompanyNameColor as ThemeColor || 'text-foreground'}
@@ -318,4 +337,3 @@ export default function CmsFooterPage() {
     </div>
   );
 }
-
