@@ -48,9 +48,15 @@ export default async function AboutSection() {
   const textStyle: React.CSSProperties = {
     fontSize: settings?.aboutTextSize ? `${settings.aboutTextSize}px` : undefined,
   };
+
+  const sectionStyle: React.CSSProperties = {};
+  if (settings?.sectionPadding?.about) {
+    sectionStyle.paddingTop = `${settings.sectionPadding.about.top}px`;
+    sectionStyle.paddingBottom = `${settings.sectionPadding.about.bottom}px`;
+  }
   
   return (
-    <section id="om-os" className="bg-secondary">
+    <section id="om-os" className="bg-secondary" style={sectionStyle}>
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
           <div className="text-center lg:text-left">

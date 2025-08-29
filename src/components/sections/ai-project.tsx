@@ -10,6 +10,8 @@ import { qualifyProjectAction } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
+import { getGeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/services/settings';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -22,9 +24,15 @@ export default function AiProjectSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [isQualified, setIsQualified] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    async function loadSettings() {
+      const loadedSettings = await getGeneralSettings();
+      setSettings(loadedSettings);
+    }
+    loadSettings();
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -81,8 +89,14 @@ export default function AiProjectSection() {
     }
   };
 
+  const sectionStyle: React.CSSProperties = {};
+  if (settings?.sectionPadding?.aiProject) {
+    sectionStyle.paddingTop = `${settings.sectionPadding.aiProject.top}px`;
+    sectionStyle.paddingBottom = `${settings.sectionPadding.aiProject.bottom}px`;
+  }
+
   return (
-    <section id="ai-project" className="w-full">
+    <section id="ai-project" className="w-full" style={sectionStyle}>
       <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">

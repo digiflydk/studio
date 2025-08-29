@@ -135,6 +135,15 @@ export interface GeneralSettings {
     aboutTextColor?: string;
     aboutTextSize?: number;
     teamMembers?: TeamMember[];
+
+    // Spacing
+    sectionPadding?: {
+        services: { top: number; bottom: number };
+        aiProject: { top: number; bottom: number };
+        cases: { top: number; bottom: number };
+        about: { top: number; bottom: number };
+        contact: { top: number; bottom: number };
+    };
 }
 
 

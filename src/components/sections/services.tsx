@@ -45,8 +45,14 @@ export default async function ServicesSection() {
     fontSize: settings?.servicesSectionDescriptionSize ? `${settings.servicesSectionDescriptionSize}px` : undefined,
   };
 
+  const sectionStyle: React.CSSProperties = {};
+  if (settings?.sectionPadding?.services) {
+    sectionStyle.paddingTop = `${settings.sectionPadding.services.top}px`;
+    sectionStyle.paddingBottom = `${settings.sectionPadding.services.bottom}px`;
+  }
+
   return (
-    <section id="services" className="bg-secondary">
+    <section id="services" className="bg-secondary" style={sectionStyle}>
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
           <h2 

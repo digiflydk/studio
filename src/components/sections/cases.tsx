@@ -44,8 +44,14 @@ export default async function CasesSection() {
     fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
   };
 
+  const sectionStyle: React.CSSProperties = {};
+  if (settings?.sectionPadding?.cases) {
+    sectionStyle.paddingTop = `${settings.sectionPadding.cases.top}px`;
+    sectionStyle.paddingBottom = `${settings.sectionPadding.cases.bottom}px`;
+  }
+
   return (
-    <section id="cases" className="bg-background">
+    <section id="cases" className="bg-background" style={sectionStyle}>
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="mb-12 text-center">
            <h2 

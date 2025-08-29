@@ -214,6 +214,48 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
     );
 }
 
+function SpacingEditor({
+    label,
+    padding,
+    onPaddingChange
+}: {
+    label: string;
+    padding: { top: number; bottom: number };
+    onPaddingChange: (padding: { top: number; bottom: number }) => void;
+}) {
+    return (
+        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+            <h3 className="font-semibold">{label}</h3>
+            <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>Afstand i toppen</Label>
+                    <span className="text-sm text-muted-foreground">{padding.top}px</span>
+                </div>
+                <Slider 
+                    value={[padding.top]} 
+                    onValueChange={([v]) => onPaddingChange({ ...padding, top: v })}
+                    min={0}
+                    max={200}
+                    step={4}
+                />
+            </div>
+            <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>Afstand i bunden</Label>
+                    <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                </div>
+                <Slider 
+                    value={[padding.bottom]} 
+                    onValueChange={([v]) => onPaddingChange({ ...padding, bottom: v })}
+                    min={0}
+                    max={200}
+                    step={4}
+                />
+            </div>
+        </div>
+    );
+}
+
 export default function CmsHomePage() {
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -258,6 +300,14 @@ export default function CmsHomePage() {
             aboutTextColor: loadedSettings.aboutTextColor || "text-muted-foreground",
             aboutTextSize: loadedSettings.aboutTextSize || 18,
             teamMembers: loadedSettings.teamMembers && loadedSettings.teamMembers.length > 0 ? loadedSettings.teamMembers : defaultTeam,
+            
+            sectionPadding: loadedSettings.sectionPadding || {
+                services: { top: 96, bottom: 96 },
+                aiProject: { top: 96, bottom: 96 },
+                cases: { top: 96, bottom: 96 },
+                about: { top: 96, bottom: 96 },
+                contact: { top: 96, bottom: 96 },
+            },
         });
       } else {
         // If no settings are loaded at all, populate with all defaults
@@ -293,6 +343,14 @@ export default function CmsHomePage() {
             aboutTextColor: "text-muted-foreground",
             aboutTextSize: 18,
             teamMembers: defaultTeam,
+
+            sectionPadding: {
+                services: { top: 96, bottom: 96 },
+                aiProject: { top: 96, bottom: 96 },
+                cases: { top: 96, bottom: 96 },
+                about: { top: 96, bottom: 96 },
+                contact: { top: 96, bottom: 96 },
+            },
         })
       }
       setIsLoading(false);
@@ -302,6 +360,16 @@ export default function CmsHomePage() {
   
   const handleInputChange = (field: keyof GeneralSettings, value: any) => {
     setSettings(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: { top: number; bottom: number }) => {
+    setSettings(prev => ({
+        ...prev,
+        sectionPadding: {
+            ...prev.sectionPadding,
+            [section]: value,
+        }
+    }));
   };
 
   const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
@@ -519,6 +587,45 @@ export default function CmsHomePage() {
             ))}
         </Accordion>
         <Button variant="outline" onClick={() => handleListAdd('teamMembers', { name: 'Nyt Medlem', title: '', description: '', imageUrl: '', linkedinUrl: '#', aiHint: '' })}>Tilføj Medlem</Button>
+      </SectionCard>
+       <SectionCard title="Sektionsafstand" description="Juster den vertikale afstand (padding) for hver sektion.">
+        <div className="space-y-4">
+            {settings.sectionPadding?.services && (
+                <SpacingEditor
+                    label="Services"
+                    padding={settings.sectionPadding.services}
+                    onPaddingChange={(p) => handlePaddingChange('services', p)}
+                />
+            )}
+             {settings.sectionPadding?.aiProject && (
+                <SpacingEditor
+                    label="Fortæl os om dit projekt"
+                    padding={settings.sectionPadding.aiProject}
+                    onPaddingChange={(p) => handlePaddingChange('aiProject', p)}
+                />
+            )}
+             {settings.sectionPadding?.cases && (
+                <SpacingEditor
+                    label="Cases"
+                    padding={settings.sectionPadding.cases}
+                    onPaddingChange={(p) => handlePaddingChange('cases', p)}
+                />
+            )}
+             {settings.sectionPadding?.about && (
+                <SpacingEditor
+                    label="Om Os"
+                    padding={settings.sectionPadding.about}
+                    onPaddingChange={(p) => handlePaddingChange('about', p)}
+                />
+            )}
+             {settings.sectionPadding?.contact && (
+                <SpacingEditor
+                    label="Kontakt"
+                    padding={settings.sectionPadding.contact}
+                    onPaddingChange={(p) => handlePaddingChange('contact', p)}
+                />
+            )}
+        </div>
       </SectionCard>
     </div>
   );

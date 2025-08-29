@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { sendContactMessage } from '@/app/actions';
+import { sendContactMessage, getSettingsAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import type { GeneralSettings } from '@/services/settings';
 
 const initialState = {
   message: '',
@@ -32,6 +33,15 @@ function SubmitButton() {
 export default function ContactSection() {
   const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
+  const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+  useEffect(() => {
+    async function loadSettings() {
+      const loadedSettings = await getSettingsAction();
+      setSettings(loadedSettings);
+    }
+    loadSettings();
+  }, []);
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -49,8 +59,14 @@ export default function ContactSection() {
     }
   }, [state, toast]);
 
+  const sectionStyle: React.CSSProperties = {};
+  if (settings?.sectionPadding?.contact) {
+    sectionStyle.paddingTop = `${settings.sectionPadding.contact.top}px`;
+    sectionStyle.paddingBottom = `${settings.sectionPadding.contact.bottom}px`;
+  }
+
   return (
-    <section id="kontakt" className="w-full">
+    <section id="kontakt" className="w-full" style={sectionStyle}>
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
