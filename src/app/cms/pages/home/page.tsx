@@ -284,14 +284,6 @@ export default function CmsHomePage() {
       const loadedSettings = await getSettingsAction();
       const initialSettings = loadedSettings || {};
 
-      const sectionPadding = {
-          services: initialSettings.sectionPadding?.services || defaultPadding,
-          aiProject: initialSettings.sectionPadding?.aiProject || defaultPadding,
-          cases: initialSettings.sectionPadding?.cases || defaultPadding,
-          about: initialSettings.sectionPadding?.about || defaultPadding,
-          contact: initialSettings.sectionPadding?.contact || defaultPadding,
-      };
-
       setSettings({
           ...initialSettings,
           heroHeadline: initialSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
@@ -326,7 +318,13 @@ export default function CmsHomePage() {
           aboutTextSize: initialSettings.aboutTextSize || 18,
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
           
-          sectionPadding,
+          sectionPadding: {
+              services: initialSettings.sectionPadding?.services || defaultPadding,
+              aiProject: initialSettings.sectionPadding?.aiProject || defaultPadding,
+              cases: initialSettings.sectionPadding?.cases || defaultPadding,
+              about: initialSettings.sectionPadding?.about || defaultPadding,
+              contact: initialSettings.sectionPadding?.contact || defaultPadding,
+          },
       });
 
       setIsLoading(false);
@@ -667,3 +665,5 @@ export default function CmsHomePage() {
     </div>
   );
 }
+
+    
