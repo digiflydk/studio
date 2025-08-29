@@ -36,10 +36,6 @@ export async function generateMetadata(
     robots: {},
   };
 
-  if (settings?.faviconUrl) {
-    metadata.icons = [{ rel: 'icon', url: settings.faviconUrl }];
-  }
-
 
   if (settings?.allowSearchEngineIndexing === false) {
     metadata.robots!.index = false;
@@ -79,9 +75,6 @@ export default async function RootLayout({
         <Script id="hash-clean" strategy="beforeInteractive">
         {`(function(){
   try {
-    // Slå al smooth scroll fra præ-paint, så browseren ikke anker-hopper
-    document.documentElement.style.scrollBehavior = 'auto';
-
     // Gør scrollRestoration manual med det samme
     if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 
@@ -92,11 +85,6 @@ export default async function RootLayout({
       window.scrollTo(0, 0);
       window.addEventListener('load', function(){ try { window.scrollTo(0, 0); } catch(_){} }, { once: true });
     }
-
-    // Gendan smooth scroll efter første frame
-    requestAnimationFrame(function(){
-      document.documentElement.style.scrollBehavior = '';
-    });
   } catch(_) {}
 })();`}
         </Script>
