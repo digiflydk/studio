@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
-import { Suspense } from 'react';
+import { ReactNode } from 'react';
 import Script from 'next/script';
 import ScrollManager from '@/components/scroll-manager';
 
@@ -45,12 +45,6 @@ export async function generateMetadata(
     metadata.robots!.follow = true;
   }
   
-  if (settings?.faviconUrl) {
-    metadata.icons = {
-        icon: settings.faviconUrl,
-    };
-  }
-
   return metadata;
 }
 
@@ -58,7 +52,7 @@ export async function generateMetadata(
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const settings = await getGeneralSettings();
   return (
@@ -81,16 +75,10 @@ export default async function RootLayout({
         <Script id="autoscroll-killer" strategy="beforeInteractive">
 {`(function(){
   try {
-    // 1) PRE-PAINT LOCK: slå smooth fra og deaktiver browserens auto-justering
-    var docEl = document.documentElement;
-    var body = document.body;
+    // 1) PRE-PAINT LOCK: deaktiver browserens auto-justering
     var _siv = Element.prototype.scrollIntoView;
     var _sto = window.scrollTo;
     var unlocked = false;
-
-    // slå fra før nogen når at scrolle
-    docEl.style.scrollBehavior = 'auto';
-    docEl.style.overflowAnchor = 'none';
 
     if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 
@@ -132,8 +120,6 @@ export default async function RootLayout({
     // 4) UNLOCK: genaktiver scroll efter 2 frames (brugeren kan nu klikke i menu)
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
-        docEl.style.scrollBehavior = '';
-        docEl.style.overflowAnchor = '';
         Element.prototype.scrollIntoView = _siv;
         window.scrollTo = _sto;
         unlocked = true;
@@ -145,9 +131,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <Suspense fallback={null}>
-            <Analytics />
-        </Suspense>
+        <Analytics />
       </head>
       <body className="font-body antialiased">
         <ThemeProvider settings={settings}>
