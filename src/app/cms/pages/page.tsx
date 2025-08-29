@@ -1,22 +1,57 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, Home, ArrowUp, ArrowDown } from "lucide-react";
+import Link from "next/link";
+
+const pageSections = [
+  {
+    name: "Home",
+    description: "Administrer indholdet på forsiden.",
+    href: "/cms/pages/home",
+    icon: Home,
+  },
+  {
+    name: "Header",
+    description: "Rediger navigationslinks og logo.",
+    href: "/cms/pages/header",
+    icon: ArrowUp,
+  },
+  {
+    name: "Footer",
+    description: "Opdater kontaktoplysninger og sociale links.",
+    href: "/cms/pages/footer",
+    icon: ArrowDown,
+  },
+];
 
 export default function CmsPagesPage() {
   return (
-    <div className="flex justify-center items-center h-full">
-        <Card className="w-full max-w-lg text-center shadow-lg">
-            <CardHeader>
-                 <div className="mx-auto bg-muted rounded-full p-3 w-fit">
-                    <FileText className="h-8 w-8" />
-                </div>
-                <CardTitle className="mt-4">Sideadministration</CardTitle>
-                <CardDescription>Dette område er under udvikling. Her vil du kunne administrere indholdet på dine sider.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">
-                    Kom snart tilbage for at se de nye funktioner!
-                </p>
+    <div className="space-y-8">
+       <div>
+            <h1 className="text-2xl font-bold">Sideindhold</h1>
+            <p className="text-muted-foreground">Vælg en sektion for at redigere indholdet.</p>
+       </div>
+        <Card className="shadow-lg">
+            <CardContent className="p-0">
+                <ul className="divide-y">
+                    {pageSections.map((section, index) => (
+                         <li key={section.name} className="p-4 hover:bg-muted/50 transition-colors">
+                            <Link href={section.href} className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                     <div className="bg-muted rounded-md p-2">
+                                        <section.icon className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">{section.name}</h3>
+                                        <p className="text-sm text-muted-foreground">{section.description}</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            </Link>
+                         </li>
+                    ))}
+                </ul>
             </CardContent>
         </Card>
     </div>

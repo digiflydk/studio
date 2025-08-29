@@ -27,6 +27,7 @@ const settingsNavLinks = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
+  const [isPagesOpen, setIsPagesOpen] = useState(pathname.startsWith('/cms/pages'));
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
   useEffect(() => {
@@ -37,6 +38,12 @@ export default function Sidebar() {
       loadSettings();
   }, []);
 
+  const pageLinks = [
+    { href: "/cms/pages/home", label: "Home" },
+    { href: "/cms/pages/header", label: "Header" },
+    { href: "/cms/pages/footer", label: "Footer" },
+  ];
+
   return (
     <aside className="hidden w-64 flex-col border-r bg-black sm:flex text-white">
       <div className="flex h-16 items-center border-b border-gray-800 px-6">
@@ -46,20 +53,53 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 overflow-auto py-4">
         <ul className="grid items-start px-4 text-sm font-medium">
-          {mainNavLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
-                  { "bg-gray-800 text-white": pathname.startsWith(link.href) && (link.href !== '/cms' || pathname === '/cms') }
-                )}
-              >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          <li>
+            <Link
+              href="/cms"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                { "bg-gray-800 text-white": pathname === '/cms' }
+              )}
+            >
+              <Brush className="h-4 w-4" />
+              Design
+            </Link>
+          </li>
+           <li>
+            <Collapsible open={isPagesOpen} onOpenChange={setIsPagesOpen}>
+                <CollapsibleTrigger 
+                    className={cn("flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                        {"bg-gray-800 text-white": pathname.startsWith('/cms/pages')}
+                    )}
+                    asChild
+                >
+                   <Link href="/cms/pages">
+                        <div className="flex items-center gap-3">
+                            <FileText className="h-4 w-4" />
+                            <span>Pages</span>
+                        </div>
+                        <ChevronDown className={cn("h-4 w-4 transition-transform", { "rotate-180": isPagesOpen })} />
+                    </Link>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pl-6">
+                    <ul className="grid items-start py-2 text-sm font-medium">
+                       {pageLinks.map(link => (
+                         <li key={link.label}>
+                            <Link
+                                href={link.href}
+                                className={cn(
+                                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                                { "bg-gray-800 text-white": pathname === link.href }
+                                )}
+                            >
+                                {link.label}
+                            </Link>
+                         </li>
+                       ))}
+                    </ul>
+                </CollapsibleContent>
+            </Collapsible>
+          </li>
            <li>
             <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800">
