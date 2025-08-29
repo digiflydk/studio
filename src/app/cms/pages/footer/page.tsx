@@ -12,6 +12,7 @@ import { GeneralSettings } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -131,6 +132,62 @@ function HslColorPicker({
     )
 }
 
+const themeColorOptions = [
+    { value: 'text-primary', label: 'Primary' },
+    { value: 'text-secondary-foreground', label: 'Secondary' },
+    { value: 'text-accent', label: 'Accent' },
+    { value: 'text-foreground', label: 'Default Text' },
+    { value: 'text-muted-foreground', label: 'Muted Text' },
+    { value: 'text-white', label: 'White' },
+    { value: 'text-black', label: 'Black' },
+] as const;
+
+type ThemeColor = typeof themeColorOptions[number]['value'];
+
+function TextStyleEditor({
+    label,
+    colorValue,
+    onColorChange,
+    sizeValue,
+    onSizeChange
+}: {
+    label: string;
+    colorValue: ThemeColor;
+    onColorChange: (value: ThemeColor) => void;
+    sizeValue: number;
+    onSizeChange: (value: number) => void;
+}) {
+    return (
+        <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h3 className="font-semibold md:col-span-2">{label}</h3>
+            <div className="space-y-2">
+                <Label>Farve</Label>
+                <Select value={colorValue} onValueChange={onColorChange}>
+                    <SelectTrigger><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                        {themeColorOptions.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>Tekststørrelse</Label>
+                    <span className="text-sm text-muted-foreground">{sizeValue}px</span>
+                </div>
+                <Slider 
+                    value={[sizeValue]} 
+                    onValueChange={([v]) => onSizeChange(v)}
+                    min={10}
+                    max={48}
+                    step={1}
+                />
+            </div>
+        </div>
+    );
+}
+
 export default function CmsFooterPage() {
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -145,7 +202,13 @@ export default function CmsFooterPage() {
       if (loadedSettings) {
         setSettings({
             ...loadedSettings,
-            footerBackgroundColor: loadedSettings.footerBackgroundColor || { h: 210, s: 60, l: 98 }
+            footerBackgroundColor: loadedSettings.footerBackgroundColor || { h: 210, s: 60, l: 98 },
+            footerCompanyNameColor: loadedSettings.footerCompanyNameColor || 'text-foreground',
+            footerCompanyNameSize: loadedSettings.footerCompanyNameSize || 16,
+            footerAddressColor: loadedSettings.footerAddressColor || 'text-muted-foreground',
+            footerAddressSize: loadedSettings.footerAddressSize || 14,
+            footerContactColor: loadedSettings.footerContactColor || 'text-muted-foreground',
+            footerContactSize: loadedSettings.footerContactSize || 14,
         });
       }
       setIsLoading(false);
@@ -229,8 +292,30 @@ export default function CmsFooterPage() {
                     onChange={(hsl) => handleInputChange('footerBackgroundColor', hsl)}
                 />
             </div>
+             <TextStyleEditor 
+                label="Virksomhedsnavn"
+                colorValue={settings.footerCompanyNameColor as ThemeColor || 'text-foreground'}
+                onColorChange={(v) => handleInputChange('footerCompanyNameColor', v)}
+                sizeValue={settings.footerCompanyNameSize || 16}
+                onSizeChange={(v) => handleInputChange('footerCompanyNameSize', v)}
+            />
+            <TextStyleEditor 
+                label="Adresse"
+                colorValue={settings.footerAddressColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerAddressColor', v)}
+                sizeValue={settings.footerAddressSize || 14}
+                onSizeChange={(v) => handleInputChange('footerAddressSize', v)}
+            />
+            <TextStyleEditor 
+                label="Kontakt (Tlf, Email, CVR)"
+                colorValue={settings.footerContactColor as ThemeColor || 'text-muted-foreground'}
+                onColorChange={(v) => handleInputChange('footerContactColor', v)}
+                sizeValue={settings.footerContactSize || 14}
+                onSizeChange={(v) => handleInputChange('footerContactSize', v)}
+            />
         </CardContent>
       </Card>
     </div>
   );
 }
+

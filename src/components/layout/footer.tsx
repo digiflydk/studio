@@ -3,6 +3,7 @@ import { Linkedin, Facebook, Instagram, Twitter, Clapperboard } from 'lucide-rea
 import Link from 'next/link';
 import Logo from '@/components/logo';
 import { getGeneralSettings } from '@/services/settings';
+import { cn } from '@/lib/utils';
 
 const socialIcons = {
   linkedinUrl: { icon: Linkedin, label: 'LinkedIn' },
@@ -33,12 +34,25 @@ export default async function Footer() {
     const { h, s, l } = settings.footerBackgroundColor;
     footerStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
   }
+  
+  const companyNameStyle: React.CSSProperties = {
+    fontSize: settings?.footerCompanyNameSize ? `${settings.footerCompanyNameSize}px` : undefined,
+  };
+  const addressStyle: React.CSSProperties = {
+     fontSize: settings?.footerAddressSize ? `${settings.footerAddressSize}px` : undefined,
+  };
+   const contactStyle: React.CSSProperties = {
+     fontSize: settings?.footerContactSize ? `${settings.footerContactSize}px` : undefined,
+  };
 
   const currentYear = new Date().getFullYear();
   const companyName = settings?.companyName || 'Digifly';
 
+  const defaultTextColorClass = settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50 ? "text-white" : "text-secondary-foreground";
+  const mutedTextColorClass = settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50 ? "text-gray-300" : "text-muted-foreground";
+
   return (
-    <footer style={footerStyle} className={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50 ? "text-white" : "text-secondary-foreground"}>
+    <footer style={footerStyle} className={cn(defaultTextColorClass)}>
       <div className="container mx-auto max-w-7xl px-4 py-12 md:px-6">
         <div className="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
           <div className="flex flex-col items-center md:items-start">
@@ -48,34 +62,34 @@ export default async function Footer() {
                 width={settings?.footerLogoWidth || 96}
                 isDark={settings?.footerBackgroundColor && settings.footerBackgroundColor.l < 50}
             />
-            <p className="mt-2 text-sm text-muted-foreground">{settings?.footerTagline || 'Flow. Automatisér. Skalér.'}</p>
+            <p className={cn("mt-2 text-sm", mutedTextColorClass)}>{settings?.footerTagline || 'Flow. Automatisér. Skalér.'}</p>
           </div>
           <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
-             <div className="space-y-1 text-sm">
-                {settings?.companyName && <p className="font-semibold">{settings.companyName}</p>}
-                {fullAddress && <p className="text-muted-foreground">{fullAddress}</p>}
-                 {fullPhoneNumber && (
-                  <Link href={`tel:${fullPhoneNumber.replace(/\s/g, '')}`} className="text-muted-foreground hover:text-primary transition-colors">
-                    Tlf: {fullPhoneNumber}
-                  </Link>
-                )}
+             <div className="space-y-1">
+                {settings?.companyName && <p className={cn("font-semibold", settings.footerCompanyNameColor)} style={companyNameStyle}>{settings.companyName}</p>}
+                {fullAddress && <p className={cn(settings.footerAddressColor)} style={addressStyle}>{fullAddress}</p>}
              </div>
-            <div className="flex items-center gap-4 text-sm">
+            <div className={cn("flex items-center gap-4", settings.footerContactColor)} style={contactStyle}>
               {settings?.cvr && <span>CVR: {settings.cvr}</span>}
               {settings?.businessEmail && (
                  <Link href={`mailto:${settings.businessEmail}`} className="hover:text-primary transition-colors">{settings.businessEmail}</Link>
               )}
+               {fullPhoneNumber && (
+                  <Link href={`tel:${fullPhoneNumber.replace(/\s/g, '')}`} className="hover:text-primary transition-colors">
+                    Tlf: {fullPhoneNumber}
+                  </Link>
+                )}
             </div>
              {socialLinks.length > 0 && (
               <div className="flex items-center gap-4">
                 {socialLinks.map(({ url, icon: Icon, label }) => (
                   <Link key={label} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}>
-                    <Icon className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors" />
+                    <Icon className={cn("h-6 w-6 hover:text-primary transition-colors", mutedTextColorClass)} />
                   </Link>
                 ))}
               </div>
             )}
-            <p className="text-xs text-muted-foreground">&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
+            <p className={cn("text-xs", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
           </div>
         </div>
       </div>

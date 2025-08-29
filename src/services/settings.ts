@@ -61,6 +61,12 @@ export interface GeneralSettings {
     footerTagline?: string;
     footerLogoWidth?: number;
     footerBackgroundColor?: HSLColor;
+    footerCompanyNameColor?: string;
+    footerCompanyNameSize?: number;
+    footerAddressColor?: string;
+    footerAddressSize?: number;
+    footerContactColor?: string;
+    footerContactSize?: number;
 }
 
 export async function getGeneralSettings(): Promise<GeneralSettings | null> {
@@ -93,3 +99,4 @@ export async function saveGeneralSettings(settings: Partial<GeneralSettings>): P
         throw new Error("Could not save settings to database.");
     }
 }
+
