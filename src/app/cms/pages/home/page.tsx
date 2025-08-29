@@ -13,6 +13,87 @@ import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
+const defaultServices: Service[] = [
+  {
+    title: 'Digital Strategi',
+    description: 'Vi lægger en køreplan for jeres digitale transformation med fokus på ROI og forretningsmål.',
+    imageUrl: 'https://picsum.photos/600/400?random=1',
+    aiHint: 'strategy business',
+  },
+  {
+    title: 'Softwareudvikling',
+    description: 'Skræddersyede softwareløsninger, fra web-apps til komplekse systemintegrationer.',
+    imageUrl: 'https://picsum.photos/600/400?random=2',
+    aiHint: 'software development',
+  },
+  {
+    title: 'AI & Automatisering',
+    description: 'Implementering af kunstig intelligens og automatisering for at optimere jeres workflows.',
+    imageUrl: 'https://picsum.photos/600/400?random=3',
+    aiHint: 'artificial intelligence',
+  },
+  {
+    title: 'Cloud Løsninger',
+    description: 'Sikker og skalerbar cloud-infrastruktur, der understøtter jeres vækstambitioner.',
+    imageUrl: 'https://picsum.photos/600/400?random=4',
+    aiHint: 'cloud infrastructure',
+  },
+];
+
+const defaultCases: Case[] = [
+  {
+    title: 'Automatiseret Fakturering',
+    description: 'Udvikling af et system der sparede en mellemstor virksomhed for 20+ timer i manuelt tastearbejde om ugen.',
+    imageUrl: 'https://picsum.photos/600/400?random=5',
+    link: '#',
+    aiHint: 'invoice automation',
+  },
+  {
+    title: 'Dynamisk Prissætnings-AI',
+    description: 'En AI-model for en webshop der optimerede priser i realtid og øgede overskuddet med 12%.',
+    imageUrl: 'https://picsum.photos/600/400?random=6',
+    link: '#',
+    aiHint: 'pricing algorithm',
+  },
+  {
+    title: 'Skalerbar Cloud Platform',
+    description: 'Migration til en moderne cloud-arkitektur, der håndterede en 10x stigning i trafik uden problemer.',
+    imageUrl: 'https://picsum.photos/600/400?random=7',
+    link: '#',
+    aiHint: 'cloud platform',
+  },
+];
+
+const defaultTeam: TeamMember[] = [
+  {
+    name: 'Alex Andersen',
+    title: 'Lead Developer & Arkitekt',
+    description: 'Specialist i skalerbare systemer og komplekse integrationer. Elsker at bygge robuste løsninger.',
+    imageUrl: 'https://picsum.photos/200/200?random=8',
+    linkedinUrl: '#',
+    aiHint: 'male portrait',
+  },
+  {
+    name: 'Maria Jensen',
+    title: 'AI & Data Specialist',
+    description: 'Transformerer data til forretningsværdi gennem machine learning og intelligente automatiseringer.',
+    imageUrl: 'https://picsum.photos/200/200?random=9',
+    linkedinUrl: '#',
+    aiHint: 'female portrait',
+  },
+  {
+    name: 'Jesper Nielsen',
+    title: 'Digital Strateg & Projektleder',
+    description: 'Sikrer at teknologien understøtter forretningsmålene og at projekter leveres til tiden.',
+    imageUrl: 'https://picsum.photos/200/200?random=10',
+    linkedinUrl: '#',
+    aiHint: 'man portrait',
+  },
+];
+
+const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
+
+
 function SectionCard({ title, description, children }: { title: string, description: string, children: React.ReactNode }) {
     return (
         <Card className="shadow-lg">
@@ -92,11 +173,22 @@ export default function CmsHomePage() {
             heroHeadline: loadedSettings.heroHeadline || 'Flow. Automatisér. Skalér.',
             heroDescription: loadedSettings.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
             heroImageUrl: loadedSettings.heroImageUrl || 'https://picsum.photos/1920/1280',
-            services: loadedSettings.services || [],
-            cases: loadedSettings.cases || [],
-            aboutText: loadedSettings.aboutText || '',
-            teamMembers: loadedSettings.teamMembers || [],
+            services: loadedSettings.services && loadedSettings.services.length > 0 ? loadedSettings.services : defaultServices,
+            cases: loadedSettings.cases && loadedSettings.cases.length > 0 ? loadedSettings.cases : defaultCases,
+            aboutText: loadedSettings.aboutText || defaultAboutText,
+            teamMembers: loadedSettings.teamMembers && loadedSettings.teamMembers.length > 0 ? loadedSettings.teamMembers : defaultTeam,
         });
+      } else {
+        // If no settings are loaded at all, populate with all defaults
+        setSettings({
+            heroHeadline: 'Flow. Automatisér. Skalér.',
+            heroDescription: 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
+            heroImageUrl: 'https://picsum.photos/1920/1280',
+            services: defaultServices,
+            cases: defaultCases,
+            aboutText: defaultAboutText,
+            teamMembers: defaultTeam,
+        })
       }
       setIsLoading(false);
     }
