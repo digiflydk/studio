@@ -12,6 +12,7 @@ import { GeneralSettings } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -147,7 +148,9 @@ function NavLinkStyleEditor({
     hoverColorValue,
     onHoverColorChange,
     sizeValue,
-    onSizeChange
+    onSizeChange,
+    iconColorValue,
+    onIconColorChange,
 }: {
     label: string;
     colorValue: ThemeColor;
@@ -156,6 +159,8 @@ function NavLinkStyleEditor({
     onHoverColorChange: (value: ThemeColor) => void;
     sizeValue: number;
     onSizeChange: (value: number) => void;
+    iconColorValue: ThemeColor;
+    onIconColorChange: (value: ThemeColor) => void;
 }) {
     return (
         <div className="p-4 border rounded-lg space-y-4">
@@ -197,6 +202,17 @@ function NavLinkStyleEditor({
                     step={1}
                 />
             </div>
+            <div className="space-y-2">
+                <Label>Mobil Menu Ikonfarve</Label>
+                <Select value={iconColorValue} onValueChange={onIconColorChange}>
+                    <SelectTrigger><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                        {themeColorOptions.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     );
 }
@@ -215,10 +231,13 @@ export default function CmsHeaderPage() {
                 setSettings({
                     ...loadedSettings,
                     headerBackgroundColor: loadedSettings.headerBackgroundColor || { h: 210, s: 100, l: 95 },
+                    headerBackgroundOpacity: loadedSettings.headerBackgroundOpacity ?? 95,
+                    headerIsSticky: loadedSettings.headerIsSticky ?? true,
                     headerLogoWidth: loadedSettings.headerLogoWidth || 96,
                     headerLinkColor: loadedSettings.headerLinkColor || 'text-foreground',
                     headerLinkHoverColor: loadedSettings.headerLinkHoverColor || 'text-primary',
                     headerLinkSize: loadedSettings.headerLinkSize || 14,
+                    headerMenuIconColor: loadedSettings.headerMenuIconColor || 'text-foreground',
                 });
             }
             setIsLoading(false);
@@ -264,9 +283,20 @@ export default function CmsHeaderPage() {
             
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Generelt Design</CardTitle>
+                    <CardTitle>Generelt Design & Funktion</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="sticky-header" className="text-base">Sticky Header</Label>
+                            <p className="text-sm text-muted-foreground">Gør headeren fastlåst i toppen af siden.</p>
+                        </div>
+                        <Switch
+                            id="sticky-header"
+                            checked={settings.headerIsSticky}
+                            onCheckedChange={(value) => handleInputChange('headerIsSticky', value)}
+                        />
+                    </div>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <Label>Logo Bredde</Label>
@@ -287,24 +317,39 @@ export default function CmsHeaderPage() {
                             onChange={(hsl) => handleInputChange('headerBackgroundColor', hsl)}
                         />
                     }
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label>Baggrunds-gennemsigtighed</Label>
+                            <span className="text-sm text-muted-foreground">{settings.headerBackgroundOpacity || 95}%</span>
+                        </div>
+                        <Slider 
+                            value={[settings.headerBackgroundOpacity || 95]} 
+                            onValueChange={([v]) => handleInputChange('headerBackgroundOpacity', v)}
+                            min={0}
+                            max={100}
+                            step={1}
+                        />
+                    </div>
                 </CardContent>
             </Card>
 
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Navigationslinks</CardTitle>
-                    <CardDescription>Tilpas udseendet af links i headeren.</CardDescription>
+                    <CardTitle>Navigationslinks & Menu</CardTitle>
+                    <CardDescription>Tilpas udseendet af links og ikoner i headeren.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                   {settings.headerLinkColor && typeof settings.headerLinkSize !== 'undefined' && settings.headerLinkHoverColor &&
+                   {settings.headerLinkColor && typeof settings.headerLinkSize !== 'undefined' && settings.headerLinkHoverColor && settings.headerMenuIconColor &&
                         <NavLinkStyleEditor 
-                            label="Styling for links"
+                            label="Styling for links og ikoner"
                             colorValue={settings.headerLinkColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('headerLinkColor', v)}
                             hoverColorValue={settings.headerLinkHoverColor as ThemeColor}
                             onHoverColorChange={(v) => handleInputChange('headerLinkHoverColor', v)}
                             sizeValue={settings.headerLinkSize}
                             onSizeChange={(v) => handleInputChange('headerLinkSize', v)}
+                            iconColorValue={settings.headerMenuIconColor as ThemeColor}
+                            onIconColorChange={(v) => handleInputChange('headerMenuIconColor', v)}
                         />
                     }
                 </CardContent>

@@ -17,10 +17,13 @@ const navLinks = [
 export default async function Header() {
   const settings = await getGeneralSettings();
 
+  const isSticky = settings?.headerIsSticky ?? true;
+  const opacity = (settings?.headerBackgroundOpacity ?? 95) / 100;
+
   const headerStyle: React.CSSProperties = {};
   if (settings?.headerBackgroundColor) {
     const { h, s, l } = settings.headerBackgroundColor;
-    headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, 0.6)`;
+    headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${opacity})`;
   }
   
   const linkStyle: React.CSSProperties = {
@@ -38,11 +41,19 @@ export default async function Header() {
     settings?.headerLinkColor || "text-foreground",
     `hover:${settings?.headerLinkHoverColor || 'text-primary'}`
   );
+  
+  const menuIconClasses = cn(
+    "h-6 w-6",
+    settings?.headerMenuIconColor || "text-foreground"
+  );
 
 
   return (
     <header 
-      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className={cn(
+        "top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        isSticky && "sticky"
+      )}
       style={headerStyle}
       >
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -74,7 +85,7 @@ export default async function Header() {
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+                <Menu className={menuIconClasses} />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
@@ -108,4 +119,3 @@ export default async function Header() {
     </header>
   );
 }
-

@@ -60,6 +60,9 @@ export interface GeneralSettings {
     // Header Settings
     headerLogoWidth?: number;
     headerBackgroundColor?: HSLColor;
+    headerBackgroundOpacity?: number;
+    headerIsSticky?: boolean;
+    headerMenuIconColor?: string;
     headerLinkColor?: string;
     headerLinkHoverColor?: string;
     headerLinkSize?: number;
