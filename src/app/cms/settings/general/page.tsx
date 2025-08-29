@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, Copy, Loader2, X } from "lucide-react";
+import { Copy, Loader2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { GeneralSettings } from "@/services/settings";
-import { getSettingsAction, saveSettingsAction, uploadFileAction } from "@/app/actions";
+import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 
 const weekDays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
 
@@ -26,14 +26,10 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
   return acc;
 }, {} as Record<string, OpeningTime>);
 
-type UploadStatus = "idle" | "uploading" | "success" | "error";
-
 export default function GeneralSettingsPage() {
     const [settings, setSettings] = useState<GeneralSettings>({ openingHours: initialOpeningHours });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, startSaving] = useTransition();
-    const [logoUploadStatus, setLogoUploadStatus] = useState<UploadStatus>('idle');
-    const [faviconUploadStatus, setFaviconUploadStatus] = useState<UploadStatus>('idle');
     const { toast } = useToast();
 
     useEffect(() => {
@@ -55,50 +51,13 @@ export default function GeneralSettingsPage() {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleFileUpload = async (file: File, type: 'logo' | 'favicon') => {
-        const setStatus = type === 'logo' ? setLogoUploadStatus : setFaviconUploadStatus;
-        setStatus('uploading');
-
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const result = await uploadFileAction(formData);
-
-        if (result.success && result.url) {
-            const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
-            
-            const updatedSettings = { ...settings, [fieldName]: result.url };
-            setSettings(updatedSettings);
-            setStatus('success');
-            toast({ title: "Upload Succes!", description: result.message });
-            
-            // Automatically save after successful upload
-            startSaving(async () => {
-                await saveSettingsAction(updatedSettings);
-            });
-        } else {
-            setStatus('error');
-            toast({ title: "Upload Fejl!", description: result.message, variant: 'destructive' });
-        }
-    }
-    
     const removeImage = (type: 'logo' | 'favicon') => {
         const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
         const updatedSettings: GeneralSettings = { ...settings, [fieldName]: undefined };
         if (type === 'logo') {
             updatedSettings.logoAlt = undefined;
         }
-
         setSettings(updatedSettings);
-
-        startSaving(async () => {
-            const result = await saveSettingsAction(updatedSettings);
-            toast({
-                title: result.success ? "Billede fjernet!" : "Fejl!",
-                description: result.message,
-                variant: result.success ? "default" : "destructive",
-            });
-        });
     }
 
     const handleTimeChange = (day: string, part: 'from' | 'to', value: string) => {
@@ -166,43 +125,29 @@ export default function GeneralSettingsPage() {
           <div className="space-y-6">
              <div className="space-y-4">
                 <Label>Logo</Label>
-                {settings.logoUrl ? (
+                {settings.logoUrl && (
                     <div className="relative w-48 h-12 bg-muted rounded-md p-2 flex items-center justify-center">
                         <Image src={settings.logoUrl} alt={settings.logoAlt || 'Logo preview'} layout="fill" objectFit="contain" />
                          <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white" onClick={() => removeImage('logo')}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
-                ): (
-                    <Button variant="outline" asChild disabled={logoUploadStatus === 'uploading'}>
-                        <label htmlFor="logo-upload" className="cursor-pointer">
-                            {logoUploadStatus === 'uploading' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                            Upload billede
-                            <input id="logo-upload" type="file" className="sr-only" accept="image/*" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'logo')} />
-                        </label>
-                    </Button>
                 )}
-                 <Input id="logo-alt" placeholder="Alt text for logo" value={settings.logoAlt || ''} onChange={e => handleInputChange('logoAlt', e.target.value)} />
+                <Input id="logo-url" placeholder="Indsæt URL til logo billede" value={settings.logoUrl || ''} onChange={e => handleInputChange('logoUrl', e.target.value)} />
+                <Input id="logo-alt" placeholder="Alt text for logo" value={settings.logoAlt || ''} onChange={e => handleInputChange('logoAlt', e.target.value)} />
                 <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels. PNG med transparent baggrund foretrækkes.</p>
             </div>
              <div className="space-y-2">
                 <Label>Favicon</Label>
-                {settings.faviconUrl ? (
+                {settings.faviconUrl && (
                      <div className="relative w-8 h-8 bg-muted rounded-md p-1 flex items-center justify-center">
                         <Image src={settings.faviconUrl} alt="Favicon preview" layout="fill" objectFit="contain" />
                          <Button variant="ghost" size="icon" className="absolute -top-2 -right-2 h-6 w-6 bg-black/50 hover:bg-black/70 text-white rounded-full" onClick={() => removeImage('favicon')}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
-                ) : (
-                    <Button variant="outline" asChild disabled={faviconUploadStatus === 'uploading'}>
-                        <label htmlFor="favicon-upload" className="cursor-pointer">
-                             {faviconUploadStatus === 'uploading' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                            Upload favicon
-                            <input id="favicon-upload" type="file" className="sr-only" accept="image/x-icon, image/png, image/svg+xml" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'favicon')} />
-                        </label>
-                    </Button>
                 )}
+                <Input id="favicon-url" placeholder="Indsæt URL til favicon" value={settings.faviconUrl || ''} onChange={e => handleInputChange('faviconUrl', e.target.value)} />
                 <p className="text-sm text-muted-foreground">Anbefalet størrelse: 32x32 pixels. ICO, PNG or SVG.</p>
             </div>
           </div>

@@ -4,9 +4,6 @@ import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 import { getGeneralSettings, saveGeneralSettings, GeneralSettings } from '@/services/settings';
 import { revalidatePath } from 'next/cache';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from '@/lib/firebase';
-
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
   // Here you could add server-side validation or logging if needed
@@ -67,29 +64,5 @@ export async function saveSettingsAction(settings: GeneralSettings): Promise<{ s
     } catch (error) {
         console.error(error);
         return { success: false, message: 'Der opstod en fejl under lagring.' };
-    }
-}
-
-export async function uploadFileAction(formData: FormData): Promise<{ success: boolean; url?: string; message: string }> {
-    const file = formData.get('file') as File;
-    if (!file) {
-        return { success: false, message: 'Ingen fil fundet.' };
-    }
-
-    try {
-        const storageRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
-        
-        // Convert file to ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
-
-        const snapshot = await uploadBytes(storageRef, arrayBuffer, {
-          contentType: file.type,
-        });
-        
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        return { success: true, url: downloadURL, message: 'Filen blev uploadet.' };
-    } catch (error) {
-        console.error("Fejl under upload:", error);
-        return { success: false, message: 'Der opstod en fejl under upload.' };
     }
 }
