@@ -110,7 +110,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
 
     const isComplete = !output.nextQuestion;
 
-    if (isComplete && output.qualified && output.collectedInfo?.name && output.collectedInfo?.email && output.collectedInfo?.phone) {
+    if (isComplete && output.collectedInfo?.name && output.collectedInfo?.email && output.collectedInfo?.phone) {
       const fullConversation = [
         ...input.conversationHistory,
         { role: 'user' as const, content: input.projectIdea },
