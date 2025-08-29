@@ -130,7 +130,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                                 <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                             </Avatar>
                             )}
-                            <div className={cn('rounded-lg p-3 text-sm', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-gray-800 text-gray-200')}>
+                            <div className={cn('rounded-lg p-3 text-sm break-words', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-gray-800 text-gray-200')}>
                             <p>{message.content}</p>
                             </div>
                             {message.role === 'user' && (
