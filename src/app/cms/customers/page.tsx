@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const customerFormSchema = z.object({
   name: z.string().min(1, 'Navn er påkrævet'),
@@ -93,7 +94,7 @@ export default function CmsCustomersPage() {
       <div>
         <h1 className="text-2xl font-bold">Kunder</h1>
         <p className="text-muted-foreground">
-          Administrer logoer for de kunder, der skal vises på din hjemmeside.
+          Administrer logoer for de kunder, der skal vises i den roterende karrusel på din hjemmeside.
         </p>
       </div>
 
@@ -102,6 +103,7 @@ export default function CmsCustomersPage() {
             <Card className="shadow-lg">
                 <CardHeader>
                     <CardTitle>Eksisterende Kunder</CardTitle>
+                    <CardDescription>Disse logoer vises på forsiden.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      {isLoading ? (
@@ -134,7 +136,12 @@ export default function CmsCustomersPage() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-muted-foreground text-center py-8">Ingen kunder tilføjet endnu.</p>
+                         <Alert>
+                            <AlertTitle>Ingen kunder tilføjet</AlertTitle>
+                            <AlertDescription>
+                                Der er endnu ikke tilføjet nogle kundelogoer. Tilføj en i formularen til højre for at få dem vist på forsiden.
+                            </AlertDescription>
+                        </Alert>
                     )}
                 </CardContent>
             </Card>
