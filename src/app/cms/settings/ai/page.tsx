@@ -49,8 +49,10 @@ const defaultPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt ko
 `;
 
 const aiModels = [
-    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro (Kraftfuld)' },
-    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash (Hurtig)' },
+    { value: 'googleai/gemini-2.5-pro', label: 'Gemini 2.5 Pro (Mest kraftfuld)' },
+    { value: 'googleai/gemini-2.5-flash', label: 'Gemini 2.5 Flash (Hurtigst)' },
+    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro (Udgået)' },
+    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash (Udgået)' },
 ]
 
 export default function AiSettingsPage() {
