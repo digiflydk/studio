@@ -12,6 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { getGeneralSettings } from '@/services/settings';
+import { saveLead } from '@/services/leads';
 
 const CollectedInfoSchema = z.object({
   name: z.string().nullable().describe("The user's full name."),
@@ -47,9 +48,6 @@ const defaultSystemPrompt = `You are an expert AI assistant for Digifly, a digit
 **{{role}}:** {{content}}
 {{/each}}
 
-**User's Latest Message:**
-{{{projectIdea}}}
-
 **IMPORTANT:** Follow the output schema VERY carefully. Always respond with a complete JSON object that fulfills the schema.`;
 
 
@@ -64,19 +62,39 @@ const aiProjectQualificationFlow = ai.defineFlow(
     const settings = await getGeneralSettings();
     const systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
     const model = settings?.aiModel || 'googleai/gemini-1.5-flash';
+    
+    // Construct the full conversation history, including the latest user message.
+    const fullConversationHistory = [
+      ...input.conversationHistory,
+      { role: 'user' as const, content: input.projectIdea },
+    ];
 
     const qualificationPrompt = ai.definePrompt({
         name: 'aiProjectQualificationPrompt',
-        input: { schema: AIProjectQualificationInputSchema },
+        // The input for the prompt itself now only needs the history
+        input: { schema: z.object({ conversationHistory: z.any() }) }, 
         output: { schema: AIProjectQualificationOutputSchema },
-        model: model as any, // Cast to any to allow dynamic model names
+        model: model as any,
         prompt: systemPrompt,
     });
     
-    const {output} = await qualificationPrompt(input);
+    // Pass the full conversation history to the prompt
+    const {output} = await qualificationPrompt({ conversationHistory: fullConversationHistory });
 
     if (!output) {
       throw new Error('No output from prompt');
+    }
+
+    // When the conversation is complete and qualified, save the lead
+    if (output.qualified && output.shouldBookMeeting && output.collectedInfo) {
+        await saveLead({
+            name: output.collectedInfo.name || 'N/A',
+            email: output.collectedInfo.email || 'N/A',
+            phone: output.collectedInfo.phone || 'N/A',
+            projectIdea: JSON.stringify(input.conversationHistory), // Store convo for context
+            status: 'Qualified',
+            createdAt: new Date(),
+        });
     }
 
     return output;
