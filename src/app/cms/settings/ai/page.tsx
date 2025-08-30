@@ -150,6 +150,9 @@ export default function AiSettingsPage() {
                 </SelectContent>
              </Select>
              <p className="text-sm text-muted-foreground">Vælg den AI-model, assistenten skal bruge. Pro er mere avanceret, mens Flash er hurtigere.</p>
+              {settings.aiModel && (
+                <p className="text-xs text-muted-foreground pt-1">Aktiv model: <span className="font-mono bg-muted px-1 py-0.5 rounded-sm">{settings.aiModel}</span></p>
+              )}
           </div>
           <hr />
           <div className="space-y-2">
