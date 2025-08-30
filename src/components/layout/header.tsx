@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
 import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
@@ -115,6 +115,10 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+                <SheetTitle className="sr-only">{settings?.logoAlt || 'Menu'}</SheetTitle>
+                <SheetDescription className="sr-only">
+                    Hovednavigation med links til sidens sektioner.
+                </SheetDescription>
               <div className="flex flex-col p-6">
                 <div className="mb-8">
                   <Logo 
