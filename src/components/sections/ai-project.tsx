@@ -27,14 +27,16 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const [isComplete, setIsComplete] = useState(false);
   const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo'] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const greetingMessage = settings?.aiGreetingMessage || defaultGreeting;
 
   useEffect(() => {
-    const greeting = settings?.aiGreetingMessage || defaultGreeting;
     setMessages([{
       role: 'assistant',
-      content: greeting
+      content: greetingMessage
     }])
-  }, [settings]);
+  }, [greetingMessage]);
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,13 +46,8 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     e.preventDefault();
     if (!input.trim() || isPending || isComplete) return;
 
-    const currentUserMessage = input;
-    const greetingMessage: Message = { role: 'assistant', content: settings?.aiGreetingMessage || defaultGreeting };
-    
-    // Always include the greeting message in the history for the AI.
-    const historyForAi: Message[] = messages.length === 1 ? [greetingMessage] : [...messages];
-    
-    const newMessages: Message[] = [...messages, { role: 'user', content: currentUserMessage }];
+    const currentUserMessage: Message = { role: 'user', content: input };
+    const newMessages: Message[] = [...messages, currentUserMessage];
     
     setMessages(newMessages);
     setInput('');
@@ -58,9 +55,10 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     startTransition(async () => {
         try {
             const qualificationInput: AIProjectQualificationInput = {
-                projectIdea: currentUserMessage,
-                // Pass the conversation history *before* the user's latest message
-                conversationHistory: historyForAi.map(msg => ({ role: msg.role, content: msg.content })),
+                // Pass the full conversation history including the latest user message
+                conversationHistory: newMessages.map(msg => ({ role: msg.role, content: msg.content })),
+                // projectIdea is now part of the history, so we can pass an empty string
+                projectIdea: '', 
             };
 
             const response: AIProjectQualificationOutput = await qualifyProjectAction(qualificationInput);
@@ -176,7 +174,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                     )}
 
                     {!isComplete && (
-                        <form onSubmit={handleSendMessage} className="relative" data-form="project_qualifier">
+                        <form ref={formRef} onSubmit={handleSendMessage} className="relative" data-form="project_qualifier">
                         <Textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}

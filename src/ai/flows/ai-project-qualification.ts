@@ -21,7 +21,8 @@ const CollectedInfoSchema = z.object({
 });
 
 const AIProjectQualificationInputSchema = z.object({
-  projectIdea: z.string().describe('The initial project idea provided by the user.'),
+  // The projectIdea field is kept for schema compatibility but is no longer the primary input.
+  projectIdea: z.string().describe('The initial project idea provided by the user.').optional(),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
@@ -63,15 +64,8 @@ const aiProjectQualificationFlow = ai.defineFlow(
     const systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
     const model = settings?.aiModel || 'googleai/gemini-1.5-flash';
     
-    // Construct the full conversation history, including the latest user message.
-    const fullConversationHistory = [
-      ...input.conversationHistory,
-      { role: 'user' as const, content: input.projectIdea },
-    ];
-
     const qualificationPrompt = ai.definePrompt({
         name: 'aiProjectQualificationPrompt',
-        // The input for the prompt itself now only needs the history
         input: { schema: z.object({ conversationHistory: z.any() }) }, 
         output: { schema: AIProjectQualificationOutputSchema },
         model: model as any,
@@ -79,7 +73,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
     });
     
     // Pass the full conversation history to the prompt
-    const {output} = await qualificationPrompt({ conversationHistory: fullConversationHistory });
+    const {output} = await qualificationPrompt({ conversationHistory: input.conversationHistory });
 
     if (!output) {
       throw new Error('No output from prompt');
