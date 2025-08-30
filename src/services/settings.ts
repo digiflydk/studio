@@ -89,6 +89,7 @@ export interface GeneralSettings {
     // AI Settings
     aiGreetingMessage?: string;
     aiSystemPrompt?: string;
+    aiModel?: string;
 
     // Design Settings
     themeColors?: {

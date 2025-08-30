@@ -92,12 +92,13 @@ const aiProjectQualificationFlow = ai.defineFlow(
 
     const settings = await getGeneralSettings();
     const systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
+    const model = settings?.aiModel || 'googleai/gemini-1.5-flash';
 
     const qualificationPrompt = ai.definePrompt({
         name: 'aiProjectQualificationPrompt',
         input: { schema: AIProjectQualificationInputSchema },
         output: { schema: AIProjectQualificationOutputSchema },
-        model: 'googleai/gemini-1.5-flash',
+        model: model as any, // Cast to any to allow dynamic model names
         prompt: systemPrompt,
     });
     
