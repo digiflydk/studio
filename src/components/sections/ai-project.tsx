@@ -45,6 +45,11 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     if (!input.trim() || isPending || isComplete) return;
 
     const currentUserMessage = input;
+    const greetingMessage: Message = { role: 'assistant', content: settings?.aiGreetingMessage || defaultGreeting };
+    
+    // Always include the greeting message in the history for the AI.
+    const historyForAi: Message[] = messages.length === 1 ? [greetingMessage] : [...messages];
+    
     const newMessages: Message[] = [...messages, { role: 'user', content: currentUserMessage }];
     
     setMessages(newMessages);
@@ -52,12 +57,13 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
 
     startTransition(async () => {
         try {
-            const historyForAi: AIProjectQualificationInput['conversationHistory'] = messages.map(msg => ({ role: msg.role, content: msg.content }));
-
-            const response: AIProjectQualificationOutput = await qualifyProjectAction({
+            const qualificationInput: AIProjectQualificationInput = {
                 projectIdea: currentUserMessage,
-                conversationHistory: historyForAi,
-            });
+                // Pass the conversation history *before* the user's latest message
+                conversationHistory: historyForAi.map(msg => ({ role: msg.role, content: msg.content })),
+            };
+
+            const response: AIProjectQualificationOutput = await qualifyProjectAction(qualificationInput);
 
             let allNewMessages = [...newMessages];
 
@@ -196,7 +202,3 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     </section>
   );
 }
-
-    
-
-    
