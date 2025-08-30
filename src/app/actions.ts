@@ -2,9 +2,11 @@
 'use server';
 import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
-import { getGeneralSettings, saveGeneralSettings, GeneralSettings } from '@/services/settings';
+import { getGeneralSettings, saveGeneralSettings, GeneralSettings, Customer } from '@/services/settings';
 import { revalidatePath } from 'next/cache';
 import { getAllLeads, Lead } from '@/services/leads';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
   // Here you could add server-side validation or logging if needed
@@ -70,4 +72,38 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
 
 export async function getLeadsAction(): Promise<Lead[]> {
     return getAllLeads();
+}
+
+export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Promise<{ success: boolean; message: string; customers: Customer[] }> {
+    try {
+        const settings = await getGeneralSettings();
+        const customers = settings?.customers || [];
+        const newCustomer: Customer = { ...customerData, id: uuidv4() };
+        const updatedCustomers = [...customers, newCustomer];
+        await saveGeneralSettings({ customers: updatedCustomers });
+        revalidatePath('/cms/customers');
+        return { success: true, message: 'Kunde tilføjet.', customers: updatedCustomers };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Der opstod en fejl.', customers: [] };
+    }
+}
+
+export async function deleteCustomerAction(customerId: string): Promise<{ success: boolean; message: string; customers: Customer[] }> {
+    try {
+        const settings = await getGeneralSettings();
+        const customers = settings?.customers || [];
+        const updatedCustomers = customers.filter(c => c.id !== customerId);
+        await saveGeneralSettings({ customers: updatedCustomers });
+        revalidatePath('/cms/customers');
+        return { success: true, message: 'Kunde slettet.', customers: updatedCustomers };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Der opstod en fejl.', customers: [] };
+    }
+}
+
+export async function getCustomersAction(): Promise<Customer[]> {
+    const settings = await getGeneralSettings();
+    return settings?.customers || [];
 }

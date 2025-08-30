@@ -44,6 +44,13 @@ export interface NavLink {
     href: string;
 }
 
+export interface Customer {
+    id: string;
+    name: string;
+    logoUrl: string;
+    aiHint: string;
+}
+
 export type SectionPadding = {
     top: number;
     bottom: number;
@@ -172,6 +179,9 @@ export interface GeneralSettings {
         about: SectionPadding;
         contact: SectionPadding;
     };
+
+    // Customers
+    customers?: Customer[];
 }
 
 
