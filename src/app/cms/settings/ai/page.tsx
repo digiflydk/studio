@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -242,7 +241,7 @@ export default function AiSettingsPage() {
                     placeholder="Indsæt din OpenAI API nøgle (sk-...)"
                 />
               </div>
-              <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen som `OPENAI_API_KEY`.</p>
+              <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen i formatet: `OPENAI_API_KEY=sk-...`.</p>
             </div>
           )}
 
