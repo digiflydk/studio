@@ -48,7 +48,7 @@ export default function CmsHeader() {
             <SheetContent side="left" className="sm:max-w-xs bg-black text-white border-gray-800">
                 <SheetHeader className="mb-6 text-left">
                     <SheetTitle asChild>
-                         <Link href="/cms" className="flex items-center gap-2 font-semibold">
+                         <Link href="/cms/dashboard" className="flex items-center gap-2 font-semibold">
                             <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
                         </Link>
                     </SheetTitle>
@@ -61,7 +61,7 @@ export default function CmsHeader() {
                         <FileText className="h-5 w-5" />
                         Indhold
                     </Link>
-                    <Link href="/cms" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms' })}>
+                    <Link href="/cms/dashboard" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms/dashboard' })}>
                         <Brush className="h-5 w-5" />
                         Design
                     </Link>

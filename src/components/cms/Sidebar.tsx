@@ -36,7 +36,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden border-r bg-black text-white md:block">
       <div className="flex h-14 items-center border-b border-gray-800 px-4 lg:h-[60px] lg:px-6">
-        <Link href="/cms" className="flex items-center gap-2 font-semibold">
+        <Link href="/cms/dashboard" className="flex items-center gap-2 font-semibold">
           <Logo logoUrl={settings?.logoUrl} logoAlt={settings?.logoAlt} />
         </Link>
       </div>
@@ -53,10 +53,10 @@ export default function Sidebar() {
               Indhold
             </Link>
             <Link
-              href="/cms"
+              href="/cms/dashboard"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
-                { "bg-gray-800 text-white": pathname === '/cms' }
+                { "bg-gray-800 text-white": pathname === '/cms/dashboard' }
               )}
             >
               <Brush className="h-4 w-4" />
