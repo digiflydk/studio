@@ -168,7 +168,7 @@ export default function AiSettingsPage() {
   const availableModels = settings.aiProvider === 'openai' ? openAIModels : googleModels;
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
          <div>
             <h1 className="text-2xl font-bold">AI Prompt Indstillinger</h1>
