@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Lightbulb, KeyRound } from 'lucide-react';
+import { Loader2, KeyRound, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -104,6 +104,13 @@ export default function AiSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
+
+  // We can't access process.env on the client, so we can't be 100% sure.
+  // This is a simple check. If the user has *ever* entered a key in the session,
+  // we assume it's been set in .env. A more robust solution would require
+  // a server-side check.
+  const isOpenAIKeyLikelySet = !!settings.openAIKey;
+
 
   useEffect(() => {
     async function loadSettings() {
@@ -230,19 +237,31 @@ export default function AiSettingsPage() {
           </div>
           
           {settings.aiProvider === 'openai' && (
-            <div className="space-y-2">
-              <Label htmlFor="openai-key">OpenAI API Key</Label>
-              <div className="flex items-center gap-2">
-                 <KeyRound className="h-5 w-5 text-muted-foreground" />
-                 <Input
-                    id="openai-key"
-                    type="password"
-                    value={settings.openAIKey || ''}
-                    onChange={(e) => handleInputChange('openAIKey', e.target.value)}
-                    placeholder="Indsæt din OpenAI API nøgle (sk-...)"
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen i formatet: `OPENAI_API_KEY=sk-...`.</p>
+             <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="openai-key">OpenAI API Key</Label>
+                  <div className="flex items-center gap-2">
+                     <KeyRound className="h-5 w-5 text-muted-foreground" />
+                     <Input
+                        id="openai-key"
+                        type="password"
+                        value={settings.openAIKey || ''}
+                        onChange={(e) => handleInputChange('openAIKey', e.target.value)}
+                        placeholder="Indsæt din OpenAI API nøgle (sk-...)"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen i formatet: `OPENAI_API_KEY=sk-...`.</p>
+                </div>
+
+                {!isOpenAIKeyLikelySet && (
+                     <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>API Nøgle Mangler</AlertTitle>
+                      <AlertDescription>
+                        Du har valgt OpenAI, men har ikke indtastet en API nøgle i dette felt endnu. Husk at tilføje din nøgle til `.env`-filen for at det virker. App'en vil falde tilbage til Google Gemini, hvis nøglen ikke er sat korrekt.
+                      </AlertDescription>
+                    </Alert>
+                )}
             </div>
           )}
         </CardContent>
@@ -280,3 +299,5 @@ export default function AiSettingsPage() {
     </div>
   );
 }
+
+    
