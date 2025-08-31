@@ -11,11 +11,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings, Service, Case, TeamMember, SectionPadding } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2, Monitor, Smartphone } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone, ExternalLink } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import Link from 'next/link';
 
 const defaultServices: Service[] = [
   {
@@ -454,7 +455,7 @@ export default function CmsHomePage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Forside Indhold {previewMode === 'desktop' ? 'Desktop' : 'Mobil'}</h1>
+          <h1 className="text-2xl font-bold">Forside Indhold</h1>
           <p className="text-muted-foreground">Administrer indholdet på din forside.</p>
         </div>
         <div className="flex items-center gap-4">
@@ -522,6 +523,13 @@ export default function CmsHomePage() {
                         <div className="space-y-2">
                             <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
                             <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} />
+                             <p className="text-sm text-muted-foreground">
+                                Find gratis billeder i høj kvalitet på f.eks. 
+                                <Link href="https://unsplash.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Unsplash</Link> 
+                                eller
+                                <Link href="https://pexels.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Pexels</Link>.
+                                Sørg for at du har rettighederne til det billede, du bruger.
+                            </p>
                         </div>
                     </CardContent>
                 </AccordionContent>
