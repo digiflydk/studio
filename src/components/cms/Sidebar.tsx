@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users, HeartHandshake } from "lucide-react";
+import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users, HeartHandshake, Rss } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -81,6 +81,16 @@ export default function Sidebar() {
             >
               <HeartHandshake className="h-4 w-4" />
               Kunder
+            </Link>
+             <Link
+              href="/cms/blogs"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                { "bg-gray-800 text-white": pathname.startsWith('/cms/blogs') }
+              )}
+            >
+              <Rss className="h-4 w-4" />
+              Blogs
             </Link>
             <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800">

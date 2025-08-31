@@ -5,8 +5,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { getGeneralSettings } from '@/services/settings';
 import { ReactNode } from 'react';
 import Script from 'next/script';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
+import Analytics from '@/components/analytics';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export async function generateMetadata(
   {},
@@ -35,7 +35,7 @@ export async function generateMetadata(
     },
     robots: {},
     icons: {
-      icon: '/favicon.ico',
+      icon: settings?.faviconUrl || '/favicon.ico',
     },
   };
 
@@ -63,42 +63,9 @@ export default async function RootLayout({
       <head>
         <Script id="scroll-restoration" strategy="beforeInteractive">
           {`
-            console.log('AUTOSCROLL KILLER: Script loaded. Setting history.scrollRestoration to manual.');
-            try {
-              if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'manual';
-              }
-            } catch (e) {
-              console.error('AUTOSCROLL KILLER: Error setting scrollRestoration:', e);
+            if ('scrollRestoration' in history) {
+              history.scrollRestoration = 'manual';
             }
-          `}
-        </Script>
-        <Script id="scroll-debug" strategy="afterInteractive">
-          {`
-            const killScroll = () => {
-                console.log('AUTOSCROLL KILLER: Forcing scroll to top at ' + new Date().toLocaleTimeString());
-                window.scrollTo(0, 0);
-            };
-            
-            // Re-kill on popstate (browser back/forward)
-            window.addEventListener('popstate', () => {
-              console.log('AUTOSCROLL KILLER: Popstate event detected.');
-              killScroll();
-            });
-            
-            // Re-kill after a short delay to fight any late-loading scripts
-            setTimeout(() => {
-              console.log('AUTOSCROLL KILLER: Initial timeout (100ms) fired.');
-              killScroll();
-            }, 100);
-            setTimeout(() => {
-              console.log('AUTOSCROLL KILLER: Second timeout (500ms) fired.');
-              killScroll();
-            }, 500);
-             setTimeout(() => {
-              console.log('AUTOSCROLL KILLER: Third timeout (1000ms) fired.');
-              killScroll();
-            }, 1000);
           `}
         </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -106,11 +73,10 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <Header settings={settings} />
-        <main className="flex-1">
+        <ThemeProvider settings={settings}>
             {children}
-        </main>
-        <Footer settings={settings}/>
+        </ThemeProvider>
+        <Analytics settings={settings} />
         <Toaster />
       </body>
     </html>

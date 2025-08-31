@@ -51,6 +51,18 @@ export interface Customer {
     aiHint: string;
 }
 
+export interface BlogPost {
+    id: string;
+    title: string;
+    slug: string;
+    content: string; // Markdown content
+    featuredImageUrl: string;
+    metaDescription: string;
+    aiHint: string;
+    publishedAt: Date;
+}
+
+
 export type SectionPadding = {
     top: number;
     bottom: number;
@@ -185,6 +197,9 @@ export interface GeneralSettings {
 
     // Customers
     customers?: Customer[];
+    
+    // Blog
+    blogPosts?: BlogPost[];
 }
 
 

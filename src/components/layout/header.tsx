@@ -9,6 +9,7 @@ import Logo from '@/components/logo';
 import { type NavLink, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -19,7 +20,28 @@ const defaultNavLinks: NavLink[] = [
 
 export default function Header({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
-  const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
+  const [navLinks, setNavLinks] = useState(settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks);
+
+  useEffect(() => {
+    const baseNavLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
+    const hasBlog = settings?.blogPosts && settings.blogPosts.length > 0;
+    
+    let newNavLinks = [...baseNavLinks];
+
+    // Add blog link if it doesn't exist and there are posts
+    if (hasBlog && !newNavLinks.some(link => link.href === '/blog')) {
+      newNavLinks.push({ href: '/blog', label: 'Blog' });
+    }
+    
+    // Remove blog link if it exists and there are no posts
+    if (!hasBlog) {
+        newNavLinks = newNavLinks.filter(link => link.href !== '/blog');
+    }
+
+    setNavLinks(newNavLinks);
+
+  }, [settings?.headerNavLinks, settings?.blogPosts]);
+
 
   const isSticky = settings?.headerIsSticky ?? true;
   const opacity = (settings?.headerBackgroundOpacity ?? 95) / 100;
@@ -54,6 +76,12 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
+      // If we are not on the home page, first navigate there
+      if (pathname !== '/') {
+        window.location.href = `/${href}`;
+        return;
+      }
+      
       const targetId = href.substring(1);
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
@@ -65,8 +93,6 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
               top: offsetPosition,
               behavior: "smooth"
           });
-      } else if (pathname !== '/') {
-         window.location.href = `/${href}`;
       }
     }
   };
@@ -94,7 +120,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
 
         <nav className="hidden md:flex md:items-center md:gap-6">
           {navLinks.map((link) => (
-             <a
+             <Link
                 key={link.href}
                 href={link.href}
                 className={navLinkClasses}
@@ -102,7 +128,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
                 onClick={(e) => handleScrollLinkClick(e, link.href)}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -121,15 +147,17 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
                 </SheetDescription>
               <div className="flex flex-col p-6">
                 <div className="mb-8">
-                  <Logo 
-                    logoUrl={settings?.logoUrl} 
-                    logoAlt={settings?.logoAlt}
-                    width={settings?.headerLogoWidth || 96}
-                  />
+                  <Link href="/" className="flex items-center gap-2">
+                    <Logo 
+                        logoUrl={settings?.logoUrl} 
+                        logoAlt={settings?.logoAlt}
+                        width={settings?.headerLogoWidth || 96}
+                    />
+                  </Link>
                 </div>
                 <nav className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
-                     <a
+                     <Link
                         key={link.href}
                         href={link.href}
                         className={mobileNavLinkClasses}
@@ -137,7 +165,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
                         onClick={(e) => handleScrollLinkClick(e, link.href)}
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   ))}
                 </nav>
               </div>

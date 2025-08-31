@@ -2,7 +2,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users, HeartHandshake } from "lucide-react";
+import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users, HeartHandshake, Rss } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -72,6 +72,10 @@ export default function CmsHeader() {
                     <Link href="/cms/customers" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/customers') })}>
                         <HeartHandshake className="h-5 w-5" />
                         Kunder
+                    </Link>
+                    <Link href="/cms/blogs" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/blogs') })}>
+                        <Rss className="h-5 w-5" />
+                        Blogs
                     </Link>
                     <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
