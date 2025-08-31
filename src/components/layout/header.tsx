@@ -45,8 +45,11 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
 
   const isSticky = settings?.headerIsSticky ?? true;
   const opacity = (settings?.headerBackgroundOpacity ?? 95) / 100;
+  const height = settings?.headerHeight || 64;
 
-  const headerStyle: React.CSSProperties = {};
+  const headerStyle: React.CSSProperties = {
+    height: `${height}px`,
+  };
   if (settings?.headerBackgroundColor) {
     const { h, s, l } = settings.headerBackgroundColor;
     headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${opacity})`;
@@ -85,7 +88,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
       const targetId = href.substring(1);
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
-          const headerOffset = 80; // Adjust as needed for your sticky header's height
+          const headerOffset = height; // Use dynamic height
           const elementPosition = targetElement.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -101,12 +104,12 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   return (
     <header 
       className={cn(
-        "top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        "top-0 z-50 w-full flex items-center border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
         isSticky && "sticky"
       )}
       style={headerStyle}
       >
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
+      <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
           <Link href="/" className="flex items-center gap-2">
             <Logo 

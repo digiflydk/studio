@@ -326,6 +326,7 @@ export default function CmsHeaderPage() {
                     headerBackgroundOpacity: loadedSettings.headerBackgroundOpacity ?? 95,
                     headerIsSticky: loadedSettings.headerIsSticky ?? true,
                     headerLogoWidth: loadedSettings.headerLogoWidth || 96,
+                    headerHeight: loadedSettings.headerHeight || 64,
                     headerLinkColor: loadedSettings.headerLinkColor || 'text-foreground',
                     headerLinkHoverColor: loadedSettings.headerLinkHoverColor || 'text-primary',
                     headerLinkSize: loadedSettings.headerLinkSize || 14,
@@ -338,6 +339,7 @@ export default function CmsHeaderPage() {
                     headerBackgroundOpacity: 95,
                     headerIsSticky: true,
                     headerLogoWidth: 96,
+                    headerHeight: 64,
                     headerLinkColor: 'text-foreground',
                     headerLinkHoverColor: 'text-primary',
                     headerLinkSize: 14,
@@ -417,6 +419,19 @@ export default function CmsHeaderPage() {
                             id="sticky-header"
                             checked={settings.headerIsSticky}
                             onCheckedChange={(value) => handleInputChange('headerIsSticky', value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <Label>Header Højde</Label>
+                            <span className="text-sm text-muted-foreground">{settings.headerHeight || 64}px</span>
+                        </div>
+                        <Slider 
+                            value={[settings.headerHeight || 64]} 
+                            onValueChange={([v]) => handleInputChange('headerHeight', v)}
+                            min={48}
+                            max={120}
+                            step={1}
                         />
                     </div>
                     <div className="space-y-2">

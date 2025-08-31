@@ -124,6 +124,7 @@ export interface GeneralSettings {
     // Header Settings
     headerNavLinks?: NavLink[];
     headerLogoWidth?: number;
+    headerHeight?: number;
     headerBackgroundColor?: HSLColor;
     headerBackgroundOpacity?: number;
     headerIsSticky?: boolean;
