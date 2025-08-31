@@ -21,8 +21,6 @@ const CollectedInfoSchema = z.object({
 });
 
 const AIProjectQualificationInputSchema = z.object({
-  // The projectIdea field is kept for schema compatibility but is no longer the primary input.
-  projectIdea: z.string().describe('The initial project idea provided by the user.').optional(),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
@@ -61,18 +59,30 @@ const aiProjectQualificationFlow = ai.defineFlow(
   async (input) => {
 
     const settings = await getGeneralSettings();
-    const systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
+    const provider = settings?.aiProvider || 'googleai';
     const model = settings?.aiModel || 'googleai/gemini-1.5-flash';
     
+    let systemPrompt: string;
+    if (provider === 'openai' && settings?.aiSystemPromptOpenAI) {
+        systemPrompt = settings.aiSystemPromptOpenAI;
+    } else {
+        systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
+    }
+
     const qualificationPrompt = ai.definePrompt({
         name: 'aiProjectQualificationPrompt',
         input: { schema: z.object({ conversationHistory: z.any() }) }, 
         output: { schema: AIProjectQualificationOutputSchema },
         model: model as any,
         prompt: systemPrompt,
+        config: {
+            // Pass the OpenAI API key if the provider is OpenAI
+            ...(provider === 'openai' && process.env.OPENAI_API_KEY && {
+                apiKey: process.env.OPENAI_API_KEY
+            })
+        }
     });
     
-    // Pass the full conversation history to the prompt
     const {output} = await qualificationPrompt({ conversationHistory: input.conversationHistory });
 
     if (!output) {

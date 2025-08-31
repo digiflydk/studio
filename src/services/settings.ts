@@ -94,9 +94,12 @@ export interface GeneralSettings {
     googleAdsId?: string;
 
     // AI Settings
-    aiGreetingMessage?: string;
-    aiSystemPrompt?: string;
+    aiProvider?: 'googleai' | 'openai';
     aiModel?: string;
+    aiGreetingMessage?: string;
+    aiSystemPrompt?: string; // Used for Google AI
+    aiSystemPromptOpenAI?: string; // Used for OpenAI
+    openAIKey?: string; // Only for temporary client-side use, not stored in DB
 
     // Design Settings
     themeColors?: {
@@ -190,7 +193,12 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
         const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
         const docSnap = await getDoc(settingsDocRef);
         if (docSnap.exists()) {
-            return docSnap.data() as GeneralSettings;
+            // We never return the API key from the database.
+            const data = docSnap.data() as GeneralSettings;
+            if (data.openAIKey) {
+                delete data.openAIKey;
+            }
+            return data;
         }
         return null;
     } catch (error) {
@@ -202,8 +210,14 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
 
 export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<void> {
     try {
+        const settingsToSave = { ...settings };
+        // We never save the API key to the database for security reasons.
+        if (settingsToSave.openAIKey) {
+            delete settingsToSave.openAIKey;
+        }
+
         const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
-        await setDoc(settingsDocRef, settings, { merge: true });
+        await setDoc(settingsDocRef, settingsToSave, { merge: true });
     } catch (error) {
         console.error("Error saving general settings: ", error);
         throw new Error("Could not save settings.");

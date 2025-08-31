@@ -9,15 +9,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Lightbulb } from 'lucide-react';
+import { Loader2, Lightbulb, KeyRound } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const defaultGreeting = 'Hej! Jeg er din AI-assistent. Fortæl mig kort om din projektidé, så kan jeg vurdere, om vi er det rette match.';
 const defaultModel = 'googleai/gemini-1.5-flash';
+const defaultProvider = 'googleai';
 
-const defaultPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
+const geminiPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt konsulentfirma. Dit primære mål er at kvalificere potentielle klientprojekter ved at indsamle oplysninger på en venlig og professionel måde.
 
 **Regler for samtale-flow:**
 1.  **Prioritet #1: Indsaml kontaktoplysninger.**
@@ -48,12 +49,52 @@ const defaultPrompt = `Du er en ekspert AI-assistent for Digifly, et digitalt ko
   - Stil ikke flere spørgsmål.
 `;
 
-const aiModels = [
-    { value: 'googleai/gemini-2.5-pro', label: 'Gemini 2.5 Pro (Mest kraftfuld)' },
-    { value: 'googleai/gemini-2.5-flash', label: 'Gemini 2.5 Flash (Hurtigst)' },
-    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro (Udgået)' },
-    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash (Udgået)' },
-]
+const openAIPrompt = `You are an expert AI assistant for Digifly, a digital consulting firm. Your primary purpose is to qualify potential client projects by gathering information in a friendly and professional manner. You MUST adhere to the JSON output schema provided to you.
+
+**Conversation Flow Rules:**
+1.  **Priority #1: Collect contact information.**
+    - Start by asking for the user's full name.
+    - Once you have the name, ask for their email address.
+    - Once you have the email, ask for their phone number.
+    - Do NOT ask about project details until you have their name, email, and phone number.
+
+2.  **Priority #2: Qualify the project.**
+    - Only after collecting all contact information, proceed to ask about the project.
+    - You MUST gather information on the following key areas:
+        - **Key Features & Goals:** What are the most important features? What is the primary goal?
+        - **Budget:** What is the approximate budget? (e.g., "< $7,000", "$7,000-$20,000", "> $20,000").
+        - **Timeline:** What is the desired timeline?
+    - Ask ONE question at a time.
+
+**Decision Logic & Output Formatting:**
+- **If you are missing ANY information (Name, Email, Phone, Features, Budget, or Timeline):**
+  - Set \`qualified\` to \`false\`.
+  - Formulate \`nextQuestion\` to get the next piece of missing information.
+  - Fill the \`collectedInfo\` object with the information you have gathered so far.
+  - Do NOT set \`shouldBookMeeting\`.
+
+- **Once you have ALL necessary information (Name, Email, Phone, Features, Budget, Timeline):**
+  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`.
+  - If it's a clear mismatch (e.g., marketing, graphic design), set \`qualified\` to \`false\`.
+  - Fill the \`collectedInfo\` object with all collected information.
+  - Do not ask more questions.
+`;
+
+const aiProviders = [
+    { value: 'googleai', label: 'Google Gemini' },
+    { value: 'openai', label: 'OpenAI' }
+];
+
+const googleModels = [
+    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro (Most powerful)' },
+    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash (Fastest)' },
+];
+
+const openAIModels = [
+    { value: 'openai/gpt-4o', label: 'GPT-4o (Newest)' },
+    { value: 'openai/gpt-4-turbo', label: 'GPT-4 Turbo' },
+    { value: 'openai/gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+];
 
 export default function AiSettingsPage() {
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
@@ -67,15 +108,20 @@ export default function AiSettingsPage() {
       const loadedSettings = await getSettingsAction();
       if (loadedSettings) {
         setSettings({
-            aiSystemPrompt: loadedSettings.aiSystemPrompt ?? defaultPrompt,
-            aiGreetingMessage: loadedSettings.aiGreetingMessage ?? defaultGreeting,
+            ...loadedSettings,
+            aiProvider: loadedSettings.aiProvider ?? defaultProvider,
             aiModel: loadedSettings.aiModel ?? defaultModel,
+            aiGreetingMessage: loadedSettings.aiGreetingMessage ?? defaultGreeting,
+            aiSystemPrompt: loadedSettings.aiSystemPrompt ?? geminiPrompt,
+            aiSystemPromptOpenAI: loadedSettings.aiSystemPromptOpenAI ?? openAIPrompt,
         });
       } else {
         setSettings({ 
-            aiSystemPrompt: defaultPrompt,
-            aiGreetingMessage: defaultGreeting,
+            aiProvider: defaultProvider,
             aiModel: defaultModel,
+            aiGreetingMessage: defaultGreeting,
+            aiSystemPrompt: geminiPrompt,
+            aiSystemPromptOpenAI: openAIPrompt,
         });
       }
       setIsLoading(false);
@@ -86,6 +132,17 @@ export default function AiSettingsPage() {
   const handleInputChange = (field: keyof GeneralSettings, value: string) => {
     setSettings((prev) => ({ ...prev, [field]: value }));
   };
+  
+  const handleProviderChange = (value: 'googleai' | 'openai') => {
+      const newProvider = value;
+      // Set a default model for the new provider
+      const newModel = newProvider === 'openai' ? openAIModels[0].value : googleModels[0].value;
+      setSettings(prev => ({
+          ...prev,
+          aiProvider: newProvider,
+          aiModel: newModel
+      }));
+  }
 
   const handleSaveChanges = () => {
     startSaving(async () => {
@@ -105,6 +162,8 @@ export default function AiSettingsPage() {
       </div>
     );
   }
+  
+  const availableModels = settings.aiProvider === 'openai' ? openAIModels : googleModels;
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -121,9 +180,9 @@ export default function AiSettingsPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>AI Assistent</CardTitle>
+          <CardTitle>AI Assistent Konfiguration</CardTitle>
           <CardDescription>
-            Styr den indledende besked, AI-model og de overordnede instruktioner for AI-assistenten.
+            Vælg AI-udbyder, model, startbesked og de system-prompts, der styrer assistenten.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -137,38 +196,81 @@ export default function AiSettingsPage() {
             />
             <p className="text-sm text-muted-foreground">Dette er den allerførste besked, brugeren ser i chat-vinduet.</p>
           </div>
-          <div className="space-y-2">
-             <Label htmlFor="ai-model">AI Model</Label>
-             <Select value={settings.aiModel} onValueChange={(value) => handleInputChange('aiModel', value)}>
-                <SelectTrigger id="ai-model">
-                    <SelectValue placeholder="Vælg en AI model" />
-                </SelectTrigger>
-                <SelectContent>
-                    {aiModels.map(model => (
-                        <SelectItem key={model.value} value={model.value}>{model.label}</SelectItem>
-                    ))}
-                </SelectContent>
-             </Select>
-             <p className="text-sm text-muted-foreground">Vælg den AI-model, assistenten skal bruge. Pro er mere avanceret, mens Flash er hurtigere.</p>
-              {settings.aiModel && (
-                <p className="text-xs text-muted-foreground pt-1">Aktiv model: <span className="font-mono bg-muted px-1 py-0.5 rounded-sm">{settings.aiModel}</span></p>
-              )}
+          <hr/>
+          <div className='grid md:grid-cols-2 gap-6'>
+            <div className="space-y-2">
+                <Label htmlFor="ai-provider">AI Provider</Label>
+                <Select value={settings.aiProvider} onValueChange={(v: 'googleai' | 'openai') => handleProviderChange(v)}>
+                    <SelectTrigger id="ai-provider">
+                        <SelectValue placeholder="Vælg AI udbyder" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {aiProviders.map(provider => (
+                            <SelectItem key={provider.value} value={provider.value}>{provider.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="ai-model">AI Model</Label>
+                <Select value={settings.aiModel} onValueChange={(value) => handleInputChange('aiModel', value)}>
+                    <SelectTrigger id="ai-model">
+                        <SelectValue placeholder="Vælg en AI model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {availableModels.map(model => (
+                            <SelectItem key={model.value} value={model.value}>{model.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
           </div>
+          
+          {settings.aiProvider === 'openai' && (
+            <div className="space-y-2">
+              <Label htmlFor="openai-key">OpenAI API Key</Label>
+              <div className="flex items-center gap-2">
+                 <KeyRound className="h-5 w-5 text-muted-foreground" />
+                 <Input
+                    id="openai-key"
+                    type="password"
+                    value={settings.openAIKey || ''}
+                    onChange={(e) => handleInputChange('openAIKey', e.target.value)}
+                    placeholder="Indsæt din OpenAI API nøgle (sk-..)"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">Din API nøgle gemmes ikke i databasen. Den skal tilføjes til dine environment variables som `OPENAI_API_KEY` for at virke i produktion.</p>
+            </div>
+          )}
+
           <hr />
-          <div className="space-y-2">
-            <Label htmlFor="ai-prompt">System Prompt</Label>
-            <Textarea
-              id="ai-prompt"
-              value={settings.aiSystemPrompt || ''}
-              onChange={(e) => handleInputChange('aiSystemPrompt', e.target.value)}
-              className="min-h-[400px] font-mono text-xs"
-            />
-          </div>
+          
+          {settings.aiProvider === 'googleai' ? (
+            <div className="space-y-2">
+              <Label htmlFor="ai-prompt-gemini">System Prompt (Gemini)</Label>
+              <Textarea
+                id="ai-prompt-gemini"
+                value={settings.aiSystemPrompt || ''}
+                onChange={(e) => handleInputChange('aiSystemPrompt', e.target.value)}
+                className="min-h-[400px] font-mono text-xs"
+              />
+            </div>
+          ) : (
+             <div className="space-y-2">
+              <Label htmlFor="ai-prompt-openai">System Prompt (OpenAI)</Label>
+              <Textarea
+                id="ai-prompt-openai"
+                value={settings.aiSystemPromptOpenAI || ''}
+                onChange={(e) => handleInputChange('aiSystemPromptOpenAI', e.target.value)}
+                className="min-h-[400px] font-mono text-xs"
+              />
+            </div>
+          )}
            <Alert>
               <Lightbulb className="h-4 w-4" />
               <AlertTitle>Hvordan virker System Prompten?</AlertTitle>
               <AlertDescription>
-                Dette er den centrale instruktion, der definerer AI-assistentens mål, tone og regler. Hver gang en bruger sender en besked, sendes hele samtalen sammen med denne prompt til AI'en. Vær specifik for at få de bedste resultater.
+                Dette er den centrale instruktion, der definerer AI-assistentens mål, tone og regler. Vær specifik for at få de bedste resultater. Husk at forskellige modeller kræver forskellige prompt-strategier.
               </AlertDescription>
             </Alert>
         </CardContent>
