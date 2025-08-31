@@ -93,7 +93,8 @@ const googleModels = [
 ];
 
 const openAIModels = [
-    { value: 'openai/gpt-4o', label: 'GPT-4o (Newest)' },
+    { value: 'openai/gpt-4o', label: 'GPT-4o (Newest & Most Powerful)' },
+    { value: 'openai/gpt-4o-mini', label: 'GPT-4o mini (Newest & Fastest)' },
     { value: 'openai/gpt-4-turbo', label: 'GPT-4 Turbo' },
     { value: 'openai/gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
 ];
