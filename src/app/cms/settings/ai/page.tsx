@@ -238,10 +238,10 @@ export default function AiSettingsPage() {
                     type="password"
                     value={settings.openAIKey || ''}
                     onChange={(e) => handleInputChange('openAIKey', e.target.value)}
-                    placeholder="Indsæt din OpenAI API nøgle (sk-..)"
+                    placeholder="Indsæt din OpenAI API nøgle (sk-...)"
                 />
               </div>
-              <p className="text-sm text-muted-foreground">Vigtigt: Nøglen gemmes ikke. For at virke live, skal den tilføjes til `.env`-filen som `OPENAI_API_KEY`.</p>
+              <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen som `OPENAI_API_KEY`.</p>
             </div>
           )}
 
