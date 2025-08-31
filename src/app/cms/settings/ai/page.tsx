@@ -86,8 +86,10 @@ const aiProviders = [
 ];
 
 const googleModels = [
-    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro (Most powerful)' },
-    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash (Fastest)' },
+    { value: 'googleai/gemini-2.5-pro-preview', label: 'Gemini 2.5 Pro (Newest & Most powerful)' },
+    { value: 'googleai/gemini-2.5-flash-preview', label: 'Gemini 2.5 Flash (Newest & Fastest)' },
+    { value: 'googleai/gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+    { value: 'googleai/gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
 ];
 
 const openAIModels = [
@@ -278,3 +280,5 @@ export default function AiSettingsPage() {
     </div>
   );
 }
+
+    
