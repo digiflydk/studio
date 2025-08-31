@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 export const ai = genkit({
   plugins: [
     googleAI(),
-    // The OpenAI plugin will automatically use the OPENAI_API_KEY environment variable.
-    new OpenAI(),
+    // The OpenAI plugin is initialized dynamically in the flow
+    // new OpenAI(),
   ],
 });
