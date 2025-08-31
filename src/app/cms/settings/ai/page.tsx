@@ -241,7 +241,7 @@ export default function AiSettingsPage() {
                     placeholder="Indsæt din OpenAI API nøgle (sk-..)"
                 />
               </div>
-              <p className="text-sm text-muted-foreground">Din API nøgle gemmes ikke i databasen. Den skal tilføjes til dine environment variables som `OPENAI_API_KEY` for at virke i produktion.</p>
+              <p className="text-sm text-muted-foreground">Vigtigt: Nøglen gemmes ikke. For at virke live, skal den tilføjes til `.env`-filen som `OPENAI_API_KEY`.</p>
             </div>
           )}
 
@@ -280,5 +280,3 @@ export default function AiSettingsPage() {
     </div>
   );
 }
-
-    
