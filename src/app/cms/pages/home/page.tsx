@@ -112,6 +112,68 @@ const themeColorOptions = [
 
 type ThemeColor = typeof themeColorOptions[number]['value'];
 
+function HslColorPicker({
+  label,
+  color,
+  onChange,
+}: {
+  label: string;
+  color: { h: number; s: number; l: number };
+  onChange: (hsl: { h: number; s: number; l: number }) => void;
+}) {
+    function hslToHex(h: number, s: number, l: number) {
+      l /= 100;
+      const a = (s * Math.min(l, 1 - l)) / 100;
+      const f = (n: number) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, "0");
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    }
+    function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if (!result) return null;
+        let r = parseInt(result[1], 16) / 255, g = parseInt(result[2], 16) / 255, b = parseInt(result[3], 16) / 255;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0, l = (max + min) / 2;
+        if (max === min) { h = s = 0; } else {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+    }
+    const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
+    useEffect(() => { setHexInputValue(hslToHex(color.h, color.s, color.l)); }, [color]);
+    const handleColorChange = (part: 'h' | 's' | 'l', value: number) => { onChange({ ...color, [part]: value }); };
+    const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => { setHexInputValue(e.target.value); }
+    const handleHexBlur = () => {
+        const newHsl = hexToHsl(hexInputValue);
+        if(newHsl) { onChange(newHsl); } else { setHexInputValue(hslToHex(color.h, color.s, color.l)); }
+    }
+    const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { handleHexBlur(); (e.target as HTMLInputElement).blur(); } }
+    return (
+        <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
+             <div className="flex justify-between items-center">
+                 <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+                 <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm uppercase" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>HEX</span>
+                    <Input value={hexInputValue} onChange={handleHexChange} onBlur={handleHexBlur} onKeyDown={handleHexKeyPress} className="w-24 font-mono" style={{ backgroundColor: 'hsla(0, 0%, 100%, 0.2)', color: color.l > 50 ? '#000' : '#FFF', borderColor: 'hsla(0, 0%, 100%, 0.3)' }}/>
+                </div>
+            </div>
+            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Hue ({color.h})</Label> <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} /> </div>
+            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Saturation ({color.s}%)</Label> <Slider value={[color.s]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} /> </div>
+            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Lightness ({color.l}%)</Label> <Slider value={[color.l]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} /> </div>
+        </div>
+    )
+}
+
 function TextStyleEditor({
     label,
     colorValue,
@@ -365,6 +427,15 @@ export default function CmsHomePage() {
           servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize ?? 18,
           services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
           
+          aiProjectSectionIconText: initialSettings.aiProjectSectionIconText ?? 'AI-drevet Projektkvalificering',
+          aiProjectSectionTitle: initialSettings.aiProjectSectionTitle ?? 'Har du en idé? Lad os validere den sammen.',
+          aiProjectSectionTitleColor: initialSettings.aiProjectSectionTitleColor ?? 'text-white',
+          aiProjectSectionTitleSize: initialSettings.aiProjectSectionTitleSize ?? 36,
+          aiProjectSectionDescription: initialSettings.aiProjectSectionDescription ?? 'Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.',
+          aiProjectSectionDescriptionColor: initialSettings.aiProjectSectionDescriptionColor ?? 'text-gray-300',
+          aiProjectSectionDescriptionSize: initialSettings.aiProjectSectionDescriptionSize ?? 18,
+          aiProjectSectionBackgroundColor: initialSettings.aiProjectSectionBackgroundColor ?? { h: 240, s: 10, l: 10 },
+
           casesSectionTitle: initialSettings.casesSectionTitle ?? "Vores Arbejde",
           casesSectionTitleColor: initialSettings.casesSectionTitleColor ?? "text-black",
           casesSectionTitleSize: initialSettings.casesSectionTitleSize ?? 36,
@@ -610,6 +681,75 @@ export default function CmsHomePage() {
                             ))}
                         </Accordion>
                         <Button variant="outline" onClick={() => handleListAdd('services', { title: 'Ny Service', description: '', imageUrl: '', aiHint: '' })}>Tilføj Service</Button>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+
+        <Card className="shadow-lg">
+            <AccordionItem value="ai-project">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <CardTitle>AI Projekt Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer indhold og design for AI-chat sektionen.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="ai-project-icon-text">Ikon-tekst</Label>
+                            <Input id="ai-project-icon-text" value={settings.aiProjectSectionIconText || ''} onChange={e => handleInputChange('aiProjectSectionIconText', e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="ai-project-title">Titel</Label>
+                            <Input id="ai-project-title" value={settings.aiProjectSectionTitle || ''} onChange={e => handleInputChange('aiProjectSectionTitle', e.target.value)} />
+                        </div>
+                         <div className="p-4 border rounded-lg bg-muted/20">
+                            <h3 className="font-semibold">Design for Titel</h3>
+                            <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.aiProjectSectionTitleColor as ThemeColor || 'text-white'} onValueChange={(v) => handleInputChange('aiProjectSectionTitleColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.aiProjectSectionTitleSize || 36}px</span>
+                                </div>
+                                <Slider value={[settings.aiProjectSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('aiProjectSectionTitleSize', v)} min={10} max={120} step={1} />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="ai-project-description">Beskrivelse</Label>
+                            <Textarea id="ai-project-description" value={settings.aiProjectSectionDescription || ''} onChange={e => handleInputChange('aiProjectSectionDescription', e.target.value)} rows={4} />
+                        </div>
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                            <h3 className="font-semibold">Design for Beskrivelse</h3>
+                            <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.aiProjectSectionDescriptionColor as ThemeColor || 'text-gray-300'} onValueChange={(v) => handleInputChange('aiProjectSectionDescriptionColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.aiProjectSectionDescriptionSize || 18}px</span>
+                                </div>
+                                <Slider value={[settings.aiProjectSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('aiProjectSectionDescriptionSize', v)} min={10} max={48} step={1} />
+                            </div>
+                        </div>
+                        {settings.aiProjectSectionBackgroundColor &&
+                          <HslColorPicker 
+                              label="Baggrundsfarve (Mørk)"
+                              color={settings.aiProjectSectionBackgroundColor}
+                              onChange={(hsl) => handleInputChange('aiProjectSectionBackgroundColor', hsl)}
+                          />
+                        }
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>

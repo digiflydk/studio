@@ -159,6 +159,7 @@ export interface GeneralSettings {
     heroDescriptionSize?: number;
     heroDescriptionSizeMobile?: number;
     heroImageUrl?: string;
+    
     servicesSectionTitle?: string;
     servicesSectionTitleColor?: string;
     servicesSectionTitleSize?: number;
@@ -166,6 +167,16 @@ export interface GeneralSettings {
     servicesSectionDescriptionColor?: string;
     servicesSectionDescriptionSize?: number;
     services?: Service[];
+
+    aiProjectSectionIconText?: string;
+    aiProjectSectionTitle?: string;
+    aiProjectSectionTitleColor?: string;
+    aiProjectSectionTitleSize?: number;
+    aiProjectSectionDescription?: string;
+    aiProjectSectionDescriptionColor?: string;
+    aiProjectSectionDescriptionSize?: number;
+    aiProjectSectionBackgroundColor?: HSLColor;
+
     casesSectionTitle?: string;
     casesSectionTitleColor?: string;
     casesSectionTitleSize?: number;
@@ -173,6 +184,7 @@ export interface GeneralSettings {
     casesSectionDescriptionColor?: string;
     casesSectionDescriptionSize?: number;
     cases?: Case[];
+    
     aboutSectionTitle?: string;
     aboutSectionTitleColor?: string;
     aboutSectionTitleSize?: number;

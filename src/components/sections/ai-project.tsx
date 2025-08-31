@@ -32,6 +32,16 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const isMobile = useIsMobile();
 
   const greetingMessage = settings?.aiGreetingMessage || defaultGreeting;
+  const iconText = settings?.aiProjectSectionIconText || 'AI-drevet Projektkvalificering';
+  const title = settings?.aiProjectSectionTitle || 'Har du en idé? Lad os validere den sammen.';
+  const description = settings?.aiProjectSectionDescription || 'Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.';
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.aiProjectSectionTitleSize ? `${settings.aiProjectSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.aiProjectSectionDescriptionSize ? `${settings.aiProjectSectionDescriptionSize}px` : undefined,
+  };
 
   useEffect(() => {
     setMessages([{
@@ -104,29 +114,43 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const sectionPadding = settings?.sectionPadding?.aiProject;
   const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
   const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
+  const backgroundColor = settings?.aiProjectSectionBackgroundColor ? `hsl(${settings.aiProjectSectionBackgroundColor.h}, ${settings.aiProjectSectionBackgroundColor.s}%, ${settings.aiProjectSectionBackgroundColor.l}%)` : 'rgb(17 24 39)'; // fallback to gray-900
 
-  const style: React.CSSProperties = {
+  const style: React.CSSProperties & { [key: string]: string } = {
     paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
     paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+    '--bg-color': backgroundColor,
+    '--bg-gradient-from': `hsl(${settings?.aiProjectSectionBackgroundColor?.h || 211}, ${settings?.aiProjectSectionBackgroundColor?.s || 100}%, ${Math.max(0, (settings?.aiProjectSectionBackgroundColor?.l || 50) - 20)}%)`,
+    '--bg-gradient-to': `hsl(${settings?.aiProjectSectionBackgroundColor?.h || 211}, ${settings?.aiProjectSectionBackgroundColor?.s || 100}%, ${Math.max(0, (settings?.aiProjectSectionBackgroundColor?.l || 40) - 20)}%)`
   };
-
+  
   return (
     <section 
         id="ai-project" 
-        className="relative w-full bg-gray-900 text-white" 
-        style={style}>
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 opacity-20"></div>
+        className="relative w-full text-white" 
+        style={style}
+    >
+      <div className="absolute inset-0 bg-[var(--bg-color)]"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-gradient-from)] to-[var(--bg-gradient-to)] opacity-20"></div>
       <div className="absolute inset-0 bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-4 text-center md:text-left">
                 <div className="inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                     <Sparkles className="mr-2 h-4 w-4" />
-                    AI-drevet Projektkvalificering
+                    {iconText}
                 </div>
-                <h2 className="text-h2 font-bold tracking-tight text-white">Har du en idé? Lad os validere den sammen.</h2>
-                <p className="text-lg text-gray-300">
-                    Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.
+                <h2 
+                  className={cn("text-h2 font-bold tracking-tight", settings?.aiProjectSectionTitleColor || 'text-white')}
+                  style={titleStyle}
+                >
+                  {title}
+                </h2>
+                <p 
+                  className={cn("text-lg", settings?.aiProjectSectionDescriptionColor || 'text-gray-300')}
+                  style={descriptionStyle}
+                >
+                  {description}
                 </p>
             </div>
             
@@ -206,4 +230,3 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     </section>
   );
 }
-
