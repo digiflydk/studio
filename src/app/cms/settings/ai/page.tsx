@@ -185,7 +185,7 @@ export default function AiSettingsPage() {
         <CardHeader>
           <CardTitle>AI Assistent Konfiguration</CardTitle>
           <CardDescription>
-            Vælg AI-udbyder, model, startbesked og de system-prompts, der styrer assistenten.
+            Vælg AI-udbyder, model, og den første besked som AI-assistenten skal sende.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -245,37 +245,36 @@ export default function AiSettingsPage() {
               <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen i formatet: `OPENAI_API_KEY=sk-...`.</p>
             </div>
           )}
-
-          <hr />
-          
-          {settings.aiProvider === 'googleai' ? (
-            <div className="space-y-2">
-              <Label htmlFor="ai-prompt-gemini">System Prompt (Gemini)</Label>
-              <Textarea
-                id="ai-prompt-gemini"
-                value={settings.aiSystemPrompt || ''}
-                onChange={(e) => handleInputChange('aiSystemPrompt', e.target.value)}
-                className="min-h-[400px] font-mono text-xs"
-              />
-            </div>
-          ) : (
-             <div className="space-y-2">
-              <Label htmlFor="ai-prompt-openai">System Prompt (OpenAI)</Label>
-              <Textarea
-                id="ai-prompt-openai"
-                value={settings.aiSystemPromptOpenAI || ''}
-                onChange={(e) => handleInputChange('aiSystemPromptOpenAI', e.target.value)}
-                className="min-h-[400px] font-mono text-xs"
-              />
-            </div>
-          )}
-           <Alert>
-              <Lightbulb className="h-4 w-4" />
-              <AlertTitle>Hvordan virker System Prompten?</AlertTitle>
-              <AlertDescription>
+        </CardContent>
+      </Card>
+      
+      <Card className="shadow-lg">
+        <CardHeader>
+             <CardTitle>System Prompt</CardTitle>
+             <CardDescription>
                 Dette er den centrale instruktion, der definerer AI-assistentens mål, tone og regler. Vær specifik for at få de bedste resultater. Husk at forskellige modeller kræver forskellige prompt-strategier.
-              </AlertDescription>
-            </Alert>
+             </CardDescription>
+        </CardHeader>
+        <CardContent>
+            {settings.aiProvider === 'googleai' ? (
+                <div className="space-y-2">
+                <Textarea
+                    id="ai-prompt-gemini"
+                    value={settings.aiSystemPrompt || ''}
+                    onChange={(e) => handleInputChange('aiSystemPrompt', e.target.value)}
+                    className="min-h-[400px] font-mono text-xs w-full"
+                />
+                </div>
+            ) : (
+                <div className="space-y-2">
+                <Textarea
+                    id="ai-prompt-openai"
+                    value={settings.aiSystemPromptOpenAI || ''}
+                    onChange={(e) => handleInputChange('aiSystemPromptOpenAI', e.target.value)}
+                    className="min-h-[400px] font-mono text-xs w-full"
+                />
+                </div>
+            )}
         </CardContent>
       </Card>
     </div>
