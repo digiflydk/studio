@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import type { GeneralSettings } from '@/services/settings';
 import type { AIProjectQualificationOutput, AIProjectQualificationInput } from '@/ai/flows/ai-project-qualification';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -28,6 +29,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo'] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const isMobile = useIsMobile();
 
   const greetingMessage = settings?.aiGreetingMessage || defaultGreeting;
 
@@ -55,10 +57,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     startTransition(async () => {
         try {
             const qualificationInput: AIProjectQualificationInput = {
-                // Pass the full conversation history including the latest user message
                 conversationHistory: newMessages.map(msg => ({ role: msg.role, content: msg.content })),
-                // projectIdea is now part of the history, so we can pass an empty string
-                projectIdea: '', 
             };
 
             const response: AIProjectQualificationOutput = await qualifyProjectAction(qualificationInput);
@@ -103,17 +102,18 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   };
 
   const sectionPadding = settings?.sectionPadding?.aiProject;
-  const style: React.CSSProperties = sectionPadding ? {
-    '--padding-top': `${sectionPadding.top}px`,
-    '--padding-bottom': `${sectionPadding.bottom}px`,
-    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
-    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
-  } as any : {};
+  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
+  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
+
+  const style: React.CSSProperties = {
+    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
+    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  };
 
   return (
     <section 
         id="ai-project" 
-        className="relative w-full bg-gray-900 text-white py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        className="relative w-full bg-gray-900 text-white" 
         style={style}>
       <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 opacity-20"></div>
       <div className="absolute inset-0 bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
@@ -131,17 +131,16 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
             </div>
             
             <Card className="shadow-lg bg-gray-900/60 backdrop-blur-sm border-primary/20">
-                <CardContent className="p-6">
-                    <div className="flex flex-col space-y-4">
-                    <div className="max-h-80 overflow-y-auto space-y-6 pr-2">
+                <CardContent className="p-6 flex flex-col h-[500px]">
+                    <div className="flex-1 overflow-y-auto space-y-6 pr-4 -mr-4 mb-4 scrollbar-gutter-stable">
                         {messages.map((message, index) => (
-                        <div key={index} className={cn('flex items-start gap-4', message.role === 'user' ? 'justify-end' : 'justify-start')}>
+                        <div key={index} className={cn('flex items-start gap-3', message.role === 'user' ? 'justify-end' : 'justify-start')}>
                             {message.role === 'assistant' && (
                             <Avatar className="w-8 h-8 border border-primary/50">
                                 <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                             </Avatar>
                             )}
-                            <div className={cn('rounded-lg p-3 text-sm break-words', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-gray-800 text-gray-200')}>
+                            <div className={cn('rounded-lg p-3 text-sm break-words max-w-[80%]', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-gray-800 text-gray-200')}>
                                 <p>{message.content}</p>
                             </div>
                             {message.role === 'user' && (
@@ -152,7 +151,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                         </div>
                         ))}
                         {isPending && (
-                        <div className="flex items-start gap-4 justify-start">
+                        <div className="flex items-start gap-3 justify-start">
                             <Avatar className="w-8 h-8 border border-primary/50">
                                 <AvatarFallback className="bg-gray-800"><Bot className="w-5 h-5 text-primary" /></AvatarFallback>
                             </Avatar>
@@ -164,34 +163,41 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {isComplete && collectedInfo?.name && (
-                        <div className="text-center p-4 border-t border-primary/20">
-                        <h3 className="text-xl font-semibold mb-4 text-white">Klar til næste skridt?</h3>
-                        <Button asChild size="lg" data-cta="book_meeting_qualified">
-                            <Link href="#kontakt">Book Møde Med En Konsulent</Link>
-                        </Button>
-                        </div>
-                    )}
-
-                    {!isComplete && (
-                        <form ref={formRef} onSubmit={handleSendMessage} className="relative" data-form="project_qualifier">
-                        <Textarea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder="Beskriv din idé her..."
-                            className="pr-20 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
-                            onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSendMessage(e);
-                            }
-                            }}
-                        />
-                        <Button type="submit" size="icon" className="absolute bottom-3 right-3" disabled={isPending || !input.trim()}>
-                            <CornerDownLeft className="h-4 w-4" />
-                        </Button>
-                        </form>
-                    )}
+                    <div className="mt-auto border-t border-primary/20 pt-4">
+                        {isComplete ? (
+                            <div className="text-center p-4">
+                                {collectedInfo?.name ? (
+                                    <>
+                                        <h3 className="text-xl font-semibold mb-4 text-white">Klar til næste skridt?</h3>
+                                        <Button asChild size="lg" data-cta="book_meeting_qualified">
+                                            <Link href="#kontakt">Book Møde Med En Konsulent</Link>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <p className="text-gray-400">Tak for din henvendelse.</p>
+                                )}
+                            </div>
+                        ) : (
+                            <form ref={formRef} onSubmit={handleSendMessage} className="relative" data-form="project_qualifier">
+                                <Textarea
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder="Beskriv din idé her..."
+                                    className="pr-12 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSendMessage(e);
+                                        }
+                                    }}
+                                    rows={3}
+                                />
+                                <Button type="submit" size="icon" className="absolute bottom-2.5 right-2.5 h-8 w-8" disabled={isPending || !input.trim()}>
+                                    <CornerDownLeft className="h-4 w-4" />
+                                    <span className="sr-only">Send</span>
+                                </Button>
+                            </form>
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -200,3 +206,4 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     </section>
   );
 }
+
