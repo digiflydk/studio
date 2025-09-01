@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const defaultServices: Service[] = [
   {
@@ -273,6 +274,7 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
                                     value={item[field.key] || ''}
                                     onChange={e => handleFieldChange(field.key, e.target.value)}
                                     rows={3}
+                                    className="w-full"
                                 />
                             ) : (
                                 <Input
@@ -595,7 +597,7 @@ export default function CmsHomePage() {
                         />
                         <div className="space-y-2">
                             <Label htmlFor="hero-description">Beskrivelse</Label>
-                            <Textarea id="hero-description" value={settings.heroDescription || ''} onChange={e => handleInputChange('heroDescription', e.target.value)} />
+                            <Textarea id="hero-description" value={settings.heroDescription || ''} onChange={e => handleInputChange('heroDescription', e.target.value)} className="w-full" />
                         </div>
                         <TextStyleEditor 
                             label="Design for Beskrivelse"
@@ -657,7 +659,7 @@ export default function CmsHomePage() {
 
                         <div className="space-y-2">
                             <Label htmlFor="services-description">Sektionsbeskrivelse</Label>
-                            <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} />
+                            <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                              <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
@@ -740,7 +742,7 @@ export default function CmsHomePage() {
 
                         <div className="space-y-2">
                             <Label htmlFor="ai-project-description">Beskrivelse</Label>
-                            <Textarea id="ai-project-description" value={settings.aiProjectSectionDescription || ''} onChange={e => handleInputChange('aiProjectSectionDescription', e.target.value)} rows={4} />
+                            <Textarea id="ai-project-description" value={settings.aiProjectSectionDescription || ''} onChange={e => handleInputChange('aiProjectSectionDescription', e.target.value)} rows={4} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Beskrivelse</h3>
@@ -804,7 +806,7 @@ export default function CmsHomePage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="cases-description">Sektionsbeskrivelse</Label>
-                            <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} />
+                            <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
@@ -882,7 +884,7 @@ export default function CmsHomePage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="about-text">Intro tekst</Label>
-                            <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} />
+                            <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} className="w-full" />
                         </div>
                          <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Intro Tekst</h3>
@@ -1010,7 +1012,7 @@ export default function CmsHomePage() {
 
                         <div className="space-y-2">
                             <Label htmlFor="customers-description">Sektionsbeskrivelse</Label>
-                            <Textarea id="customers-description" value={settings.customersSectionDescription || ''} onChange={e => handleInputChange('customersSectionDescription', e.target.value)} />
+                            <Textarea id="customers-description" value={settings.customersSectionDescription || ''} onChange={e => handleInputChange('customersSectionDescription', e.target.value)} className="w-full" />
                         </div>
                          <div className="p-4 border rounded-lg bg-muted/20">
                              <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
@@ -1075,7 +1077,7 @@ export default function CmsHomePage() {
 
                         <div className="space-y-2">
                             <Label htmlFor="blog-description">Sektionsbeskrivelse</Label>
-                            <Textarea id="blog-description" value={settings.blogSectionDescription || ''} onChange={e => handleInputChange('blogSectionDescription', e.target.value)} />
+                            <Textarea id="blog-description" value={settings.blogSectionDescription || ''} onChange={e => handleInputChange('blogSectionDescription', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
