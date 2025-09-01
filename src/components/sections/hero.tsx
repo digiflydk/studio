@@ -154,16 +154,19 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
      
       <div className={cn(
         "w-full h-full text-white flex",
-        "pt-[var(--header-height)] pb-16",
+        "pt-[calc(var(--header-height)_+_4rem)] pb-16",
         alignmentClasses.vertical[verticalAlign]
       )}>
         <div className={cn(
-            'w-full flex',
-            horizontalAlign === 'center' ? 'justify-center text-center' : 'container mx-auto px-4 md:px-6',
+          "w-full flex",
+          horizontalAlign === 'center' ? 'justify-center text-center' : 'container mx-auto px-4 md:px-6'
         )}>
-            <div className={cn('flex w-full', alignmentClasses.container[horizontalAlign])}>
-                 {content}
-            </div>
+          <div className={cn(
+            'flex w-full',
+             horizontalAlign !== 'center' && alignmentClasses.container[horizontalAlign]
+          )}>
+            {content}
+          </div>
         </div>
       </div>
     </section>
