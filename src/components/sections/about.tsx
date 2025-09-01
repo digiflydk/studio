@@ -77,13 +77,13 @@ export default function AboutSection({ settings }: AboutSectionProps) {
     };
 
     const alignmentClasses = {
-        left: 'lg:text-left',
-        center: 'lg:text-center lg:items-center',
-        right: 'lg:text-right lg:items-end',
+        left: 'text-left items-start',
+        center: 'text-center items-center',
+        right: 'text-right items-end',
     };
     
     const textContent = (
-         <div className={cn("space-y-6 text-center", alignmentClasses[alignment])}>
+         <div className={cn("space-y-6", alignmentClasses[alignment])}>
             <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
             style={titleStyle}

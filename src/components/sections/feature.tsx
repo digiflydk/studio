@@ -63,13 +63,13 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
 
     const alignment = settings?.featureSectionAlignment || 'left';
     const alignmentClasses = {
-        left: 'md:text-left md:items-start',
-        center: 'md:text-center md:items-center',
-        right: 'md:text-right md:items-end',
+        left: 'text-left items-start',
+        center: 'text-center items-center',
+        right: 'text-right items-end',
     };
     
     const textContent = (
-        <div className={cn('flex flex-col space-y-6 text-center', alignmentClasses[alignment])}>
+        <div className={cn('flex flex-col space-y-6', alignmentClasses[alignment])}>
             <h2
                 className={cn("text-h2 font-bold tracking-tight", settings?.featureSectionHeadingColor)}
                 style={headingStyle}

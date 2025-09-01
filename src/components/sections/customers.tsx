@@ -72,8 +72,10 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
             <h3 
                 className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground', {
                     'mx-auto': alignment === 'center',
-                    'mr-auto': alignment === 'right',
-                    'ml-auto': alignment === 'left',
+                    'ml-auto': alignment === 'right',
+                    'mr-0': alignment === 'right',
+                    'mr-auto': alignment === 'left',
+                    'ml-0': alignment === 'left',
                 })}
                 style={titleStyle}
             >
@@ -83,8 +85,10 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
                 <p 
                     className={cn("mt-4 max-w-2xl text-body", settings?.customersSectionDescriptionColor || "text-muted-foreground", {
                         'mx-auto': alignment === 'center',
-                        'mr-auto': alignment === 'right',
-                        'ml-auto': alignment === 'left',
+                        'ml-auto': alignment === 'right',
+                        'mr-0': alignment === 'right',
+                        'mr-auto': alignment === 'left',
+                        'ml-0': alignment === 'left',
                     })}
                     style={descriptionStyle}
                 >

@@ -102,8 +102,10 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
           <p 
             className={cn("mt-4 max-w-2xl text-body", settings?.servicesSectionDescriptionColor || "text-muted-foreground", {
                 'mx-auto': alignment === 'center',
-                'mr-auto': alignment === 'right',
-                'ml-auto': alignment === 'left',
+                'ml-auto': alignment === 'right',
+                'mr-0': alignment === 'right',
+                'mr-auto': alignment === 'left',
+                'ml-0': alignment === 'left',
             })}
             style={descriptionStyle}
           >

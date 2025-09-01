@@ -132,9 +132,9 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   };
   
   const alignmentClasses = {
-      left: 'md:text-left',
-      center: 'md:text-center',
-      right: 'md:text-right',
+      left: 'text-left',
+      center: 'text-center',
+      right: 'text-right',
   };
 
   return (
@@ -148,8 +148,11 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
       <div className="absolute inset-0 bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className={cn("space-y-4 text-center", alignmentClasses[alignment])}>
-                <div className="inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+            <div className={cn("space-y-4", alignmentClasses[alignment])}>
+                <div className={cn("inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary", {
+                  'mx-auto': alignment === 'center',
+                  'mr-auto': alignment === 'right',
+                })}>
                     <Sparkles className="mr-2 h-4 w-4" />
                     {iconText}
                 </div>
@@ -160,7 +163,10 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                   {title}
                 </h2>
                 <p 
-                  className={cn("text-lg", settings?.aiProjectSectionDescriptionColor || 'text-gray-300')}
+                  className={cn("text-lg", settings?.aiProjectSectionDescriptionColor || 'text-gray-300', {
+                    'mx-auto': alignment === 'center',
+                    'ml-auto': alignment === 'right'
+                  })}
                   style={descriptionStyle}
                 >
                   {description}
