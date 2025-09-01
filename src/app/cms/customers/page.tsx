@@ -1,10 +1,9 @@
 
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
 import Image from 'next/image';
-import { useForm, useFormState } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -25,8 +24,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, PlusCircle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 
 const customerFormSchema = z.object({
   name: z.string().min(1, 'Navn er påkrævet'),
@@ -41,6 +48,7 @@ export default function CmsCustomersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, startTransition] = useTransition();
   const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
@@ -72,6 +80,7 @@ export default function CmsCustomersPage() {
       if (result.success) {
         setCustomers(result.customers);
         form.reset();
+        setIsDialogOpen(false);
       }
     });
   };
@@ -92,119 +101,127 @@ export default function CmsCustomersPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">Kunder</h1>
-        <p className="text-muted-foreground">
-          Administrer logoer for de kunder, der skal vises i den roterende karrusel på din hjemmeside.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Kunder</h1>
+          <p className="text-muted-foreground">
+            Administrer logoer for de kunder, der skal vises på din hjemmeside.
+          </p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+             <Button onClick={() => form.reset()}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Tilføj Ny Kunde
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Tilføj Ny Kunde</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Kundenavn</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="F.eks. Google" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="logoUrl"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Logo URL</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="https://..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                      <FormField
+                        control={form.control}
+                        name="aiHint"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>AI Billede Hint (valgfrit)</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="F.eks. tech company" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className="flex justify-end gap-2">
+                         <DialogClose asChild>
+                            <Button type="button" variant="secondary">Annuller</Button>
+                         </DialogClose>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Gem Kunde
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle>Eksisterende Kunder</CardTitle>
-                    <CardDescription>Disse logoer vises på forsiden.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     {isLoading ? (
-                        <div className="flex justify-center items-center h-48">
-                            <Loader2 className="h-8 w-8 animate-spin" />
-                        </div>
-                    ) : customers.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            {customers.map((customer) => (
-                                <div key={customer.id} className="group relative flex flex-col items-center gap-2 p-2 border rounded-lg">
-                                    <div className="relative w-full h-20 bg-muted rounded-md flex items-center justify-center">
-                                        <Image
-                                            src={customer.logoUrl}
-                                            alt={customer.name}
-                                            fill
-                                            className="object-contain p-2"
-                                        />
-                                    </div>
-                                    <p className="text-sm font-medium text-center truncate w-full">{customer.name}</p>
-                                    <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => handleDelete(customer.id)}
-                                        disabled={isSubmitting}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle>Eksisterende Kunder</CardTitle>
+                <CardDescription>Disse logoer vises i karrusellen på forsiden.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                  {isLoading ? (
+                    <div className="flex justify-center items-center h-48">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                    </div>
+                ) : customers.length > 0 ? (
+                     <div className="space-y-4">
+                        {customers.map((customer) => (
+                           <div key={customer.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                             <div className="flex items-center gap-4">
+                               <div className="relative w-24 h-12 bg-white rounded-md flex items-center justify-center p-1">
+                                    <Image
+                                        src={customer.logoUrl}
+                                        alt={customer.name}
+                                        fill
+                                        className="object-contain"
+                                    />
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                         <Alert>
-                            <AlertTitle>Ingen kunder tilføjet</AlertTitle>
-                            <AlertDescription>
-                                Der er endnu ikke tilføjet nogle kundelogoer. Tilføj en i formularen til højre for at få dem vist på forsiden.
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
-        <div>
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle>Tilføj Ny Kunde</CardTitle>
-                    <CardDescription>Udfyld felterne for at tilføje et nyt kundelogo.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Kundenavn</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="F.eks. Google" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="logoUrl"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Logo URL</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="https://..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                             <FormField
-                                control={form.control}
-                                name="aiHint"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>AI Billede Hint (valgfrit)</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="F.eks. tech company" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button type="submit" disabled={isSubmitting} className="w-full">
-                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Gem Kunde
+                                <h3 className="font-semibold">{customer.name}</h3>
+                             </div>
+                             <Button
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => handleDelete(customer.id)}
+                                disabled={isSubmitting}
+                                className="h-8 w-8"
+                            >
+                                <Trash2 className="h-4 w-4" />
                             </Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
-        </div>
-      </div>
+                           </div>
+                        ))}
+                    </div>
+                ) : (
+                      <Alert>
+                        <AlertTitle>Ingen kunder tilføjet</AlertTitle>
+                        <AlertDescription>
+                            Der er endnu ikke tilføjet nogle kundelogoer. Klik på "Tilføj Ny Kunde" for at oprette en.
+                        </AlertDescription>
+                    </Alert>
+                )}
+            </CardContent>
+        </Card>
     </div>
   );
 }
