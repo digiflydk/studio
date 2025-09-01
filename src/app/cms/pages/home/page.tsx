@@ -146,10 +146,13 @@ type ThemeColor = typeof themeColorOptions[number]['value'];
 
 const sectionLinks = [
     { value: '#hero', label: 'Hero Sektion' },
+    { value: '#feature', label: 'Fremhævet Sektion' },
     { value: '#services', label: 'Services' },
     { value: '#ai-project', label: 'AI Projekt' },
     { value: '#cases', label: 'Cases' },
     { value: '#om-os', label: 'Om Os' },
+    { value: '#customers', label: 'Kunder' },
+    { value: '#blog', label: 'Blog' },
     { value: '#kontakt', label: 'Kontakt' },
     { value: 'custom', label: 'Brugerdefineret link' },
 ];
@@ -703,9 +706,10 @@ export default function CmsHomePage() {
     );
   }
 
+  const heroCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.heroCtaLink);
+  const heroCtaSelectValue = heroCtaIsCustomLink ? 'custom' : settings.heroCtaLink;
   const servicesCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.servicesCtaLink);
   const servicesCtaSelectValue = servicesCtaIsCustomLink ? 'custom' : settings.servicesCtaLink;
-
   const featureCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.featureSectionCtaLink);
   const featureCtaSelectValue = featureCtaIsCustomLink ? 'custom' : settings.featureSectionCtaLink;
 
@@ -809,9 +813,30 @@ export default function CmsHomePage() {
                                         <Input id="hero-cta-text" value={settings.heroCtaText || ''} onChange={e => handleInputChange('heroCtaText', e.target.value)} />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="hero-cta-link">Knap Link</Label>
-                                        <Input id="hero-cta-link" value={settings.heroCtaLink || ''} onChange={e => handleInputChange('heroCtaLink', e.target.value)} placeholder="f.eks. #kontakt eller https://google.com" />
+                                        <Label htmlFor="hero-cta-link-select">Knap Link</Label>
+                                        <Select
+                                            value={heroCtaSelectValue || ''}
+                                            onValueChange={(value) => handleInputChange('heroCtaLink', value === 'custom' ? '' : value)}
+                                        >
+                                            <SelectTrigger id="hero-cta-link-select"><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                {sectionLinks.map(link => (
+                                                    <SelectItem key={link.value} value={link.value}>{link.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
+                                    {heroCtaSelectValue === 'custom' && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="hero-cta-link-input">Brugerdefineret Link</Label>
+                                            <Input
+                                                id="hero-cta-link-input"
+                                                value={settings.heroCtaLink || ''}
+                                                placeholder="f.eks. https://eksempel.dk"
+                                                onChange={e => handleInputChange('heroCtaLink', e.target.value)}
+                                            />
+                                        </div>
+                                    )}
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                         <div className="space-y-2">
                                             <Label>Knap Design</Label>
