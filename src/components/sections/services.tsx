@@ -106,14 +106,14 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         </div>
         <div className="flex flex-wrap gap-8 justify-center">
           {services.map((service) => (
-            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)]">
+            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]">
               <div className="relative w-full h-40">
                   <Image
                     src={service.imageUrl}
                     alt={service.title}
                     data-ai-hint={service.aiHint}
                     fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover"
                   />
                 </div>
