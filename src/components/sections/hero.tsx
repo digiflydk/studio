@@ -43,15 +43,10 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       center: 'items-center',
       bottom: 'items-end pb-16',
     },
-    horizontalContainer: {
-        left: 'items-start',
-        center: 'items-center',
-        right: 'items-end',
-    },
-    horizontalText: {
-        left: 'text-left',
-        center: 'text-center',
-        right: 'text-right',
+    horizontal: {
+      left: 'items-start text-left',
+      center: 'items-center text-center',
+      right: 'items-end text-right',
     },
   };
 
@@ -104,14 +99,13 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       </div>
      
       <div className={cn(
-        "relative w-full h-full text-white flex flex-col justify-center",
+        "relative w-full h-full text-white flex flex-col",
         "container mx-auto px-4 md:px-6",
         alignmentClasses.vertical[verticalAlign]
       )}>
         <div className={cn(
             "flex flex-col space-y-6 hero-text-container z-10 w-full",
-            alignmentClasses.horizontalContainer[horizontalAlign],
-            alignmentClasses.horizontalText[horizontalAlign]
+            alignmentClasses.horizontal[horizontalAlign]
         )}>
           <h1 
             className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
