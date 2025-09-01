@@ -203,6 +203,10 @@ function TextStyleEditor({
     onMobileSizeChange: (value: number) => void;
     previewMode: 'desktop' | 'mobile';
 }) {
+    const size = previewMode === 'desktop' ? desktopSize : mobileSize;
+    const onSizeChange = previewMode === 'desktop' ? onDesktopSizeChange : onMobileSizeChange;
+    const max = previewMode === 'desktop' ? 120 : 80;
+
     return (
         <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
             <h3 className="font-semibold md:col-span-2">{label}</h3>
@@ -217,36 +221,24 @@ function TextStyleEditor({
                     </SelectContent>
                 </Select>
             </div>
-
-            {previewMode === 'desktop' ? (
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label><Monitor className="inline-block h-4 w-4 mr-2" />Desktop Størrelse</Label>
-                        <span className="text-sm text-muted-foreground">{desktopSize}px</span>
-                    </div>
-                    <Slider 
-                        value={[desktopSize]} 
-                        onValueChange={([v]) => onDesktopSizeChange(v)}
-                        min={10}
-                        max={120}
-                        step={1}
-                    />
+            <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                    <Label>
+                        <span className="flex items-center gap-2">
+                            {previewMode === 'desktop' ? <Monitor className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />}
+                            Størrelse
+                        </span>
+                    </Label>
+                    <span className="text-sm text-muted-foreground">{size}px</span>
                 </div>
-            ) : (
-                <div className="space-y-2">
-                     <div className="flex justify-between items-center">
-                        <Label><Smartphone className="inline-block h-4 w-4 mr-2" />Mobil Størrelse</Label>
-                        <span className="text-sm text-muted-foreground">{mobileSize}px</span>
-                    </div>
-                    <Slider 
-                        value={[mobileSize]} 
-                        onValueChange={([v]) => onMobileSizeChange(v)}
-                        min={10}
-                        max={80}
-                        step={1}
-                    />
-                </div>
-            )}
+                <Slider 
+                    value={[size]} 
+                    onValueChange={([v]) => onSizeChange(v)}
+                    min={10}
+                    max={max}
+                    step={1}
+                />
+            </div>
         </div>
     );
 }
@@ -449,6 +441,10 @@ export default function CmsHomePage() {
           servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor ?? "text-muted-foreground",
           servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize ?? 18,
           services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
+          serviceCardTitleColor: initialSettings.serviceCardTitleColor ?? "text-foreground",
+          serviceCardTitleSize: initialSettings.serviceCardTitleSize ?? 24,
+          serviceCardDescriptionColor: initialSettings.serviceCardDescriptionColor ?? "text-muted-foreground",
+          serviceCardDescriptionSize: initialSettings.serviceCardDescriptionSize ?? 14,
           
           aiProjectSectionIconText: initialSettings.aiProjectSectionIconText ?? 'AI-drevet Projektkvalificering',
           aiProjectSectionTitle: initialSettings.aiProjectSectionTitle ?? 'Har du en idé? Lad os validere den sammen.',
@@ -732,35 +728,16 @@ export default function CmsHomePage() {
                                             </Select>
                                         </div>
                                     </div>
-                                    {previewMode === 'desktop' ? (
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <Label><Monitor className="inline-block h-4 w-4 mr-2" />Knap Tekststørrelse (Desktop)</Label>
-                                                <span className="text-sm text-muted-foreground">{settings.heroCtaTextSize}px</span>
-                                            </div>
-                                            <Slider 
-                                                value={[settings.heroCtaTextSize || 16]} 
-                                                onValueChange={([v]) => handleInputChange('heroCtaTextSize', v)}
-                                                min={12}
-                                                max={32}
-                                                step={1}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                             <div className="flex justify-between items-center">
-                                                <Label><Smartphone className="inline-block h-4 w-4 mr-2" />Knap Tekststørrelse (Mobil)</Label>
-                                                <span className="text-sm text-muted-foreground">{settings.heroCtaTextSizeMobile}px</span>
-                                            </div>
-                                            <Slider 
-                                                value={[settings.heroCtaTextSizeMobile || 14]} 
-                                                onValueChange={([v]) => handleInputChange('heroCtaTextSizeMobile', v)}
-                                                min={10}
-                                                max={28}
-                                                step={1}
-                                            />
-                                        </div>
-                                    )}
+                                    <TextStyleEditor 
+                                        label="Design for Knap Tekst"
+                                        colorValue={'text-primary-foreground' as ThemeColor}
+                                        onColorChange={(v) => { /* Color is fixed for CTA for now */ }}
+                                        desktopSize={settings.heroCtaTextSize || 16}
+                                        onDesktopSizeChange={(v) => handleInputChange('heroCtaTextSize', v)}
+                                        mobileSize={settings.heroCtaTextSizeMobile || 14}
+                                        onMobileSizeChange={(v) => handleInputChange('heroCtaTextSizeMobile', v)}
+                                        previewMode={previewMode}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -831,6 +808,32 @@ export default function CmsHomePage() {
                              onMobileSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
                              previewMode={previewMode}
                         />
+
+                        <div className="space-y-4">
+                            <h3 className="text-base font-semibold">Design for Service Kort</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <TextStyleEditor 
+                                    label="Kort Titel"
+                                    colorValue={settings.serviceCardTitleColor as ThemeColor || 'text-foreground'}
+                                    onColorChange={(v) => handleInputChange('serviceCardTitleColor', v)}
+                                    desktopSize={settings.serviceCardTitleSize || 24}
+                                    onDesktopSizeChange={(v) => handleInputChange('serviceCardTitleSize', v)}
+                                    mobileSize={settings.serviceCardTitleSize || 24}
+                                    onMobileSizeChange={(v) => handleInputChange('serviceCardTitleSize', v)}
+                                    previewMode={previewMode}
+                                />
+                                <TextStyleEditor 
+                                    label="Kort Beskrivelse"
+                                    colorValue={settings.serviceCardDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                                    onColorChange={(v) => handleInputChange('serviceCardDescriptionColor', v)}
+                                    desktopSize={settings.serviceCardDescriptionSize || 14}
+                                    onDesktopSizeChange={(v) => handleInputChange('serviceCardDescriptionSize', v)}
+                                    mobileSize={settings.serviceCardDescriptionSize || 14}
+                                    onMobileSizeChange={(v) => handleInputChange('serviceCardDescriptionSize', v)}
+                                    previewMode={previewMode}
+                                />
+                            </div>
+                        </div>
 
                         <Label>Service-kort</Label>
                         <Accordion type="multiple" className="w-full border rounded-md">

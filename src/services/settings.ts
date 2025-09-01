@@ -187,6 +187,10 @@ export interface GeneralSettings {
     servicesSectionDescriptionColor?: string;
     servicesSectionDescriptionSize?: number;
     services?: Service[];
+    serviceCardTitleColor?: string;
+    serviceCardTitleSize?: number;
+    serviceCardDescriptionColor?: string;
+    serviceCardDescriptionSize?: number;
 
     aiProjectSectionIconText?: string;
     aiProjectSectionTitle?: string;

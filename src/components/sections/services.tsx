@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Service, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const defaultServices: Service[] = [
   {
@@ -37,6 +38,7 @@ interface ServicesSectionProps {
 }
 
 export default function ServicesSection({ settings }: ServicesSectionProps) {
+  const isMobile = useIsMobile();
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
@@ -47,6 +49,13 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const descriptionStyle: React.CSSProperties = {
     fontSize: settings?.servicesSectionDescriptionSize ? `${settings.servicesSectionDescriptionSize}px` : undefined,
   };
+
+  const serviceCardTitleStyle: React.CSSProperties = {
+      fontSize: settings?.serviceCardTitleSize ? `${settings.serviceCardTitleSize}px` : undefined,
+  }
+  const serviceCardDescriptionStyle: React.CSSProperties = {
+      fontSize: settings?.serviceCardDescriptionSize ? `${settings.serviceCardDescriptionSize}px` : undefined,
+  }
 
   const sectionPadding = settings?.sectionPadding?.services;
   const style: React.CSSProperties = sectionPadding ? {
@@ -92,10 +101,20 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                   />
                 </div>
               <CardHeader>
-                <CardTitle className="text-h4">{service.title}</CardTitle>
+                <CardTitle 
+                    className={cn(settings?.serviceCardTitleColor)}
+                    style={serviceCardTitleStyle}
+                >
+                    {service.title}
+                </CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-muted-foreground">{service.description}</p>
+                <p 
+                    className={cn(settings?.serviceCardDescriptionColor)}
+                    style={serviceCardDescriptionStyle}
+                >
+                    {service.description}
+                </p>
               </CardContent>
             </Card>
           ))}
