@@ -50,6 +50,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check on initial load
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };

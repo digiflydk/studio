@@ -15,9 +15,9 @@ export default async function PublicLayout({
 
   return (
     <ThemeProvider settings={settings}>
+      <Header settings={settings} />
       <div className="flex flex-col min-h-screen">
-        <Header settings={settings} />
-        <main className="flex-1" style={{ paddingTop: `${headerHeight}px` }}>
+        <main className="flex-1">
           {children}
         </main>
         <Footer settings={settings} />

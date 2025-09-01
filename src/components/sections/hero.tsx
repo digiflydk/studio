@@ -73,7 +73,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     <section
       id="hero"
       className={cn(
-        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center -mt-[var(--header-height)]",
+        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center",
         alignmentClasses.vertical[verticalAlign],
       )}
       style={heroStyles}
