@@ -7,12 +7,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 
 export default function FeatureSection({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
-    const isMobile = useIsMobile();
     
     const heading = settings?.featureSectionHeading || 'Fremhævet Overskrift';
     const body = settings?.featureSectionBody || 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.';
@@ -23,20 +21,13 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
     const ctaVariant = settings?.featureSectionCtaVariant || 'default';
     const ctaSize = settings?.featureSectionCtaSize || 'lg';
 
-    const headingDesktopSize = settings?.featureSectionHeadingSize ?? 48;
-    const headingMobileSize = settings?.featureSectionHeadingSizeMobile ?? 36;
-    const bodyDesktopSize = settings?.featureSectionBodySize ?? 18;
-    const bodyMobileSize = settings?.featureSectionBodySizeMobile ?? 16;
-    const ctaDesktopSize = settings?.featureSectionCtaTextSize ?? 16;
-    const ctaMobileSize = settings?.featureSectionCtaTextSizeMobile ?? 14;
-
     const sectionPadding = settings?.sectionPadding?.feature;
-    const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-    const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
-    const sectionStyle: CSSProperties = {
-        paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-        paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+    const sectionStyle: CSSProperties & { [key: string]: string } = {
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
     if (settings?.featureSectionBackgroundColor) {
         const { h, s, l } = settings.featureSectionBackgroundColor;
@@ -44,13 +35,22 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
     }
 
     const headingStyle: CSSProperties = {
-        fontSize: isMobile ? `${headingMobileSize}px` : `${headingDesktopSize}px`,
+        fontSize: settings?.featureSectionHeadingSizeMobile ? `${settings.featureSectionHeadingSizeMobile}px` : undefined,
+    };
+     const headingStyleDesktop: CSSProperties = {
+        fontSize: settings?.featureSectionHeadingSize ? `${settings.featureSectionHeadingSize}px` : undefined,
     };
     const bodyStyle: CSSProperties = {
-        fontSize: isMobile ? `${bodyMobileSize}px` : `${bodyDesktopSize}px`,
+         fontSize: settings?.featureSectionBodySizeMobile ? `${settings.featureSectionBodySizeMobile}px` : undefined,
+    };
+    const bodyStyleDesktop: CSSProperties = {
+        fontSize: settings?.featureSectionBodySize ? `${settings.featureSectionBodySize}px` : undefined,
     };
     const ctaStyle: CSSProperties = {
-        fontSize: isMobile ? `${ctaMobileSize}px` : `${ctaDesktopSize}px`,
+        fontSize: settings?.featureSectionCtaTextSizeMobile ? `${settings.featureSectionCtaTextSizeMobile}px` : undefined,
+    };
+    const ctaStyleDesktop: CSSProperties = {
+        fontSize: settings?.featureSectionCtaTextSize ? `${settings.featureSectionCtaTextSize}px` : undefined,
     };
 
     const getLinkHref = (href: string) => {
@@ -70,14 +70,26 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
     const textContent = (
         <div className={cn('flex flex-col space-y-6', alignmentClasses[alignment])}>
             <h2
-                className={cn("text-h2 font-bold tracking-tight", settings?.featureSectionHeadingColor)}
+                className={cn("text-h2 font-bold tracking-tight md:hidden", settings?.featureSectionHeadingColor)}
                 style={headingStyle}
             >
                 {heading}
             </h2>
+            <h2
+                className={cn("text-h2 font-bold tracking-tight hidden md:block", settings?.featureSectionHeadingColor)}
+                style={headingStyleDesktop}
+            >
+                {heading}
+            </h2>
             <p
-                className={cn("text-body", settings?.featureSectionBodyColor || 'text-muted-foreground')}
+                className={cn("text-body md:hidden", settings?.featureSectionBodyColor || 'text-muted-foreground')}
                 style={bodyStyle}
+            >
+                {body}
+            </p>
+             <p
+                className={cn("text-body hidden md:block", settings?.featureSectionBodyColor || 'text-muted-foreground')}
+                style={bodyStyleDesktop}
             >
                 {body}
             </p>
@@ -87,7 +99,20 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
                         asChild
                         size={ctaSize}
                         variant={ctaVariant}
+                        className="md:hidden"
                         style={ctaStyle}
+                    >
+                        <Link href={getLinkHref(ctaLink)}>
+                            {ctaText}
+                            {ctaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Link>
+                    </Button>
+                     <Button
+                        asChild
+                        size={ctaSize}
+                        variant={ctaVariant}
+                        className="hidden md:inline-flex"
+                        style={ctaStyleDesktop}
                     >
                         <Link href={getLinkHref(ctaLink)}>
                             {ctaText}
@@ -113,7 +138,7 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
     );
 
     return (
-        <section id="feature" style={sectionStyle}>
+        <section id="feature" className="py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]" style={sectionStyle}>
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     {alignment === 'right' ? (

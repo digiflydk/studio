@@ -7,15 +7,12 @@ import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-
 
 interface BlogSectionProps {
     settings: GeneralSettings | null
 }
 
 export default function BlogSection({ settings }: BlogSectionProps) {
-  const isMobile = useIsMobile();
   const posts = settings?.blogPosts || [];
   const title = settings?.blogSectionTitle || "Seneste fra bloggen";
   const description = settings?.blogSectionDescription || "Læs vores seneste indlæg om teknologi, AI og digitalisering.";
@@ -35,12 +32,12 @@ export default function BlogSection({ settings }: BlogSectionProps) {
   };
   
   const sectionPadding = settings?.sectionPadding?.blog;
-  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
-  const style: React.CSSProperties = {
-    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  const style: React.CSSProperties & { [key: string]: string } = {
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
   };
   
   if (settings?.blogSectionBackgroundColor) {
@@ -58,7 +55,7 @@ export default function BlogSection({ settings }: BlogSectionProps) {
     <section 
         id="blog" 
         style={style}
-        className={cn(!settings?.blogSectionBackgroundColor && 'bg-background')}
+        className={cn('py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]', !settings?.blogSectionBackgroundColor && 'bg-background')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className={cn("mb-12", alignmentClasses[alignment])}>
@@ -72,9 +69,6 @@ export default function BlogSection({ settings }: BlogSectionProps) {
             className={cn("mt-4 max-w-2xl text-body", settings?.blogSectionDescriptionColor || "text-muted-foreground", {
                 'mx-auto': alignment === 'center',
                 'ml-auto': alignment === 'right',
-                'mr-0': alignment === 'right',
-                'mr-auto': alignment === 'left',
-                'ml-0': alignment === 'left',
             })}
             style={descriptionStyle}
           >

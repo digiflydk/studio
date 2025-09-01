@@ -10,14 +10,12 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CustomersSectionProps {
   settings: GeneralSettings | null;
 }
 
 export default function CustomersSection({ settings }: CustomersSectionProps) {
-  const isMobile = useIsMobile();
   const customers = settings?.customers || [];
   
   const title = settings?.customersSectionTitle || "Betroet af branchens bedste";
@@ -33,12 +31,12 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
   }
   
   const sectionPadding = settings?.sectionPadding?.customers;
-  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
-  const style: React.CSSProperties = {
-    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  const style: React.CSSProperties & { [key: string]: string } = {
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
   };
 
   if (settings?.customersSectionBackgroundColor) {
@@ -64,7 +62,7 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
     <section 
         id="customers" 
         style={style}
-        className={cn(!settings?.customersSectionBackgroundColor && 'bg-secondary')}
+        className={cn('py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]', !settings?.customersSectionBackgroundColor && 'bg-secondary')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className={cn("mb-12", alignmentClasses[alignment])}>
@@ -72,9 +70,6 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
                 className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground', {
                     'mx-auto': alignment === 'center',
                     'ml-auto': alignment === 'right',
-                    'mr-0': alignment === 'right',
-                    'mr-auto': alignment === 'left',
-                    'ml-0': alignment === 'left',
                 })}
                 style={titleStyle}
             >
@@ -85,9 +80,6 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
                     className={cn("mt-4 max-w-2xl text-body", settings?.customersSectionDescriptionColor || "text-muted-foreground", {
                         'mx-auto': alignment === 'center',
                         'ml-auto': alignment === 'right',
-                        'mr-0': alignment === 'right',
-                        'mr-auto': alignment === 'left',
-                        'ml-0': alignment === 'left',
                     })}
                     style={descriptionStyle}
                 >

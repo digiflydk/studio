@@ -6,7 +6,6 @@ import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { TeamMember, GeneralSettings, SectionPadding, Alignment } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 
 const defaultTeam: TeamMember[] = [
@@ -43,7 +42,6 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ settings }: AboutSectionProps) {
-    const isMobile = useIsMobile();
     const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
     const aboutText = settings?.aboutText || defaultAboutText;
     const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
@@ -67,12 +65,12 @@ export default function AboutSection({ settings }: AboutSectionProps) {
     };
 
     const sectionPadding = settings?.sectionPadding?.about;
-    const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-    const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
-
-    const style: React.CSSProperties = {
-        paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-        paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+    
+    const style: React.CSSProperties & { [key: string]: string } = {
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
 
     const alignmentClasses = {
@@ -126,7 +124,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
     return (
         <section 
             id="om-os" 
-            className="bg-secondary"
+            className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]"
             style={style}
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">

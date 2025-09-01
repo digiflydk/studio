@@ -7,12 +7,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
-  const isMobile = useIsMobile();
   const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
   const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
   const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
@@ -34,8 +32,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     '--header-height': `${headerHeight}px`,
   } as CSSProperties;
   
-  const ctaTextSize = isMobile ? settings?.heroCtaTextSizeMobile : settings?.heroCtaTextSize;
-  const ctaStyle: React.CSSProperties = ctaTextSize ? { fontSize: `${ctaTextSize}px` } : {};
+  const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
+  const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
 
   const getLinkHref = (href: string) => {
     if (href.startsWith('#') && pathname !== '/') {
@@ -118,7 +116,20 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                   asChild
                   size={settings.heroCtaSize || 'lg'}
                   variant={settings.heroCtaVariant || 'default'}
+                  className="md:hidden"
                   style={ctaStyle}
+                >
+                  <Link href={getLinkHref(settings.heroCtaLink)}>
+                    {settings.heroCtaText}
+                    {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+                 <Button
+                  asChild
+                  size={settings.heroCtaSize || 'lg'}
+                  variant={settings.heroCtaVariant || 'default'}
+                  className="hidden md:inline-flex"
+                  style={ctaStyleDesktop}
                 >
                   <Link href={getLinkHref(settings.heroCtaLink)}>
                     {settings.heroCtaText}

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Service, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -40,7 +39,6 @@ interface ServicesSectionProps {
 }
 
 export default function ServicesSection({ settings }: ServicesSectionProps) {
-  const isMobile = useIsMobile();
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
@@ -60,16 +58,17 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
       fontSize: settings?.serviceCardDescriptionSize ? `${settings.serviceCardDescriptionSize}px` : undefined,
   }
   
-  const ctaTextSize = isMobile ? settings?.servicesCtaTextSizeMobile : settings?.servicesCtaTextSize;
-  const ctaStyle: React.CSSProperties = ctaTextSize ? { fontSize: `${ctaTextSize}px` } : {};
+  const ctaStyle: React.CSSProperties = settings?.servicesCtaTextSizeMobile ? { fontSize: `${settings.servicesCtaTextSizeMobile}px` } : {};
+  const ctaStyleDesktop: React.CSSProperties = settings?.servicesCtaTextSize ? { fontSize: `${settings.servicesCtaTextSize}px` } : {};
+
 
   const sectionPadding = settings?.sectionPadding?.services;
-  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
-  const style: React.CSSProperties = {
-    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  const style: React.CSSProperties & { [key: string]: string } = {
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
   };
 
   if (settings?.servicesSectionBackgroundColor) {
@@ -88,7 +87,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
     <section 
         id="services" 
         style={style}
-        className={cn(!settings?.servicesSectionBackgroundColor && 'bg-secondary')}
+        className={cn('py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]', !settings?.servicesSectionBackgroundColor && 'bg-secondary')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className={cn("mb-12", alignmentClasses[alignment])}>
@@ -102,9 +101,6 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
             className={cn("mt-4 max-w-2xl text-body", settings?.servicesSectionDescriptionColor || "text-muted-foreground", {
                 'mx-auto': alignment === 'center',
                 'ml-auto': alignment === 'right',
-                'mr-0': alignment === 'right',
-                'mr-auto': alignment === 'left',
-                'ml-0': alignment === 'left',
             })}
             style={descriptionStyle}
           >
@@ -149,7 +145,20 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                     asChild
                     size={settings.servicesCtaSize || 'lg'}
                     variant={settings.servicesCtaVariant || 'default'}
+                    className="md:hidden"
                     style={ctaStyle}
+                >
+                    <Link href={settings.servicesCtaLink || '#kontakt'}>
+                        {settings.servicesCtaText || 'Book et møde med os'}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+                <Button
+                    asChild
+                    size={settings.servicesCtaSize || 'lg'}
+                    variant={settings.servicesCtaVariant || 'default'}
+                    className="hidden md:inline-flex"
+                    style={ctaStyleDesktop}
                 >
                     <Link href={settings.servicesCtaLink || '#kontakt'}>
                         {settings.servicesCtaText || 'Book et møde med os'}

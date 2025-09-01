@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import type { GeneralSettings } from '@/types/settings';
 import type { AIProjectQualificationOutput, AIProjectQualificationInput } from '@/ai/flows/ai-project-qualification';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -28,7 +27,6 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const [collectedInfo, setCollectedInfo] = useState<AIProjectQualificationOutput['collectedInfo'] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const isMobile = useIsMobile();
   const hasScrolledRef = useRef(false);
 
   const greetingMessage = settings?.aiGreetingMessage || defaultGreeting;
@@ -118,13 +116,13 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   };
 
   const sectionPadding = settings?.sectionPadding?.aiProject;
-  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
   const backgroundColor = settings?.aiProjectSectionBackgroundColor ? `hsl(${settings.aiProjectSectionBackgroundColor.h}, ${settings.aiProjectSectionBackgroundColor.s}%, ${settings.aiProjectSectionBackgroundColor.l}%)` : 'rgb(17 24 39)'; // fallback to gray-900
 
   const style: React.CSSProperties & { [key: string]: string } = {
-    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     '--bg-color': backgroundColor,
     '--bg-gradient-from': `hsl(${settings?.aiProjectSectionBackgroundColor?.h || 211}, ${settings?.aiProjectSectionBackgroundColor?.s || 100}%, ${Math.max(0, (settings?.aiProjectSectionBackgroundColor?.l || 50) - 20)}%)`,
     '--bg-gradient-to': `hsl(${settings?.aiProjectSectionBackgroundColor?.h || 211}, ${settings?.aiProjectSectionBackgroundColor?.s || 100}%, ${Math.max(0, (settings?.aiProjectSectionBackgroundColor?.l || 40) - 20)}%)`
@@ -139,7 +137,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   return (
     <section 
         id="ai-project" 
-        className="relative w-full text-white" 
+        className="relative w-full text-white py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]" 
         style={style}
     >
       <div className="absolute inset-0 bg-[var(--bg-color)]"></div>

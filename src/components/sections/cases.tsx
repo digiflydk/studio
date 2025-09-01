@@ -5,7 +5,6 @@ import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 import type { Case, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 
 const defaultCases: Case[] = [
@@ -37,7 +36,6 @@ interface CasesSectionProps {
 }
 
 export default function CasesSection({ settings }: CasesSectionProps) {
-  const isMobile = useIsMobile();
   const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
@@ -51,12 +49,11 @@ export default function CasesSection({ settings }: CasesSectionProps) {
   };
   
   const sectionPadding = settings?.sectionPadding?.cases;
-  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
-  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
-
-  const style: React.CSSProperties = {
-    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
-    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  const style: React.CSSProperties & { [key: string]: string } = {
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
   };
   
   const alignmentClasses = {
@@ -68,7 +65,7 @@ export default function CasesSection({ settings }: CasesSectionProps) {
   return (
     <section 
         id="cases" 
-        className="bg-background" 
+        className="bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]" 
         style={style}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
@@ -83,9 +80,6 @@ export default function CasesSection({ settings }: CasesSectionProps) {
             className={cn("mt-4 max-w-2xl text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground", {
                 'mx-auto': alignment === 'center',
                 'ml-auto': alignment === 'right',
-                'mr-0': alignment === 'right',
-                'mr-auto': alignment === 'left',
-                'ml-0': alignment === 'left',
             })}
             style={descriptionStyle}
           >
