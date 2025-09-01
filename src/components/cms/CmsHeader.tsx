@@ -28,12 +28,16 @@ export default function CmsHeader() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
+  // This data fetching is safe because it only runs on the client-side
+  // after the initial render, avoiding build-time errors.
   useEffect(() => {
       async function loadSettings() {
           const loadedSettings = await getGeneralSettings();
           setSettings(loadedSettings);
       }
-      loadSettings();
+      if (typeof window !== 'undefined') {
+        loadSettings();
+      }
   }, []);
 
 
