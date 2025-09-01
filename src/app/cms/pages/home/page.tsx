@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink } from '@/services/settings';
+import { Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink } from '@/types/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight, GripVertical } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -522,7 +523,7 @@ export default function CmsHomePage() {
           featureSectionHeadingColor: initialSettings.featureSectionHeadingColor ?? 'text-foreground',
           featureSectionHeadingSize: initialSettings.featureSectionHeadingSize ?? 48,
           featureSectionHeadingSizeMobile: initialSettings.featureSectionHeadingSizeMobile ?? 36,
-          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
+          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
           featureSectionBodyColor: initialSettings.featureSectionBodyColor ?? 'text-muted-foreground',
           featureSectionBodySize: initialSettings.featureSectionBodySize ?? 18,
           featureSectionBodySizeMobile: initialSettings.featureSectionBodySizeMobile ?? 16,
