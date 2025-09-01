@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2, Monitor, Smartphone, ExternalLink } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone, ExternalLink, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -431,7 +431,15 @@ export default function CmsHomePage() {
           heroDescriptionSize: initialSettings.heroDescriptionSize ?? 18,
           heroDescriptionSizeMobile: initialSettings.heroDescriptionSizeMobile ?? 16,
           heroImageUrl: initialSettings.heroImageUrl ?? 'https://picsum.photos/1920/1280',
-          
+          heroAlignment: initialSettings.heroAlignment ?? 'center',
+          heroVerticalAlignment: initialSettings.heroVerticalAlignment ?? 'center',
+          heroTextMaxWidth: initialSettings.heroTextMaxWidth ?? 700,
+          heroCtaEnabled: initialSettings.heroCtaEnabled ?? false,
+          heroCtaText: initialSettings.heroCtaText ?? 'Kontakt Os',
+          heroCtaLink: initialSettings.heroCtaLink ?? '#kontakt',
+          heroCtaVariant: initialSettings.heroCtaVariant ?? 'default',
+          heroCtaSize: initialSettings.heroCtaSize ?? 'lg',
+
           servicesSectionTitle: initialSettings.servicesSectionTitle ?? "Vores Services",
           servicesSectionTitleColor: initialSettings.servicesSectionTitleColor ?? "text-black",
           servicesSectionTitleSize: initialSettings.servicesSectionTitleSize ?? 36,
@@ -631,6 +639,100 @@ export default function CmsHomePage() {
                             onMobileSizeChange={(v) => handleInputChange('heroDescriptionSizeMobile', v)}
                             previewMode={previewMode}
                         />
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <h3 className="font-semibold">Tekst Justering &amp; Placering</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                <div className="space-y-2">
+                                    <Label>Horisontal Placering</Label>
+                                    <ToggleGroup 
+                                        type="single" 
+                                        value={settings.heroAlignment}
+                                        onValueChange={(value: 'left' | 'center' | 'right') => value && handleInputChange('heroAlignment', value)}
+                                        className='w-full'
+                                    >
+                                        <ToggleGroupItem value="left" aria-label="Venstre" className='flex-1'><AlignHorizontalJustifyStart className='h-4 w-4'/></ToggleGroupItem>
+                                        <ToggleGroupItem value="center" aria-label="Center" className='flex-1'><AlignHorizontalJustifyCenter className='h-4 w-4'/></ToggleGroupItem>
+                                        <ToggleGroupItem value="right" aria-label="Højre" className='flex-1'><AlignHorizontalJustifyEnd className='h-4 w-4'/></ToggleGroupItem>
+                                    </ToggleGroup>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Vertikal Placering</Label>
+                                    <ToggleGroup 
+                                        type="single" 
+                                        value={settings.heroVerticalAlignment}
+                                        onValueChange={(value: 'top' | 'center' | 'bottom') => value && handleInputChange('heroVerticalAlignment', value)}
+                                        className='w-full'
+                                    >
+                                        <ToggleGroupItem value="top" aria-label="Top" className='flex-1'><AlignVerticalJustifyStart className='h-4 w-4'/></ToggleGroupItem>
+                                        <ToggleGroupItem value="center" aria-label="Center" className='flex-1'><AlignVerticalJustifyCenter className='h-4 w-4'/></ToggleGroupItem>
+                                        <ToggleGroupItem value="bottom" aria-label="Bund" className='flex-1'><AlignVerticalJustifyEnd className='h-4 w-4'/></ToggleGroupItem>
+                                    </ToggleGroup>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Maksimal tekstbredde</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.heroTextMaxWidth}px</span>
+                                </div>
+                                <Slider 
+                                    value={[settings.heroTextMaxWidth || 700]} 
+                                    onValueChange={([v]) => handleInputChange('heroTextMaxWidth', v)}
+                                    min={300}
+                                    max={1200}
+                                    step={10}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-semibold">Call to Action Knap</h3>
+                                <Switch
+                                    checked={settings.heroCtaEnabled}
+                                    onCheckedChange={(value) => handleInputChange('heroCtaEnabled', value)}
+                                />
+                            </div>
+                            {settings.heroCtaEnabled && (
+                                <div className='space-y-4'>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="hero-cta-text">Knap Tekst</Label>
+                                        <Input id="hero-cta-text" value={settings.heroCtaText || ''} onChange={e => handleInputChange('heroCtaText', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="hero-cta-link">Knap Link</Label>
+                                        <Input id="hero-cta-link" value={settings.heroCtaLink || ''} onChange={e => handleInputChange('heroCtaLink', e.target.value)} placeholder="f.eks. #kontakt eller https://google.com" />
+                                    </div>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                        <div className="space-y-2">
+                                            <Label>Knap Design</Label>
+                                            <Select value={settings.heroCtaVariant} onValueChange={(v) => handleInputChange('heroCtaVariant', v)}>
+                                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="default">Default</SelectItem>
+                                                    <SelectItem value="secondary">Secondary</SelectItem>
+                                                    <SelectItem value="outline">Outline</SelectItem>
+                                                    <SelectItem value="destructive">Destructive</SelectItem>
+                                                    <SelectItem value="ghost">Ghost</SelectItem>
+                                                    <SelectItem value="link">Link</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                         <div className="space-y-2">
+                                            <Label>Knap Størrelse</Label>
+                                            <Select value={settings.heroCtaSize} onValueChange={(v) => handleInputChange('heroCtaSize', v)}>
+                                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="default">Default</SelectItem>
+                                                    <SelectItem value="sm">Small</SelectItem>
+                                                    <SelectItem value="lg">Large</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
                             <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} className="w-full" />

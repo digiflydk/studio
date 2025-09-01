@@ -1,10 +1,15 @@
+
+'use client';
 import Image from 'next/image';
 import { type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { CSSProperties } from 'react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
-
+  const pathname = usePathname();
   const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
   const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
   const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
@@ -13,18 +18,62 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
   const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
   const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
   const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
-  
+  const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
+
   const heroStyles = {
     '--headline-desktop-size': `${headlineDesktopSize}px`,
     '--headline-mobile-size': `${headlineMobileSize}px`,
     '--description-desktop-size': `${descriptionDesktopSize}px`,
     '--description-mobile-size': `${descriptionMobileSize}px`,
+    '--text-max-width': `${textMaxWidth}px`,
   } as CSSProperties;
+
+  const alignmentClasses = {
+    vertical: {
+      top: 'items-start pt-32',
+      center: 'items-center',
+      bottom: 'items-end pb-32',
+    },
+    horizontal: {
+      left: 'text-left items-start',
+      center: 'text-center items-center',
+      right: 'text-right items-end',
+    }
+  };
+
+  const verticalAlign = settings?.heroVerticalAlignment || 'center';
+  const horizontalAlign = settings?.heroAlignment || 'center';
+
+  const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      if (pathname !== '/') {
+        window.location.href = `/${href}`;
+        return;
+      }
+      
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+          const headerOffset = settings?.headerHeight || 64;
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth"
+          });
+      }
+    }
+  };
 
   return (
     <section
       id="hero"
-      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex items-center justify-center text-center py-0"
+      className={cn(
+        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center py-0",
+        alignmentClasses.vertical[verticalAlign],
+      )}
       style={heroStyles}
     >
       <style>
@@ -34,6 +83,9 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
           }
           .hero-description {
             font-size: var(--description-mobile-size);
+          }
+          .hero-text-container {
+            max-width: var(--text-max-width);
           }
           @media (min-width: 768px) {
             .hero-headline {
@@ -53,18 +105,34 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         className="object-cover -z-10 brightness-50"
         priority
       />
-      <div className="container px-4 md:px-6 text-white">
-        <div className="flex flex-col items-center space-y-6">
+      <div className={cn("container px-4 md:px-6 text-white flex", alignmentClasses.horizontal[horizontalAlign] === 'text-center items-center' ? 'justify-center' : alignmentClasses.horizontal[horizontalAlign].includes('left') ? 'justify-start' : 'justify-end')}>
+        <div className={cn(
+            "flex flex-col space-y-6 hero-text-container",
+            alignmentClasses.horizontal[horizontalAlign]
+        )}>
           <h1 
             className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
           >
             {headline}
           </h1>
           <p 
-            className={cn("hero-description max-w-[700px] text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+            className={cn("hero-description text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
           >
             {description}
           </p>
+          {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
+             <div className="pt-4">
+                <Button
+                  asChild
+                  size={settings.heroCtaSize || 'lg'}
+                  variant={settings.heroCtaVariant || 'default'}
+                >
+                  <Link href={settings.heroCtaLink} onClick={(e) => handleScrollLinkClick(e, settings.heroCtaLink!)}>
+                    {settings.heroCtaText}
+                  </Link>
+                </Button>
+            </div>
+          )}
         </div>
       </div>
     </section>

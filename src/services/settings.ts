@@ -169,6 +169,14 @@ export interface GeneralSettings {
     heroDescriptionSize?: number;
     heroDescriptionSizeMobile?: number;
     heroImageUrl?: string;
+    heroAlignment?: 'left' | 'center' | 'right';
+    heroVerticalAlignment?: 'top' | 'center' | 'bottom';
+    heroTextMaxWidth?: number;
+    heroCtaEnabled?: boolean;
+    heroCtaText?: string;
+    heroCtaLink?: string;
+    heroCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+    heroCtaSize?: 'default' | 'sm' | 'lg' | 'icon';
     
     servicesSectionTitle?: string;
     servicesSectionTitleColor?: string;
@@ -255,11 +263,11 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
         if (docSnap.exists()) {
             const data = docSnap.data() as GeneralSettings;
             // Backwards compatibility for old header settings
-            if (data.headerBackgroundColor && !data.headerScrolledBackgroundColor) {
-                data.headerScrolledBackgroundColor = data.headerBackgroundColor;
+            if ('headerBackgroundColor' in data && !data.headerScrolledBackgroundColor) {
+                data.headerScrolledBackgroundColor = (data as any).headerBackgroundColor;
             }
-             if (data.headerBackgroundOpacity && !data.headerScrolledBackgroundOpacity) {
-                data.headerScrolledBackgroundOpacity = data.headerBackgroundOpacity;
+             if ('headerBackgroundOpacity' in data && !data.headerScrolledBackgroundOpacity) {
+                data.headerScrolledBackgroundOpacity = (data as any).headerBackgroundOpacity;
             }
             return data;
         }
