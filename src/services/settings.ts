@@ -24,10 +24,11 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
             }
             return data;
         }
+        console.log("SETTINGS_SERVICE_INFO: Settings document does not exist.");
         return null;
     } catch (error) {
-        console.error("Error fetching general settings: ", error);
-        return null;
+        console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
+        throw new Error("Could not fetch settings from Firestore.");
     }
 }
 

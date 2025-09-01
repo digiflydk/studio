@@ -19,7 +19,7 @@ export async function generateMetadata(
   try {
     settings = await getGeneralSettings();
   } catch (error) {
-    console.error("Failed to fetch settings for metadata:", error);
+    console.error("METADATA_FETCH_ERROR: Failed to fetch settings for metadata. This might be expected during build time.", error);
   }
   const previousImages = (await parent).openGraph?.images || [];
 
@@ -69,7 +69,7 @@ export default async function RootLayout({
   try {
       settings = await getGeneralSettings();
   } catch (error) {
-      console.error("Failed to fetch settings for layout:", error);
+      console.error("LAYOUT_FETCH_ERROR: Failed to fetch settings for layout. This might be expected during build time.", error);
   }
   return (
     <html lang="en" className="scroll-smooth">
