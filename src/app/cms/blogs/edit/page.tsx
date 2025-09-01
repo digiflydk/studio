@@ -61,10 +61,7 @@ function EditBlogPostForm() {
       setIsLoading(true);
       getBlogPostAction(postId).then(post => {
         if (post) {
-          form.reset({
-            ...post,
-            publishedAt: undefined, // ensure this is not in the form data
-          });
+          form.reset(post);
         } else {
             toast({ title: "Fejl", description: "Kunne ikke finde blogindlægget.", variant: "destructive"});
             router.push('/cms/blogs');

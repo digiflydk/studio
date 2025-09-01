@@ -143,7 +143,11 @@ export async function saveBlogPostAction(postData: Omit<BlogPost, 'id' | 'publis
             if (!existingPost) {
                 throw new Error("Post not found");
             }
-            const updatedPost = { ...existingPost, ...postData };
+            const updatedPost = { 
+                ...existingPost, 
+                ...postData,
+                publishedAt: existingPost.publishedAt, // Preserve original date
+            };
             updatedPosts = posts.map(p => p.id === postData.id ? updatedPost : p);
             message = 'Blogindlæg er blevet opdateret.';
         } else {
@@ -160,7 +164,9 @@ export async function saveBlogPostAction(postData: Omit<BlogPost, 'id' | 'publis
         await saveGeneralSettings({ blogPosts: updatedPosts });
         revalidatePath('/cms/blogs');
         revalidatePath('/blog');
-        revalidatePath(`/blog/${postData.slug}`);
+        if (postData.slug) {
+            revalidatePath(`/blog/${postData.slug}`);
+        }
 
         const sortedPosts = updatedPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
