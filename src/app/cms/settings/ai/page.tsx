@@ -74,8 +74,8 @@ const openAIPrompt = `You are an expert AI assistant for Digifly, a digital cons
   - Do NOT set \`shouldBookMeeting\`.
 
 - **Once you have ALL necessary information (Name, Email, Phone, Features, Budget, Timeline):**
-  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`.
-  - If it's a clear mismatch (e.g., marketing, graphic design), set \`qualified\` to \`false\`.
+  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified` to \`true\` and \`shouldBookMeeting\` to \`true\`.
+  - If it's a clear mismatch (e.g., marketing, graphic design), set \`qualified` to \`false\`.
   - Fill the \`collectedInfo\` object with all collected information.
   - Do not ask more questions.
 `;
@@ -105,10 +105,6 @@ export default function AiSettingsPage() {
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
 
-  // We can't access process.env on the client, so we can't be 100% sure.
-  // This is a simple check. If the user has *ever* entered a key in the session,
-  // we assume it's been set in .env. A more robust solution would require
-  // a server-side check.
   const isOpenAIKeyLikelySet = !!settings.openAIKey;
 
 
@@ -145,7 +141,6 @@ export default function AiSettingsPage() {
   
   const handleProviderChange = (value: 'googleai' | 'openai') => {
       const newProvider = value;
-      // Set a default model for the new provider
       const newModel = newProvider === 'openai' ? openAIModels[0].value : googleModels[0].value;
       setSettings(prev => ({
           ...prev,
@@ -247,10 +242,12 @@ export default function AiSettingsPage() {
                         type="password"
                         value={settings.openAIKey || ''}
                         onChange={(e) => handleInputChange('openAIKey', e.target.value)}
-                        placeholder="Indsæt din OpenAI API nøgle (sk-...)"
+                        placeholder="sk-..."
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground">Af sikkerhedsmæssige årsager gemmes nøglen ikke i databasen. For at siden kan bruge nøglen, skal den tilføjes til `.env`-filen i formatet: `OPENAI_API_KEY=sk-...`.</p>
+                   <p className="text-sm text-muted-foreground">
+                    Af sikkerhedsmæssige årsager gemmes din nøgle **ikke** i databasen. For at aktivere OpenAI, **skal** du tilføje nøglen til din <code className="bg-muted px-1 py-0.5 rounded-sm">.env</code> fil i formatet: <code className="bg-muted px-1 py-0.5 rounded-sm">OPENAI_API_KEY=sk-...</code>.
+                  </p>
                 </div>
 
                 {!isOpenAIKeyLikelySet && (
@@ -299,5 +296,3 @@ export default function AiSettingsPage() {
     </div>
   );
 }
-
-    
