@@ -1,5 +1,6 @@
 
 import type { Metadata, ResolvingMetadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getGeneralSettings } from '@/services/settings';
@@ -7,6 +8,8 @@ import { ReactNode } from 'react';
 import Script from 'next/script';
 import Analytics from '@/components/analytics';
 import { ThemeContextWrapper } from '@/context/ThemeContextWrapper';
+
+const inter = Inter({ subsets: ['latin'] })
 
 export async function generateMetadata(
   {},
@@ -68,11 +71,8 @@ export default async function RootLayout({
             }
           `}
         </Script>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
+      <body className={`${inter.className} antialiased`}>
         <ThemeContextWrapper settings={settings}>
             {children}
             <Analytics settings={settings} />
@@ -82,4 +82,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

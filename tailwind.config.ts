@@ -10,11 +10,6 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
-        code: ['monospace'],
-      },
       fontSize: {
         'h1': ['var(--font-size-h1)', { lineHeight: '1.1', fontWeight: '700' }],
         'h2': ['var(--font-size-h2)', { lineHeight: '2.5rem', fontWeight: '700' }],
