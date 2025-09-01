@@ -774,45 +774,31 @@ export default function CmsHomePage() {
                             <Label htmlFor="services-title">Sektionstitel</Label>
                             <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionstitel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.servicesSectionTitleColor as ThemeColor || 'text-black'} onValueChange={(v) => handleInputChange('servicesSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                             <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.servicesSectionTitleSize || 36}px</span>
-                                </div>
-                                <Slider value={[settings.servicesSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('servicesSectionTitleSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.servicesSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('servicesSectionTitleColor', v)}
+                            desktopSize={settings.servicesSectionTitleSize || 36}
+                            onDesktopSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
+                            mobileSize={settings.servicesSectionTitleSize || 36}
+                            onMobileSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
+                            previewMode={previewMode}
+                        />
 
                         <div className="space-y-2">
                             <Label htmlFor="services-description">Sektionsbeskrivelse</Label>
                             <Textarea id="services-description" value={settings.servicesSectionDescription || ''} onChange={e => handleInputChange('servicesSectionDescription', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                             <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
-                             <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                             <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.servicesSectionDescriptionSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.servicesSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('servicesSectionDescriptionSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                             label="Design for Sektionsbeskrivelse"
+                             colorValue={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             onColorChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}
+                             desktopSize={settings.servicesSectionDescriptionSize || 18}
+                             onDesktopSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
+                             mobileSize={settings.servicesSectionDescriptionSize || 18}
+                             onMobileSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
+                             previewMode={previewMode}
+                        />
 
                         <Label>Service-kort</Label>
                         <Accordion type="multiple" className="w-full border rounded-md">
@@ -868,45 +854,32 @@ export default function CmsHomePage() {
                             <Label htmlFor="ai-project-title">Titel</Label>
                             <Input id="ai-project-title" value={settings.aiProjectSectionTitle || ''} onChange={e => handleInputChange('aiProjectSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                         <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Titel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.aiProjectSectionTitleColor as ThemeColor || 'text-white'} onValueChange={(v) => handleInputChange('aiProjectSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.aiProjectSectionTitleSize || 36}px</span>
-                                </div>
-                                <Slider value={[settings.aiProjectSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('aiProjectSectionTitleSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Titel"
+                            colorValue={settings.aiProjectSectionTitleColor as ThemeColor || 'text-white'}
+                            onColorChange={(v) => handleInputChange('aiProjectSectionTitleColor', v)}
+                            desktopSize={settings.aiProjectSectionTitleSize || 36}
+                            onDesktopSizeChange={(v) => handleInputChange('aiProjectSectionTitleSize', v)}
+                            mobileSize={settings.aiProjectSectionTitleSize || 36}
+                            onMobileSizeChange={(v) => handleInputChange('aiProjectSectionTitleSize', v)}
+                            previewMode={previewMode}
+                        />
 
                         <div className="space-y-2">
                             <Label htmlFor="ai-project-description">Beskrivelse</Label>
                             <Textarea id="ai-project-description" value={settings.aiProjectSectionDescription || ''} onChange={e => handleInputChange('aiProjectSectionDescription', e.target.value)} rows={4} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Beskrivelse</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.aiProjectSectionDescriptionColor as ThemeColor || 'text-gray-300'} onValueChange={(v) => handleInputChange('aiProjectSectionDescriptionColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.aiProjectSectionDescriptionSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.aiProjectSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('aiProjectSectionDescriptionSize', v)} min={10} max={48} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Beskrivelse"
+                            colorValue={settings.aiProjectSectionDescriptionColor as ThemeColor || 'text-gray-300'}
+                            onColorChange={(v) => handleInputChange('aiProjectSectionDescriptionColor', v)}
+                            desktopSize={settings.aiProjectSectionDescriptionSize || 18}
+                            onDesktopSizeChange={(v) => handleInputChange('aiProjectSectionDescriptionSize', v)}
+                            mobileSize={settings.aiProjectSectionDescriptionSize || 18}
+                            onMobileSizeChange={(v) => handleInputChange('aiProjectSectionDescriptionSize', v)}
+                            previewMode={previewMode}
+                        />
+
                         {settings.aiProjectSectionBackgroundColor &&
                           <HslColorPicker 
                               label="Baggrundsfarve (Mørk)"
@@ -944,44 +917,32 @@ export default function CmsHomePage() {
                             <Label htmlFor="cases-title">Sektionstitel</Label>
                             <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionstitel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.casesSectionTitleColor as ThemeColor || 'text-black'} onValueChange={(v) => handleInputChange('casesSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.casesSectionTitleSize || 36}px</span>
-                                </div>
-                                <Slider value={[settings.casesSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('casesSectionTitleSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.casesSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('casesSectionTitleColor', v)}
+                            desktopSize={settings.casesSectionTitleSize || 36}
+                            onDesktopSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
+                            mobileSize={settings.casesSectionTitleSize || 36}
+                            onMobileSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
+                            previewMode={previewMode}
+                        />
+
                         <div className="space-y-2">
                             <Label htmlFor="cases-description">Sektionsbeskrivelse</Label>
                             <Textarea id="cases-description" value={settings.casesSectionDescription || ''} onChange={e => handleInputChange('casesSectionDescription', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.casesSectionDescriptionSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.casesSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('casesSectionDescriptionSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                             label="Design for Sektionsbeskrivelse"
+                             colorValue={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             onColorChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}
+                             desktopSize={settings.casesSectionDescriptionSize || 18}
+                             onDesktopSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
+                             mobileSize={settings.casesSectionDescriptionSize || 18}
+                             onMobileSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
+                             previewMode={previewMode}
+                        />
+
                         <Label>Case-kort</Label>
                         <Accordion type="multiple" className="w-full border rounded-md">
                             {(settings.cases || []).map((caseItem, index) => (
@@ -1033,90 +994,68 @@ export default function CmsHomePage() {
                             <Label htmlFor="about-title">Sektionstitel</Label>
                             <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                         <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionstitel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.aboutSectionTitleColor as ThemeColor || 'text-black'} onValueChange={(v) => handleInputChange('aboutSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.aboutSectionTitleSize || 36}px</span>
-                                </div>
-                                <Slider value={[settings.aboutSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('aboutSectionTitleSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                           label="Design for Sektionstitel"
+                           colorValue={settings.aboutSectionTitleColor as ThemeColor || 'text-black'}
+                           onColorChange={(v) => handleInputChange('aboutSectionTitleColor', v)}
+                           desktopSize={settings.aboutSectionTitleSize || 36}
+                           onDesktopSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
+                           mobileSize={settings.aboutSectionTitleSize || 36}
+                           onMobileSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
+                           previewMode={previewMode}
+                        />
+
                         <div className="space-y-2">
                             <Label htmlFor="about-text">Intro tekst</Label>
                             <Textarea id="about-text" value={settings.aboutText || ''} onChange={e => handleInputChange('aboutText', e.target.value)} rows={5} className="w-full" />
                         </div>
-                         <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Intro Tekst</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('aboutTextColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.aboutTextSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.aboutTextSize || 18]} onValueChange={([v]) => handleInputChange('aboutTextSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                           label="Design for Intro Tekst"
+                           colorValue={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'}
+                           onColorChange={(v) => handleInputChange('aboutTextColor', v)}
+                           desktopSize={settings.aboutTextSize || 18}
+                           onDesktopSizeChange={(v) => handleInputChange('aboutTextSize', v)}
+                           mobileSize={settings.aboutTextSize || 18}
+                           onMobileSizeChange={(v) => handleInputChange('aboutTextSize', v)}
+                           previewMode={previewMode}
+                        />
+
                         <div className="space-y-2">
                              <Label>Team</Label>
                              <div className="p-4 border rounded-lg bg-muted/20 space-y-4">
                                 <h3 className="font-semibold">Design for teammedlemmer</h3>
-                                <div className="space-y-2">
-                                    <Label>Navn farve</Label>
-                                    <Select value={settings.teamMemberNameColor as ThemeColor || 'text-foreground'} onValueChange={(v) => handleInputChange('teamMemberNameColor', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                    </Select>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     <TextStyleEditor 
+                                        label="Navn"
+                                        colorValue={settings.teamMemberNameColor as ThemeColor || 'text-foreground'}
+                                        onColorChange={(v) => handleInputChange('teamMemberNameColor', v)}
+                                        desktopSize={settings.teamMemberNameSize || 18}
+                                        onDesktopSizeChange={(v) => handleInputChange('teamMemberNameSize', v)}
+                                        mobileSize={settings.teamMemberNameSize || 18}
+                                        onMobileSizeChange={(v) => handleInputChange('teamMemberNameSize', v)}
+                                        previewMode={previewMode}
+                                    />
+                                      <TextStyleEditor 
+                                        label="Titel"
+                                        colorValue={settings.teamMemberTitleColor as ThemeColor || 'text-primary'}
+                                        onColorChange={(v) => handleInputChange('teamMemberTitleColor', v)}
+                                        desktopSize={settings.teamMemberTitleSize || 14}
+                                        onDesktopSizeChange={(v) => handleInputChange('teamMemberTitleSize', v)}
+                                        mobileSize={settings.teamMemberTitleSize || 14}
+                                        onMobileSizeChange={(v) => handleInputChange('teamMemberTitleSize', v)}
+                                        previewMode={previewMode}
+                                    />
                                 </div>
-                                <div className="space-y-2">
-                                     <div className="flex justify-between items-center">
-                                        <Label>Navn Tekststørrelse</Label>
-                                        <span className="text-sm text-muted-foreground">{settings.teamMemberNameSize || 18}px</span>
-                                    </div>
-                                    <Slider value={[settings.teamMemberNameSize || 18]} onValueChange={([v]) => handleInputChange('teamMemberNameSize', v)} min={12} max={32} step={1} />
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label>Titel farve</Label>
-                                    <Select value={settings.teamMemberTitleColor as ThemeColor || 'text-primary'} onValueChange={(v) => handleInputChange('teamMemberTitleColor', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                     <div className="flex justify-between items-center">
-                                        <Label>Titel Tekststørrelse</Label>
-                                        <span className="text-sm text-muted-foreground">{settings.teamMemberTitleSize || 14}px</span>
-                                    </div>
-                                    <Slider value={[settings.teamMemberTitleSize || 14]} onValueChange={([v]) => handleInputChange('teamMemberTitleSize', v)} min={10} max={24} step={1} />
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label>Beskrivelse farve</Label>
-                                    <Select value={settings.teamMemberDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('teamMemberDescriptionColor', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                     <div className="flex justify-between items-center">
-                                        <Label>Beskrivelse Tekststørrelse</Label>
-                                        <span className="text-sm text-muted-foreground">{settings.teamMemberDescriptionSize || 14}px</span>
-                                    </div>
-                                    <Slider value={[settings.teamMemberDescriptionSize || 14]} onValueChange={([v]) => handleInputChange('teamMemberDescriptionSize', v)} min={10} max={24} step={1} />
-                                </div>
+                                <TextStyleEditor 
+                                    label="Beskrivelse"
+                                    colorValue={settings.teamMemberDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                                    onColorChange={(v) => handleInputChange('teamMemberDescriptionColor', v)}
+                                    desktopSize={settings.teamMemberDescriptionSize || 14}
+                                    onDesktopSizeChange={(v) => handleInputChange('teamMemberDescriptionSize', v)}
+                                    mobileSize={settings.teamMemberDescriptionSize || 14}
+                                    onMobileSizeChange={(v) => handleInputChange('teamMemberDescriptionSize', v)}
+                                    previewMode={previewMode}
+                                />
                              </div>
                         </div>
 
@@ -1171,45 +1110,32 @@ export default function CmsHomePage() {
                             <Label htmlFor="customers-title">Sektionstitel</Label>
                             <Input id="customers-title" value={settings.customersSectionTitle || ''} onChange={e => handleInputChange('customersSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionstitel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.customersSectionTitleColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('customersSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.customersSectionTitleSize || 16}px</span>
-                                </div>
-                                <Slider value={[settings.customersSectionTitleSize || 16]} onValueChange={([v]) => handleInputChange('customersSectionTitleSize', v)} min={12} max={48} step={1} />
-                            </div>
-                        </div>
+                         <TextStyleEditor 
+                             label="Design for Sektionstitel"
+                             colorValue={settings.customersSectionTitleColor as ThemeColor || 'text-muted-foreground'}
+                             onColorChange={(v) => handleInputChange('customersSectionTitleColor', v)}
+                             desktopSize={settings.customersSectionTitleSize || 16}
+                             onDesktopSizeChange={(v) => handleInputChange('customersSectionTitleSize', v)}
+                             mobileSize={settings.customersSectionTitleSize || 16}
+                             onMobileSizeChange={(v) => handleInputChange('customersSectionTitleSize', v)}
+                             previewMode={previewMode}
+                         />
 
                         <div className="space-y-2">
                             <Label htmlFor="customers-description">Sektionsbeskrivelse</Label>
                             <Textarea id="customers-description" value={settings.customersSectionDescription || ''} onChange={e => handleInputChange('customersSectionDescription', e.target.value)} className="w-full" />
                         </div>
-                         <div className="p-4 border rounded-lg bg-muted/20">
-                             <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
-                             <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.customersSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('customersSectionDescriptionColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                             <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.customersSectionDescriptionSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.customersSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('customersSectionDescriptionSize', v)} min={10} max={32} step={1} />
-                            </div>
-                        </div>
+                         <TextStyleEditor 
+                             label="Design for Sektionsbeskrivelse"
+                             colorValue={settings.customersSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             onColorChange={(v) => handleInputChange('customersSectionDescriptionColor', v)}
+                             desktopSize={settings.customersSectionDescriptionSize || 18}
+                             onDesktopSizeChange={(v) => handleInputChange('customersSectionDescriptionSize', v)}
+                             mobileSize={settings.customersSectionDescriptionSize || 18}
+                             onMobileSizeChange={(v) => handleInputChange('customersSectionDescriptionSize', v)}
+                             previewMode={previewMode}
+                         />
+
                         {settings.customersSectionBackgroundColor &&
                           <HslColorPicker 
                               label="Baggrundsfarve"
@@ -1247,45 +1173,32 @@ export default function CmsHomePage() {
                             <Label htmlFor="blog-title">Sektionstitel</Label>
                             <Input id="blog-title" value={settings.blogSectionTitle || ''} onChange={e => handleInputChange('blogSectionTitle', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionstitel</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.blogSectionTitleColor as ThemeColor || 'text-black'} onValueChange={(v) => handleInputChange('blogSectionTitleColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.blogSectionTitleSize || 36}px</span>
-                                </div>
-                                <Slider value={[settings.blogSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('blogSectionTitleSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionstitel"
+                            colorValue={settings.blogSectionTitleColor as ThemeColor || 'text-black'}
+                            onColorChange={(v) => handleInputChange('blogSectionTitleColor', v)}
+                            desktopSize={settings.blogSectionTitleSize || 36}
+                            onDesktopSizeChange={(v) => handleInputChange('blogSectionTitleSize', v)}
+                            mobileSize={settings.blogSectionTitleSize || 36}
+                            onMobileSizeChange={(v) => handleInputChange('blogSectionTitleSize', v)}
+                            previewMode={previewMode}
+                        />
 
                         <div className="space-y-2">
                             <Label htmlFor="blog-description">Sektionsbeskrivelse</Label>
                             <Textarea id="blog-description" value={settings.blogSectionDescription || ''} onChange={e => handleInputChange('blogSectionDescription', e.target.value)} className="w-full" />
                         </div>
-                        <div className="p-4 border rounded-lg bg-muted/20">
-                            <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
-                            <div className="space-y-2 mt-2">
-                                <Label>Farve</Label>
-                                <Select value={settings.blogSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('blogSectionDescriptionColor', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2 mt-2">
-                                <div className="flex justify-between items-center">
-                                    <Label>Tekststørrelse</Label>
-                                    <span className="text-sm text-muted-foreground">{settings.blogSectionDescriptionSize || 18}px</span>
-                                </div>
-                                <Slider value={[settings.blogSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('blogSectionDescriptionSize', v)} min={10} max={120} step={1} />
-                            </div>
-                        </div>
+                        <TextStyleEditor 
+                            label="Design for Sektionsbeskrivelse"
+                            colorValue={settings.blogSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                            onColorChange={(v) => handleInputChange('blogSectionDescriptionColor', v)}
+                            desktopSize={settings.blogSectionDescriptionSize || 18}
+                            onDesktopSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}
+                            mobileSize={settings.blogSectionDescriptionSize || 18}
+                            onMobileSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}
+                            previewMode={previewMode}
+                        />
+
                         {settings.blogSectionBackgroundColor &&
                           <HslColorPicker 
                               label="Baggrundsfarve"
