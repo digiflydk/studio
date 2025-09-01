@@ -5,7 +5,5 @@ import OpenAI from 'openai';
 export const ai = genkit({
   plugins: [
     googleAI(),
-    // The OpenAI plugin is initialized dynamically in the flow
-    // new OpenAI(),
   ],
 });

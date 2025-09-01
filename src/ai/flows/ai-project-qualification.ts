@@ -13,6 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { getGeneralSettings } from '@/services/settings';
 import { saveLead } from '@/services/leads';
+import { defineOpenAIPlugin } from 'genkitx-openai';
 
 const CollectedInfoSchema = z.object({
   name: z.string().nullable().describe("The user's full name."),
@@ -60,7 +61,7 @@ const aiProjectQualificationFlow = ai.defineFlow(
 
     const settings = await getGeneralSettings();
     const provider = settings?.aiProvider || 'googleai';
-    const model = settings?.aiModel || 'googleai/gemini-1.5-flash';
+    const modelName = settings?.aiModel || 'googleai/gemini-1.5-flash';
     
     let systemPrompt: string;
     if (provider === 'openai' && settings?.aiSystemPromptOpenAI) {
@@ -68,19 +69,25 @@ const aiProjectQualificationFlow = ai.defineFlow(
     } else {
         systemPrompt = settings?.aiSystemPrompt || defaultSystemPrompt;
     }
+    
+    let model: any;
+    if (provider === 'openai') {
+        if (!process.env.OPENAI_API_KEY) {
+            console.warn("OpenAI provider selected, but OPENAI_API_KEY is not set. Falling back to Google AI.");
+            model = 'googleai/gemini-1.5-flash'
+        } else {
+            model = defineOpenAIPlugin({apiKey: process.env.OPENAI_API_KEY}).model(modelName.replace('openai/', ''));
+        }
+    } else {
+        model = modelName;
+    }
 
     const qualificationPrompt = ai.definePrompt({
         name: 'aiProjectQualificationPrompt',
         input: { schema: z.object({ conversationHistory: z.any() }) }, 
         output: { schema: AIProjectQualificationOutputSchema },
-        model: model as any,
+        model: model,
         prompt: systemPrompt,
-        config: {
-            // Pass the OpenAI API key if the provider is OpenAI
-            ...(provider === 'openai' && process.env.OPENAI_API_KEY && {
-                apiKey: process.env.OPENAI_API_KEY
-            })
-        }
     });
     
     const {output} = await qualificationPrompt({ conversationHistory: input.conversationHistory });
