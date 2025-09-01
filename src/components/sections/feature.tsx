@@ -63,54 +63,71 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
 
     const alignment = settings?.featureSectionAlignment || 'left';
     const alignmentClasses = {
-        left: 'text-left items-start',
-        center: 'text-center items-center',
-        right: 'text-right items-end',
+        left: 'md:text-left md:items-start',
+        center: 'md:text-center md:items-center',
+        right: 'md:text-right md:items-end',
     };
+    
+    const textContent = (
+        <div className={cn('flex flex-col space-y-6 text-center', alignmentClasses[alignment])}>
+            <h2
+                className={cn("text-h2 font-bold tracking-tight", settings?.featureSectionHeadingColor)}
+                style={headingStyle}
+            >
+                {heading}
+            </h2>
+            <p
+                className={cn("text-body", settings?.featureSectionBodyColor || 'text-muted-foreground')}
+                style={bodyStyle}
+            >
+                {body}
+            </p>
+            {ctaText && ctaLink && (
+                <div className="pt-4">
+                    <Button
+                        asChild
+                        size={ctaSize}
+                        variant={ctaVariant}
+                        style={ctaStyle}
+                    >
+                        <Link href={getLinkHref(ctaLink)}>
+                            {ctaText}
+                            {ctaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Link>
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
+    
+    const imageContent = (
+         <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-xl">
+            <Image
+                src={imageUrl}
+                alt={heading}
+                data-ai-hint={aiHint}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+            />
+        </div>
+    );
 
     return (
         <section id="feature" style={sectionStyle}>
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
-                    <div className={cn('flex flex-col space-y-6', alignmentClasses[alignment])}>
-                        <h2
-                            className={cn("text-h2 font-bold tracking-tight", settings?.featureSectionHeadingColor)}
-                            style={headingStyle}
-                        >
-                            {heading}
-                        </h2>
-                        <p
-                            className={cn("text-body", settings?.featureSectionBodyColor || 'text-muted-foreground')}
-                            style={bodyStyle}
-                        >
-                            {body}
-                        </p>
-                        {ctaText && ctaLink && (
-                            <div className="pt-4">
-                                <Button
-                                    asChild
-                                    size={ctaSize}
-                                    variant={ctaVariant}
-                                    style={ctaStyle}
-                                >
-                                    <Link href={getLinkHref(ctaLink)}>
-                                        {ctaText}
-                                        {ctaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                                    </Link>
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                    <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-xl">
-                        <Image
-                            src={imageUrl}
-                            alt={heading}
-                            data-ai-hint={aiHint}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                    </div>
+                    {alignment === 'right' ? (
+                        <>
+                            {imageContent}
+                            {textContent}
+                        </>
+                    ) : (
+                        <>
+                            {textContent}
+                            {imageContent}
+                        </>
+                    )}
                 </div>
             </div>
         </section>

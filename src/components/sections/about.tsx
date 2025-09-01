@@ -78,9 +78,51 @@ export default function AboutSection({ settings }: AboutSectionProps) {
 
     const alignmentClasses = {
         left: 'lg:text-left',
-        center: 'lg:text-center',
-        right: 'lg:text-right',
+        center: 'lg:text-center lg:items-center',
+        right: 'lg:text-right lg:items-end',
     };
+    
+    const textContent = (
+         <div className={cn("space-y-6 text-center", alignmentClasses[alignment])}>
+            <h2 
+            className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
+            style={titleStyle}
+            >
+            {title}
+            </h2>
+            <p 
+            className={cn("text-body", settings?.aboutTextColor || "text-muted-foreground")}
+            style={textStyle}
+            >
+            {aboutText}
+            </p>
+        </div>
+    );
+    
+    const teamContent = (
+        <div className="grid grid-cols-1 gap-8">
+            {team.map((member) => (
+            <div key={member.name} className="flex items-start space-x-4">
+                <Avatar className="w-16 h-16 border-2 border-primary">
+                <AvatarImage src={member.imageUrl} alt={`${member.name} - ${member.title}`} data-ai-hint={member.aiHint} />
+                <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                <div className="flex items-center justify-between">
+                    <div>
+                    <h3 className={cn("font-semibold", settings?.teamMemberNameColor)} style={teamMemberNameStyle}>{member.name}</h3>
+                    <p className={cn("text-sm", settings?.teamMemberTitleColor)} style={teamMemberTitleStyle}>{member.title}</p>
+                    </div>
+                    <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
+                        <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+                    </Link>
+                </div>
+                <p className={cn("mt-2 text-sm", settings?.teamMemberDescriptionColor)} style={teamMemberDescriptionStyle}>{member.description}</p>
+                </div>
+            </div>
+            ))}
+        </div>
+    );
 
     return (
         <section 
@@ -90,42 +132,17 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
-                    <div className={cn("text-center", alignmentClasses[alignment])}>
-                        <h2 
-                        className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
-                        style={titleStyle}
-                        >
-                        {title}
-                        </h2>
-                        <p 
-                        className={cn("mt-6 text-body", settings?.aboutTextColor || "text-muted-foreground")}
-                        style={textStyle}
-                        >
-                        {aboutText}
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-8">
-                        {team.map((member) => (
-                        <div key={member.name} className="flex items-start space-x-4">
-                            <Avatar className="w-16 h-16 border-2 border-primary">
-                            <AvatarImage src={member.imageUrl} alt={`${member.name} - ${member.title}`} data-ai-hint={member.aiHint} />
-                            <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                <h3 className={cn("font-semibold", settings?.teamMemberNameColor)} style={teamMemberNameStyle}>{member.name}</h3>
-                                <p className={cn("text-sm", settings?.teamMemberTitleColor)} style={teamMemberTitleStyle}>{member.title}</p>
-                                </div>
-                                <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
-                                    <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
-                                </Link>
-                            </div>
-                            <p className={cn("mt-2 text-sm", settings?.teamMemberDescriptionColor)} style={teamMemberDescriptionStyle}>{member.description}</p>
-                            </div>
-                        </div>
-                        ))}
-                    </div>
+                   {alignment === 'right' ? (
+                       <>
+                        {teamContent}
+                        {textContent}
+                       </>
+                   ) : (
+                       <>
+                        {textContent}
+                        {teamContent}
+                       </>
+                   )}
                 </div>
             </div>
         </section>

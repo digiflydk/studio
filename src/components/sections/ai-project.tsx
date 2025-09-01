@@ -30,6 +30,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const isMobile = useIsMobile();
+  const hasScrolledRef = useRef(false);
 
   const greetingMessage = settings?.aiGreetingMessage || defaultGreeting;
   const iconText = settings?.aiProjectSectionIconText || 'AI-drevet Projektkvalificering';
@@ -52,7 +53,12 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   }, [greetingMessage]);
   
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 1 || hasScrolledRef.current) {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    if (messages.length === 1 && !hasScrolledRef.current) {
+        hasScrolledRef.current = true;
+    }
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -237,3 +243,4 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     </section>
   );
 }
+
