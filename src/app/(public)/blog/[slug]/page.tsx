@@ -109,7 +109,7 @@ export default async function BlogPostPage({ params }: Props) {
           />
         </div>
 
-        <div className="prose max-w-none mx-auto text-body">
+        <div className="prose max-w-none mx-auto text-body whitespace-pre-wrap">
             <Markdown content={post.content} />
         </div>
       </div>
