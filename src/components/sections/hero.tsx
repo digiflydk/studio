@@ -39,9 +39,9 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
   const alignmentClasses = {
     vertical: {
-      top: 'items-start pt-32',
+      top: 'items-start',
       center: 'items-center',
-      bottom: 'items-end pb-32',
+      bottom: 'items-end',
     },
     horizontal: {
       left: 'text-left items-start',
@@ -80,6 +80,39 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       }
     }
   };
+
+  const content = (
+      <div className={cn(
+            "flex flex-col space-y-6 hero-text-container z-10",
+            alignmentClasses.horizontal[horizontalAlign]
+        )}>
+          <h1 
+            className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
+          >
+            {headline}
+          </h1>
+          <p 
+            className={cn("hero-description text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+          >
+            {description}
+          </p>
+          {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
+             <div className="pt-4">
+                <Button
+                  asChild
+                  size={settings.heroCtaSize || 'lg'}
+                  variant={settings.heroCtaVariant || 'default'}
+                  style={ctaStyle}
+                >
+                  <Link href={settings.heroCtaLink} onClick={(e) => handleScrollLinkClick(e, settings.heroCtaLink!)}>
+                    {settings.heroCtaText}
+                    {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                  </Link>
+                </Button>
+            </div>
+          )}
+        </div>
+  );
 
   return (
     <section
@@ -122,37 +155,14 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         />
       </div>
      
-      <div className={cn("w-full container px-4 md:px-6 text-white flex pt-[var(--header-height)]", alignmentClasses.container[horizontalAlign])}>
-        <div className={cn(
-            "flex flex-col space-y-6 hero-text-container z-10",
-            alignmentClasses.horizontal[horizontalAlign]
-        )}>
-          <h1 
-            className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
-          >
-            {headline}
-          </h1>
-          <p 
-            className={cn("hero-description text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
-          >
-            {description}
-          </p>
-          {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
-             <div className="pt-4">
-                <Button
-                  asChild
-                  size={settings.heroCtaSize || 'lg'}
-                  variant={settings.heroCtaVariant || 'default'}
-                  style={ctaStyle}
-                >
-                  <Link href={settings.heroCtaLink} onClick={(e) => handleScrollLinkClick(e, settings.heroCtaLink!)}>
-                    {settings.heroCtaText}
-                    {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Link>
-                </Button>
-            </div>
-          )}
-        </div>
+      <div className={cn(
+        "w-full text-white flex pt-[var(--header-height)]",
+         alignmentClasses.container[horizontalAlign],
+         (horizontalAlign === 'left' || horizontalAlign === 'right') && "container px-4 md:px-6",
+         verticalAlign === 'bottom' && "pb-32",
+         verticalAlign === 'top' && "pt-32"
+      )}>
+        {content}
       </div>
     </section>
   );
