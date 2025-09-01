@@ -40,6 +40,11 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       left: 'text-left items-start',
       center: 'text-center items-center',
       right: 'text-right items-end',
+    },
+    justify: {
+        left: 'justify-start',
+        center: 'justify-center',
+        right: 'justify-end'
     }
   };
 
@@ -73,7 +78,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     <section
       id="hero"
       className={cn(
-        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center",
+        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex",
         alignmentClasses.vertical[verticalAlign],
       )}
       style={heroStyles}
@@ -110,7 +115,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         />
       </div>
      
-      <div className={cn("container px-4 md:px-6 text-white flex pt-[var(--header-height)]", alignmentClasses.horizontal[horizontalAlign] === 'text-center items-center' ? 'justify-center' : alignmentClasses.horizontal[horizontalAlign].includes('left') ? 'justify-start' : 'justify-end')}>
+      <div className={cn("container px-4 md:px-6 text-white flex pt-[var(--header-height)]", alignmentClasses.justify[horizontalAlign])}>
         <div className={cn(
             "flex flex-col space-y-6 hero-text-container z-10",
             alignmentClasses.horizontal[horizontalAlign]
