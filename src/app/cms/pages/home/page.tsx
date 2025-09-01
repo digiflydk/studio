@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -439,6 +439,8 @@ export default function CmsHomePage() {
           heroCtaLink: initialSettings.heroCtaLink ?? '#kontakt',
           heroCtaVariant: initialSettings.heroCtaVariant ?? 'default',
           heroCtaSize: initialSettings.heroCtaSize ?? 'lg',
+          heroCtaTextSize: initialSettings.heroCtaTextSize ?? 16,
+          heroCtaTextSizeMobile: initialSettings.heroCtaTextSizeMobile ?? 14,
 
           servicesSectionTitle: initialSettings.servicesSectionTitle ?? "Vores Services",
           servicesSectionTitleColor: initialSettings.servicesSectionTitleColor ?? "text-black",
@@ -709,6 +711,7 @@ export default function CmsHomePage() {
                                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="default">Default</SelectItem>
+                                                    <SelectItem value="pill">Pill</SelectItem>
                                                     <SelectItem value="secondary">Secondary</SelectItem>
                                                     <SelectItem value="outline">Outline</SelectItem>
                                                     <SelectItem value="destructive">Destructive</SelectItem>
@@ -729,6 +732,35 @@ export default function CmsHomePage() {
                                             </Select>
                                         </div>
                                     </div>
+                                    {previewMode === 'desktop' ? (
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <Label><Monitor className="inline-block h-4 w-4 mr-2" />Knap Tekststørrelse (Desktop)</Label>
+                                                <span className="text-sm text-muted-foreground">{settings.heroCtaTextSize}px</span>
+                                            </div>
+                                            <Slider 
+                                                value={[settings.heroCtaTextSize || 16]} 
+                                                onValueChange={([v]) => handleInputChange('heroCtaTextSize', v)}
+                                                min={12}
+                                                max={32}
+                                                step={1}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                             <div className="flex justify-between items-center">
+                                                <Label><Smartphone className="inline-block h-4 w-4 mr-2" />Knap Tekststørrelse (Mobil)</Label>
+                                                <span className="text-sm text-muted-foreground">{settings.heroCtaTextSizeMobile}px</span>
+                                            </div>
+                                            <Slider 
+                                                value={[settings.heroCtaTextSizeMobile || 14]} 
+                                                onValueChange={([v]) => handleInputChange('heroCtaTextSizeMobile', v)}
+                                                min={10}
+                                                max={28}
+                                                step={1}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

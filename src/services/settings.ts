@@ -175,8 +175,10 @@ export interface GeneralSettings {
     heroCtaEnabled?: boolean;
     heroCtaText?: string;
     heroCtaLink?: string;
-    heroCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+    heroCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
     heroCtaSize?: 'default' | 'sm' | 'lg' | 'icon';
+    heroCtaTextSize?: number;
+    heroCtaTextSizeMobile?: number;
     
     servicesSectionTitle?: string;
     servicesSectionTitleColor?: string;
