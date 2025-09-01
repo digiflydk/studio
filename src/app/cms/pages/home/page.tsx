@@ -461,7 +461,7 @@ export default function CmsHomePage() {
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [activeAccordionItem, setActiveAccordionItem] = useState<string | string[]>('hero');
+  const [activeAccordionItem, setActiveAccordionItem] = useState<string | string[]>(['hero']);
 
 
   const sensors = useSensors(
