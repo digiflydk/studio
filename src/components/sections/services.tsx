@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '../ui/button';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 const defaultServices: Service[] = [
   {
@@ -134,6 +135,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                 >
                     <Link href={settings.servicesCtaLink || '#kontakt'}>
                         {settings.servicesCtaText || 'Book et møde med os'}
+                        <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>
             </div>
