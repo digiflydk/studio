@@ -20,6 +20,7 @@ const defaultNavLinks: NavLink[] = [
 
 export default function Header({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [navLinks, setNavLinks] = useState(settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks);
 
   useEffect(() => {
@@ -41,18 +42,44 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
     setNavLinks(newNavLinks);
 
   }, [settings?.headerNavLinks, settings?.blogPosts]);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      setIsScrolled(offset > 10);
+    };
 
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const isSticky = settings?.headerIsSticky ?? true;
-  const opacity = (settings?.headerBackgroundOpacity ?? 95) / 100;
   const height = settings?.headerHeight || 64;
+
+  const currentBgColor = isScrolled 
+    ? settings?.headerScrolledBackgroundColor 
+    : settings?.headerInitialBackgroundColor;
+
+  const currentOpacity = isScrolled 
+    ? (settings?.headerScrolledBackgroundOpacity ?? 95) / 100 
+    : (settings?.headerInitialBackgroundOpacity ?? 0) / 100;
 
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
   };
-  if (settings?.headerBackgroundColor) {
-    const { h, s, l } = settings.headerBackgroundColor;
-    headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${opacity})`;
+
+  if (currentBgColor) {
+    const { h, s, l } = currentBgColor;
+    headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${currentOpacity})`;
+    if (currentOpacity > 0.8 && isScrolled) {
+        headerStyle.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+        headerStyle.borderColor = `hsla(${h}, ${s}%, ${l-10}%, ${currentOpacity})`;
+    }
+  } else {
+     headerStyle.backgroundColor = 'transparent';
   }
   
   const linkStyle: React.CSSProperties = {
@@ -79,7 +106,6 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
-      // If we are not on the home page, first navigate there
       if (pathname !== '/') {
         window.location.href = `/${href}`;
         return;
@@ -88,7 +114,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
       const targetId = href.substring(1);
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
-          const headerOffset = height; // Use dynamic height
+          const headerOffset = height;
           const elementPosition = targetElement.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -104,8 +130,9 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   return (
     <header 
       className={cn(
-        "top-0 z-50 w-full flex items-center border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-        isSticky && "sticky"
+        "top-0 z-50 w-full flex items-center border-b",
+        isSticky && "sticky",
+        isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}
       >
@@ -116,7 +143,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
               logoUrl={settings?.logoUrl} 
               logoAlt={settings?.logoAlt} 
               width={settings?.headerLogoWidth || 96}
-              isDark={settings?.headerBackgroundColor && settings.headerBackgroundColor.l < 50}
+              isDark={currentBgColor ? currentBgColor.l < 50 : false}
             />
           </Link>
         </div>

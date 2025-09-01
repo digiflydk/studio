@@ -133,8 +133,10 @@ export interface GeneralSettings {
     headerNavLinks?: NavLink[];
     headerLogoWidth?: number;
     headerHeight?: number;
-    headerBackgroundColor?: HSLColor;
-    headerBackgroundOpacity?: number;
+    headerInitialBackgroundColor?: HSLColor;
+    headerInitialBackgroundOpacity?: number;
+    headerScrolledBackgroundColor?: HSLColor;
+    headerScrolledBackgroundOpacity?: number;
     headerIsSticky?: boolean;
     headerMenuIconColor?: string;
     headerLinkColor?: string;
@@ -251,7 +253,15 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
         const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
         const docSnap = await getDoc(settingsDocRef);
         if (docSnap.exists()) {
-            return docSnap.data() as GeneralSettings;
+            const data = docSnap.data() as GeneralSettings;
+            // Backwards compatibility for old header settings
+            if (data.headerBackgroundColor && !data.headerScrolledBackgroundColor) {
+                data.headerScrolledBackgroundColor = data.headerBackgroundColor;
+            }
+             if (data.headerBackgroundOpacity && !data.headerScrolledBackgroundOpacity) {
+                data.headerScrolledBackgroundOpacity = data.headerBackgroundOpacity;
+            }
+            return data;
         }
         return null;
     } catch (error) {

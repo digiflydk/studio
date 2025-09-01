@@ -68,11 +68,13 @@ function HslColorPicker({
     const [hexInputValue, setHexInputValue] = useState('');
     
     useEffect(() => {
-        setHexInputValue(hslToHex(color.h, color.s, color.l));
+        if (color) {
+            setHexInputValue(hslToHex(color.h, color.s, color.l));
+        }
     }, [color]);
 
     const handleColorChange = (part: 'h' | 's' | 'l', value: number) => {
-        onChange({ ...color, [part]: value });
+        onChange({ ...(color || {h:0,s:0,l:100}), [part]: value });
     };
 
     const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +86,9 @@ function HslColorPicker({
         if(newHsl) {
             onChange(newHsl);
         } else {
-            setHexInputValue(hslToHex(color.h, color.s, color.l));
+            if (color) {
+                setHexInputValue(hslToHex(color.h, color.s, color.l));
+            }
         }
     }
   
@@ -94,6 +98,8 @@ function HslColorPicker({
             (e.target as HTMLInputElement).blur();
         }
     }
+
+    if (!color) return null;
 
     return (
         <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
@@ -318,34 +324,23 @@ export default function CmsHeaderPage() {
         async function loadSettings() {
             setIsLoading(true);
             const loadedSettings = await getSettingsAction();
-            if (loadedSettings) {
-                setSettings({
-                    ...loadedSettings,
-                    headerNavLinks: loadedSettings.headerNavLinks && loadedSettings.headerNavLinks.length > 0 ? loadedSettings.headerNavLinks : defaultNavLinks,
-                    headerBackgroundColor: loadedSettings.headerBackgroundColor || { h: 210, s: 100, l: 95 },
-                    headerBackgroundOpacity: loadedSettings.headerBackgroundOpacity ?? 95,
-                    headerIsSticky: loadedSettings.headerIsSticky ?? true,
-                    headerLogoWidth: loadedSettings.headerLogoWidth || 96,
-                    headerHeight: loadedSettings.headerHeight || 64,
-                    headerLinkColor: loadedSettings.headerLinkColor || 'text-foreground',
-                    headerLinkHoverColor: loadedSettings.headerLinkHoverColor || 'text-primary',
-                    headerLinkSize: loadedSettings.headerLinkSize || 14,
-                    headerMenuIconColor: loadedSettings.headerMenuIconColor || 'text-foreground',
-                });
-            } else {
-                 setSettings({
-                    headerNavLinks: defaultNavLinks,
-                    headerBackgroundColor: { h: 210, s: 100, l: 95 },
-                    headerBackgroundOpacity: 95,
-                    headerIsSticky: true,
-                    headerLogoWidth: 96,
-                    headerHeight: 64,
-                    headerLinkColor: 'text-foreground',
-                    headerLinkHoverColor: 'text-primary',
-                    headerLinkSize: 14,
-                    headerMenuIconColor: 'text-foreground',
-                 })
-            }
+            
+            const newSettings: Partial<GeneralSettings> = { ...loadedSettings };
+
+            newSettings.headerNavLinks = newSettings.headerNavLinks && newSettings.headerNavLinks.length > 0 ? newSettings.headerNavLinks : defaultNavLinks;
+            newSettings.headerInitialBackgroundColor = newSettings.headerInitialBackgroundColor || { h: 0, s: 0, l: 100 };
+            newSettings.headerInitialBackgroundOpacity = newSettings.headerInitialBackgroundOpacity ?? 0;
+            newSettings.headerScrolledBackgroundColor = newSettings.headerScrolledBackgroundColor || { h: 210, s: 100, l: 95 };
+            newSettings.headerScrolledBackgroundOpacity = newSettings.headerScrolledBackgroundOpacity ?? 95;
+            newSettings.headerIsSticky = newSettings.headerIsSticky ?? true;
+            newSettings.headerLogoWidth = newSettings.headerLogoWidth || 96;
+            newSettings.headerHeight = newSettings.headerHeight || 64;
+            newSettings.headerLinkColor = newSettings.headerLinkColor || 'text-foreground';
+            newSettings.headerLinkHoverColor = newSettings.headerLinkHoverColor || 'text-primary';
+            newSettings.headerLinkSize = newSettings.headerLinkSize || 14;
+            newSettings.headerMenuIconColor = newSettings.headerMenuIconColor || 'text-foreground';
+            
+            setSettings(newSettings);
             setIsLoading(false);
         }
         loadSettings();
@@ -447,28 +442,64 @@ export default function CmsHeaderPage() {
                             step={1}
                         />
                     </div>
-                    {settings.headerBackgroundColor &&
-                        <HslColorPicker 
-                            label="Baggrundsfarve"
-                            color={settings.headerBackgroundColor}
-                            onChange={(hsl) => handleInputChange('headerBackgroundColor', hsl)}
-                        />
-                    }
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <Label>Baggrunds-gennemsigtighed</Label>
-                            <span className="text-sm text-muted-foreground">{settings.headerBackgroundOpacity || 95}%</span>
-                        </div>
-                        <Slider 
-                            value={[settings.headerBackgroundOpacity || 95]} 
-                            onValueChange={([v]) => handleInputChange('headerBackgroundOpacity', v)}
-                            min={0}
-                            max={100}
-                            step={1}
-                        />
-                    </div>
                 </CardContent>
             </Card>
+
+            <Card className="shadow-lg">
+                 <CardHeader>
+                    <CardTitle>Baggrundsfarve</CardTitle>
+                    <CardDescription>Styr headerens udseende i toppen af siden og når der scrolles.</CardDescription>
+                </CardHeader>
+                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4 p-4 border rounded-lg">
+                         <h3 className="font-semibold">Normal Tilstand (Top)</h3>
+                        {settings.headerInitialBackgroundColor &&
+                            <HslColorPicker 
+                                label="Baggrundsfarve"
+                                color={settings.headerInitialBackgroundColor}
+                                onChange={(hsl) => handleInputChange('headerInitialBackgroundColor', hsl)}
+                            />
+                        }
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <Label>Gennemsigtighed</Label>
+                                <span className="text-sm text-muted-foreground">{settings.headerInitialBackgroundOpacity || 0}%</span>
+                            </div>
+                            <Slider 
+                                value={[settings.headerInitialBackgroundOpacity || 0]} 
+                                onValueChange={([v]) => handleInputChange('headerInitialBackgroundOpacity', v)}
+                                min={0}
+                                max={100}
+                                step={1}
+                            />
+                        </div>
+                    </div>
+                     <div className="space-y-4 p-4 border rounded-lg">
+                        <h3 className="font-semibold">Scrollet Tilstand</h3>
+                        {settings.headerScrolledBackgroundColor &&
+                            <HslColorPicker 
+                                label="Baggrundsfarve"
+                                color={settings.headerScrolledBackgroundColor}
+                                onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
+                            />
+                        }
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <Label>Gennemsigtighed</Label>
+                                <span className="text-sm text-muted-foreground">{settings.headerScrolledBackgroundOpacity || 95}%</span>
+                            </div>
+                            <Slider 
+                                value={[settings.headerScrolledBackgroundOpacity || 95]} 
+                                onValueChange={([v]) => handleInputChange('headerScrolledBackgroundOpacity', v)}
+                                min={0}
+                                max={100}
+                                step={1}
+                            />
+                        </div>
+                    </div>
+                 </CardContent>
+            </Card>
+
 
             <Card className="shadow-lg">
                 <CardHeader>
