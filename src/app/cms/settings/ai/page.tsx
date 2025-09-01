@@ -80,6 +80,7 @@ const openAIPrompt = `You are an expert AI assistant for Digifly, a digital cons
   - Do not ask more questions.
 `;
 
+
 const aiProviders = [
     { value: 'googleai', label: 'Google Gemini' },
     { value: 'openai', label: 'OpenAI' }
@@ -104,9 +105,6 @@ export default function AiSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
-
-  const isOpenAIKeyLikelySet = !!settings.openAIKey;
-
 
   useEffect(() => {
     async function loadSettings() {
@@ -233,32 +231,13 @@ export default function AiSettingsPage() {
           
           {settings.aiProvider === 'openai' && (
              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="openai-key">OpenAI API Key</Label>
-                  <div className="flex items-center gap-2">
-                     <KeyRound className="h-5 w-5 text-muted-foreground" />
-                     <Input
-                        id="openai-key"
-                        type="password"
-                        value={settings.openAIKey || ''}
-                        onChange={(e) => handleInputChange('openAIKey', e.target.value)}
-                        placeholder="sk-..."
-                    />
-                  </div>
-                   <p className="text-sm text-muted-foreground">
-                    Af sikkerhedsmæssige årsager gemmes din nøgle **ikke** i databasen. For at aktivere OpenAI, **skal** du tilføje nøglen til din <code className="bg-muted px-1 py-0.5 rounded-sm">.env</code> fil i formatet: <code className="bg-muted px-1 py-0.5 rounded-sm">OPENAI_API_KEY=sk-...</code>.
-                  </p>
-                </div>
-
-                {!isOpenAIKeyLikelySet && (
-                     <Alert variant="destructive">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>API Nøgle Mangler</AlertTitle>
-                      <AlertDescription>
-                        Du har valgt OpenAI, men har ikke indtastet en API nøgle i dette felt endnu. Husk at tilføje din nøgle til `.env`-filen for at det virker. App'en vil falde tilbage til Google Gemini, hvis nøglen ikke er sat korrekt.
-                      </AlertDescription>
-                    </Alert>
-                )}
+                 <Alert variant="destructive">
+                  <KeyRound className="h-4 w-4" />
+                  <AlertTitle>API Nøgle Påkrævet</AlertTitle>
+                  <AlertDescription>
+                    For at aktivere OpenAI, **skal** du tilføje din API-nøgle til din <code className="bg-muted px-1 py-0.5 rounded-sm">.env</code> fil i formatet: <code className="bg-muted px-1 py-0.5 rounded-sm">OPENAI_API_KEY=sk-...</code>. Applikationen vil automatisk falde tilbage til Google Gemini, hvis nøglen ikke er sat korrekt i dine server-miljøvariabler.
+                  </AlertDescription>
+                </Alert>
             </div>
           )}
         </CardContent>
