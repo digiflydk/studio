@@ -115,7 +115,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         <div className="flex flex-wrap gap-8 justify-center">
           {services.map((service) => (
             <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]">
-              <div className="relative w-full h-40">
+              <div className="relative w-full h-48">
                   <Image
                     src={service.imageUrl}
                     alt={service.title}
