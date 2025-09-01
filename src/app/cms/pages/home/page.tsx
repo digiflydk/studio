@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -121,6 +122,17 @@ const themeColorOptions = [
 ] as const;
 
 type ThemeColor = typeof themeColorOptions[number]['value'];
+
+const sectionLinks = [
+    { value: '#hero', label: 'Hero Sektion' },
+    { value: '#services', label: 'Services' },
+    { value: '#ai-project', label: 'AI Projekt' },
+    { value: '#cases', label: 'Cases' },
+    { value: '#om-os', label: 'Om Os' },
+    { value: '#kontakt', label: 'Kontakt' },
+    { value: 'custom', label: 'Brugerdefineret link' },
+];
+
 
 function HslColorPicker({
   label,
@@ -579,6 +591,9 @@ export default function CmsHomePage() {
     );
   }
 
+  const servicesCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.servicesCtaLink);
+  const servicesCtaSelectValue = servicesCtaIsCustomLink ? 'custom' : settings.servicesCtaLink;
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -881,9 +896,30 @@ export default function CmsHomePage() {
                                         <Input id="services-cta-text" value={settings.servicesCtaText || ''} onChange={e => handleInputChange('servicesCtaText', e.target.value)} />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="services-cta-link">Knap Link</Label>
-                                        <Input id="services-cta-link" value={settings.servicesCtaLink || ''} onChange={e => handleInputChange('servicesCtaLink', e.target.value)} placeholder="f.eks. #kontakt eller https://google.com" />
+                                        <Label htmlFor="services-cta-link-select">Knap Link</Label>
+                                        <Select
+                                            value={servicesCtaSelectValue || ''}
+                                            onValueChange={(value) => handleInputChange('servicesCtaLink', value === 'custom' ? '' : value)}
+                                        >
+                                            <SelectTrigger id="services-cta-link-select"><SelectValue/></SelectTrigger>
+                                            <SelectContent>
+                                                {sectionLinks.map(link => (
+                                                    <SelectItem key={link.value} value={link.value}>{link.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
+                                    {servicesCtaSelectValue === 'custom' && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="services-cta-link-input">Brugerdefineret Link</Label>
+                                            <Input
+                                                id="services-cta-link-input"
+                                                value={settings.servicesCtaLink || ''}
+                                                placeholder="f.eks. https://eksempel.dk"
+                                                onChange={e => handleInputChange('servicesCtaLink', e.target.value)}
+                                            />
+                                        </div>
+                                    )}
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                         <div className="space-y-2">
                                             <Label>Knap Design</Label>
@@ -1390,3 +1426,4 @@ export default function CmsHomePage() {
     </div>
   );
 }
+
