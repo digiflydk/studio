@@ -207,7 +207,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder="Beskriv din idé her..."
-                                    className="pr-12 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
+                                    className="w-full pr-12 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-primary"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();
