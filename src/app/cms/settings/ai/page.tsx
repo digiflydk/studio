@@ -74,8 +74,8 @@ const openAIPrompt = `You are an expert AI assistant for Digifly, a digital cons
   - Do NOT set \`shouldBookMeeting\`.
 
 - **Once you have ALL necessary information (Name, Email, Phone, Features, Budget, Timeline):**
-  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified` to \`true\` and \`shouldBookMeeting\` to \`true\`.
-  - If it's a clear mismatch (e.g., marketing, graphic design), set \`qualified` to \`false\`.
+  - Analyze the project. If it seems like a good fit (software, AI, automation with a reasonable budget/timeline), set \`qualified\` to \`true\` and \`shouldBookMeeting\` to \`true\`.
+  - If it's a clear mismatch (e.g., marketing, graphic design), set \`qualified\` to \`false\`.
   - Fill the \`collectedInfo\` object with all collected information.
   - Do not ask more questions.
 `;
