@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Service, type GeneralSettings } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 const defaultServices: Service[] = [
   {
@@ -56,6 +58,9 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const serviceCardDescriptionStyle: React.CSSProperties = {
       fontSize: settings?.serviceCardDescriptionSize ? `${settings.serviceCardDescriptionSize}px` : undefined,
   }
+  
+  const ctaTextSize = isMobile ? settings?.servicesCtaTextSizeMobile : settings?.servicesCtaTextSize;
+  const ctaStyle: React.CSSProperties = ctaTextSize ? { fontSize: `${ctaTextSize}px` } : {};
 
   const sectionPadding = settings?.sectionPadding?.services;
   const style: React.CSSProperties = sectionPadding ? {
@@ -87,9 +92,9 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
             {description}
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 justify-center">
+        <div className="flex flex-wrap gap-8 justify-center">
           {services.map((service) => (
-            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
+            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]">
               <div className="relative w-full h-40">
                   <Image
                     src={service.imageUrl}
@@ -119,6 +124,20 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
             </Card>
           ))}
         </div>
+        {settings?.servicesCtaEnabled && (
+            <div className="mt-12 text-center">
+                <Button
+                    asChild
+                    size={settings.servicesCtaSize || 'lg'}
+                    variant={settings.servicesCtaVariant || 'default'}
+                    style={ctaStyle}
+                >
+                    <Link href={settings.servicesCtaLink || '#kontakt'}>
+                        {settings.servicesCtaText || 'Book et møde med os'}
+                    </Link>
+                </Button>
+            </div>
+        )}
       </div>
     </section>
   );

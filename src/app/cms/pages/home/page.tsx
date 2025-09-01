@@ -192,16 +192,18 @@ function TextStyleEditor({
     onDesktopSizeChange,
     mobileSize,
     onMobileSizeChange,
-    previewMode
+    previewMode,
+    isOptional = false
 }: {
     label: string;
-    colorValue: ThemeColor;
-    onColorChange: (value: ThemeColor) => void;
+    colorValue?: ThemeColor;
+    onColorChange?: (value: ThemeColor) => void;
     desktopSize: number;
     onDesktopSizeChange: (value: number) => void;
     mobileSize: number;
     onMobileSizeChange: (value: number) => void;
     previewMode: 'desktop' | 'mobile';
+    isOptional?: boolean;
 }) {
     const size = previewMode === 'desktop' ? desktopSize : mobileSize;
     const onSizeChange = previewMode === 'desktop' ? onDesktopSizeChange : onMobileSizeChange;
@@ -210,17 +212,19 @@ function TextStyleEditor({
     return (
         <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
             <h3 className="font-semibold md:col-span-2">{label}</h3>
-             <div className="space-y-2">
-                <Label>Farve</Label>
-                <Select value={colorValue} onValueChange={onColorChange}>
-                    <SelectTrigger><SelectValue/></SelectTrigger>
-                    <SelectContent>
-                        {themeColorOptions.map(opt => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+             {!isOptional && colorValue && onColorChange && (
+                <div className="space-y-2">
+                    <Label>Farve</Label>
+                    <Select value={colorValue} onValueChange={onColorChange}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            {themeColorOptions.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
             <div className="space-y-2">
                 <div className="flex justify-between items-center">
                     <Label>
@@ -445,6 +449,13 @@ export default function CmsHomePage() {
           serviceCardTitleSize: initialSettings.serviceCardTitleSize ?? 24,
           serviceCardDescriptionColor: initialSettings.serviceCardDescriptionColor ?? "text-muted-foreground",
           serviceCardDescriptionSize: initialSettings.serviceCardDescriptionSize ?? 14,
+          servicesCtaEnabled: initialSettings.servicesCtaEnabled ?? false,
+          servicesCtaText: initialSettings.servicesCtaText ?? 'Book et møde med os',
+          servicesCtaLink: initialSettings.servicesCtaLink ?? '#kontakt',
+          servicesCtaVariant: initialSettings.servicesCtaVariant ?? 'default',
+          servicesCtaSize: initialSettings.servicesCtaSize ?? 'lg',
+          servicesCtaTextSize: initialSettings.servicesCtaTextSize ?? 16,
+          servicesCtaTextSizeMobile: initialSettings.servicesCtaTextSizeMobile ?? 14,
           
           aiProjectSectionIconText: initialSettings.aiProjectSectionIconText ?? 'AI-drevet Projektkvalificering',
           aiProjectSectionTitle: initialSettings.aiProjectSectionTitle ?? 'Har du en idé? Lad os validere den sammen.',
@@ -615,7 +626,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Overskrift"
-                            colorValue={settings.heroHeadlineColor as ThemeColor || 'text-white'}
+                            colorValue={settings.heroHeadlineColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
                             desktopSize={settings.heroHeadlineSize || 64}
                             onDesktopSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
@@ -629,7 +640,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Beskrivelse"
-                            colorValue={settings.heroDescriptionColor as ThemeColor || 'text-primary-foreground/80'}
+                            colorValue={settings.heroDescriptionColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
                             desktopSize={settings.heroDescriptionSize || 18}
                             onDesktopSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}
@@ -730,13 +741,12 @@ export default function CmsHomePage() {
                                     </div>
                                     <TextStyleEditor 
                                         label="Design for Knap Tekst"
-                                        colorValue={'text-primary-foreground' as ThemeColor}
-                                        onColorChange={(v) => { /* Color is fixed for CTA for now */ }}
                                         desktopSize={settings.heroCtaTextSize || 16}
                                         onDesktopSizeChange={(v) => handleInputChange('heroCtaTextSize', v)}
                                         mobileSize={settings.heroCtaTextSizeMobile || 14}
                                         onMobileSizeChange={(v) => handleInputChange('heroCtaTextSizeMobile', v)}
                                         previewMode={previewMode}
+                                        isOptional={true}
                                     />
                                 </div>
                             )}
@@ -785,7 +795,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Sektionstitel"
-                            colorValue={settings.servicesSectionTitleColor as ThemeColor || 'text-black'}
+                            colorValue={settings.servicesSectionTitleColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('servicesSectionTitleColor', v)}
                             desktopSize={settings.servicesSectionTitleSize || 36}
                             onDesktopSizeChange={(v) => handleInputChange('servicesSectionTitleSize', v)}
@@ -800,7 +810,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                              label="Design for Sektionsbeskrivelse"
-                             colorValue={settings.servicesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             colorValue={settings.servicesSectionDescriptionColor as ThemeColor}
                              onColorChange={(v) => handleInputChange('servicesSectionDescriptionColor', v)}
                              desktopSize={settings.servicesSectionDescriptionSize || 18}
                              onDesktopSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
@@ -814,7 +824,7 @@ export default function CmsHomePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <TextStyleEditor 
                                     label="Kort Titel"
-                                    colorValue={settings.serviceCardTitleColor as ThemeColor || 'text-foreground'}
+                                    colorValue={settings.serviceCardTitleColor as ThemeColor}
                                     onColorChange={(v) => handleInputChange('serviceCardTitleColor', v)}
                                     desktopSize={settings.serviceCardTitleSize || 24}
                                     onDesktopSizeChange={(v) => handleInputChange('serviceCardTitleSize', v)}
@@ -824,7 +834,7 @@ export default function CmsHomePage() {
                                 />
                                 <TextStyleEditor 
                                     label="Kort Beskrivelse"
-                                    colorValue={settings.serviceCardDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                                    colorValue={settings.serviceCardDescriptionColor as ThemeColor}
                                     onColorChange={(v) => handleInputChange('serviceCardDescriptionColor', v)}
                                     desktopSize={settings.serviceCardDescriptionSize || 14}
                                     onDesktopSizeChange={(v) => handleInputChange('serviceCardDescriptionSize', v)}
@@ -855,6 +865,66 @@ export default function CmsHomePage() {
                             ))}
                         </Accordion>
                         <Button variant="outline" onClick={() => handleListAdd('services', { title: 'Ny Service', description: '', imageUrl: '', aiHint: '' })}>Tilføj Service</Button>
+
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-semibold">Call to Action Knap</h3>
+                                <Switch
+                                    checked={settings.servicesCtaEnabled}
+                                    onCheckedChange={(value) => handleInputChange('servicesCtaEnabled', value)}
+                                />
+                            </div>
+                            {settings.servicesCtaEnabled && (
+                                <div className='space-y-4'>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="services-cta-text">Knap Tekst</Label>
+                                        <Input id="services-cta-text" value={settings.servicesCtaText || ''} onChange={e => handleInputChange('servicesCtaText', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="services-cta-link">Knap Link</Label>
+                                        <Input id="services-cta-link" value={settings.servicesCtaLink || ''} onChange={e => handleInputChange('servicesCtaLink', e.target.value)} placeholder="f.eks. #kontakt eller https://google.com" />
+                                    </div>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                        <div className="space-y-2">
+                                            <Label>Knap Design</Label>
+                                            <Select value={settings.servicesCtaVariant} onValueChange={(v) => handleInputChange('servicesCtaVariant', v)}>
+                                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="default">Default</SelectItem>
+                                                    <SelectItem value="pill">Pill</SelectItem>
+                                                    <SelectItem value="secondary">Secondary</SelectItem>
+                                                    <SelectItem value="outline">Outline</SelectItem>
+                                                    <SelectItem value="destructive">Destructive</SelectItem>
+                                                    <SelectItem value="ghost">Ghost</SelectItem>
+                                                    <SelectItem value="link">Link</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                         <div className="space-y-2">
+                                            <Label>Knap Størrelse</Label>
+                                            <Select value={settings.servicesCtaSize} onValueChange={(v) => handleInputChange('servicesCtaSize', v)}>
+                                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="default">Default</SelectItem>
+                                                    <SelectItem value="sm">Small</SelectItem>
+                                                    <SelectItem value="lg">Large</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <TextStyleEditor 
+                                        label="Design for Knap Tekst"
+                                        desktopSize={settings.servicesCtaTextSize || 16}
+                                        onDesktopSizeChange={(v) => handleInputChange('servicesCtaTextSize', v)}
+                                        mobileSize={settings.servicesCtaTextSizeMobile || 14}
+                                        onMobileSizeChange={(v) => handleInputChange('servicesCtaTextSizeMobile', v)}
+                                        previewMode={previewMode}
+                                        isOptional={true}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>
@@ -891,7 +961,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Titel"
-                            colorValue={settings.aiProjectSectionTitleColor as ThemeColor || 'text-white'}
+                            colorValue={settings.aiProjectSectionTitleColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('aiProjectSectionTitleColor', v)}
                             desktopSize={settings.aiProjectSectionTitleSize || 36}
                             onDesktopSizeChange={(v) => handleInputChange('aiProjectSectionTitleSize', v)}
@@ -906,7 +976,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Beskrivelse"
-                            colorValue={settings.aiProjectSectionDescriptionColor as ThemeColor || 'text-gray-300'}
+                            colorValue={settings.aiProjectSectionDescriptionColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('aiProjectSectionDescriptionColor', v)}
                             desktopSize={settings.aiProjectSectionDescriptionSize || 18}
                             onDesktopSizeChange={(v) => handleInputChange('aiProjectSectionDescriptionSize', v)}
@@ -954,7 +1024,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Sektionstitel"
-                            colorValue={settings.casesSectionTitleColor as ThemeColor || 'text-black'}
+                            colorValue={settings.casesSectionTitleColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('casesSectionTitleColor', v)}
                             desktopSize={settings.casesSectionTitleSize || 36}
                             onDesktopSizeChange={(v) => handleInputChange('casesSectionTitleSize', v)}
@@ -969,7 +1039,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                              label="Design for Sektionsbeskrivelse"
-                             colorValue={settings.casesSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             colorValue={settings.casesSectionDescriptionColor as ThemeColor}
                              onColorChange={(v) => handleInputChange('casesSectionDescriptionColor', v)}
                              desktopSize={settings.casesSectionDescriptionSize || 18}
                              onDesktopSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
@@ -1031,7 +1101,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                            label="Design for Sektionstitel"
-                           colorValue={settings.aboutSectionTitleColor as ThemeColor || 'text-black'}
+                           colorValue={settings.aboutSectionTitleColor as ThemeColor}
                            onColorChange={(v) => handleInputChange('aboutSectionTitleColor', v)}
                            desktopSize={settings.aboutSectionTitleSize || 36}
                            onDesktopSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
@@ -1046,7 +1116,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                            label="Design for Intro Tekst"
-                           colorValue={settings.aboutTextColor as ThemeColor || 'text-muted-foreground'}
+                           colorValue={settings.aboutTextColor as ThemeColor}
                            onColorChange={(v) => handleInputChange('aboutTextColor', v)}
                            desktopSize={settings.aboutTextSize || 18}
                            onDesktopSizeChange={(v) => handleInputChange('aboutTextSize', v)}
@@ -1062,7 +1132,7 @@ export default function CmsHomePage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                      <TextStyleEditor 
                                         label="Navn"
-                                        colorValue={settings.teamMemberNameColor as ThemeColor || 'text-foreground'}
+                                        colorValue={settings.teamMemberNameColor as ThemeColor}
                                         onColorChange={(v) => handleInputChange('teamMemberNameColor', v)}
                                         desktopSize={settings.teamMemberNameSize || 18}
                                         onDesktopSizeChange={(v) => handleInputChange('teamMemberNameSize', v)}
@@ -1072,7 +1142,7 @@ export default function CmsHomePage() {
                                     />
                                       <TextStyleEditor 
                                         label="Titel"
-                                        colorValue={settings.teamMemberTitleColor as ThemeColor || 'text-primary'}
+                                        colorValue={settings.teamMemberTitleColor as ThemeColor}
                                         onColorChange={(v) => handleInputChange('teamMemberTitleColor', v)}
                                         desktopSize={settings.teamMemberTitleSize || 14}
                                         onDesktopSizeChange={(v) => handleInputChange('teamMemberTitleSize', v)}
@@ -1083,7 +1153,7 @@ export default function CmsHomePage() {
                                 </div>
                                 <TextStyleEditor 
                                     label="Beskrivelse"
-                                    colorValue={settings.teamMemberDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                                    colorValue={settings.teamMemberDescriptionColor as ThemeColor}
                                     onColorChange={(v) => handleInputChange('teamMemberDescriptionColor', v)}
                                     desktopSize={settings.teamMemberDescriptionSize || 14}
                                     onDesktopSizeChange={(v) => handleInputChange('teamMemberDescriptionSize', v)}
@@ -1147,7 +1217,7 @@ export default function CmsHomePage() {
                         </div>
                          <TextStyleEditor 
                              label="Design for Sektionstitel"
-                             colorValue={settings.customersSectionTitleColor as ThemeColor || 'text-muted-foreground'}
+                             colorValue={settings.customersSectionTitleColor as ThemeColor}
                              onColorChange={(v) => handleInputChange('customersSectionTitleColor', v)}
                              desktopSize={settings.customersSectionTitleSize || 16}
                              onDesktopSizeChange={(v) => handleInputChange('customersSectionTitleSize', v)}
@@ -1162,7 +1232,7 @@ export default function CmsHomePage() {
                         </div>
                          <TextStyleEditor 
                              label="Design for Sektionsbeskrivelse"
-                             colorValue={settings.customersSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                             colorValue={settings.customersSectionDescriptionColor as ThemeColor}
                              onColorChange={(v) => handleInputChange('customersSectionDescriptionColor', v)}
                              desktopSize={settings.customersSectionDescriptionSize || 18}
                              onDesktopSizeChange={(v) => handleInputChange('customersSectionDescriptionSize', v)}
@@ -1210,7 +1280,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Sektionstitel"
-                            colorValue={settings.blogSectionTitleColor as ThemeColor || 'text-black'}
+                            colorValue={settings.blogSectionTitleColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('blogSectionTitleColor', v)}
                             desktopSize={settings.blogSectionTitleSize || 36}
                             onDesktopSizeChange={(v) => handleInputChange('blogSectionTitleSize', v)}
@@ -1225,7 +1295,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Sektionsbeskrivelse"
-                            colorValue={settings.blogSectionDescriptionColor as ThemeColor || 'text-muted-foreground'}
+                            colorValue={settings.blogSectionDescriptionColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('blogSectionDescriptionColor', v)}
                             desktopSize={settings.blogSectionDescriptionSize || 18}
                             onDesktopSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}

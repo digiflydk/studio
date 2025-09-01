@@ -191,6 +191,13 @@ export interface GeneralSettings {
     serviceCardTitleSize?: number;
     serviceCardDescriptionColor?: string;
     serviceCardDescriptionSize?: number;
+    servicesCtaEnabled?: boolean;
+    servicesCtaText?: string;
+    servicesCtaLink?: string;
+    servicesCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+    servicesCtaSize?: 'default' | 'sm' | 'lg';
+    servicesCtaTextSize?: number;
+    servicesCtaTextSizeMobile?: number;
 
     aiProjectSectionIconText?: string;
     aiProjectSectionTitle?: string;
