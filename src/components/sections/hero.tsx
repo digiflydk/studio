@@ -39,9 +39,9 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
   const alignmentClasses = {
     vertical: {
-      top: 'items-start',
+      top: 'items-start pt-32',
       center: 'items-center',
-      bottom: 'items-end',
+      bottom: 'items-end pb-32',
     },
     horizontal: {
       left: 'text-left items-start',
@@ -117,10 +117,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
   return (
     <section
       id="hero"
-      className={cn(
-        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex",
-        alignmentClasses.vertical[verticalAlign],
-      )}
+      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
       style={heroStyles}
     >
       <style>
@@ -156,13 +153,17 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       </div>
      
       <div className={cn(
-        "w-full text-white flex pt-[var(--header-height)]",
-         alignmentClasses.container[horizontalAlign],
-         (horizontalAlign === 'left' || horizontalAlign === 'right') && "container px-4 md:px-6",
-         verticalAlign === 'bottom' && "pb-32",
-         verticalAlign === 'top' && "pt-32"
+        "w-full h-full text-white flex pt-[var(--header-height)]",
+        alignmentClasses.vertical[verticalAlign]
       )}>
-        {content}
+        <div className={cn(
+            'flex w-full',
+             horizontalAlign === 'center' ? 'justify-center' : 'container px-4 md:px-6',
+        )}>
+            <div className={cn('flex w-full', horizontalAlign !== 'center' && alignmentClasses.container[horizontalAlign])}>
+                 {content}
+            </div>
+        </div>
       </div>
     </section>
   );
