@@ -130,7 +130,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   return (
     <header 
       className={cn(
-        "top-0 z-50 w-full flex items-center border-b",
+        "top-0 left-0 right-0 z-50 w-full flex items-center border-b",
         isSticky && "sticky",
         isScrolled ? "border-border/40" : "border-transparent"
       )}
@@ -143,7 +143,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
               logoUrl={settings?.logoUrl} 
               logoAlt={settings?.logoAlt} 
               width={settings?.headerLogoWidth || 96}
-              isDark={currentBgColor ? currentBgColor.l < 50 : false}
+              isDark={currentBgColor ? currentBgColor.l < 50 : true}
             />
           </Link>
         </div>

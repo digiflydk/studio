@@ -20,12 +20,15 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
   const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
   const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
+  const headerHeight = settings?.headerHeight || 64;
+
   const heroStyles = {
     '--headline-desktop-size': `${headlineDesktopSize}px`,
     '--headline-mobile-size': `${headlineMobileSize}px`,
     '--description-desktop-size': `${descriptionDesktopSize}px`,
     '--description-mobile-size': `${descriptionMobileSize}px`,
     '--text-max-width': `${textMaxWidth}px`,
+    '--header-height': `${headerHeight}px`,
   } as CSSProperties;
 
   const alignmentClasses = {
@@ -71,7 +74,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     <section
       id="hero"
       className={cn(
-        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center py-0",
+        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center -mt-[var(--header-height)] pt-[var(--header-height)]",
         alignmentClasses.vertical[verticalAlign],
       )}
       style={heroStyles}
