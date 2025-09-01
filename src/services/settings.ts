@@ -70,6 +70,15 @@ export type SectionPadding = {
     bottomMobile: number;
 }
 
+export interface SectionVisibility {
+    services: boolean;
+    aiProject: boolean;
+    cases: boolean;
+    about: boolean;
+    customers: boolean;
+    blog: boolean;
+}
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -225,6 +234,9 @@ export interface GeneralSettings {
         blog: SectionPadding;
         contact: SectionPadding;
     };
+    
+    // Section Visibility
+    sectionVisibility?: SectionVisibility;
 
     // Customers
     customers?: Customer[];

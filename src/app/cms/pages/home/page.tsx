@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember, SectionPadding } from '@/services/settings';
+import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2, Monitor, Smartphone, ExternalLink } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -17,6 +17,7 @@ import { Slider } from '@/components/ui/slider';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
 
 const defaultServices: Service[] = [
   {
@@ -99,6 +100,15 @@ const defaultTeam: TeamMember[] = [
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
 const defaultPadding: SectionPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
+
+const defaultVisibility: SectionVisibility = {
+    services: true,
+    aiProject: true,
+    cases: true,
+    about: true,
+    customers: true,
+    blog: true,
+}
 
 const themeColorOptions = [
     { value: 'text-primary', label: 'Primary' },
@@ -281,6 +291,7 @@ function EditableListItem({ index, item, updateItem, removeItem, fields, titleFi
                                     id={`item-${index}-${field.key}`}
                                     value={item[field.key] || ''}
                                     onChange={e => handleFieldChange(field.key, e.target.value)}
+                                    className="w-full"
                                 />
                             )}
                         </div>
@@ -477,6 +488,7 @@ export default function CmsHomePage() {
           blogSectionBackgroundColor: initialSettings.blogSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
 
           sectionPadding: newSectionPadding,
+          sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
       });
 
       setIsLoading(false);
@@ -502,6 +514,16 @@ export default function CmsHomePage() {
         };
     });
   };
+
+  const handleVisibilityChange = (section: keyof SectionVisibility, isVisible: boolean) => {
+      setSettings(prev => ({
+          ...prev,
+          sectionVisibility: {
+              ...prev.sectionVisibility,
+              [section]: isVisible,
+          }
+      }));
+  }
 
   const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
     const list = (settings[listName] as T[] || []);
@@ -583,7 +605,7 @@ export default function CmsHomePage() {
                     <CardContent className="space-y-6 pt-6">
                          <div className="space-y-2">
                             <Label htmlFor="hero-headline">Overskrift</Label>
-                            <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} />
+                            <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} className="w-full" />
                         </div>
                         <TextStyleEditor 
                             label="Design for Overskrift"
@@ -611,7 +633,7 @@ export default function CmsHomePage() {
                         />
                         <div className="space-y-2">
                             <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
-                            <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} />
+                            <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} className="w-full" />
                              <p className="text-sm text-muted-foreground">
                                 Find gratis billeder i høj kvalitet på f.eks. 
                                 <Link href="https://unsplash.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Unsplash</Link> 
@@ -635,9 +657,20 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="services-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="services-visible"
+                                checked={settings.sectionVisibility?.services}
+                                onCheckedChange={(value) => handleVisibilityChange('services', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="services-title">Sektionstitel</Label>
-                            <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} />
+                            <Input id="services-title" value={settings.servicesSectionTitle || ''} onChange={e => handleInputChange('servicesSectionTitle', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionstitel</h3>
@@ -714,13 +747,24 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                         <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="ai-project-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="ai-project-visible"
+                                checked={settings.sectionVisibility?.aiProject}
+                                onCheckedChange={(value) => handleVisibilityChange('aiProject', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="ai-project-icon-text">Ikon-tekst</Label>
-                            <Input id="ai-project-icon-text" value={settings.aiProjectSectionIconText || ''} onChange={e => handleInputChange('aiProjectSectionIconText', e.target.value)} />
+                            <Input id="ai-project-icon-text" value={settings.aiProjectSectionIconText || ''} onChange={e => handleInputChange('aiProjectSectionIconText', e.target.value)} className="w-full" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="ai-project-title">Titel</Label>
-                            <Input id="ai-project-title" value={settings.aiProjectSectionTitle || ''} onChange={e => handleInputChange('aiProjectSectionTitle', e.target.value)} />
+                            <Input id="ai-project-title" value={settings.aiProjectSectionTitle || ''} onChange={e => handleInputChange('aiProjectSectionTitle', e.target.value)} className="w-full" />
                         </div>
                          <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Titel</h3>
@@ -783,9 +827,20 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                         <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="cases-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="cases-visible"
+                                checked={settings.sectionVisibility?.cases}
+                                onCheckedChange={(value) => handleVisibilityChange('cases', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="cases-title">Sektionstitel</Label>
-                            <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} />
+                            <Input id="cases-title" value={settings.casesSectionTitle || ''} onChange={e => handleInputChange('casesSectionTitle', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionstitel</h3>
@@ -861,9 +916,20 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="about-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="about-visible"
+                                checked={settings.sectionVisibility?.about}
+                                onCheckedChange={(value) => handleVisibilityChange('about', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="about-title">Sektionstitel</Label>
-                            <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} />
+                            <Input id="about-title" value={settings.aboutSectionTitle || ''} onChange={e => handleInputChange('aboutSectionTitle', e.target.value)} className="w-full" />
                         </div>
                          <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionstitel</h3>
@@ -988,9 +1054,20 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="customers-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="customers-visible"
+                                checked={settings.sectionVisibility?.customers}
+                                onCheckedChange={(value) => handleVisibilityChange('customers', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="customers-title">Sektionstitel</Label>
-                            <Input id="customers-title" value={settings.customersSectionTitle || ''} onChange={e => handleInputChange('customersSectionTitle', e.target.value)} />
+                            <Input id="customers-title" value={settings.customersSectionTitle || ''} onChange={e => handleInputChange('customersSectionTitle', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionstitel</h3>
@@ -1053,9 +1130,20 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="blog-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="blog-visible"
+                                checked={settings.sectionVisibility?.blog}
+                                onCheckedChange={(value) => handleVisibilityChange('blog', value)}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="blog-title">Sektionstitel</Label>
-                            <Input id="blog-title" value={settings.blogSectionTitle || ''} onChange={e => handleInputChange('blogSectionTitle', e.target.value)} />
+                            <Input id="blog-title" value={settings.blogSectionTitle || ''} onChange={e => handleInputChange('blogSectionTitle', e.target.value)} className="w-full" />
                         </div>
                         <div className="p-4 border rounded-lg bg-muted/20">
                             <h3 className="font-semibold">Design for Sektionstitel</h3>

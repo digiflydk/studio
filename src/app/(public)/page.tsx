@@ -12,18 +12,17 @@ import BlogSection from '@/components/sections/blog';
 
 export default async function Home() {
   const settings = await getGeneralSettings();
+  const visibility = settings?.sectionVisibility;
 
   return (
     <>
       <HeroSection settings={settings} />
-      <ServicesSection settings={settings} />
-      <AiProjectSection settings={settings} />
-      <CasesSection
-        settings={settings}
-      />
-      <AboutSection settings={settings} />
-      <CustomersSection settings={settings} />
-      <BlogSection settings={settings} />
+      {visibility?.services !== false && <ServicesSection settings={settings} />}
+      {visibility?.aiProject !== false && <AiProjectSection settings={settings} />}
+      {visibility?.cases !== false && <CasesSection settings={settings} />}
+      {visibility?.about !== false && <AboutSection settings={settings} />}
+      {visibility?.customers !== false && <CustomersSection settings={settings} />}
+      {visibility?.blog !== false && <BlogSection settings={settings} />}
       <ContactSection settings={settings} />
       <StickyCta />
     </>
