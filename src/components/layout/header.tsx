@@ -24,8 +24,9 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   const [navLinks, setNavLinks] = useState(settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks);
 
   useEffect(() => {
-    const baseNavLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
-    const hasBlog = settings?.blogPosts && settings.blogPosts.length > 0;
+    if (!settings) return;
+    const baseNavLinks = settings.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
+    const hasBlog = settings.blogPosts && settings.blogPosts.length > 0;
     
     let newNavLinks = [...baseNavLinks];
 
@@ -41,7 +42,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
 
     setNavLinks(newNavLinks);
 
-  }, [settings?.headerNavLinks, settings?.blogPosts]);
+  }, [settings]);
   
   useEffect(() => {
     if (!settings?.headerIsSticky) return;

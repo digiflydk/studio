@@ -15,7 +15,12 @@ export async function generateMetadata(
   {},
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const settings = await getGeneralSettings();
+  let settings = null;
+  try {
+    settings = await getGeneralSettings();
+  } catch (error) {
+    console.error("Failed to fetch settings for metadata:", error);
+  }
   const previousImages = (await parent).openGraph?.images || [];
 
   const defaultTitle = 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
@@ -60,18 +65,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const settings = await getGeneralSettings();
+  let settings = null;
+  try {
+      settings = await getGeneralSettings();
+  } catch (error) {
+      console.error("Failed to fetch settings for layout:", error);
+  }
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <Script id="scroll-restoration" strategy="beforeInteractive">
-          {`
-            if ('scrollRestoration' in history) {
-              history.scrollRestoration = 'auto';
-            }
-          `}
-        </Script>
-      </head>
       <body className={`${inter.className} antialiased`}>
         <ThemeContextWrapper settings={settings}>
             {children}

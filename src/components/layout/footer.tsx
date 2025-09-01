@@ -14,6 +14,10 @@ const socialIcons = {
 } as const;
 
 export default function Footer({ settings }: { settings: GeneralSettings | null }) {
+  if (!settings) {
+      return null;
+  }
+    
   const addressLine2 = [settings?.postalCode, settings?.city].filter(Boolean).join(' ');
   const fullPhoneNumber = settings?.countryCode && settings.phoneNumber ? `${settings.countryCode} ${settings.phoneNumber}` : settings?.phoneNumber;
   
