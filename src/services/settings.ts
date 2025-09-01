@@ -16,10 +16,10 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
         if (docSnap.exists()) {
             const data = docSnap.data() as GeneralSettings;
             // Backwards compatibility for old header settings
-            if ('headerBackgroundColor' in data && !data.headerScrolledBackgroundColor) {
+            if (data && 'headerBackgroundColor' in data && !data.headerScrolledBackgroundColor) {
                 data.headerScrolledBackgroundColor = (data as any).headerBackgroundColor;
             }
-             if ('headerBackgroundOpacity' in data && !data.headerScrolledBackgroundOpacity) {
+             if (data && 'headerBackgroundOpacity' in data && !data.headerScrolledBackgroundOpacity) {
                 data.headerScrolledBackgroundOpacity = (data as any).headerBackgroundOpacity;
             }
             return data;
