@@ -104,29 +104,12 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
     settings?.headerMenuIconColor || "text-foreground"
   );
   
-  const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      if (pathname !== '/') {
-        window.location.href = `/${href}`;
-        return;
-      }
-      
-      const targetId = href.substring(1);
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-          const headerOffset = height;
-          const elementPosition = targetElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-          window.scrollTo({
-              top: offsetPosition,
-              behavior: "smooth"
-          });
-      }
+  const getLinkHref = (href: string) => {
+    if (href.startsWith('#') && pathname !== '/') {
+      return `/${href}`;
     }
-  };
-
+    return href;
+  }
 
   return (
     <header 
@@ -153,10 +136,9 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
           {navLinks.map((link) => (
              <Link
                 key={link.href}
-                href={link.href}
+                href={getLinkHref(link.href)}
                 className={navLinkClasses}
                 style={linkStyle}
-                onClick={(e) => handleScrollLinkClick(e, link.href)}
             >
               {link.label}
             </Link>
@@ -190,10 +172,9 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
                   {navLinks.map((link) => (
                      <Link
                         key={link.href}
-                        href={link.href}
+                        href={getLinkHref(link.href)}
                         className={mobileNavLinkClasses}
                         style={linkStyle}
-                        onClick={(e) => handleScrollLinkClick(e, link.href)}
                     >
                       {link.label}
                     </Link>

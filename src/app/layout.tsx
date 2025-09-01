@@ -64,7 +64,7 @@ export default async function RootLayout({
         <Script id="scroll-restoration" strategy="beforeInteractive">
           {`
             if ('scrollRestoration' in history) {
-              history.scrollRestoration = 'manual';
+              history.scrollRestoration = 'auto';
             }
           `}
         </Script>

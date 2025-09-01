@@ -58,28 +58,12 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
   const verticalAlign = settings?.heroVerticalAlignment || 'center';
   const horizontalAlign = settings?.heroAlignment || 'center';
 
-  const handleScrollLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      if (pathname !== '/') {
-        window.location.href = `/${href}`;
-        return;
-      }
-      
-      const targetId = href.substring(1);
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-          const headerOffset = settings?.headerHeight || 64;
-          const elementPosition = targetElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-          window.scrollTo({
-              top: offsetPosition,
-              behavior: "smooth"
-          });
-      }
+  const getLinkHref = (href: string) => {
+    if (href.startsWith('#') && pathname !== '/') {
+      return `/${href}`;
     }
-  };
+    return href;
+  }
 
   const content = (
       <div className={cn(
@@ -104,7 +88,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                   variant={settings.heroCtaVariant || 'default'}
                   style={ctaStyle}
                 >
-                  <Link href={settings.heroCtaLink} onClick={(e) => handleScrollLinkClick(e, settings.heroCtaLink!)}>
+                  <Link href={getLinkHref(settings.heroCtaLink)}>
                     {settings.heroCtaText}
                     {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                   </Link>
