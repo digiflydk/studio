@@ -39,9 +39,9 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
   const alignmentClasses = {
     vertical: {
-      top: 'items-start pt-32',
+      top: 'items-start',
       center: 'items-center',
-      bottom: 'items-end pb-32',
+      bottom: 'items-end',
     },
     horizontal: {
       left: 'text-left items-start',
@@ -153,14 +153,15 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       </div>
      
       <div className={cn(
-        "w-full h-full text-white flex pt-[var(--header-height)]",
+        "w-full h-full text-white flex",
+        "pt-[var(--header-height)] pb-16",
         alignmentClasses.vertical[verticalAlign]
       )}>
         <div className={cn(
-            'flex w-full',
-             horizontalAlign === 'center' ? 'justify-center' : 'container px-4 md:px-6',
+            'w-full flex',
+            horizontalAlign === 'center' ? 'justify-center text-center' : 'container mx-auto px-4 md:px-6',
         )}>
-            <div className={cn('flex w-full', horizontalAlign !== 'center' && alignmentClasses.container[horizontalAlign])}>
+            <div className={cn('flex w-full', alignmentClasses.container[horizontalAlign])}>
                  {content}
             </div>
         </div>
