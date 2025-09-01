@@ -523,7 +523,7 @@ export default function CmsHomePage() {
           featureSectionHeadingColor: initialSettings.featureSectionHeadingColor ?? 'text-foreground',
           featureSectionHeadingSize: initialSettings.featureSectionHeadingSize ?? 48,
           featureSectionHeadingSizeMobile: initialSettings.featureSectionHeadingSizeMobile ?? 36,
-          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
+          featureSectionBody: initialSettings.featureSectionBody ?? "Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.",
           featureSectionBodyColor: initialSettings.featureSectionBodyColor ?? 'text-muted-foreground',
           featureSectionBodySize: initialSettings.featureSectionBodySize ?? 18,
           featureSectionBodySizeMobile: initialSettings.featureSectionBodySizeMobile ?? 16,
@@ -546,6 +546,7 @@ export default function CmsHomePage() {
           servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor ?? "text-muted-foreground",
           servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize ?? 18,
           servicesSectionAlignment: initialSettings.servicesSectionAlignment ?? 'center',
+          servicesSectionBackgroundColor: initialSettings.servicesSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
           services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
           serviceCardTitleColor: initialSettings.serviceCardTitleColor ?? "text-foreground",
           serviceCardTitleSize: initialSettings.serviceCardTitleSize ?? 24,
@@ -1195,6 +1196,14 @@ export default function CmsHomePage() {
                                 </div>
                             )}
                         </div>
+                        
+                        {settings.servicesSectionBackgroundColor &&
+                          <HslColorPicker 
+                              label="Baggrundsfarve"
+                              color={settings.servicesSectionBackgroundColor}
+                              onChange={(hsl) => handleInputChange('servicesSectionBackgroundColor', hsl)}
+                          />
+                        }
 
                     </CardContent>
                 </AccordionContent>

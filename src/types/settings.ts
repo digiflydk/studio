@@ -204,6 +204,7 @@ export interface GeneralSettings {
     servicesSectionDescriptionColor?: string;
     servicesSectionDescriptionSize?: number;
     servicesSectionAlignment?: Alignment;
+    servicesSectionBackgroundColor?: HSLColor;
     services?: Service[];
     serviceCardTitleColor?: string;
     serviceCardTitleSize?: number;

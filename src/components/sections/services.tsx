@@ -65,13 +65,19 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const ctaStyle: React.CSSProperties = ctaTextSize ? { fontSize: `${ctaTextSize}px` } : {};
 
   const sectionPadding = settings?.sectionPadding?.services;
-  const style: React.CSSProperties = sectionPadding ? {
-    '--padding-top': `${sectionPadding.top}px`,
-    '--padding-bottom': `${sectionPadding.bottom}px`,
-    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
-    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
-  } as any : {};
+  const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
+  const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
+  const style: React.CSSProperties = {
+    paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
+    paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
+  };
+
+  if (settings?.servicesSectionBackgroundColor) {
+    const { h, s, l } = settings.servicesSectionBackgroundColor;
+    style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  }
+  
   const alignmentClasses = {
     left: 'text-left',
     center: 'text-center',
@@ -82,8 +88,8 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   return (
     <section 
         id="services" 
-        className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
         style={style}
+        className={cn(!settings?.servicesSectionBackgroundColor && 'bg-secondary')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className={cn("mb-12", alignmentClasses[alignment])}>
