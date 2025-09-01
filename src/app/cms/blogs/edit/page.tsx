@@ -194,7 +194,7 @@ function EditBlogPostForm() {
                             <FormItem>
                                 <FormLabel>Indhold</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="Skriv dit blogindlæg her... Brug \\n for nye linjer." {...field} rows={15} />
+                                    <Textarea placeholder="Skriv dit blogindlæg her..." {...field} rows={15} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

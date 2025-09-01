@@ -53,7 +53,7 @@ export async function generateStaticParams() {
 // A simple markdown to HTML converter
 function Markdown({ content }: { content: string }) {
   const html = content
-    .split('\\n')
+    .split('\n')
     .map(line => {
         line = line.trim();
         if (line.startsWith('### ')) return `<h3>${line.substring(4)}</h3>`;
@@ -65,8 +65,8 @@ function Markdown({ content }: { content: string }) {
     })
     .join('')
     // Basic formatting for bold and italic
-    .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
-    .replace(/\\*(.*?)\\*/g, '<em>$1</em>');
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
   return (
     <div
