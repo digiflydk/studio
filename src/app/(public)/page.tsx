@@ -31,7 +31,9 @@ export default async function Home() {
   return (
     <>
       <HeroSection settings={settings} />
-      {order.map(sectionKey => sections[sectionKey])}
+      {order.map(sectionKey => (
+        <div key={sectionKey}>{sections[sectionKey]}</div>
+      ))}
       <ContactSection settings={settings} />
       <StickyCta />
     </>
