@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -44,6 +43,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   }, [settings?.headerNavLinks, settings?.blogPosts]);
   
   useEffect(() => {
+    if (!settings?.headerIsSticky) return;
     const handleScroll = () => {
       const offset = window.scrollY;
       setIsScrolled(offset > 10);
@@ -53,7 +53,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [settings?.headerIsSticky]);
 
   const isSticky = settings?.headerIsSticky ?? true;
   const height = settings?.headerHeight || 64;
@@ -130,8 +130,8 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   return (
     <header 
       className={cn(
-        "top-0 left-0 right-0 z-50 w-full flex items-center border-b",
-        isSticky && "sticky",
+        "top-0 left-0 w-full z-50 flex items-center border-b",
+        isSticky && "fixed",
         isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}

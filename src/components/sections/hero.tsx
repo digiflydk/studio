@@ -1,4 +1,3 @@
-
 'use client';
 import Image from 'next/image';
 import { type GeneralSettings } from '@/services/settings';
@@ -74,7 +73,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     <section
       id="hero"
       className={cn(
-        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center -mt-[var(--header-height)] pt-[var(--header-height)]",
+        "relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex text-center -mt-[var(--header-height)]",
         alignmentClasses.vertical[verticalAlign],
       )}
       style={heroStyles}
@@ -100,17 +99,20 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
           }
         `}
       </style>
-      <Image
-        src={imageUrl}
-        alt="Tech background"
-        data-ai-hint="tech background"
-        fill
-        className="object-cover -z-10 brightness-50"
-        priority
-      />
-      <div className={cn("container px-4 md:px-6 text-white flex", alignmentClasses.horizontal[horizontalAlign] === 'text-center items-center' ? 'justify-center' : alignmentClasses.horizontal[horizontalAlign].includes('left') ? 'justify-start' : 'justify-end')}>
+      <div className="absolute inset-0">
+         <Image
+            src={imageUrl}
+            alt="Tech background"
+            data-ai-hint="tech background"
+            fill
+            className="object-cover -z-10 brightness-50"
+            priority
+        />
+      </div>
+     
+      <div className={cn("container px-4 md:px-6 text-white flex pt-[var(--header-height)]", alignmentClasses.horizontal[horizontalAlign] === 'text-center items-center' ? 'justify-center' : alignmentClasses.horizontal[horizontalAlign].includes('left') ? 'justify-start' : 'justify-end')}>
         <div className={cn(
-            "flex flex-col space-y-6 hero-text-container",
+            "flex flex-col space-y-6 hero-text-container z-10",
             alignmentClasses.horizontal[horizontalAlign]
         )}>
           <h1 
