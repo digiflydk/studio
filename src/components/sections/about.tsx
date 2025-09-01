@@ -91,7 +91,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
             {title}
             </h2>
             <p 
-            className={cn("text-body", settings?.aboutTextColor || "text-muted-foreground")}
+            className={cn("text-body whitespace-pre-wrap", settings?.aboutTextColor || "text-muted-foreground")}
             style={textStyle}
             >
             {aboutText}
