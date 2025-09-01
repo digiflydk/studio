@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -398,12 +397,13 @@ export default function CmsHomePage() {
         bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
       });
       
-      const sections = ['services', 'aiProject', 'cases', 'about', 'contact'];
       const newSectionPadding: GeneralSettings['sectionPadding'] = {
         services: ensurePadding(initialSettings.sectionPadding?.services),
         aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
         cases: ensurePadding(initialSettings.sectionPadding?.cases),
         about: ensurePadding(initialSettings.sectionPadding?.about),
+        customers: ensurePadding(initialSettings.sectionPadding?.customers),
+        blog: ensurePadding(initialSettings.sectionPadding?.blog),
         contact: ensurePadding(initialSettings.sectionPadding?.contact),
       };
 
@@ -458,6 +458,22 @@ export default function CmsHomePage() {
           teamMemberDescriptionColor: initialSettings.teamMemberDescriptionColor ?? 'text-muted-foreground',
           teamMemberDescriptionSize: initialSettings.teamMemberDescriptionSize ?? 14,
           
+          customersSectionTitle: initialSettings.customersSectionTitle ?? "Betroet af branchens bedste",
+          customersSectionDescription: initialSettings.customersSectionDescription ?? "",
+          customersSectionTitleColor: initialSettings.customersSectionTitleColor ?? "text-muted-foreground",
+          customersSectionTitleSize: initialSettings.customersSectionTitleSize ?? 16,
+          customersSectionDescriptionColor: initialSettings.customersSectionDescriptionColor ?? "text-muted-foreground",
+          customersSectionDescriptionSize: initialSettings.customersSectionDescriptionSize ?? 18,
+          customersSectionBackgroundColor: initialSettings.customersSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
+
+          blogSectionTitle: initialSettings.blogSectionTitle ?? "Seneste fra bloggen",
+          blogSectionDescription: initialSettings.blogSectionDescription ?? "Læs vores seneste indlæg om teknologi, AI og digitalisering.",
+          blogSectionTitleColor: initialSettings.blogSectionTitleColor ?? "text-black",
+          blogSectionTitleSize: initialSettings.blogSectionTitleSize ?? 36,
+          blogSectionDescriptionColor: initialSettings.blogSectionDescriptionColor ?? "text-muted-foreground",
+          blogSectionDescriptionSize: initialSettings.blogSectionDescriptionSize ?? 18,
+          blogSectionBackgroundColor: initialSettings.blogSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
+
           sectionPadding: newSectionPadding,
       });
 
@@ -959,6 +975,136 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
+
+        <Card className="shadow-lg">
+            <AccordionItem value="customers">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <CardTitle>Kunde Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer indholdet i sektionen med kundelogoer.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="customers-title">Sektionstitel</Label>
+                            <Input id="customers-title" value={settings.customersSectionTitle || ''} onChange={e => handleInputChange('customersSectionTitle', e.target.value)} />
+                        </div>
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                            <h3 className="font-semibold">Design for Sektionstitel</h3>
+                            <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.customersSectionTitleColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('customersSectionTitleColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.customersSectionTitleSize || 16}px</span>
+                                </div>
+                                <Slider value={[settings.customersSectionTitleSize || 16]} onValueChange={([v]) => handleInputChange('customersSectionTitleSize', v)} min={12} max={48} step={1} />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="customers-description">Sektionsbeskrivelse</Label>
+                            <Textarea id="customers-description" value={settings.customersSectionDescription || ''} onChange={e => handleInputChange('customersSectionDescription', e.target.value)} />
+                        </div>
+                         <div className="p-4 border rounded-lg bg-muted/20">
+                             <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
+                             <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.customersSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('customersSectionDescriptionColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                             <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.customersSectionDescriptionSize || 18}px</span>
+                                </div>
+                                <Slider value={[settings.customersSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('customersSectionDescriptionSize', v)} min={10} max={32} step={1} />
+                            </div>
+                        </div>
+                        {settings.customersSectionBackgroundColor &&
+                          <HslColorPicker 
+                              label="Baggrundsfarve"
+                              color={settings.customersSectionBackgroundColor}
+                              onChange={(hsl) => handleInputChange('customersSectionBackgroundColor', hsl)}
+                          />
+                        }
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+
+        <Card className="shadow-lg">
+            <AccordionItem value="blog">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <CardTitle>Blog Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer indholdet i sektionen med de seneste blogindlæg.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="blog-title">Sektionstitel</Label>
+                            <Input id="blog-title" value={settings.blogSectionTitle || ''} onChange={e => handleInputChange('blogSectionTitle', e.target.value)} />
+                        </div>
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                            <h3 className="font-semibold">Design for Sektionstitel</h3>
+                            <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.blogSectionTitleColor as ThemeColor || 'text-black'} onValueChange={(v) => handleInputChange('blogSectionTitleColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.blogSectionTitleSize || 36}px</span>
+                                </div>
+                                <Slider value={[settings.blogSectionTitleSize || 36]} onValueChange={([v]) => handleInputChange('blogSectionTitleSize', v)} min={10} max={120} step={1} />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="blog-description">Sektionsbeskrivelse</Label>
+                            <Textarea id="blog-description" value={settings.blogSectionDescription || ''} onChange={e => handleInputChange('blogSectionDescription', e.target.value)} />
+                        </div>
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                            <h3 className="font-semibold">Design for Sektionsbeskrivelse</h3>
+                            <div className="space-y-2 mt-2">
+                                <Label>Farve</Label>
+                                <Select value={settings.blogSectionDescriptionColor as ThemeColor || 'text-muted-foreground'} onValueChange={(v) => handleInputChange('blogSectionDescriptionColor', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>{themeColorOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Tekststørrelse</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.blogSectionDescriptionSize || 18}px</span>
+                                </div>
+                                <Slider value={[settings.blogSectionDescriptionSize || 18]} onValueChange={([v]) => handleInputChange('blogSectionDescriptionSize', v)} min={10} max={120} step={1} />
+                            </div>
+                        </div>
+                        {settings.blogSectionBackgroundColor &&
+                          <HslColorPicker 
+                              label="Baggrundsfarve"
+                              color={settings.blogSectionBackgroundColor}
+                              onChange={(hsl) => handleInputChange('blogSectionBackgroundColor', hsl)}
+                          />
+                        }
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
         
         <Card className="shadow-lg">
             <AccordionItem value="spacing">
@@ -999,6 +1145,22 @@ export default function CmsHomePage() {
                                 label="Om Os"
                                 padding={settings.sectionPadding.about}
                                 onPaddingChange={(v, p) => handlePaddingChange('about', v, p)}
+                                previewMode={previewMode}
+                            />
+                        )}
+                        {settings.sectionPadding?.customers && (
+                            <SpacingEditor
+                                label="Kunder"
+                                padding={settings.sectionPadding.customers}
+                                onPaddingChange={(v, p) => handlePaddingChange('customers', v, p)}
+                                previewMode={previewMode}
+                            />
+                        )}
+                        {settings.sectionPadding?.blog && (
+                            <SpacingEditor
+                                label="Blog"
+                                padding={settings.sectionPadding.blog}
+                                onPaddingChange={(v, p) => handlePaddingChange('blog', v, p)}
                                 previewMode={previewMode}
                             />
                         )}

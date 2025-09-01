@@ -197,6 +197,23 @@ export interface GeneralSettings {
     teamMemberTitleSize?: number;
     teamMemberDescriptionColor?: string;
     teamMemberDescriptionSize?: number;
+    
+    customersSectionTitle?: string;
+    customersSectionTitleColor?: string;
+    customersSectionTitleSize?: number;
+    customersSectionDescription?: string;
+    customersSectionDescriptionColor?: string;
+    customersSectionDescriptionSize?: number;
+    customersSectionBackgroundColor?: HSLColor;
+    
+    blogSectionTitle?: string;
+    blogSectionTitleColor?: string;
+    blogSectionTitleSize?: number;
+    blogSectionDescription?: string;
+    blogSectionDescriptionColor?: string;
+    blogSectionDescriptionSize?: number;
+    blogSectionBackgroundColor?: HSLColor;
+
 
     // Spacing
     sectionPadding?: {
@@ -204,6 +221,8 @@ export interface GeneralSettings {
         aiProject: SectionPadding;
         cases: SectionPadding;
         about: SectionPadding;
+        customers: SectionPadding;
+        blog: SectionPadding;
         contact: SectionPadding;
     };
 

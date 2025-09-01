@@ -8,6 +8,7 @@ import ContactSection from '@/components/sections/contact';
 import StickyCta from '@/components/sticky-cta';
 import { getGeneralSettings } from '@/services/settings';
 import CustomersSection from '@/components/sections/customers';
+import BlogSection from '@/components/sections/blog';
 
 export default async function Home() {
   const settings = await getGeneralSettings();
@@ -22,6 +23,7 @@ export default async function Home() {
       />
       <AboutSection settings={settings} />
       <CustomersSection settings={settings} />
+      <BlogSection settings={settings} />
       <ContactSection settings={settings} />
       <StickyCta />
     </>

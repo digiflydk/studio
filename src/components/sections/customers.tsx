@@ -20,6 +20,9 @@ interface CustomersSectionProps {
 export default function CustomersSection({ settings }: CustomersSectionProps) {
   const isMobile = useIsMobile();
   const customers = settings?.customers || [];
+  
+  const title = settings?.customersSectionTitle || "Betroet af branchens bedste";
+  const description = settings?.customersSectionDescription || "";
 
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
@@ -29,7 +32,7 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
     return null;
   }
   
-  const sectionPadding = settings?.sectionPadding?.cases; // Using cases padding for now
+  const sectionPadding = settings?.sectionPadding?.customers;
   const paddingTop = isMobile ? sectionPadding?.topMobile : sectionPadding?.top;
   const paddingBottom = isMobile ? sectionPadding?.bottomMobile : sectionPadding?.bottom;
 
@@ -38,15 +41,41 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
     paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
   };
 
+  if (settings?.customersSectionBackgroundColor) {
+    const { h, s, l } = settings.customersSectionBackgroundColor;
+    style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  }
+  
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.customersSectionTitleSize ? `${settings.customersSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.customersSectionDescriptionSize ? `${settings.customersSectionDescriptionSize}px` : undefined,
+  };
+
+
   return (
     <section 
         id="customers" 
-        className="bg-secondary" 
         style={style}
+        className={cn(!settings?.customersSectionBackgroundColor && 'bg-secondary')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className="text-center mb-12">
-            <h3 className="text-lg font-semibold tracking-wider text-muted-foreground uppercase">Betroet af branchens bedste</h3>
+            <h3 
+                className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground')}
+                style={titleStyle}
+            >
+                {title}
+            </h3>
+            {description && (
+                <p 
+                    className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.customersSectionDescriptionColor || "text-muted-foreground")}
+                    style={descriptionStyle}
+                >
+                    {description}
+                </p>
+            )}
         </div>
         <Carousel
           plugins={[plugin.current]}
