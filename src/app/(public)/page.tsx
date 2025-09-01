@@ -20,8 +20,8 @@ export default async function Home() {
       <CasesSection
         settings={settings}
       />
-      <CustomersSection settings={settings} />
       <AboutSection settings={settings} />
+      <CustomersSection settings={settings} />
       <ContactSection settings={settings} />
       <StickyCta />
     </>
