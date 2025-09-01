@@ -10,7 +10,7 @@ import { qualifyProjectAction } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
-import type { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 import type { AIProjectQualificationOutput, AIProjectQualificationInput } from '@/ai/flows/ai-project-qualification';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -243,4 +243,3 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     </section>
   );
 }
-

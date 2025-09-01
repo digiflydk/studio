@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Loader2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { GeneralSettings } from "@/services/settings";
+import type { GeneralSettings } from "@/types/settings";
 import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 
 const weekDays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
@@ -28,7 +28,7 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
 }, {} as Record<string, OpeningTime>);
 
 export default function GeneralSettingsPage() {
-    const [settings, setSettings] = useState<GeneralSettings>({ openingHours: initialOpeningHours });
+    const [settings, setSettings] = useState<Partial<GeneralSettings>>({ openingHours: initialOpeningHours });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, startSaving] = useTransition();
     const { toast } = useToast();
@@ -54,7 +54,7 @@ export default function GeneralSettingsPage() {
 
     const removeImage = (type: 'logo' | 'favicon') => {
         const fieldName = type === 'logo' ? 'logoUrl' : 'faviconUrl';
-        const updatedSettings: GeneralSettings = { ...settings, [fieldName]: undefined };
+        const updatedSettings: Partial<GeneralSettings> = { ...settings, [fieldName]: undefined };
         if (type === 'logo') {
             updatedSettings.logoAlt = undefined;
         }

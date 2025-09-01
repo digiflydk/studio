@@ -2,7 +2,8 @@
 'use server';
 import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
-import { getGeneralSettings, saveGeneralSettings, GeneralSettings, Customer, BlogPost } from '@/services/settings';
+import { getGeneralSettings, saveGeneralSettings } from '@/services/settings';
+import type { GeneralSettings, Customer, BlogPost } from '@/types/settings';
 import { revalidatePath } from 'next/cache';
 import { getAllLeads, Lead } from '@/services/leads';
 import { v4 as uuidv4 } from 'uuid';

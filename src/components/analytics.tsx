@@ -4,7 +4,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 
 declare global {
   interface Window {

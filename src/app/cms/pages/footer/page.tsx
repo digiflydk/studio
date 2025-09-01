@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';

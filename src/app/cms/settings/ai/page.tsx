@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, KeyRound, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';

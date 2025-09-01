@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { GeneralSettings } from "@/services/settings";
+import type { GeneralSettings } from "@/types/settings";
 import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 import { Loader2, Linkedin, Facebook, Twitter, Instagram, Clapperboard } from "lucide-react";
 
@@ -119,7 +119,7 @@ export default function SocialSettingsPage() {
                     <Input 
                         id={platform.name}
                         placeholder={`https://www.${platform.label.toLowerCase().split(' ')[0]}.com/dit-profil`}
-                        value={settings[platform.name] || ''}
+                        value={settings[platform.name as keyof typeof settings] as string || ''}
                         onChange={(e) => handleInputChange(platform.name, e.target.value)}
                     />
                 </div>

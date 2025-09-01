@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type TeamMember, type GeneralSettings, type SectionPadding, type Alignment } from '@/services/settings';
+import type { TeamMember, GeneralSettings, SectionPadding, Alignment } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 

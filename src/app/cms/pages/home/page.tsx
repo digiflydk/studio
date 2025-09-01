@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink, defaultSectionOrder } from '@/services/settings';
+import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight, GripVertical } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -36,6 +36,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'blog'];
 
 const defaultServices: Service[] = [
   {

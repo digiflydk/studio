@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useState, useCallback, useEffect, useContext } from 'react';
-import type { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 
 type HSLColor = { h: number; s: number; l: number };
 type FontSizes = {

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, NavLink } from '@/services/settings';
+import type { GeneralSettings, NavLink } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

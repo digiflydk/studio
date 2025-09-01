@@ -1,7 +1,7 @@
 
 'use client';
 import Image from 'next/image';
-import { type GeneralSettings } from '@/services/settings';
+import { type GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';

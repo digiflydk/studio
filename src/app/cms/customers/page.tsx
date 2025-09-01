@@ -11,7 +11,7 @@ import {
   deleteCustomerAction,
   getCustomersAction,
 } from '@/app/actions';
-import type { Customer } from '@/services/settings';
+import type { Customer } from '@/types/settings';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Form,

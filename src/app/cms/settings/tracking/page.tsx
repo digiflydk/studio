@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { GeneralSettings } from "@/services/settings";
+import type { GeneralSettings } from "@/types/settings";
 import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 import { Loader2, AlertTriangle, Lightbulb } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

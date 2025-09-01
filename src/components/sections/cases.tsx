@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
-import type { Case, GeneralSettings } from '@/services/settings';
+import type { Case, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 

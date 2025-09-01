@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { GeneralSettings } from "@/services/settings";
+import type { GeneralSettings } from "@/types/settings";
 import { getSettingsAction, saveSettingsAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";

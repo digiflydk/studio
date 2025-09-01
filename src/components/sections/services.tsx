@@ -2,7 +2,7 @@
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { type Service, type GeneralSettings } from '@/services/settings';
+import type { Service, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '../ui/button';

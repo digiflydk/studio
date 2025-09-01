@@ -2,7 +2,7 @@
 import { Linkedin, Facebook, Instagram, Twitter, Clapperboard } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/logo';
-import { type GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 
 const socialIcons = {

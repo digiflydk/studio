@@ -8,7 +8,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
-import { getGeneralSettings, GeneralSettings } from "@/services/settings";
+import { getGeneralSettings } from "@/services/settings";
+import type { GeneralSettings } from "@/types/settings";
 
 const settingsNavLinks = [
     { href: "/cms/settings/general", label: "General", icon: Settings },

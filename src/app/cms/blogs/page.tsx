@@ -11,7 +11,7 @@ import {
   deleteBlogPostAction,
   getBlogPostsAction,
 } from '@/app/actions';
-import type { BlogPost } from '@/services/settings';
+import type { BlogPost } from '@/types/settings';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';

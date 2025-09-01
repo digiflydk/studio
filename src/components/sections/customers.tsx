@@ -9,7 +9,7 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { type GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
