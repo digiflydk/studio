@@ -39,14 +39,19 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
   const alignmentClasses = {
     vertical: {
-      top: 'items-start',
+      top: 'items-start pt-16',
       center: 'items-center',
-      bottom: 'items-end',
+      bottom: 'items-end pb-16',
     },
-    horizontal: {
-      left: 'text-left items-start',
-      center: 'text-center items-center',
-      right: 'text-right items-end',
+    horizontalContainer: {
+        left: 'items-start',
+        center: 'items-center',
+        right: 'items-end',
+    },
+    horizontalText: {
+        left: 'text-left',
+        center: 'text-center',
+        right: 'text-right',
     },
   };
 
@@ -99,15 +104,14 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       </div>
      
       <div className={cn(
-        "w-full h-full text-white flex",
-        "pt-[calc(var(--header-height)_+_4rem)] pb-16",
+        "relative w-full h-full text-white flex flex-col justify-center",
         "container mx-auto px-4 md:px-6",
-        alignmentClasses.vertical[verticalAlign],
-        horizontalAlign === 'center' ? 'justify-center' : horizontalAlign === 'left' ? 'justify-start' : 'justify-end'
+        alignmentClasses.vertical[verticalAlign]
       )}>
         <div className={cn(
-            "flex flex-col space-y-6 hero-text-container z-10",
-            alignmentClasses.horizontal[horizontalAlign]
+            "flex flex-col space-y-6 hero-text-container z-10 w-full",
+            alignmentClasses.horizontalContainer[horizontalAlign],
+            alignmentClasses.horizontalText[horizontalAlign]
         )}>
           <h1 
             className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
