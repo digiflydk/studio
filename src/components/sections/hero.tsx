@@ -37,22 +37,6 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
   const ctaTextSize = isMobile ? settings?.heroCtaTextSizeMobile : settings?.heroCtaTextSize;
   const ctaStyle: React.CSSProperties = ctaTextSize ? { fontSize: `${ctaTextSize}px` } : {};
 
-  const alignmentClasses = {
-    vertical: {
-      top: 'items-start pt-16',
-      center: 'items-center',
-      bottom: 'items-end pb-16',
-    },
-    horizontal: {
-      left: 'items-start text-left',
-      center: 'items-center text-center',
-      right: 'items-end text-right',
-    },
-  };
-
-  const verticalAlign = settings?.heroVerticalAlignment || 'center';
-  const horizontalAlign = settings?.heroAlignment || 'center';
-
   const getLinkHref = (href: string) => {
     if (href.startsWith('#') && pathname !== '/') {
       return `/${href}`;
@@ -98,15 +82,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         />
       </div>
      
-      <div className={cn(
-        "relative w-full h-full text-white flex flex-col",
-        "container mx-auto px-4 md:px-6",
-        alignmentClasses.vertical[verticalAlign]
-      )}>
-        <div className={cn(
-            "flex flex-col space-y-6 hero-text-container z-10 w-full",
-            alignmentClasses.horizontal[horizontalAlign]
-        )}>
+      <div className="relative h-full container mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col items-center space-y-6 hero-text-container z-10 w-full text-white">
           <h1 
             className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
           >
