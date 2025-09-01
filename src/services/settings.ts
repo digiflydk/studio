@@ -82,6 +82,8 @@ export interface SectionVisibility {
 
 export type Alignment = 'left' | 'center' | 'right';
 
+export const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'blog'];
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -163,6 +165,8 @@ export interface GeneralSettings {
     footerContactSize?: number;
 
     // Home Page Content
+    homePageSectionOrder?: string[];
+
     heroHeadline?: string;
     heroHeadlineColor?: string;
     heroHeadlineSize?: number;

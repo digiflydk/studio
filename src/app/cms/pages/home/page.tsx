@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment } from '@/services/settings';
+import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink, defaultSectionOrder } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight, GripVertical } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -18,6 +18,24 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 const defaultServices: Service[] = [
   {
@@ -416,6 +434,23 @@ function SpacingEditor({
   );
 }
 
+function SortableSection({ id, children }: { id: string, children: React.ReactNode }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="relative">
+            {children}
+            <div {...attributes} {...listeners} className="absolute top-4 right-4 z-10 p-2 cursor-grab text-muted-foreground hover:bg-muted rounded-md active:cursor-grabbing">
+                <GripVertical className="h-5 w-5" />
+            </div>
+        </div>
+    );
+}
 
 export default function CmsHomePage() {
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
@@ -423,6 +458,15 @@ export default function CmsHomePage() {
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [activeAccordionItem, setActiveAccordionItem] = useState<string | string[]>('hero');
+
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     async function loadSettings() {
@@ -450,6 +494,8 @@ export default function CmsHomePage() {
 
       setSettings({
           ...initialSettings,
+          homePageSectionOrder: initialSettings.homePageSectionOrder ?? defaultSectionOrder,
+          
           heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
           heroHeadlineColor: initialSettings.heroHeadlineColor ?? 'text-white',
           heroHeadlineSize: initialSettings.heroHeadlineSize ?? 64,
@@ -474,7 +520,7 @@ export default function CmsHomePage() {
           featureSectionHeadingColor: initialSettings.featureSectionHeadingColor ?? 'text-foreground',
           featureSectionHeadingSize: initialSettings.featureSectionHeadingSize ?? 48,
           featureSectionHeadingSizeMobile: initialSettings.featureSectionHeadingSizeMobile ?? 36,
-          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
+          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
           featureSectionBodyColor: initialSettings.featureSectionBodyColor ?? 'text-muted-foreground',
           featureSectionBodySize: initialSettings.featureSectionBodySize ?? 18,
           featureSectionBodySizeMobile: initialSettings.featureSectionBodySizeMobile ?? 16,
@@ -628,6 +674,22 @@ export default function CmsHomePage() {
       });
     });
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+        setSettings((prev) => {
+            const oldOrder = prev.homePageSectionOrder || [];
+            const oldIndex = oldOrder.indexOf(active.id as string);
+            const newIndex = oldOrder.indexOf(over!.id as string);
+            return {
+                ...prev,
+                homePageSectionOrder: arrayMove(oldOrder, oldIndex, newIndex)
+            }
+        });
+    }
+  }
   
   if (isLoading) {
     return (
@@ -643,37 +705,8 @@ export default function CmsHomePage() {
   const featureCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.featureSectionCtaLink);
   const featureCtaSelectValue = featureCtaIsCustomLink ? 'custom' : settings.featureSectionCtaLink;
 
-  return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Forside Indhold</h1>
-          <p className="text-muted-foreground">Administrer indholdet på din forside.</p>
-        </div>
-        <div className="flex items-center gap-4">
-            <ToggleGroup 
-                type="single" 
-                value={previewMode}
-                onValueChange={(value: 'desktop' | 'mobile') => value && setPreviewMode(value)}
-                aria-label="Vælg visning"
-                variant="outline"
-            >
-                <ToggleGroupItem value="desktop" aria-label="Desktop visning">
-                    <Monitor className="h-4 w-4" />
-                </ToggleGroupItem>
-                <ToggleGroupItem value="mobile" aria-label="Mobil visning">
-                    <Smartphone className="h-4 w-4" />
-                </ToggleGroupItem>
-            </ToggleGroup>
-
-            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
-            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Gem Ændringer
-            </Button>
-        </div>
-      </div>
-
-      <Accordion type="multiple" className="w-full space-y-4" defaultValue={['hero']}>
+  const sectionComponents: Record<string, React.ReactNode> = {
+    hero: (
         <Card className="shadow-lg">
             <AccordionItem value="hero">
                 <AccordionTrigger className="px-6 py-4">
@@ -831,7 +864,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-        
+    ),
+    feature: (
         <Card className="shadow-lg">
             <AccordionItem value="feature">
                 <AccordionTrigger className="px-6 py-4">
@@ -975,8 +1009,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-
-
+    ),
+    services: (
         <Card className="shadow-lg">
             <AccordionItem value="services">
                 <AccordionTrigger className="px-6 py-4">
@@ -1163,7 +1197,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-
+    ),
+    aiProject: (
         <Card className="shadow-lg">
             <AccordionItem value="ai-project">
                 <AccordionTrigger className="px-6 py-4">
@@ -1234,7 +1269,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-      
+    ),
+    cases: (
         <Card className="shadow-lg">
             <AccordionItem value="cases">
                 <AccordionTrigger className="px-6 py-4">
@@ -1315,7 +1351,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-
+    ),
+    about: (
         <Card className="shadow-lg">
             <AccordionItem value="about">
                 <AccordionTrigger className="px-6 py-4">
@@ -1435,7 +1472,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-
+    ),
+    customers: (
         <Card className="shadow-lg">
             <AccordionItem value="customers">
                 <AccordionTrigger className="px-6 py-4">
@@ -1502,7 +1540,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-
+    ),
+    blog: (
         <Card className="shadow-lg">
             <AccordionItem value="blog">
                 <AccordionTrigger className="px-6 py-4">
@@ -1569,7 +1608,8 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-        
+    ),
+    spacing: (
         <Card className="shadow-lg">
             <AccordionItem value="spacing">
                 <AccordionTrigger className="px-6 py-4">
@@ -1648,7 +1688,62 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
-      </Accordion>
+    )
+  };
+
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Forside Indhold</h1>
+          <p className="text-muted-foreground">Administrer indholdet på din forside. Træk i sektionerne for at ændre rækkefølgen.</p>
+        </div>
+        <div className="flex items-center gap-4">
+            <ToggleGroup 
+                type="single" 
+                value={previewMode}
+                onValueChange={(value: 'desktop' | 'mobile') => value && setPreviewMode(value)}
+                aria-label="Vælg visning"
+                variant="outline"
+            >
+                <ToggleGroupItem value="desktop" aria-label="Desktop visning">
+                    <Monitor className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="mobile" aria-label="Mobil visning">
+                    <Smartphone className="h-4 w-4" />
+                </ToggleGroupItem>
+            </ToggleGroup>
+
+            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Gem Ændringer
+            </Button>
+        </div>
+      </div>
+        <Accordion type="multiple" className="w-full space-y-4" value={activeAccordionItem} onValueChange={setActiveAccordionItem}>
+            {sectionComponents['hero']}
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+            >
+                <SortableContext
+                    items={settings.homePageSectionOrder || []}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <div className="space-y-4">
+                        {(settings.homePageSectionOrder || []).map(id => (
+                            <SortableSection key={id} id={id}>
+                                {sectionComponents[id]}
+                            </SortableSection>
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
+             {sectionComponents['spacing']}
+        </Accordion>
     </div>
   );
 }
