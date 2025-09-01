@@ -43,6 +43,18 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     }
     return href;
   }
+  
+  const verticalAlignmentClasses = {
+      top: 'justify-start pt-32',
+      center: 'justify-center',
+      bottom: 'justify-end pb-20'
+  }
+  
+  const horizontalAlignmentClasses = {
+        left: 'items-start text-left',
+        center: 'items-center text-center',
+        right: 'items-end text-right'
+  }
 
   return (
     <section
@@ -82,8 +94,14 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         />
       </div>
      
-      <div className="relative h-full container mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center">
-        <div className="flex flex-col items-center space-y-6 hero-text-container z-10 w-full text-white">
+      <div className={cn(
+          "relative h-full container mx-auto px-4 md:px-6 flex flex-col",
+           verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
+      )}>
+        <div className={cn(
+            "flex flex-col space-y-6 hero-text-container z-10 w-full text-white",
+            horizontalAlignmentClasses[settings?.heroAlignment || 'center']
+        )}>
           <h1 
             className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
           >
