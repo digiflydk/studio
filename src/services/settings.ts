@@ -79,6 +79,8 @@ export interface SectionVisibility {
     blog: boolean;
 }
 
+export type Alignment = 'left' | 'center' | 'right';
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -169,7 +171,7 @@ export interface GeneralSettings {
     heroDescriptionSize?: number;
     heroDescriptionSizeMobile?: number;
     heroImageUrl?: string;
-    heroAlignment?: 'left' | 'center' | 'right';
+    heroAlignment?: Alignment;
     heroVerticalAlignment?: 'top' | 'center' | 'bottom';
     heroTextMaxWidth?: number;
     heroCtaEnabled?: boolean;
@@ -186,6 +188,7 @@ export interface GeneralSettings {
     servicesSectionDescription?: string;
     servicesSectionDescriptionColor?: string;
     servicesSectionDescriptionSize?: number;
+    servicesSectionAlignment?: Alignment;
     services?: Service[];
     serviceCardTitleColor?: string;
     serviceCardTitleSize?: number;
@@ -207,6 +210,7 @@ export interface GeneralSettings {
     aiProjectSectionDescriptionColor?: string;
     aiProjectSectionDescriptionSize?: number;
     aiProjectSectionBackgroundColor?: HSLColor;
+    aiProjectSectionAlignment?: Alignment;
 
     casesSectionTitle?: string;
     casesSectionTitleColor?: string;
@@ -214,6 +218,7 @@ export interface GeneralSettings {
     casesSectionDescription?: string;
     casesSectionDescriptionColor?: string;
     casesSectionDescriptionSize?: number;
+    casesSectionAlignment?: Alignment;
     cases?: Case[];
     
     aboutSectionTitle?: string;
@@ -222,6 +227,7 @@ export interface GeneralSettings {
     aboutText?: string;
     aboutTextColor?: string;
     aboutTextSize?: number;
+    aboutSectionAlignment?: Alignment;
     teamMembers?: TeamMember[];
     teamMemberNameColor?: string;
     teamMemberNameSize?: number;
@@ -237,6 +243,7 @@ export interface GeneralSettings {
     customersSectionDescriptionColor?: string;
     customersSectionDescriptionSize?: number;
     customersSectionBackgroundColor?: HSLColor;
+    customersSectionAlignment?: Alignment;
     
     blogSectionTitle?: string;
     blogSectionTitleColor?: string;
@@ -245,6 +252,7 @@ export interface GeneralSettings {
     blogSectionDescriptionColor?: string;
     blogSectionDescriptionSize?: number;
     blogSectionBackgroundColor?: HSLColor;
+    blogSectionAlignment?: Alignment;
 
 
     // Spacing

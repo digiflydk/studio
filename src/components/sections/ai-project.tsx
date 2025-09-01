@@ -35,6 +35,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const iconText = settings?.aiProjectSectionIconText || 'AI-drevet Projektkvalificering';
   const title = settings?.aiProjectSectionTitle || 'Har du en idé? Lad os validere den sammen.';
   const description = settings?.aiProjectSectionDescription || 'Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.';
+  const alignment = settings?.aiProjectSectionAlignment || 'left';
 
   const titleStyle: React.CSSProperties = {
     fontSize: settings?.aiProjectSectionTitleSize ? `${settings.aiProjectSectionTitleSize}px` : undefined,
@@ -124,6 +125,12 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
     '--bg-gradient-to': `hsl(${settings?.aiProjectSectionBackgroundColor?.h || 211}, ${settings?.aiProjectSectionBackgroundColor?.s || 100}%, ${Math.max(0, (settings?.aiProjectSectionBackgroundColor?.l || 40) - 20)}%)`
   };
   
+  const alignmentClasses = {
+      left: 'md:text-left',
+      center: 'md:text-center',
+      right: 'md:text-right',
+  };
+
   return (
     <section 
         id="ai-project" 
@@ -135,7 +142,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
       <div className="absolute inset-0 bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
       <div className="container mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-4 text-center md:text-left">
+            <div className={cn("space-y-4 text-center", alignmentClasses[alignment])}>
                 <div className="inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                     <Sparkles className="mr-2 h-4 w-4" />
                     {iconText}

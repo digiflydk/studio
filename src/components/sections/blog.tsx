@@ -20,6 +20,7 @@ export default function BlogSection({ settings }: BlogSectionProps) {
   const posts = settings?.blogPosts || [];
   const title = settings?.blogSectionTitle || "Seneste fra bloggen";
   const description = settings?.blogSectionDescription || "Læs vores seneste indlæg om teknologi, AI og digitalisering.";
+  const alignment = settings?.blogSectionAlignment || 'center';
 
   if (!posts || posts.length === 0) {
     return null;
@@ -47,6 +48,12 @@ export default function BlogSection({ settings }: BlogSectionProps) {
     const { h, s, l } = settings.blogSectionBackgroundColor;
     style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
   }
+  
+  const alignmentClasses = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  };
 
   return (
     <section 
@@ -55,7 +62,7 @@ export default function BlogSection({ settings }: BlogSectionProps) {
         className={cn(!settings?.blogSectionBackgroundColor && 'bg-background')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <div className="mb-12 text-center">
+        <div className={cn("mb-12", alignmentClasses[alignment])}>
            <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.blogSectionTitleColor || "text-black")}
             style={titleStyle}
@@ -63,7 +70,11 @@ export default function BlogSection({ settings }: BlogSectionProps) {
             {title}
           </h2>
           <p 
-            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.blogSectionDescriptionColor || "text-muted-foreground")}
+            className={cn("mt-4 max-w-2xl text-body", settings?.blogSectionDescriptionColor || "text-muted-foreground", {
+                'mx-auto': alignment === 'center',
+                'mr-auto': alignment === 'right',
+                'ml-auto': alignment === 'left',
+            })}
             style={descriptionStyle}
           >
             {description}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Linkedin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type TeamMember, type GeneralSettings, type SectionPadding } from '@/services/settings';
+import { type TeamMember, type GeneralSettings, type SectionPadding, type Alignment } from '@/services/settings';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -48,6 +48,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
     const team = settings?.teamMembers && settings.teamMembers.length > 0 ? settings.teamMembers : defaultTeam;
     const aboutText = settings?.aboutText || defaultAboutText;
     const title = settings?.aboutSectionTitle || "Hvem er Digifly?";
+    const alignment = settings?.aboutSectionAlignment || 'left';
 
     const titleStyle: React.CSSProperties = {
         fontSize: settings?.aboutSectionTitleSize ? `${settings.aboutSectionTitleSize}px` : undefined,
@@ -75,6 +76,11 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
     };
 
+    const alignmentClasses = {
+        left: 'lg:text-left',
+        center: 'lg:text-center',
+        right: 'lg:text-right',
+    };
 
     return (
         <section 
@@ -84,7 +90,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24 items-center">
-                    <div className="text-center lg:text-left">
+                    <div className={cn("text-center", alignmentClasses[alignment])}>
                         <h2 
                         className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
                         style={titleStyle}

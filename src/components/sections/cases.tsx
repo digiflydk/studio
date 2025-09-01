@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -41,6 +42,7 @@ export default function CasesSection({ settings }: CasesSectionProps) {
   const cases = settings?.cases && settings.cases.length > 0 ? settings.cases : defaultCases;
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
+  const alignment = settings?.casesSectionAlignment || 'center';
 
   const titleStyle: React.CSSProperties = {
     fontSize: settings?.casesSectionTitleSize ? `${settings.casesSectionTitleSize}px` : undefined,
@@ -57,6 +59,12 @@ export default function CasesSection({ settings }: CasesSectionProps) {
     paddingTop: paddingTop !== undefined ? `${paddingTop}px` : undefined,
     paddingBottom: paddingBottom !== undefined ? `${paddingBottom}px` : undefined,
   };
+  
+  const alignmentClasses = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  };
 
   return (
     <section 
@@ -65,7 +73,7 @@ export default function CasesSection({ settings }: CasesSectionProps) {
         style={style}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <div className="mb-12 text-center">
+        <div className={cn("mb-12", alignmentClasses[alignment])}>
            <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.casesSectionTitleColor || "text-black")}
             style={titleStyle}
@@ -73,7 +81,11 @@ export default function CasesSection({ settings }: CasesSectionProps) {
             {title}
           </h2>
           <p 
-            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground")}
+            className={cn("mt-4 max-w-2xl text-body", settings?.casesSectionDescriptionColor || "text-muted-foreground", {
+                'mx-auto': alignment === 'center',
+                'mr-auto': alignment === 'right',
+                'ml-auto': alignment === 'left',
+            })}
             style={descriptionStyle}
           >
             {description}

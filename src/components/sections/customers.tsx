@@ -23,6 +23,7 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
   
   const title = settings?.customersSectionTitle || "Betroet af branchens bedste";
   const description = settings?.customersSectionDescription || "";
+  const alignment = settings?.customersSectionAlignment || 'center';
 
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
@@ -52,6 +53,12 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
   const descriptionStyle: React.CSSProperties = {
     fontSize: settings?.customersSectionDescriptionSize ? `${settings.customersSectionDescriptionSize}px` : undefined,
   };
+  
+  const alignmentClasses = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  };
 
 
   return (
@@ -61,16 +68,24 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
         className={cn(!settings?.customersSectionBackgroundColor && 'bg-secondary')}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <div className="text-center mb-12">
+        <div className={cn("mb-12", alignmentClasses[alignment])}>
             <h3 
-                className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground')}
+                className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground', {
+                    'mx-auto': alignment === 'center',
+                    'mr-auto': alignment === 'right',
+                    'ml-auto': alignment === 'left',
+                })}
                 style={titleStyle}
             >
                 {title}
             </h3>
             {description && (
                 <p 
-                    className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.customersSectionDescriptionColor || "text-muted-foreground")}
+                    className={cn("mt-4 max-w-2xl text-body", settings?.customersSectionDescriptionColor || "text-muted-foreground", {
+                        'mx-auto': alignment === 'center',
+                        'mr-auto': alignment === 'right',
+                        'ml-auto': alignment === 'left',
+                    })}
                     style={descriptionStyle}
                 >
                     {description}

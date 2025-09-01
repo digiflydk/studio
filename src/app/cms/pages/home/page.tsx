@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility } from '@/services/settings';
+import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -195,6 +195,25 @@ function HslColorPicker({
         </div>
     )
 }
+
+function AlignmentControl({ value, onValueChange }: { value: Alignment, onValueChange: (value: Alignment) => void}) {
+    return (
+        <div className="p-4 border rounded-lg space-y-2 bg-muted/20">
+            <Label>Justering</Label>
+            <ToggleGroup 
+                type="single" 
+                value={value}
+                onValueChange={(v: Alignment) => v && onValueChange(v)}
+                className='w-full'
+            >
+                <ToggleGroupItem value="left" aria-label="Venstre" className='flex-1'><AlignHorizontalJustifyStart className='h-4 w-4'/></ToggleGroupItem>
+                <ToggleGroupItem value="center" aria-label="Center" className='flex-1'><AlignHorizontalJustifyCenter className='h-4 w-4'/></ToggleGroupItem>
+                <ToggleGroupItem value="right" aria-label="Højre" className='flex-1'><AlignHorizontalJustifyEnd className='h-4 w-4'/></ToggleGroupItem>
+            </ToggleGroup>
+        </div>
+    );
+}
+
 
 function TextStyleEditor({
     label,
@@ -456,6 +475,7 @@ export default function CmsHomePage() {
           servicesSectionDescription: initialSettings.servicesSectionDescription ?? "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.",
           servicesSectionDescriptionColor: initialSettings.servicesSectionDescriptionColor ?? "text-muted-foreground",
           servicesSectionDescriptionSize: initialSettings.servicesSectionDescriptionSize ?? 18,
+          servicesSectionAlignment: initialSettings.servicesSectionAlignment ?? 'center',
           services: initialSettings.services && initialSettings.services.length > 0 ? initialSettings.services : defaultServices,
           serviceCardTitleColor: initialSettings.serviceCardTitleColor ?? "text-foreground",
           serviceCardTitleSize: initialSettings.serviceCardTitleSize ?? 24,
@@ -477,6 +497,7 @@ export default function CmsHomePage() {
           aiProjectSectionDescriptionColor: initialSettings.aiProjectSectionDescriptionColor ?? 'text-gray-300',
           aiProjectSectionDescriptionSize: initialSettings.aiProjectSectionDescriptionSize ?? 18,
           aiProjectSectionBackgroundColor: initialSettings.aiProjectSectionBackgroundColor ?? { h: 240, s: 10, l: 10 },
+          aiProjectSectionAlignment: initialSettings.aiProjectSectionAlignment ?? 'left',
 
           casesSectionTitle: initialSettings.casesSectionTitle ?? "Vores Arbejde",
           casesSectionTitleColor: initialSettings.casesSectionTitleColor ?? "text-black",
@@ -484,6 +505,7 @@ export default function CmsHomePage() {
           casesSectionDescription: initialSettings.casesSectionDescription ?? "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.",
           casesSectionDescriptionColor: initialSettings.casesSectionDescriptionColor ?? "text-muted-foreground",
           casesSectionDescriptionSize: initialSettings.casesSectionDescriptionSize ?? 18,
+          casesSectionAlignment: initialSettings.casesSectionAlignment ?? 'center',
           cases: initialSettings.cases && initialSettings.cases.length > 0 ? initialSettings.cases : defaultCases,
           
           aboutSectionTitle: initialSettings.aboutSectionTitle ?? "Hvem er Digifly?",
@@ -492,6 +514,7 @@ export default function CmsHomePage() {
           aboutText: initialSettings.aboutText ?? defaultAboutText,
           aboutTextColor: initialSettings.aboutTextColor ?? "text-muted-foreground",
           aboutTextSize: initialSettings.aboutTextSize ?? 18,
+          aboutSectionAlignment: initialSettings.aboutSectionAlignment ?? 'left',
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
           teamMemberNameColor: initialSettings.teamMemberNameColor ?? 'text-foreground',
           teamMemberNameSize: initialSettings.teamMemberNameSize ?? 18,
@@ -507,6 +530,7 @@ export default function CmsHomePage() {
           customersSectionDescriptionColor: initialSettings.customersSectionDescriptionColor ?? "text-muted-foreground",
           customersSectionDescriptionSize: initialSettings.customersSectionDescriptionSize ?? 18,
           customersSectionBackgroundColor: initialSettings.customersSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
+          customersSectionAlignment: initialSettings.customersSectionAlignment ?? 'center',
 
           blogSectionTitle: initialSettings.blogSectionTitle ?? "Seneste fra bloggen",
           blogSectionDescription: initialSettings.blogSectionDescription ?? "Læs vores seneste indlæg om teknologi, AI og digitalisering.",
@@ -515,6 +539,7 @@ export default function CmsHomePage() {
           blogSectionDescriptionColor: initialSettings.blogSectionDescriptionColor ?? "text-muted-foreground",
           blogSectionDescriptionSize: initialSettings.blogSectionDescriptionSize ?? 18,
           blogSectionBackgroundColor: initialSettings.blogSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
+          blogSectionAlignment: initialSettings.blogSectionAlignment ?? 'center',
 
           sectionPadding: newSectionPadding,
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
@@ -671,7 +696,7 @@ export default function CmsHomePage() {
                                     <ToggleGroup 
                                         type="single" 
                                         value={settings.heroAlignment}
-                                        onValueChange={(value: 'left' | 'center' | 'right') => value && handleInputChange('heroAlignment', value)}
+                                        onValueChange={(value: Alignment) => value && handleInputChange('heroAlignment', value)}
                                         className='w-full'
                                     >
                                         <ToggleGroupItem value="left" aria-label="Venstre" className='flex-1'><AlignHorizontalJustifyStart className='h-4 w-4'/></ToggleGroupItem>
@@ -832,6 +857,10 @@ export default function CmsHomePage() {
                              mobileSize={settings.servicesSectionDescriptionSize || 18}
                              onMobileSizeChange={(v) => handleInputChange('servicesSectionDescriptionSize', v)}
                              previewMode={previewMode}
+                        />
+                        <AlignmentControl 
+                            value={settings.servicesSectionAlignment || 'center'}
+                            onValueChange={(v) => handleInputChange('servicesSectionAlignment', v)}
                         />
 
                         <div className="space-y-4">
@@ -1020,6 +1049,10 @@ export default function CmsHomePage() {
                             onMobileSizeChange={(v) => handleInputChange('aiProjectSectionDescriptionSize', v)}
                             previewMode={previewMode}
                         />
+                         <AlignmentControl 
+                            value={settings.aiProjectSectionAlignment || 'left'}
+                            onValueChange={(v) => handleInputChange('aiProjectSectionAlignment', v)}
+                        />
 
                         {settings.aiProjectSectionBackgroundColor &&
                           <HslColorPicker 
@@ -1083,6 +1116,10 @@ export default function CmsHomePage() {
                              onMobileSizeChange={(v) => handleInputChange('casesSectionDescriptionSize', v)}
                              previewMode={previewMode}
                         />
+                         <AlignmentControl 
+                            value={settings.casesSectionAlignment || 'center'}
+                            onValueChange={(v) => handleInputChange('casesSectionAlignment', v)}
+                        />
 
                         <Label>Case-kort</Label>
                         <Accordion type="multiple" className="w-full border rounded-md">
@@ -1144,6 +1181,10 @@ export default function CmsHomePage() {
                            mobileSize={settings.aboutSectionTitleSize || 36}
                            onMobileSizeChange={(v) => handleInputChange('aboutSectionTitleSize', v)}
                            previewMode={previewMode}
+                        />
+                         <AlignmentControl 
+                            value={settings.aboutSectionAlignment || 'left'}
+                            onValueChange={(v) => handleInputChange('aboutSectionAlignment', v)}
                         />
 
                         <div className="space-y-2">
@@ -1276,6 +1317,10 @@ export default function CmsHomePage() {
                              onMobileSizeChange={(v) => handleInputChange('customersSectionDescriptionSize', v)}
                              previewMode={previewMode}
                          />
+                         <AlignmentControl 
+                            value={settings.customersSectionAlignment || 'center'}
+                            onValueChange={(v) => handleInputChange('customersSectionAlignment', v)}
+                        />
 
                         {settings.customersSectionBackgroundColor &&
                           <HslColorPicker 
@@ -1338,6 +1383,10 @@ export default function CmsHomePage() {
                             mobileSize={settings.blogSectionDescriptionSize || 18}
                             onMobileSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}
                             previewMode={previewMode}
+                        />
+                        <AlignmentControl 
+                            value={settings.blogSectionAlignment || 'center'}
+                            onValueChange={(v) => handleInputChange('blogSectionAlignment', v)}
                         />
 
                         {settings.blogSectionBackgroundColor &&

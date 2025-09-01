@@ -45,6 +45,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
+  const alignment = settings?.servicesSectionAlignment || 'center';
 
   const titleStyle: React.CSSProperties = {
     fontSize: settings?.servicesSectionTitleSize ? `${settings.servicesSectionTitleSize}px` : undefined,
@@ -71,6 +72,12 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
     '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
   } as any : {};
 
+  const alignmentClasses = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  };
+
 
   return (
     <section 
@@ -79,7 +86,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         style={style}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <div className="mb-12 text-center">
+        <div className={cn("mb-12", alignmentClasses[alignment])}>
           <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.servicesSectionTitleColor || "text-black")}
             style={titleStyle}
@@ -87,7 +94,11 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
             {title}
           </h2>
           <p 
-            className={cn("mt-4 max-w-2xl mx-auto text-body", settings?.servicesSectionDescriptionColor || "text-muted-foreground")}
+            className={cn("mt-4 max-w-2xl text-body", settings?.servicesSectionDescriptionColor || "text-muted-foreground", {
+                'mx-auto': alignment === 'center',
+                'mr-auto': alignment === 'right',
+                'ml-auto': alignment === 'left',
+            })}
             style={descriptionStyle}
           >
             {description}
@@ -95,7 +106,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         </div>
         <div className="flex flex-wrap gap-8 justify-center">
           {services.map((service) => (
-            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]">
+            <Card key={service.title} className="group flex flex-col overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)]">
               <div className="relative w-full h-40">
                   <Image
                     src={service.imageUrl}
