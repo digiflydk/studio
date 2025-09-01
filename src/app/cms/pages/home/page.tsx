@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { GeneralSettings, Service, Case, TeamMember, SectionPadding, SectionVisibility } from '@/services/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
-import { Loader2, Trash2, Monitor, Smartphone, ExternalLink, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd } from 'lucide-react';
+import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -1285,5 +1285,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
-    
