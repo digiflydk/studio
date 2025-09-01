@@ -21,29 +21,11 @@ const defaultNavLinks: NavLink[] = [
 export default function Header({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [navLinks, setNavLinks] = useState(settings?.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks);
-
-  useEffect(() => {
-    if (!settings) return;
-    const baseNavLinks = settings.headerNavLinks && settings.headerNavLinks.length > 0 ? settings.headerNavLinks : defaultNavLinks;
-    const hasBlog = settings.blogPosts && settings.blogPosts.length > 0;
-    
-    let newNavLinks = [...baseNavLinks];
-
-    // Add blog link if it doesn't exist and there are posts
-    if (hasBlog && !newNavLinks.some(link => link.href === '/blog')) {
-      newNavLinks.push({ href: '/blog', label: 'Blog' });
-    }
-    
-    // Remove blog link if it exists and there are no posts
-    if (!hasBlog) {
-        newNavLinks = newNavLinks.filter(link => link.href !== '/blog');
-    }
-
-    setNavLinks(newNavLinks);
-
-  }, [settings]);
   
+  const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
+    ? settings.headerNavLinks 
+    : defaultNavLinks;
+
   useEffect(() => {
     if (!settings?.headerIsSticky) return;
     const handleScroll = () => {

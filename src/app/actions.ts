@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 import { getGeneralSettings, saveGeneralSettings } from '@/services/settings';
-import type { GeneralSettings, Customer, BlogPost } from '@/types/settings';
+import type { GeneralSettings, Customer } from '@/types/settings';
 import { revalidatePath } from 'next/cache';
 import { getAllLeads, Lead } from '@/services/leads';
 import { v4 as uuidv4 } from 'uuid';
@@ -64,7 +64,6 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
         await saveGeneralSettings(settings);
         revalidatePath('/cms', 'layout');
         revalidatePath('/', 'layout');
-        revalidatePath('/blog', 'layout');
         return { success: true, message: 'Indstillinger er blevet gemt.' };
     } catch (error) {
         console.error(error);
@@ -108,94 +107,4 @@ export async function deleteCustomerAction(customerId: string): Promise<{ succes
 export async function getCustomersAction(): Promise<Customer[]> {
     const settings = await getGeneralSettings();
     return settings?.customers || [];
-}
-
-// Blog Actions
-export async function getBlogPostsAction(): Promise<BlogPost[]> {
-    const settings = await getGeneralSettings();
-    let posts = settings?.blogPosts || [];
-
-    // Ensure publishedAt is a Date object
-    posts = posts.map(post => ({
-        ...post,
-        publishedAt: (post.publishedAt as any)?.toDate ? (post.publishedAt as any).toDate() : new Date(post.publishedAt)
-    }));
-
-    // Sort by date, newest first
-    return posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-}
-
-export async function getBlogPostAction(id: string): Promise<BlogPost | null> {
-    const posts = await getBlogPostsAction();
-    return posts.find(p => p.id === id) || null;
-}
-
-export async function saveBlogPostAction(postData: Omit<BlogPost, 'id' | 'publishedAt'> & { id?: string }): Promise<{ success: boolean; message: string; posts: BlogPost[] }> {
-    try {
-        const settings = await getGeneralSettings();
-        const posts = settings?.blogPosts || [];
-        let updatedPosts: BlogPost[];
-        let message: string;
-
-        if (postData.id) {
-            // Update existing post
-            const existingPost = posts.find(p => p.id === postData.id);
-            if (!existingPost) {
-                throw new Error("Post not found");
-            }
-            const updatedPost = { 
-                ...existingPost, 
-                ...postData,
-                publishedAt: existingPost.publishedAt, // Preserve original date
-            };
-            updatedPosts = posts.map(p => p.id === postData.id ? updatedPost : p);
-            message = 'Blogindlæg er blevet opdateret.';
-        } else {
-            // Create new post
-            const newPost: BlogPost = {
-                 ...postData,
-                 id: uuidv4(),
-                 publishedAt: new Date() 
-            };
-            updatedPosts = [...posts, newPost];
-            message = 'Blogindlæg er blevet oprettet.';
-        }
-        
-        await saveGeneralSettings({ blogPosts: updatedPosts });
-        revalidatePath('/cms/blogs');
-        revalidatePath('/blog');
-        if (postData.slug) {
-            revalidatePath(`/blog/${postData.slug}`);
-        }
-
-        const sortedPosts = updatedPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-
-        return { success: true, message, posts: sortedPosts };
-    } catch (error) {
-        console.error(error);
-        return { success: false, message: 'Der opstod en fejl.', posts: [] };
-    }
-}
-
-export async function deleteBlogPostAction(postId: string): Promise<{ success: boolean; message: string; posts: BlogPost[] }> {
-    try {
-        const settings = await getGeneralSettings();
-        const posts = settings?.blogPosts || [];
-        const postToDelete = posts.find(p => p.id === postId);
-        const updatedPosts = posts.filter(p => p.id !== postId);
-        await saveGeneralSettings({ blogPosts: updatedPosts });
-
-        revalidatePath('/cms/blogs');
-        revalidatePath('/blog');
-        if (postToDelete) {
-          revalidatePath(`/blog/${postToDelete.slug}`);
-        }
-
-        const sortedPosts = updatedPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-
-        return { success: true, message: 'Blogindlæg slettet.', posts: sortedPosts };
-    } catch (error) {
-        console.error(error);
-        return { success: false, message: 'Der opstod en fejl.', posts: [] };
-    }
 }

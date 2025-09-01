@@ -38,7 +38,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'blog'];
+const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
 const defaultServices: Service[] = [
   {
@@ -500,7 +500,7 @@ export default function CmsHomePage() {
 
       setSettings({
           ...initialSettings,
-          homePageSectionOrder: initialSettings.homePageSectionOrder ?? defaultSectionOrder,
+          homePageSectionOrder: initialSettings.homePageSectionOrder?.filter(id => id !== 'blog') ?? defaultSectionOrder,
           
           heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
           heroHeadlineColor: initialSettings.heroHeadlineColor ?? 'text-white',
