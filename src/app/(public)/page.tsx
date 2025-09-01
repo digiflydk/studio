@@ -1,5 +1,6 @@
 
 import HeroSection from '@/components/sections/hero';
+import FeatureSection from '@/components/sections/feature';
 import ServicesSection from '@/components/sections/services';
 import AiProjectSection from '@/components/sections/ai-project';
 import CasesSection from '@/components/sections/cases';
@@ -17,6 +18,7 @@ export default async function Home() {
   return (
     <>
       <HeroSection settings={settings} />
+      {visibility?.feature !== false && <FeatureSection settings={settings} />}
       {visibility?.services !== false && <ServicesSection settings={settings} />}
       {visibility?.aiProject !== false && <AiProjectSection settings={settings} />}
       {visibility?.cases !== false && <CasesSection settings={settings} />}

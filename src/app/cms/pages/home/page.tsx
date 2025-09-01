@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -103,6 +102,7 @@ const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne 
 const defaultPadding: SectionPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
 
 const defaultVisibility: SectionVisibility = {
+    feature: true,
     services: true,
     aiProject: true,
     cases: true,
@@ -438,6 +438,7 @@ export default function CmsHomePage() {
       });
       
       const newSectionPadding: GeneralSettings['sectionPadding'] = {
+        feature: ensurePadding(initialSettings.sectionPadding?.feature),
         services: ensurePadding(initialSettings.sectionPadding?.services),
         aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
         cases: ensurePadding(initialSettings.sectionPadding?.cases),
@@ -468,6 +469,26 @@ export default function CmsHomePage() {
           heroCtaSize: initialSettings.heroCtaSize ?? 'lg',
           heroCtaTextSize: initialSettings.heroCtaTextSize ?? 16,
           heroCtaTextSizeMobile: initialSettings.heroCtaTextSizeMobile ?? 14,
+          
+          featureSectionHeading: initialSettings.featureSectionHeading ?? 'Fremhævet Overskrift',
+          featureSectionHeadingColor: initialSettings.featureSectionHeadingColor ?? 'text-foreground',
+          featureSectionHeadingSize: initialSettings.featureSectionHeadingSize ?? 48,
+          featureSectionHeadingSizeMobile: initialSettings.featureSectionHeadingSizeMobile ?? 36,
+          featureSectionBody: initialSettings.featureSectionBody ?? 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.',
+          featureSectionBodyColor: initialSettings.featureSectionBodyColor ?? 'text-muted-foreground',
+          featureSectionBodySize: initialSettings.featureSectionBodySize ?? 18,
+          featureSectionBodySizeMobile: initialSettings.featureSectionBodySizeMobile ?? 16,
+          featureSectionImageUrl: initialSettings.featureSectionImageUrl ?? 'https://picsum.photos/800/600',
+          featureSectionAiHint: initialSettings.featureSectionAiHint ?? 'featured content',
+          featureSectionCtaText: initialSettings.featureSectionCtaText ?? 'Lær Mere',
+          featureSectionCtaLink: initialSettings.featureSectionCtaLink ?? '#',
+          featureSectionCtaVariant: initialSettings.featureSectionCtaVariant ?? 'default',
+          featureSectionCtaSize: initialSettings.featureSectionCtaSize ?? 'lg',
+          featureSectionCtaTextSize: initialSettings.featureSectionCtaTextSize ?? 16,
+          featureSectionCtaTextSizeMobile: initialSettings.featureSectionCtaTextSizeMobile ?? 14,
+          featureSectionBackgroundColor: initialSettings.featureSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
+          featureSectionAlignment: initialSettings.featureSectionAlignment ?? 'left',
+
 
           servicesSectionTitle: initialSettings.servicesSectionTitle ?? "Vores Services",
           servicesSectionTitleColor: initialSettings.servicesSectionTitleColor ?? "text-black",
@@ -618,6 +639,9 @@ export default function CmsHomePage() {
 
   const servicesCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.servicesCtaLink);
   const servicesCtaSelectValue = servicesCtaIsCustomLink ? 'custom' : settings.servicesCtaLink;
+
+  const featureCtaIsCustomLink = !sectionLinks.some(l => l.value === settings.featureSectionCtaLink);
+  const featureCtaSelectValue = featureCtaIsCustomLink ? 'custom' : settings.featureSectionCtaLink;
 
   return (
     <div className="space-y-8">
@@ -807,6 +831,151 @@ export default function CmsHomePage() {
                 </AccordionContent>
             </AccordionItem>
         </Card>
+        
+        <Card className="shadow-lg">
+            <AccordionItem value="feature">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <CardTitle>Fremhævet Sektion</CardTitle>
+                        <CardDescription className="mt-1">En sektion med billede, tekst og knap.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="feature-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="feature-visible"
+                                checked={settings.sectionVisibility?.feature}
+                                onCheckedChange={(value) => handleVisibilityChange('feature', value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="feature-heading">Overskrift</Label>
+                            <Input id="feature-heading" value={settings.featureSectionHeading || ''} onChange={e => handleInputChange('featureSectionHeading', e.target.value)} />
+                        </div>
+                        <TextStyleEditor
+                            label="Design for Overskrift"
+                            colorValue={settings.featureSectionHeadingColor as ThemeColor}
+                            onColorChange={(v) => handleInputChange('featureSectionHeadingColor', v)}
+                            desktopSize={settings.featureSectionHeadingSize || 48}
+                            onDesktopSizeChange={(v) => handleInputChange('featureSectionHeadingSize', v)}
+                            mobileSize={settings.featureSectionHeadingSizeMobile || 36}
+                            onMobileSizeChange={(v) => handleInputChange('featureSectionHeadingSizeMobile', v)}
+                            previewMode={previewMode}
+                        />
+                        <div className="space-y-2">
+                            <Label htmlFor="feature-body">Brødtekst</Label>
+                            <Textarea id="feature-body" value={settings.featureSectionBody || ''} onChange={e => handleInputChange('featureSectionBody', e.target.value)} rows={4} />
+                        </div>
+                        <TextStyleEditor
+                            label="Design for Brødtekst"
+                            colorValue={settings.featureSectionBodyColor as ThemeColor}
+                            onColorChange={(v) => handleInputChange('featureSectionBodyColor', v)}
+                            desktopSize={settings.featureSectionBodySize || 18}
+                            onDesktopSizeChange={(v) => handleInputChange('featureSectionBodySize', v)}
+                            mobileSize={settings.featureSectionBodySizeMobile || 16}
+                            onMobileSizeChange={(v) => handleInputChange('featureSectionBodySizeMobile', v)}
+                            previewMode={previewMode}
+                        />
+                        <AlignmentControl 
+                            value={settings.featureSectionAlignment || 'left'}
+                            onValueChange={(v) => handleInputChange('featureSectionAlignment', v)}
+                        />
+                        <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                            <h3 className="font-semibold">Call to Action Knap</h3>
+                            <div className='space-y-4'>
+                                <div className="space-y-2">
+                                    <Label htmlFor="feature-cta-text">Knap Tekst</Label>
+                                    <Input id="feature-cta-text" value={settings.featureSectionCtaText || ''} onChange={e => handleInputChange('featureSectionCtaText', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="feature-cta-link-select">Knap Link</Label>
+                                    <Select
+                                        value={featureCtaSelectValue || ''}
+                                        onValueChange={(value) => handleInputChange('featureSectionCtaLink', value === 'custom' ? '' : value)}
+                                    >
+                                        <SelectTrigger id="feature-cta-link-select"><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            {sectionLinks.map(link => (
+                                                <SelectItem key={link.value} value={link.value}>{link.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {featureCtaSelectValue === 'custom' && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="feature-cta-link-input">Brugerdefineret Link</Label>
+                                        <Input
+                                            id="feature-cta-link-input"
+                                            value={settings.featureSectionCtaLink || ''}
+                                            placeholder="f.eks. https://eksempel.dk"
+                                            onChange={e => handleInputChange('featureSectionCtaLink', e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                    <div className="space-y-2">
+                                        <Label>Knap Design</Label>
+                                        <Select value={settings.featureSectionCtaVariant} onValueChange={(v) => handleInputChange('featureSectionCtaVariant', v)}>
+                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="default">Default</SelectItem>
+                                                <SelectItem value="pill">Pill</SelectItem>
+                                                <SelectItem value="secondary">Secondary</SelectItem>
+                                                <SelectItem value="outline">Outline</SelectItem>
+                                                <SelectItem value="destructive">Destructive</SelectItem>
+                                                <SelectItem value="ghost">Ghost</SelectItem>
+                                                <SelectItem value="link">Link</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Knap Størrelse</Label>
+                                        <Select value={settings.featureSectionCtaSize} onValueChange={(v) => handleInputChange('featureSectionCtaSize', v)}>
+                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="default">Default</SelectItem>
+                                                <SelectItem value="sm">Small</SelectItem>
+                                                <SelectItem value="lg">Large</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <TextStyleEditor
+                                    label="Design for Knap Tekst"
+                                    desktopSize={settings.featureSectionCtaTextSize || 16}
+                                    onDesktopSizeChange={(v) => handleInputChange('featureSectionCtaTextSize', v)}
+                                    mobileSize={settings.featureSectionCtaTextSizeMobile || 14}
+                                    onMobileSizeChange={(v) => handleInputChange('featureSectionCtaTextSizeMobile', v)}
+                                    previewMode={previewMode}
+                                    isOptional={true}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="feature-image-url">Billede URL</Label>
+                            <Input id="feature-image-url" value={settings.featureSectionImageUrl || ''} onChange={e => handleInputChange('featureSectionImageUrl', e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="feature-ai-hint">AI Billede Hint</Label>
+                            <Input id="feature-ai-hint" value={settings.featureSectionAiHint || ''} onChange={e => handleInputChange('featureSectionAiHint', e.target.value)} />
+                        </div>
+                        {settings.featureSectionBackgroundColor &&
+                            <HslColorPicker
+                                label="Baggrundsfarve"
+                                color={settings.featureSectionBackgroundColor}
+                                onChange={(hsl) => handleInputChange('featureSectionBackgroundColor', hsl)}
+                            />
+                        }
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+
 
         <Card className="shadow-lg">
             <AccordionItem value="services">
@@ -1411,6 +1580,14 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-4 pt-6">
+                        {settings.sectionPadding?.feature && (
+                            <SpacingEditor
+                                label="Fremhævet Sektion"
+                                padding={settings.sectionPadding.feature}
+                                onPaddingChange={(v, p) => handlePaddingChange('feature', v, p)}
+                                previewMode={previewMode}
+                            />
+                        )}
                         {settings.sectionPadding?.services && (
                             <SpacingEditor
                                 label="Services"

@@ -71,6 +71,7 @@ export type SectionPadding = {
 }
 
 export interface SectionVisibility {
+    feature: boolean;
     services: boolean;
     aiProject: boolean;
     cases: boolean;
@@ -181,6 +182,25 @@ export interface GeneralSettings {
     heroCtaSize?: 'default' | 'sm' | 'lg' | 'icon';
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
+
+    featureSectionHeading?: string;
+    featureSectionHeadingColor?: string;
+    featureSectionHeadingSize?: number;
+    featureSectionHeadingSizeMobile?: number;
+    featureSectionBody?: string;
+    featureSectionBodyColor?: string;
+    featureSectionBodySize?: number;
+    featureSectionBodySizeMobile?: number;
+    featureSectionImageUrl?: string;
+    featureSectionAiHint?: string;
+    featureSectionCtaText?: string;
+    featureSectionCtaLink?: string;
+    featureSectionCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+    featureSectionCtaSize?: 'default' | 'sm' | 'lg';
+    featureSectionCtaTextSize?: number;
+    featureSectionCtaTextSizeMobile?: number;
+    featureSectionBackgroundColor?: HSLColor;
+    featureSectionAlignment?: Alignment;
     
     servicesSectionTitle?: string;
     servicesSectionTitleColor?: string;
@@ -257,6 +277,7 @@ export interface GeneralSettings {
 
     // Spacing
     sectionPadding?: {
+        feature: SectionPadding;
         services: SectionPadding;
         aiProject: SectionPadding;
         cases: SectionPadding;
