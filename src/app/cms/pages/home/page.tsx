@@ -36,7 +36,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { SectionKey, updateSectionPadding } from '@/lib/settings-utils';
 
 const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
@@ -616,12 +615,30 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
+  type SectionKey = keyof NonNullable<GeneralSettings['sectionPadding']>;
+
   const handlePaddingChange = (
     section: SectionKey,
     value: number,
     part: keyof SectionPadding
   ) => {
-    setSettings((prev) => updateSectionPadding(prev, section, part, value, defaultPadding));
+    setSettings(prev => {
+      const prevSectionPadding = (prev.sectionPadding ??
+        {}) as Partial<Record<SectionKey, SectionPadding>>;
+
+      const current: SectionPadding =
+        prevSectionPadding[section] ?? defaultPadding;
+
+      const updatedSection: SectionPadding = { ...current, [part]: value };
+
+      return {
+        ...prev,
+        sectionPadding: {
+          ...prevSectionPadding,
+          [section]: updatedSection,
+        } as Partial<Record<SectionKey, SectionPadding>>,
+      } satisfies Partial<GeneralSettings>;
+    });
   };
 
   const handleVisibilityChange = (section: keyof SectionVisibility, isVisible: boolean) => {
@@ -1689,3 +1706,4 @@ export default function CmsHomePage() {
     </div>
   );
 }
+
