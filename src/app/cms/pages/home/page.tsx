@@ -616,18 +616,28 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaddingChange = (section: keyof NonNullable<GeneralSettings['sectionPadding']>, value: number, part: keyof SectionPadding) => {
+  const handlePaddingChange = (
+    section: keyof NonNullable<GeneralSettings['sectionPadding']>,
+    value: number,
+    part: keyof SectionPadding
+  ) => {
     setSettings(prev => {
-        const currentPadding = prev.sectionPadding?.[section] || defaultPadding;
-        const newSectionPadding = { ...prev.sectionPadding };
-        newSectionPadding[section] = {
-            ...currentPadding,
-            [part]: value,
-        };
-        return {
-            ...prev,
-            sectionPadding: newSectionPadding
-        };
+      const prevSectionPadding = prev.sectionPadding ?? {};
+      const currentPadding: SectionPadding =
+        (prevSectionPadding[section] as SectionPadding | undefined) ?? defaultPadding;
+
+      const updatedSection: SectionPadding = {
+        ...currentPadding,
+        [part]: value,
+      };
+
+      return {
+        ...prev,
+        sectionPadding: {
+          ...prevSectionPadding,
+          [section]: updatedSection,
+        },
+      } satisfies Partial<GeneralSettings>;
     });
   };
 
