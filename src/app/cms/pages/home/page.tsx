@@ -36,6 +36,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { ensureAllSectionPadding, SectionKey } from '@/lib/settings-utils';
 
 const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
@@ -615,28 +616,27 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  type SectionKey = keyof NonNullable<GeneralSettings['sectionPadding']>;
-
   const handlePaddingChange = (
     section: SectionKey,
     value: number,
     part: keyof SectionPadding
   ) => {
     setSettings(prev => {
-      const prevSectionPadding = (prev.sectionPadding ??
-        {}) as Partial<Record<SectionKey, SectionPadding>>;
+      // Gør map komplet (ingen undefined keys)
+      const full = ensureAllSectionPadding(
+        prev.sectionPadding as Partial<Record<SectionKey, SectionPadding>> | undefined,
+        defaultPadding
+      );
 
-      const current: SectionPadding =
-        prevSectionPadding[section] ?? defaultPadding;
-
-      const updatedSection: SectionPadding = { ...current, [part]: value };
+      // Opdater kun den valgte sektion
+      const updatedSection: SectionPadding = { ...full[section], [part]: value };
 
       return {
         ...prev,
         sectionPadding: {
-          ...prevSectionPadding,
+          ...full,
           [section]: updatedSection,
-        } as Partial<Record<SectionKey, SectionPadding>>,
+        } as NonNullable<GeneralSettings['sectionPadding']>,
       } satisfies Partial<GeneralSettings>;
     });
   };
@@ -1706,4 +1706,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
