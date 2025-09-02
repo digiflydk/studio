@@ -1,8 +1,6 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
-import { getGeneralSettings } from '@/services/settings';
-import { ThemeContextWrapper } from '@/context/ThemeContextWrapper';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
@@ -15,14 +13,15 @@ export const metadata: Metadata = {
     title: 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
     description: 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.',
     type: 'website',
-    images: [], // Should be populated from CMS settings if possible, but static for now
+    images: [],
   },
   robots: {
-    index: true,
-    follow: true,
+      index: true,
+      follow: true,
+      googleBot: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
   },
   icons: {
-    icon: '/favicon.ico', // Default fallback
+    icon: '/favicon.ico',
   },
 };
 
@@ -32,14 +31,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getGeneralSettings();
 
   return (
     <html lang="en" className="scroll-smooth">
       <body>
-         <ThemeContextWrapper settings={settings}>
-            {children}
-        </ThemeContextWrapper>
+        {children}
       </body>
     </html>
   );
