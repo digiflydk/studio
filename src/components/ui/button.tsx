@@ -49,14 +49,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, href, showArrow, ...props }, ref) => {
     const Comp = asChild ? Slot : href ? "a" : "button";
     
-    // Determine if the arrow should be shown
     const shouldShowArrow = showArrow ?? (variant === 'pill');
 
     const content = (
-      <>
+      <span className="inline-flex items-center justify-center">
         {props.children}
         {shouldShowArrow && <RightArrow />}
-      </>
+      </span>
     );
 
     if (href && !asChild) {
