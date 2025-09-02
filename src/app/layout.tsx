@@ -29,19 +29,14 @@ export async function generateMetadata(
   const title = settings?.seoTitle || defaultTitle;
   const description = settings?.metaDescription || defaultDescription;
   const openGraphImages = settings?.socialShareImageUrl ? [settings.socialShareImageUrl] : [];
-
   const allowIndex = settings?.allowSearchEngineIndexing !== false;
 
   const robots = {
     index: allowIndex,
     follow: allowIndex,
-    googleBot: {
-      index: allowIndex,
-      follow: allowIndex,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    googleBot: allowIndex
+        ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+        : 'noindex,nofollow',
   };
 
   const metadata: Metadata = {
@@ -87,3 +82,4 @@ export default async function RootLayout({
     </html>
   );
 }
+
