@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { GeneralSettings } from '@/types/settings';
 
-const initialState = {
+
+type FormErrors = {
+    name?: string[];
+    email?: string[];
+    message?: string[];
+    gdpr?: string[];
+}
+
+type FormState = {
+  message: string;
+  errors?: FormErrors;
+};
+
+const initialState: FormState = {
   message: '',
   errors: {},
 };
@@ -37,15 +50,16 @@ interface ContactSectionProps {
 export default function ContactSection({ settings }: ContactSectionProps) {
   const [state, formAction] = useActionState(sendContactMessage, initialState);
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state.message && Object.keys(state.errors).length === 0) {
+    if (state.message && (!state.errors || Object.keys(state.errors).length === 0)) {
       toast({
         title: "Besked sendt!",
         description: state.message,
       });
-      // TODO: Reset form
-    } else if (state.message && Object.keys(state.errors).length > 0) {
+      formRef.current?.reset();
+    } else if (state.message && state.errors && Object.keys(state.errors).length > 0) {
         toast({
             title: "Fejl",
             description: state.message,
@@ -76,22 +90,22 @@ export default function ContactSection({ settings }: ContactSectionProps) {
               Har du et projekt, eller vil du bare sige hej? Udfyld formularen, så vender vi tilbage.
             </CardDescription>
           </CardHeader>
-          <form action={formAction} data-form="contact">
+          <form ref={formRef} action={formAction} data-form="contact">
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Navn</Label>
                 <Input id="name" name="name" placeholder="Dit navn" required />
-                {state?.errors?.name && <p className="text-sm text-destructive">{state.errors.name[0]}</p>}
+                {state?.errors?.name?.[0] && <p className="text-sm text-destructive">{state.errors.name[0]}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" name="email" type="email" placeholder="din@email.dk" required />
-                {state?.errors?.email && <p className="text-sm text-destructive">{state.errors.email[0]}</p>}
+                {state?.errors?.email?.[0] && <p className="text-sm text-destructive">{state.errors.email[0]}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="message">Besked</Label>
                 <Textarea id="message" name="message" placeholder="Fortæl os lidt om, hvad du har på hjerte..." required minLength={10} />
-                {state?.errors?.message && <p className="text-sm text-destructive">{state.errors.message[0]}</p>}
+                {state?.errors?.message?.[0] && <p className="text-sm text-destructive">{state.errors.message[0]}</p>}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="gdpr" name="gdpr" required />
@@ -99,7 +113,7 @@ export default function ContactSection({ settings }: ContactSectionProps) {
                   Jeg forstår, at Digifly indsamler mine oplysninger for at kunne kontakte mig.
                 </Label>
               </div>
-               {state?.errors?.gdpr && <p className="text-sm text-destructive">{state.errors.gdpr[0]}</p>}
+               {state?.errors?.gdpr?.[0] && <p className="text-sm text-destructive">{state.errors.gdpr[0]}</p>}
             </CardContent>
             <CardFooter className="flex-col gap-4">
               <SubmitButton />

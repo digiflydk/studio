@@ -29,7 +29,17 @@ const contactFormSchema = z.object({
   }),
 });
 
-export async function sendContactMessage(prevState: any, formData: FormData) {
+type FormState = {
+  message: string;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    message?: string[];
+    gdpr?: string[];
+  };
+};
+
+export async function sendContactMessage(prevState: FormState, formData: FormData): Promise<FormState> {
   const validatedFields = contactFormSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
