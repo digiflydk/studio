@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
 import Logo from "../logo";
-import { getGeneralSettings }s from "@/services/settings";
+import { getGeneralSettings } from "@/services/settings";
 import type { GeneralSettings } from "@/types/settings";
 import { usePathname } from "next/navigation";
 
