@@ -129,7 +129,6 @@ const defaultVisibility: SectionVisibility = {
     cases: true,
     about: true,
     customers: true,
-    blog: false,
 }
 
 const themeColorOptions = [

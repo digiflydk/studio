@@ -58,7 +58,6 @@ export interface SectionVisibility {
     cases: boolean;
     about: boolean;
     customers: boolean;
-    blog: boolean;
 }
 
 export type Alignment = 'left' | 'center' | 'right';
