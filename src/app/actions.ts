@@ -29,15 +29,15 @@ const contactFormSchema = z.object({
   }),
 });
 
-type FormState = {
+export type ContactFields = 'name' | 'email' | 'message' | 'gdpr';
+
+export type FormErrors = Partial<Record<ContactFields, string[]>>;
+
+export type FormState = {
   message: string;
-  errors?: {
-    name?: string[];
-    email?: string[];
-    message?: string[];
-    gdpr?: string[];
-  };
+  errors?: FormErrors;
 };
+
 
 export async function sendContactMessage(prevState: FormState, formData: FormData): Promise<FormState> {
   const validatedFields = contactFormSchema.safeParse({
