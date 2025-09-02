@@ -485,7 +485,7 @@ export default function CmsHomePage() {
         bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
       });
       
-      const newSectionPadding: Partial<GeneralSettings['sectionPadding']> = {
+      const newSectionPadding: GeneralSettings['sectionPadding'] = {
         feature: ensurePadding(initialSettings.sectionPadding?.feature),
         services: ensurePadding(initialSettings.sectionPadding?.services),
         aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
