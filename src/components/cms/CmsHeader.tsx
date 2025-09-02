@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users, HeartHandshake } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
@@ -24,20 +23,21 @@ const settingsNavLinks = [
 ]
 
 export default function CmsHeader() {
-  const pathname = usePathname();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
+  const [pathname, setPathname] = useState("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
-  // This data fetching is safe because it only runs on the client-side
-  // after the initial render, avoiding build-time errors.
   useEffect(() => {
-      async function loadSettings() {
-          const loadedSettings = await getGeneralSettings();
-          setSettings(loadedSettings);
-      }
-      if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
+        setPathname(window.location.pathname);
+        setIsSettingsOpen(window.location.pathname.startsWith('/cms/settings'));
+        
+        async function loadSettings() {
+            const loadedSettings = await getGeneralSettings();
+            setSettings(loadedSettings);
+        }
         loadSettings();
-      }
+    }
   }, []);
 
 
