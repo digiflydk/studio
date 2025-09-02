@@ -1,4 +1,3 @@
-
 "use client";
 import Link from "next/link";
 import React from "react";
@@ -27,7 +26,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "pill",
       size: "default",
     },
   }
@@ -49,6 +48,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, href, showArrow, ...props }, ref) => {
     const Comp = asChild ? Slot : href ? "a" : "button";
     
+    // Default showArrow to true if variant is pill, otherwise false
     const shouldShowArrow = showArrow ?? (variant === 'pill');
 
     const content = (

@@ -150,7 +150,6 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                 >
                     <Link href={settings.servicesCtaLink || '#kontakt'}>
                         {settings.servicesCtaText || 'Book et møde med os'}
-                        {settings.servicesCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Link>
                 </Button>
                 <Button
@@ -162,7 +161,6 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                 >
                     <Link href={settings.servicesCtaLink || '#kontakt'}>
                         {settings.servicesCtaText || 'Book et møde med os'}
-                        {settings.servicesCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Link>
                 </Button>
             </div>
