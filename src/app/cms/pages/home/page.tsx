@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -36,7 +37,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { ensureAllSectionPadding, SectionKey } from '@/lib/settings-utils';
 
 const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
@@ -142,6 +142,7 @@ const themeColorOptions = [
 ] as const;
 
 type ThemeColor = typeof themeColorOptions[number]['value'];
+type SectionKey = keyof NonNullable<GeneralSettings['sectionPadding']>;
 
 const sectionLinks = [
     { value: '#hero', label: 'Hero Sektion' },
@@ -373,10 +374,10 @@ function SpacingEditor({
                 <Label className="flex items-center gap-2">
                   <Monitor className="h-4 w-4" /> Afstand i toppen
                 </Label>
-                <span className="text-sm text-muted-foreground">{padding.top}px</span>
+                <span className="text-sm text-muted-foreground">{padding.top || 0}px</span>
               </div>
               <Slider
-                value={[padding.top]}
+                value={[padding.top || 0]}
                 onValueChange={([v]) => onPaddingChange(v, 'top')}
                 min={0}
                 max={200}
@@ -388,10 +389,10 @@ function SpacingEditor({
                 <Label className="flex items-center gap-2">
                   <Monitor className="h-4 w-4" /> Afstand i bunden
                 </Label>
-                <span className="text-sm text-muted-foreground">{padding.bottom}px</span>
+                <span className="text-sm text-muted-foreground">{padding.bottom || 0}px</span>
               </div>
               <Slider
-                value={[padding.bottom]}
+                value={[padding.bottom || 0]}
                 onValueChange={([v]) => onPaddingChange(v, 'bottom')}
                 min={0}
                 max={200}
@@ -406,10 +407,10 @@ function SpacingEditor({
                 <Label className="flex items-center gap-2">
                   <Smartphone className="h-4 w-4" /> Afstand i toppen
                 </Label>
-                <span className="text-sm text-muted-foreground">{padding.topMobile}px</span>
+                <span className="text-sm text-muted-foreground">{padding.topMobile || 0}px</span>
               </div>
               <Slider
-                value={[padding.topMobile]}
+                value={[padding.topMobile || 0]}
                 onValueChange={([v]) => onPaddingChange(v, 'topMobile')}
                 min={0}
                 max={150}
@@ -421,10 +422,10 @@ function SpacingEditor({
                 <Label className="flex items-center gap-2">
                   <Smartphone className="h-4 w-4" /> Afstand i bunden
                 </Label>
-                <span className="text-sm text-muted-foreground">{padding.bottomMobile}px</span>
+                <span className="text-sm text-muted-foreground">{padding.bottomMobile || 0}px</span>
               </div>
               <Slider
-                value={[padding.bottomMobile]}
+                value={[padding.bottomMobile || 0]}
                 onValueChange={([v]) => onPaddingChange(v, 'bottomMobile')}
                 min={0}
                 max={150}
@@ -477,24 +478,7 @@ export default function CmsHomePage() {
       setIsLoading(true);
       const loadedSettings = await getSettingsAction();
       const initialSettings = loadedSettings || {};
-
-      const ensurePadding = (padding: Partial<SectionPadding> | undefined): SectionPadding => ({
-        top: padding?.top ?? defaultPadding.top,
-        bottom: padding?.bottom ?? defaultPadding.bottom,
-        topMobile: padding?.topMobile ?? defaultPadding.topMobile,
-        bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
-      });
       
-      const newSectionPadding: GeneralSettings['sectionPadding'] = {
-        feature: ensurePadding(initialSettings.sectionPadding?.feature),
-        services: ensurePadding(initialSettings.sectionPadding?.services),
-        aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
-        cases: ensurePadding(initialSettings.sectionPadding?.cases),
-        about: ensurePadding(initialSettings.sectionPadding?.about),
-        customers: ensurePadding(initialSettings.sectionPadding?.customers),
-        contact: ensurePadding(initialSettings.sectionPadding?.contact),
-      };
-
       setSettings({
           ...initialSettings,
           homePageSectionOrder: initialSettings.homePageSectionOrder?.filter(id => id !== 'blog') ?? defaultSectionOrder,
@@ -603,7 +587,7 @@ export default function CmsHomePage() {
           customersSectionBackgroundColor: initialSettings.customersSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
           customersSectionAlignment: initialSettings.customersSectionAlignment ?? 'center',
 
-          sectionPadding: newSectionPadding,
+          sectionPadding: initialSettings.sectionPadding ?? {},
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
       });
 
@@ -622,33 +606,31 @@ export default function CmsHomePage() {
     part: keyof SectionPadding
   ) => {
     setSettings(prev => {
-      // Gør map komplet (ingen undefined keys)
-      const full = ensureAllSectionPadding(
-        prev.sectionPadding as Partial<Record<SectionKey, SectionPadding>> | undefined,
-        defaultPadding
-      );
-
-      // Opdater kun den valgte sektion
-      const updatedSection: SectionPadding = { ...full[section], [part]: value };
-
-      return {
-        ...prev,
-        sectionPadding: {
-          ...full,
-          [section]: updatedSection,
-        } as NonNullable<GeneralSettings['sectionPadding']>,
-      } satisfies Partial<GeneralSettings>;
+        const prevSectionPadding = (prev.sectionPadding ?? {}) as Partial<Record<SectionKey, SectionPadding>>;
+        const current: SectionPadding = prevSectionPadding[section] ?? defaultPadding;
+        const updatedSection: SectionPadding = { ...current, [part]: value };
+    
+        return {
+            ...prev,
+            sectionPadding: {
+                ...prevSectionPadding,
+                [section]: updatedSection,
+            } as Partial<Record<SectionKey, SectionPadding>>,
+        } satisfies Partial<GeneralSettings>;
     });
   };
 
   const handleVisibilityChange = (section: keyof SectionVisibility, isVisible: boolean) => {
-      setSettings(prev => ({
-          ...prev,
-          sectionVisibility: {
-              ...prev.sectionVisibility,
-              [section]: isVisible,
-          }
-      }));
+    setSettings(prev => {
+        const merged = { ...defaultVisibility, ...(prev.sectionVisibility ?? {}) };
+        return {
+            ...prev,
+            sectionVisibility: {
+                ...merged,
+                [section]: isVisible,
+            },
+        };
+    });
   }
 
   const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
@@ -1587,62 +1569,48 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-4 pt-6">
-                        {settings.sectionPadding?.feature && (
-                            <SpacingEditor
-                                label="Fremhævet Sektion"
-                                padding={settings.sectionPadding.feature}
-                                onPaddingChange={(v, p) => handlePaddingChange('feature', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.services && (
-                            <SpacingEditor
-                                label="Services"
-                                padding={settings.sectionPadding.services}
-                                onPaddingChange={(v, p) => handlePaddingChange('services', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.aiProject && (
-                            <SpacingEditor
-                                label="Fortæl os om dit projekt"
-                                padding={settings.sectionPadding.aiProject}
-                                onPaddingChange={(v, p) => handlePaddingChange('aiProject', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.cases && (
-                            <SpacingEditor
-                                label="Cases"
-                                padding={settings.sectionPadding.cases}
-                                onPaddingChange={(v, p) => handlePaddingChange('cases', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.about && (
-                            <SpacingEditor
-                                label="Om Os"
-                                padding={settings.sectionPadding.about}
-                                onPaddingChange={(v, p) => handlePaddingChange('about', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.customers && (
-                            <SpacingEditor
-                                label="Kunder"
-                                padding={settings.sectionPadding.customers}
-                                onPaddingChange={(v, p) => handlePaddingChange('customers', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.contact && (
-                            <SpacingEditor
-                                label="Kontakt"
-                                padding={settings.sectionPadding.contact}
-                                onPaddingChange={(v, p) => handlePaddingChange('contact', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
+                        <SpacingEditor
+                            label="Fremhævet Sektion"
+                            padding={settings.sectionPadding?.feature || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('feature', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Services"
+                            padding={settings.sectionPadding?.services || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('services', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Fortæl os om dit projekt"
+                            padding={settings.sectionPadding?.aiProject || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('aiProject', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Cases"
+                            padding={settings.sectionPadding?.cases || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('cases', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Om Os"
+                            padding={settings.sectionPadding?.about || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('about', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Kunder"
+                            padding={settings.sectionPadding?.customers || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('customers', v, p)}
+                            previewMode={previewMode}
+                        />
+                        <SpacingEditor
+                            label="Kontakt"
+                            padding={settings.sectionPadding?.contact || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('contact', v, p)}
+                            previewMode={previewMode}
+                        />
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>

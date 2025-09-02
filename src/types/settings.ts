@@ -45,19 +45,19 @@ export interface Customer {
 }
 
 export type SectionPadding = {
-    top: number;
-    bottom: number;
-    topMobile: number;
-    bottomMobile: number;
+    top?: number;
+    bottom?: number;
+    topMobile?: number;
+    bottomMobile?: number;
 }
 
 export interface SectionVisibility {
-    feature: boolean;
-    services: boolean;
-    aiProject: boolean;
-    cases: boolean;
-    about: boolean;
-    customers: boolean;
+    feature?: boolean;
+    services?: boolean;
+    aiProject?: boolean;
+    cases?: boolean;
+    about?: boolean;
+    customers?: boolean;
 }
 
 export type Alignment = 'left' | 'center' | 'right';
@@ -249,18 +249,10 @@ export interface GeneralSettings {
     customersSectionAlignment?: Alignment;
 
     // Spacing
-    sectionPadding?: {
-        feature: SectionPadding;
-        services: SectionPadding;
-        aiProject: SectionPadding;
-        cases: SectionPadding;
-        about: SectionPadding;
-        customers: SectionPadding;
-        contact: SectionPadding;
-    };
+    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact', SectionPadding>>;
     
     // Section Visibility
-    sectionVisibility?: SectionVisibility;
+    sectionVisibility?: Partial<SectionVisibility>;
 
     // Customers
     customers?: Customer[];
