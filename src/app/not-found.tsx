@@ -1,13 +1,9 @@
-'use client';
 
-import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-function NotFoundContent() {
-  // useSearchParams() kan nu sikkert kaldes her, hvis det er nødvendigt i fremtiden.
-  // const searchParams = useSearchParams();
-
+// server component – ingen "use client" og ingen client hooks
+export default function NotFound() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground text-center px-4">
       <div className="max-w-md">
@@ -21,13 +17,5 @@ function NotFoundContent() {
         </Button>
       </div>
     </main>
-  );
-}
-
-export default function NotFound() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <NotFoundContent />
-    </Suspense>
   );
 }
