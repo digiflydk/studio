@@ -1,5 +1,5 @@
 
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata, ResolvingMetadata, Robots } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -30,6 +30,19 @@ export async function generateMetadata(
   const description = settings?.metaDescription || defaultDescription;
   const openGraphImages = settings?.socialShareImageUrl ? [settings.socialShareImageUrl] : [];
 
+  const allowIndex = settings?.allowSearchEngineIndexing !== false;
+
+  const robots: Robots = {
+    index: allowIndex,
+    follow: allowIndex,
+    googleBot: {
+      index: allowIndex,
+      follow: allowIndex,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  };
 
   const metadata: Metadata = {
     metadataBase: process.env.VERCEL_URL ? new URL(`https://${process.env.VERCEL_URL}`) : new URL('http://localhost:9002'),
@@ -41,20 +54,11 @@ export async function generateMetadata(
       images: [...openGraphImages, ...previousImages],
       type: 'website',
     },
-    robots: {},
+    robots: robots,
     icons: {
       icon: settings?.faviconUrl || '/favicon.ico',
     },
   };
-
-
-  if (settings?.allowSearchEngineIndexing === false) {
-    metadata.robots!.index = false;
-    metadata.robots!.follow = false;
-  } else {
-    metadata.robots!.index = true;
-    metadata.robots!.follow = true;
-  }
   
   return metadata;
 }
