@@ -8,7 +8,6 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import Logo from '@/components/logo';
 import type { NavLink, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const defaultNavLinks: NavLink[] = [
@@ -19,7 +18,6 @@ const defaultNavLinks: NavLink[] = [
 ];
 
 export default function Header({ settings }: { settings: GeneralSettings | null }) {
-  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
@@ -89,8 +87,10 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   );
   
   const getLinkHref = (href: string) => {
-    if (href.startsWith('#') && pathname !== '/') {
-      return `/${href}`;
+    // This is a simplistic check. A more robust solution might be needed
+    // if you have other pages besides the homepage.
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+        return `/${href}`;
     }
     return href;
   }

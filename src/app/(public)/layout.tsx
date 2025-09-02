@@ -14,12 +14,10 @@ export default async function PublicLayout({
   return (
       <>
         <Header settings={settings} />
-        <div className="flex flex-col min-h-screen">
-            <main className="flex-1">
-            {children}
-            </main>
-            <Footer settings={settings} />
-        </div>
+        <main className="flex-1">
+        {children}
+        </main>
+        <Footer settings={settings} />
       </>
   );
 }

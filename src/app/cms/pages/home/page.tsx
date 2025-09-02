@@ -129,7 +129,7 @@ const defaultVisibility: SectionVisibility = {
     cases: true,
     about: true,
     customers: true,
-    blog: true,
+    blog: false,
 }
 
 const themeColorOptions = [
@@ -152,7 +152,6 @@ const sectionLinks = [
     { value: '#cases', label: 'Cases' },
     { value: '#om-os', label: 'Om Os' },
     { value: '#customers', label: 'Kunder' },
-    { value: '#blog', label: 'Blog' },
     { value: '#kontakt', label: 'Kontakt' },
     { value: 'custom', label: 'Brugerdefineret link' },
 ];
@@ -487,14 +486,13 @@ export default function CmsHomePage() {
         bottomMobile: padding?.bottomMobile ?? defaultPadding.bottomMobile,
       });
       
-      const newSectionPadding: GeneralSettings['sectionPadding'] = {
+      const newSectionPadding: Partial<GeneralSettings['sectionPadding']> = {
         feature: ensurePadding(initialSettings.sectionPadding?.feature),
         services: ensurePadding(initialSettings.sectionPadding?.services),
         aiProject: ensurePadding(initialSettings.sectionPadding?.aiProject),
         cases: ensurePadding(initialSettings.sectionPadding?.cases),
         about: ensurePadding(initialSettings.sectionPadding?.about),
         customers: ensurePadding(initialSettings.sectionPadding?.customers),
-        blog: ensurePadding(initialSettings.sectionPadding?.blog),
         contact: ensurePadding(initialSettings.sectionPadding?.contact),
       };
 
@@ -605,15 +603,6 @@ export default function CmsHomePage() {
           customersSectionDescriptionSize: initialSettings.customersSectionDescriptionSize ?? 18,
           customersSectionBackgroundColor: initialSettings.customersSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
           customersSectionAlignment: initialSettings.customersSectionAlignment ?? 'center',
-
-          blogSectionTitle: initialSettings.blogSectionTitle ?? "Seneste fra bloggen",
-          blogSectionDescription: initialSettings.blogSectionDescription ?? "Læs vores seneste indlæg om teknologi, AI og digitalisering.",
-          blogSectionTitleColor: initialSettings.blogSectionTitleColor ?? "text-black",
-          blogSectionTitleSize: initialSettings.blogSectionTitleSize ?? 36,
-          blogSectionDescriptionColor: initialSettings.blogSectionDescriptionColor ?? "text-muted-foreground",
-          blogSectionDescriptionSize: initialSettings.blogSectionDescriptionSize ?? 18,
-          blogSectionBackgroundColor: initialSettings.blogSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
-          blogSectionAlignment: initialSettings.blogSectionAlignment ?? 'center',
 
           sectionPadding: newSectionPadding,
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
@@ -1578,74 +1567,6 @@ export default function CmsHomePage() {
             </AccordionItem>
         </Card>
     ),
-    blog: (
-        <Card className="shadow-lg">
-            <AccordionItem value="blog">
-                <AccordionTrigger className="px-6 py-4">
-                    <div className="text-left">
-                        <CardTitle>Blog Sektion</CardTitle>
-                        <CardDescription className="mt-1">Administrer indholdet i sektionen med de seneste blogindlæg.</CardDescription>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="border-t">
-                    <CardContent className="space-y-6 pt-6">
-                        <div className="flex items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <Label htmlFor="blog-visible" className="text-base">Aktivér sektion</Label>
-                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
-                            </div>
-                            <Switch
-                                id="blog-visible"
-                                checked={settings.sectionVisibility?.blog}
-                                onCheckedChange={(value) => handleVisibilityChange('blog', value)}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="blog-title">Sektionstitel</Label>
-                            <Input id="blog-title" value={settings.blogSectionTitle || ''} onChange={e => handleInputChange('blogSectionTitle', e.target.value)} className="w-full" />
-                        </div>
-                        <TextStyleEditor 
-                            label="Design for Sektionstitel"
-                            colorValue={settings.blogSectionTitleColor as ThemeColor}
-                            onColorChange={(v) => handleInputChange('blogSectionTitleColor', v)}
-                            desktopSize={settings.blogSectionTitleSize || 36}
-                            onDesktopSizeChange={(v) => handleInputChange('blogSectionTitleSize', v)}
-                            mobileSize={settings.blogSectionTitleSize || 36}
-                            onMobileSizeChange={(v) => handleInputChange('blogSectionTitleSize', v)}
-                            previewMode={previewMode}
-                        />
-
-                        <div className="space-y-2">
-                            <Label htmlFor="blog-description">Sektionsbeskrivelse</Label>
-                            <Textarea id="blog-description" value={settings.blogSectionDescription || ''} onChange={e => handleInputChange('blogSectionDescription', e.target.value)} className="w-full" />
-                        </div>
-                        <TextStyleEditor 
-                            label="Design for Sektionsbeskrivelse"
-                            colorValue={settings.blogSectionDescriptionColor as ThemeColor}
-                            onColorChange={(v) => handleInputChange('blogSectionDescriptionColor', v)}
-                            desktopSize={settings.blogSectionDescriptionSize || 18}
-                            onDesktopSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}
-                            mobileSize={settings.blogSectionDescriptionSize || 18}
-                            onMobileSizeChange={(v) => handleInputChange('blogSectionDescriptionSize', v)}
-                            previewMode={previewMode}
-                        />
-                        <AlignmentControl 
-                            value={settings.blogSectionAlignment || 'center'}
-                            onValueChange={(v) => handleInputChange('blogSectionAlignment', v)}
-                        />
-
-                        {settings.blogSectionBackgroundColor &&
-                          <HslColorPicker 
-                              label="Baggrundsfarve"
-                              color={settings.blogSectionBackgroundColor}
-                              onChange={(hsl) => handleInputChange('blogSectionBackgroundColor', hsl)}
-                          />
-                        }
-                    </CardContent>
-                </AccordionContent>
-            </AccordionItem>
-        </Card>
-    ),
     spacing: (
         <Card className="shadow-lg">
             <AccordionItem value="spacing">
@@ -1702,14 +1623,6 @@ export default function CmsHomePage() {
                                 label="Kunder"
                                 padding={settings.sectionPadding.customers}
                                 onPaddingChange={(v, p) => handlePaddingChange('customers', v, p)}
-                                previewMode={previewMode}
-                            />
-                        )}
-                        {settings.sectionPadding?.blog && (
-                            <SpacingEditor
-                                label="Blog"
-                                padding={settings.sectionPadding.blog}
-                                onPaddingChange={(v, p) => handlePaddingChange('blog', v, p)}
                                 previewMode={previewMode}
                             />
                         )}

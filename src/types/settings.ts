@@ -248,16 +248,6 @@ export interface GeneralSettings {
     customersSectionDescriptionSize?: number;
     customersSectionBackgroundColor?: HSLColor;
     customersSectionAlignment?: Alignment;
-    
-    blogSectionTitle?: string;
-    blogSectionTitleColor?: string;
-    blogSectionTitleSize?: number;
-    blogSectionDescription?: string;
-    blogSectionDescriptionColor?: string;
-    blogSectionDescriptionSize?: number;
-    blogSectionBackgroundColor?: HSLColor;
-    blogSectionAlignment?: Alignment;
-
 
     // Spacing
     sectionPadding?: {
@@ -267,7 +257,6 @@ export interface GeneralSettings {
         cases: SectionPadding;
         about: SectionPadding;
         customers: SectionPadding;
-        blog: SectionPadding;
         contact: SectionPadding;
     };
     
