@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { sendContactMessage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import type { GeneralSettings } from '@/services/settings';
+import type { GeneralSettings } from '@/types/settings';
 
 const initialState = {
   message: '',
