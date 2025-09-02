@@ -6,6 +6,7 @@ import { getGeneralSettings } from '@/services/settings';
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getGeneralSettings();
   const allowIndex = settings?.allowSearchEngineIndexing !== false;
+  const faviconUrl = settings?.faviconUrl;
 
   return {
     title: {
@@ -26,14 +27,18 @@ export async function generateMetadata(): Promise<Metadata> {
         ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
         : 'noindex,nofollow',
     },
-    icons: {
-      icon: settings?.faviconUrl || '/favicon.ico',
-    },
+    icons: faviconUrl
+      ? {
+          icon: [{ url: faviconUrl, rel: "icon" }],
+          shortcut: [{ url: faviconUrl, rel: "shortcut icon" }],
+          apple: [{ url: faviconUrl, rel: "apple-touch-icon" }],
+        }
+      : null,
   };
 }
 
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
