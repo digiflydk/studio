@@ -670,11 +670,11 @@ export default function CmsHomePage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over?.id) {
+    if (over && active.id !== over.id) {
         setSettings((prev) => {
             const oldOrder = prev.homePageSectionOrder || [];
             const oldIndex = oldOrder.indexOf(active.id as string);
-            const newIndex = oldOrder.indexOf(over!.id as string);
+            const newIndex = oldOrder.indexOf(over.id as string);
             return {
                 ...prev,
                 homePageSectionOrder: arrayMove(oldOrder, oldIndex, newIndex)
@@ -1657,7 +1657,7 @@ export default function CmsHomePage() {
             type="multiple" 
             className="w-full space-y-4" 
             value={activeAccordionItem} 
-            onValueChange={(value: string[]) => setActiveAccordionItem(value)}
+            onValueChange={setActiveAccordionItem}
         >
             {sectionComponents['hero']}
             <DndContext

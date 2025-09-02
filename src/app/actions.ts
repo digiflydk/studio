@@ -16,7 +16,11 @@ export async function qualifyProjectAction(input: AIProjectQualificationInput): 
     return result;
   } catch (error) {
     console.error("Error in AI qualification flow:", error);
-    throw new Error("Failed to get response from AI assistant.");
+    // Return a structured error response that matches the expected output type
+    return {
+        qualified: false,
+        nextQuestion: 'Der opstod en uventet fejl. Prøv venligst igen senere.',
+    };
   }
 }
 
@@ -40,33 +44,46 @@ export type FormState = {
 
 
 export async function sendContactMessage(prevState: FormState, formData: FormData): Promise<FormState> {
-  const validatedFields = contactFormSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    message: formData.get('message'),
-    gdpr: formData.get('gdpr') === 'on',
-  });
+  try {
+    const validatedFields = contactFormSchema.safeParse({
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+      gdpr: formData.get('gdpr') === 'on',
+    });
 
-  if (!validatedFields.success) {
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Udfyld venligst alle felter korrekt.',
+      };
+    }
+    
+    // In a real application, you would send an email or save to a database.
+    // For this example, we'll just log the data to the console.
+    console.log('New Contact Form Submission:');
+    console.log(validatedFields.data);
+
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Udfyld venligst alle felter korrekt.',
+      message: 'Tak for din besked! Vi vender tilbage hurtigst muligt.',
+      errors: {},
     };
+  } catch (error) {
+      console.error("Error sending contact message:", error);
+      return {
+          message: 'Der opstod en serverfejl. Prøv venligst igen.',
+          errors: {},
+      }
   }
-  
-  // In a real application, you would send an email or save to a database.
-  // For this example, we'll just log the data to the console.
-  console.log('New Contact Form Submission:');
-  console.log(validatedFields.data);
-
-  return {
-    message: 'Tak for din besked! Vi vender tilbage hurtigst muligt.',
-    errors: {},
-  };
 }
 
 export async function getSettingsAction(): Promise<GeneralSettings | null> {
-    return getGeneralSettings();
+    try {
+        return getGeneralSettings();
+    } catch(error) {
+        console.error("Error in getSettingsAction: ", error);
+        return null;
+    }
 }
 
 export async function saveSettingsAction(settings: Partial<GeneralSettings>): Promise<{ success: boolean; message: string }> {
@@ -82,12 +99,17 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
 }
 
 export async function getLeadsAction(): Promise<Lead[]> {
-    return getAllLeads();
+    try {
+        return getAllLeads();
+    } catch (error) {
+        console.error("Error in getLeadsAction: ", error);
+        return [];
+    }
 }
 
 export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Promise<{ success: boolean; message: string; customers: Customer[] }> {
     try {
-        const settings = await getGeneralSettings();
+        const settings = await getGeneralSettings() || {};
         const customers = settings?.customers || [];
         const newCustomer: Customer = { ...customerData, id: uuidv4() };
         const updatedCustomers = [...customers, newCustomer];
@@ -102,7 +124,7 @@ export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Pr
 
 export async function deleteCustomerAction(customerId: string): Promise<{ success: boolean; message: string; customers: Customer[] }> {
     try {
-        const settings = await getGeneralSettings();
+        const settings = await getGeneralSettings() || {};
         const customers = settings?.customers || [];
         const updatedCustomers = customers.filter(c => c.id !== customerId);
         await saveGeneralSettings({ customers: updatedCustomers });
@@ -115,6 +137,11 @@ export async function deleteCustomerAction(customerId: string): Promise<{ succes
 }
 
 export async function getCustomersAction(): Promise<Customer[]> {
-    const settings = await getGeneralSettings();
-    return settings?.customers || [];
+    try {
+        const settings = await getGeneralSettings();
+        return settings?.customers || [];
+    } catch(error) {
+        console.error("Error in getCustomersAction: ", error);
+        return [];
+    }
 }
