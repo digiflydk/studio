@@ -1,14 +1,13 @@
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import Logo from '@/components/logo';
+import Link from 'next/link';
 
 export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 flex items-center h-16 border-b">
         <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo />
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            Digifly
           </Link>
           <Button asChild variant="secondary">
             <Link href="/">Go to Homepage</Link>

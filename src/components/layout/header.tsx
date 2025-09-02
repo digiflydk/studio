@@ -8,7 +8,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import Logo from '@/components/logo';
 import type { NavLink, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { usePathname } from 'next/navigation';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -17,8 +18,9 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-export default function Header({ settings }: { settings: GeneralSettings | null }) {
+function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
     ? settings.headerNavLinks 
@@ -87,9 +89,7 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
   );
   
   const getLinkHref = (href: string) => {
-    // This is a simplistic check. A more robust solution might be needed
-    // if you have other pages besides the homepage.
-    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+    if (href.startsWith('#') && pathname !== '/') {
         return `/${href}`;
     }
     return href;
@@ -172,4 +172,13 @@ export default function Header({ settings }: { settings: GeneralSettings | null 
       </div>
     </header>
   );
+}
+
+
+export default function Header({ settings }: { settings: GeneralSettings | null }) {
+    return (
+        <Suspense fallback={<header className="h-16 w-full"></header>}>
+            <HeaderInner settings={settings} />
+        </Suspense>
+    );
 }

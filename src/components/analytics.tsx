@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import type { GeneralSettings } from '@/types/settings';
@@ -73,7 +73,7 @@ function GA4Declarations({ gaId }: { gaId: string }) {
     )
 }
 
-export default function Analytics({ settings }: { settings: GeneralSettings | null }) {
+function AnalyticsInner({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
@@ -123,17 +123,25 @@ export default function Analytics({ settings }: { settings: GeneralSettings | nu
         }
     }, []);
 
+    return (
+        <>
+            {settings?.enableGtm && settings.gtmId && <GTMDeclarations gtmId={settings.gtmId} />}
+            {settings?.enableGoogleAnalytics && settings.googleAnalyticsId && <GA4Declarations gaId={settings.googleAnalyticsId} />}
+            {settings?.enableFacebookPixel && settings.facebookPixelId && <FBPixelDeclarations pixelId={settings.facebookPixelId} />}
+            {/* Google Ads can be loaded via GTM, but if a direct tag is needed, it would be added here */}
+        </>
+    );
+}
 
+
+export default function Analytics({ settings }: { settings: GeneralSettings | null }) {
     if (!settings) {
         return null;
     }
 
     return (
         <Suspense fallback={null}>
-            {settings.enableGtm && settings.gtmId && <GTMDeclarations gtmId={settings.gtmId} />}
-            {settings.enableGoogleAnalytics && settings.googleAnalyticsId && <GA4Declarations gaId={settings.googleAnalyticsId} />}
-            {settings.enableFacebookPixel && settings.facebookPixelId && <FBPixelDeclarations pixelId={settings.facebookPixelId} />}
-            {/* Google Ads can be loaded via GTM, but if a direct tag is needed, it would be added here */}
+           <AnalyticsInner settings={settings} />
         </Suspense>
     );
 }

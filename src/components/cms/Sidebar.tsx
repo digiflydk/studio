@@ -7,7 +7,7 @@ import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerCli
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { getGeneralSettings } from "@/services/settings";
 import type { GeneralSettings } from "@/types/settings";
 
@@ -21,7 +21,7 @@ const settingsNavLinks = [
     { href: "#", label: "Business listing", icon: Building },
 ]
 
-export default function Sidebar() {
+function SidebarInner() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
@@ -37,6 +37,10 @@ export default function Sidebar() {
         loadSettings();
       }
   }, []);
+  
+  useEffect(() => {
+    setIsSettingsOpen(pathname.startsWith('/cms/settings'));
+  }, [pathname]);
 
   return (
     <aside className="hidden border-r bg-black text-white md:block">
@@ -118,4 +122,12 @@ export default function Sidebar() {
       </div>
     </aside>
   );
+}
+
+export default function Sidebar() {
+    return (
+        <Suspense fallback={<div className="hidden w-[220px] bg-black md:block lg:w-[280px]"></div>}>
+            <SidebarInner />
+        </Suspense>
+    )
 }

@@ -1,15 +1,15 @@
+
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { CSSProperties } from 'react';
+import { CSSProperties, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
-
-export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
+function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
   const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
   const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
@@ -142,4 +142,12 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
       </div>
     </section>
   );
+}
+
+export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
+    return (
+        <Suspense fallback={<section id="hero" className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] bg-gray-800"></section>}>
+            <HeroSectionInner settings={settings} />
+        </Suspense>
+    )
 }

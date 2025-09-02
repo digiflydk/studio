@@ -1,15 +1,16 @@
+
 'use client';
 import Image from 'next/image';
 import { type GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { CSSProperties } from 'react';
+import { CSSProperties, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
 
-export default function FeatureSection({ settings }: { settings: GeneralSettings | null }) {
+function FeatureSectionInner({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
     
     const heading = settings?.featureSectionHeading || 'Fremhævet Overskrift';
@@ -156,4 +157,12 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
             </div>
         </section>
     );
+}
+
+export default function FeatureSection({ settings }: { settings: GeneralSettings | null }) {
+    return (
+        <Suspense fallback={<section id="feature" className="py-24"></section>}>
+            <FeatureSectionInner settings={settings} />
+        </Suspense>
+    )
 }
