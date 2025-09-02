@@ -1,5 +1,5 @@
 
-import type { Metadata, ResolvingMetadata, Robots } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -32,7 +32,7 @@ export async function generateMetadata(
 
   const allowIndex = settings?.allowSearchEngineIndexing !== false;
 
-  const robots: Robots = {
+  const robots = {
     index: allowIndex,
     follow: allowIndex,
     googleBot: {
