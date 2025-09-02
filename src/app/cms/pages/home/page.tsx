@@ -37,6 +37,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { ensureAllSectionPadding, SectionKey } from '@/lib/settings-utils';
 
 const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
@@ -129,6 +130,7 @@ const defaultVisibility: SectionVisibility = {
     cases: true,
     about: true,
     customers: true,
+    contact: true,
 }
 
 const themeColorOptions = [
@@ -142,7 +144,6 @@ const themeColorOptions = [
 ] as const;
 
 type ThemeColor = typeof themeColorOptions[number]['value'];
-type SectionKey = keyof NonNullable<GeneralSettings['sectionPadding']>;
 
 const sectionLinks = [
     { value: '#hero', label: 'Hero Sektion' },
@@ -606,17 +607,22 @@ export default function CmsHomePage() {
     part: keyof SectionPadding
   ) => {
     setSettings(prev => {
-        const prevSectionPadding = (prev.sectionPadding ?? {}) as Partial<Record<SectionKey, SectionPadding>>;
-        const current: SectionPadding = prevSectionPadding[section] ?? defaultPadding;
-        const updatedSection: SectionPadding = { ...current, [part]: value };
-    
-        return {
-            ...prev,
-            sectionPadding: {
-                ...prevSectionPadding,
-                [section]: updatedSection,
-            } as Partial<Record<SectionKey, SectionPadding>>,
-        } satisfies Partial<GeneralSettings>;
+      // Gør map komplet (ingen undefined keys)
+      const full = ensureAllSectionPadding(
+        prev.sectionPadding as Partial<Record<SectionKey, SectionPadding>> | undefined,
+        defaultPadding
+      );
+
+      // Opdater kun den valgte sektion
+      const updatedSection: SectionPadding = { ...full[section], [part]: value };
+
+      return {
+        ...prev,
+        sectionPadding: {
+          ...full,
+          [section]: updatedSection,
+        } as NonNullable<GeneralSettings['sectionPadding']>,
+      } satisfies Partial<GeneralSettings>;
     });
   };
 
