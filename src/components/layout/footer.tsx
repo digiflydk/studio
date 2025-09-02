@@ -1,9 +1,17 @@
 
-import { Linkedin, Facebook, Instagram, Twitter, Clapperboard } from 'lucide-react';
+import { Linkedin, Facebook, Instagram, Twitter, Clapperboard, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/logo';
 import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
+
+type SocialLink = {
+  url: string;
+  icon: LucideIcon;
+  label: string;
+};
+
+const notNull = <T,>(v: T | null): v is T => v !== null;
 
 const socialIcons = {
   linkedinUrl: { icon: Linkedin, label: 'LinkedIn' },
@@ -21,7 +29,7 @@ export default function Footer({ settings }: { settings: GeneralSettings | null 
   const addressLine2 = [settings?.postalCode, settings?.city].filter(Boolean).join(' ');
   const fullPhoneNumber = settings?.countryCode && settings.phoneNumber ? `${settings.countryCode} ${settings.phoneNumber}` : settings?.phoneNumber;
   
-  const socialLinks = Object.entries(socialIcons)
+  const socialLinks: SocialLink[] = Object.entries(socialIcons)
     .map(([key, { icon, label }]) => {
       const url = settings?.[key as keyof typeof settings];
       if (typeof url === 'string' && url) {
@@ -29,7 +37,7 @@ export default function Footer({ settings }: { settings: GeneralSettings | null 
       }
       return null;
     })
-    .filter((link): link is { url: string; icon: React.ElementType; label: string } => link !== null);
+    .filter(notNull);
 
   const footerStyle: React.CSSProperties = {};
   if (settings?.footerBackgroundColor) {
