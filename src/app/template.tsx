@@ -4,7 +4,6 @@
 import { ReactNode, Suspense } from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { getGeneralSettings } from '@/services/settings';
 import Analytics from '@/components/analytics';
 import { Toaster } from '@/components/ui/toaster';
 import { useGeneralSettings } from '@/hooks/use-general-settings';
