@@ -464,7 +464,7 @@ export default function CmsHomePage() {
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [activeAccordionItem, setActiveAccordionItem] = useState<string | string[]>([]);
+  const [activeAccordionItem, setActiveAccordionItem] = useState<string[]>([]);
 
 
   const sensors = useSensors(
@@ -601,41 +601,40 @@ export default function CmsHomePage() {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaddingChange = (
-    section: SectionKey,
-    value: number,
-    part: keyof SectionPadding
-  ) => {
+  const handlePaddingChange = (section: SectionKey, value: number, part: keyof SectionPadding) => {
     setSettings(prev => {
-      // Gør map komplet (ingen undefined keys)
       const full = ensureAllSectionPadding(
         prev.sectionPadding as Partial<Record<SectionKey, SectionPadding>> | undefined,
         defaultPadding
       );
-
-      // Opdater kun den valgte sektion
-      const updatedSection: SectionPadding = { ...full[section], [part]: value };
-
+      const updated: SectionPadding = { ...full[section], [part]: value };
       return {
         ...prev,
-        sectionPadding: {
-          ...full,
-          [section]: updatedSection,
-        } as NonNullable<GeneralSettings['sectionPadding']>,
+        sectionPadding: { ...full, [section]: updated },
       } satisfies Partial<GeneralSettings>;
     });
   };
 
   const handleVisibilityChange = (section: keyof SectionVisibility, isVisible: boolean) => {
     setSettings(prev => {
-        const merged = { ...defaultVisibility, ...(prev.sectionVisibility ?? {}) };
+        const prevVis = (prev.sectionVisibility ?? {}) as Partial<SectionVisibility>;
+
+        const nextVis: SectionVisibility = {
+            feature:   prevVis.feature   ?? defaultVisibility.feature!,
+            services:  prevVis.services  ?? defaultVisibility.services!,
+            aiProject: prevVis.aiProject ?? defaultVisibility.aiProject!,
+            cases:     prevVis.cases     ?? defaultVisibility.cases!,
+            about:     prevVis.about     ?? defaultVisibility.about!,
+            customers: prevVis.customers ?? defaultVisibility.customers!,
+            contact:   prevVis.contact   ?? defaultVisibility.contact!,
+        };
+
+        nextVis[section] = isVisible;
+
         return {
             ...prev,
-            sectionVisibility: {
-                ...merged,
-                [section]: isVisible,
-            },
-        };
+            sectionVisibility: nextVis,
+        } satisfies Partial<GeneralSettings>;
     });
   }
 
@@ -1654,7 +1653,12 @@ export default function CmsHomePage() {
             </Button>
         </div>
       </div>
-        <Accordion type="multiple" className="w-full space-y-4" value={activeAccordionItem} onValueChange={setActiveAccordionItem}>
+        <Accordion 
+            type="multiple" 
+            className="w-full space-y-4" 
+            value={activeAccordionItem} 
+            onValueChange={(value: string[]) => setActiveAccordionItem(value)}
+        >
             {sectionComponents['hero']}
             <DndContext
                 sensors={sensors}
