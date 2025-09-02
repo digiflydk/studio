@@ -1,5 +1,4 @@
 
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Home, ArrowUp, ArrowDown } from "lucide-react";
@@ -11,18 +10,6 @@ const pageSections = [
     description: "Administrer indholdet på forsiden.",
     href: "/cms/pages/home",
     icon: Home,
-  },
-  {
-    name: "Header",
-    description: "Rediger navigationslinks og logo.",
-    href: "/cms/pages/header",
-    icon: ArrowUp,
-  },
-  {
-    name: "Footer",
-    description: "Opdater kontaktoplysninger og sociale links.",
-    href: "/cms/pages/footer",
-    icon: ArrowDown,
   },
 ];
 
