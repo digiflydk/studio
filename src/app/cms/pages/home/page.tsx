@@ -622,22 +622,23 @@ export default function CmsHomePage() {
     part: keyof SectionPadding
   ) => {
     setSettings(prev => {
-      const prevSectionPadding = prev.sectionPadding ?? {};
-      const currentPadding: SectionPadding =
-        (prevSectionPadding[section] as SectionPadding | undefined) ?? defaultPadding;
+        const currentPadding: SectionPadding =
+        (prev.sectionPadding?.[section] as SectionPadding | undefined) ?? defaultPadding;
 
-      const updatedSection: SectionPadding = {
-        ...currentPadding,
-        [part]: value,
-      };
+        const updatedSection: SectionPadding = {
+            ...currentPadding,
+            [part]: value,
+        };
 
-      return {
-        ...prev,
-        sectionPadding: {
-          ...prevSectionPadding,
-          [section]: updatedSection,
-        },
-      } satisfies Partial<GeneralSettings>;
+        const newSectionPadding = {
+            ...prev.sectionPadding,
+            [section]: updatedSection,
+        };
+
+        return {
+            ...prev,
+            sectionPadding: newSectionPadding,
+        } as Partial<GeneralSettings>;
     });
   };
 
@@ -1706,3 +1707,5 @@ export default function CmsHomePage() {
     </div>
   );
 }
+
+    
