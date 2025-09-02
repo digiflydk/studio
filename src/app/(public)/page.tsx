@@ -15,7 +15,7 @@ const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about
 export default async function Home() {
   const settings = await getGeneralSettings();
   const visibility = settings?.sectionVisibility;
-  const order = settings?.homePageSectionOrder || defaultSectionOrder;
+  const order = (settings?.homePageSectionOrder || defaultSectionOrder).filter(id => id !== 'blog');
 
   const sections: Record<string, React.ReactNode> = {
     feature: visibility?.feature !== false && <FeatureSection settings={settings} />,
