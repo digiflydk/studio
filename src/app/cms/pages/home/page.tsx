@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -37,6 +36,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { SectionKey, updateSectionPadding } from '@/lib/settings-utils';
 
 const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
 
@@ -617,25 +617,11 @@ export default function CmsHomePage() {
   };
 
   const handlePaddingChange = (
-    section: keyof NonNullable<GeneralSettings['sectionPadding']>,
+    section: SectionKey,
     value: number,
     part: keyof SectionPadding
   ) => {
-    setSettings(prev => {
-      const prevSectionPadding = prev.sectionPadding ?? {};
-      const current: SectionPadding =
-        (prevSectionPadding[section] as SectionPadding | undefined) ?? defaultPadding;
-  
-      const updatedSection: SectionPadding = { ...current, [part]: value };
-  
-      return {
-        ...prev,
-        sectionPadding: {
-          ...prevSectionPadding,
-          [section]: updatedSection,
-        },
-      } as Partial<GeneralSettings>;
-    });
+    setSettings((prev) => updateSectionPadding(prev, section, part, value, defaultPadding));
   };
 
   const handleVisibilityChange = (section: keyof SectionVisibility, isVisible: boolean) => {
@@ -1703,6 +1689,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
-    
-    
