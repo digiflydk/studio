@@ -71,7 +71,8 @@ export default function CmsCustomersPage() {
 
   const onSubmit = (data: CustomerFormValues) => {
     startTransition(async () => {
-      const result = await saveCustomerAction(data);
+      const payload: Omit<Customer, 'id'> = { ...data, aiHint: data.aiHint ?? '' };
+      const result = await saveCustomerAction(payload);
       toast({
         title: result.success ? 'Succes!' : 'Fejl!',
         description: result.message,
