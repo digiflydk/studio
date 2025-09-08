@@ -56,6 +56,13 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     height: `${height}px`,
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
   };
+  
+  const topBorderStyle: React.CSSProperties = {};
+  if (settings?.headerTopBorderEnabled && settings?.headerTopBorderColor && settings?.headerTopBorderHeight) {
+      const { h, s, l } = settings.headerTopBorderColor;
+      topBorderStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+      topBorderStyle.height = `${settings.headerTopBorderHeight}px`;
+  }
 
   if (currentBgColor) {
     const { h, s, l } = currentBgColor;
@@ -99,76 +106,83 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     <header 
       ref={headerRef}
       className={cn(
-        "w-full flex items-center z-50",
-        isScrolled ? "sticky top-0 border-b border-border/40 shadow-sm" : "absolute top-0 border-b border-transparent"
+        "w-full flex flex-col z-50",
+        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 border-b border-border/40 shadow-sm" : "absolute top-0 border-b border-transparent")
       )}
-      style={headerStyle}
       >
-      <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo 
-              logoUrl={settings?.logoUrl} 
-              logoAlt={settings?.logoAlt} 
-              width={settings?.headerLogoWidth || 96}
-              isDark={!isScrolled || (currentBgColor ? currentBgColor.l < 50 : false)}
-            />
-          </Link>
-        </div>
-
-        <nav className="hidden md:flex md:items-center md:gap-6">
-          {navLinks.map((link) => (
-             <Link
-                key={link.href}
-                href={getLinkHref(link.href)}
-                className={navLinkClasses}
-                style={linkStyle}
-            >
-              {link.label}
+      {settings?.headerTopBorderEnabled && (
+         <div style={topBorderStyle} className="w-full"></div>
+      )}
+      <div 
+        className="w-full flex items-center"
+        style={{height: `${height}px`}}
+      >
+        <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-2">
+              <Logo 
+                logoUrl={settings?.logoUrl} 
+                logoAlt={settings?.logoAlt} 
+                width={settings?.headerLogoWidth || 96}
+                isDark={!isScrolled || (currentBgColor ? currentBgColor.l < 50 : false)}
+              />
             </Link>
-          ))}
-        </nav>
+          </div>
 
-        <div className="flex items-center md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className={menuIconClasses} />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-                <SheetTitle className="sr-only">{settings?.logoAlt || 'Menu'}</SheetTitle>
-                <SheetDescription className="sr-only">
-                    Hovednavigation med links til sidens sektioner.
-                </SheetDescription>
-              <div className="flex flex-col p-6">
-                <div className="mb-8">
-                  <Link href="/" className="flex items-center gap-2">
-                    <Logo 
-                        logoUrl={settings?.logoUrl} 
-                        logoAlt={settings?.logoAlt}
-                        width={settings?.headerLogoWidth || 96}
-                    />
-                  </Link>
-                </div>
-                <nav className="flex flex-col space-y-4">
-                  {navLinks.map((link) => (
-                     <Link
-                        key={link.href}
-                        href={getLinkHref(link.href)}
-                        className={mobileNavLinkClasses}
-                        style={linkStyle}
-                    >
-                      {link.label}
+          <nav className="hidden md:flex md:items-center md:gap-6">
+            {navLinks.map((link) => (
+               <Link
+                  key={link.href}
+                  href={getLinkHref(link.href)}
+                  className={navLinkClasses}
+                  style={linkStyle}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className={menuIconClasses} />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                  <SheetTitle className="sr-only">{settings?.logoAlt || 'Menu'}</SheetTitle>
+                  <SheetDescription className="sr-only">
+                      Hovednavigation med links til sidens sektioner.
+                  </SheetDescription>
+                <div className="flex flex-col p-6">
+                  <div className="mb-8">
+                    <Link href="/" className="flex items-center gap-2">
+                      <Logo 
+                          logoUrl={settings?.logoUrl} 
+                          logoAlt={settings?.logoAlt}
+                          width={settings?.headerLogoWidth || 96}
+                      />
                     </Link>
-                  ))}
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+                  </div>
+                  <nav className="flex flex-col space-y-4">
+                    {navLinks.map((link) => (
+                       <Link
+                          key={link.href}
+                          href={getLinkHref(link.href)}
+                          className={mobileNavLinkClasses}
+                          style={linkStyle}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
+        </div>
       </div>
     </header>
   );

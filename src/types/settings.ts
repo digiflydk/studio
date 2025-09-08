@@ -131,6 +131,10 @@ export interface GeneralSettings {
     headerLinkColor?: string;
     headerLinkHoverColor?: string;
     headerLinkSize?: number;
+    headerTopBorderEnabled?: boolean;
+    headerTopBorderColor?: HSLColor;
+    headerTopBorderHeight?: number;
+
 
     // Footer Settings
     footerTagline?: string;

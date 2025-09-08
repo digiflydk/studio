@@ -339,6 +339,10 @@ export default function CmsHeaderPage() {
             newSettings.headerLinkHoverColor = newSettings.headerLinkHoverColor || 'text-primary';
             newSettings.headerLinkSize = newSettings.headerLinkSize || 14;
             newSettings.headerMenuIconColor = newSettings.headerMenuIconColor || 'text-foreground';
+            newSettings.headerTopBorderEnabled = newSettings.headerTopBorderEnabled ?? false;
+            newSettings.headerTopBorderColor = newSettings.headerTopBorderColor || { h: 211, s: 100, l: 50 };
+            newSettings.headerTopBorderHeight = newSettings.headerTopBorderHeight || 4;
+
             
             setSettings(newSettings);
             setIsLoading(false);
@@ -442,6 +446,50 @@ export default function CmsHeaderPage() {
                             step={1}
                         />
                     </div>
+                </CardContent>
+            </Card>
+
+             <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle>Top Linje</CardTitle>
+                    <CardDescription>Tilføj en farvet linje i toppen af headeren.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                     <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="top-border-enabled" className="text-base">Aktivér Top Linje</Label>
+                            <p className="text-sm text-muted-foreground">Viser en farvet linje øverst på siden.</p>
+                        </div>
+                        <Switch
+                            id="top-border-enabled"
+                            checked={settings.headerTopBorderEnabled}
+                            onCheckedChange={(value) => handleInputChange('headerTopBorderEnabled', value)}
+                        />
+                    </div>
+                    {settings.headerTopBorderEnabled && (
+                        <div className="space-y-4">
+                            {settings.headerTopBorderColor && (
+                                <HslColorPicker
+                                    label="Linjens Farve"
+                                    color={settings.headerTopBorderColor}
+                                    onChange={(hsl) => handleInputChange('headerTopBorderColor', hsl)}
+                                />
+                            )}
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <Label>Linjens Højde</Label>
+                                    <span className="text-sm text-muted-foreground">{settings.headerTopBorderHeight || 4}px</span>
+                                </div>
+                                <Slider 
+                                    value={[settings.headerTopBorderHeight || 4]} 
+                                    onValueChange={([v]) => handleInputChange('headerTopBorderHeight', v)}
+                                    min={2}
+                                    max={16}
+                                    step={1}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
