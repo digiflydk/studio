@@ -512,6 +512,7 @@ export default function CmsHomePage() {
           heroCtaSize: initialSettings.heroCtaSize ?? 'lg',
           heroCtaTextSize: initialSettings.heroCtaTextSize ?? 16,
           heroCtaTextSizeMobile: initialSettings.heroCtaTextSizeMobile ?? 14,
+          heroSectionBackgroundColor: initialSettings.heroSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
           
           featureSectionHeading: initialSettings.featureSectionHeading ?? 'Fremhævet Overskrift',
           featureSectionHeadingColor: initialSettings.featureSectionHeadingColor ?? 'text-foreground',
@@ -900,8 +901,8 @@ export default function CmsHomePage() {
                                 </p>
                             </div>
                         ) : (
-                            <div className='p-4 border rounded-lg space-y-4 bg-muted/20'>
-                                <h3 className="font-semibold">Billedgitter</h3>
+                            <div className='p-4 border rounded-lg space-y-4'>
+                                <h3 className="font-semibold">Billedgitter & Baggrund</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="hero-grid-1-url">Billede 1 URL</Label>
@@ -928,6 +929,13 @@ export default function CmsHomePage() {
                                         <Input id="hero-grid-4-hint" value={settings.heroGridImage4AiHint || ''} onChange={e => handleInputChange('heroGridImage4AiHint', e.target.value)} />
                                     </div>
                                 </div>
+                                {settings.heroSectionBackgroundColor && (
+                                    <HslColorPicker
+                                        label="Baggrundsfarve"
+                                        color={settings.heroSectionBackgroundColor}
+                                        onChange={(hsl) => handleInputChange('heroSectionBackgroundColor', hsl)}
+                                    />
+                                )}
                             </div>
                         )}
                        
@@ -1764,4 +1772,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-

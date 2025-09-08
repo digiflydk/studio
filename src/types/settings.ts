@@ -179,6 +179,7 @@ export interface GeneralSettings {
     heroCtaSize?: 'default' | 'sm' | 'lg' | 'icon';
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
+    heroSectionBackgroundColor?: HSLColor;
 
     featureSectionHeading?: string;
     featureSectionHeadingColor?: string;

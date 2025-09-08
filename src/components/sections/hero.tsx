@@ -162,6 +162,11 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
          '--text-max-width': `${textMaxWidth}px`,
     } as CSSProperties;
 
+    if (settings?.heroSectionBackgroundColor) {
+        const { h, s, l } = settings.heroSectionBackgroundColor;
+        heroStyles.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+    }
+
     const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
     const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
     
@@ -180,7 +185,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     ];
 
     return (
-        <section id="hero" className="w-full bg-background" style={heroStyles}>
+        <section id="hero" className={cn("w-full", !settings?.heroSectionBackgroundColor && "bg-background")} style={heroStyles}>
              <style>
                 {`
                 .hero-headline {
