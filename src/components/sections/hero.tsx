@@ -84,7 +84,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
             alt="Tech background"
             data-ai-hint="tech background"
             fill
-            className="object-cover -z-10 brightness-50"
+            className="object-cover brightness-50"
             priority
         />
       </div>
@@ -94,7 +94,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
            verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
       )}>
         <div className={cn(
-            "flex flex-col space-y-6 hero-text-container z-10 w-full text-white",
+            "flex flex-col space-y-6 hero-text-container w-full text-white",
             horizontalAlignmentClasses[settings?.heroAlignment || 'center']
         )}>
           <h1 
