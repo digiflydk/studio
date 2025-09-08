@@ -13,6 +13,7 @@ import { sendContactMessage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import type { GeneralSettings } from '@/types/settings';
+import { cn } from '@/lib/utils';
 
 
 type FormErrors = {
@@ -69,17 +70,22 @@ export default function ContactSection({ settings }: ContactSectionProps) {
   }, [state, toast]);
 
   const sectionPadding = settings?.sectionPadding?.contact;
-  const style: React.CSSProperties = sectionPadding ? {
-    '--padding-top': `${sectionPadding.top}px`,
-    '--padding-bottom': `${sectionPadding.bottom}px`,
-    '--padding-top-mobile': `${sectionPadding.topMobile}px`,
-    '--padding-bottom-mobile': `${sectionPadding.bottomMobile}px`,
-  } as any : {};
+  const style: React.CSSProperties & { [key: string]: string } = {
+    '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+    '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+    '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+    '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
+  };
+
+  if (settings?.contactSectionBackgroundColor) {
+    const { h, s, l } = settings.contactSectionBackgroundColor;
+    style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  }
 
   return (
     <section 
         id="kontakt" 
-        className="w-full bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]" 
+        className={cn("w-full py-[var(--padding-top-mobile)] md:py-[var(--padding-top)]", !settings?.contactSectionBackgroundColor && "bg-background")}
         style={style}
     >
       <div className="container mx-auto max-w-xl px-4 md:px-6">

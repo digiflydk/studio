@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -55,6 +56,11 @@ export default function CasesSection({ settings }: CasesSectionProps) {
     '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
     '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
   };
+
+  if (settings?.casesSectionBackgroundColor) {
+    const { h, s, l } = settings.casesSectionBackgroundColor;
+    style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  }
   
   const alignmentClasses = {
     left: 'text-left',
@@ -65,7 +71,7 @@ export default function CasesSection({ settings }: CasesSectionProps) {
   return (
     <section 
         id="cases" 
-        className="bg-background py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]" 
+        className={cn("py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.casesSectionBackgroundColor && 'bg-background')}
         style={style}
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6">

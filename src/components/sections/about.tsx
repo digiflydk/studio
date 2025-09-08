@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -72,6 +73,11 @@ export default function AboutSection({ settings }: AboutSectionProps) {
         '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
         '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
+    
+    if (settings?.aboutSectionBackgroundColor) {
+        const { h, s, l } = settings.aboutSectionBackgroundColor;
+        style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+    }
 
     const alignmentClasses = {
         left: 'text-left items-start',
@@ -124,7 +130,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
     return (
         <section 
             id="om-os" 
-            className="bg-secondary py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]"
+            className={cn("py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.aboutSectionBackgroundColor && "bg-secondary")}
             style={style}
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">

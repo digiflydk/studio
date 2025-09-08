@@ -237,6 +237,7 @@ export interface GeneralSettings {
     casesSectionDescriptionColor?: string;
     casesSectionDescriptionSize?: number;
     casesSectionAlignment?: Alignment;
+    casesSectionBackgroundColor?: HSLColor;
     cases?: Case[];
     
     aboutSectionTitle?: string;
@@ -246,6 +247,7 @@ export interface GeneralSettings {
     aboutTextColor?: string;
     aboutTextSize?: number;
     aboutSectionAlignment?: Alignment;
+    aboutSectionBackgroundColor?: HSLColor;
     teamMembers?: TeamMember[];
     teamMemberNameColor?: string;
     teamMemberNameSize?: number;
@@ -262,6 +264,8 @@ export interface GeneralSettings {
     customersSectionDescriptionSize?: number;
     customersSectionBackgroundColor?: HSLColor;
     customersSectionAlignment?: Alignment;
+
+    contactSectionBackgroundColor?: HSLColor;
 
     // Spacing
     sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact', SectionPadding>>;

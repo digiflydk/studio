@@ -571,6 +571,7 @@ export default function CmsHomePage() {
           casesSectionDescriptionColor: initialSettings.casesSectionDescriptionColor ?? "text-muted-foreground",
           casesSectionDescriptionSize: initialSettings.casesSectionDescriptionSize ?? 18,
           casesSectionAlignment: initialSettings.casesSectionAlignment ?? 'center',
+          casesSectionBackgroundColor: initialSettings.casesSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
           cases: initialSettings.cases && initialSettings.cases.length > 0 ? initialSettings.cases : defaultCases,
           
           aboutSectionTitle: initialSettings.aboutSectionTitle ?? "Hvem er Digifly?",
@@ -580,6 +581,7 @@ export default function CmsHomePage() {
           aboutTextColor: initialSettings.aboutTextColor ?? "text-muted-foreground",
           aboutTextSize: initialSettings.aboutTextSize ?? 18,
           aboutSectionAlignment: initialSettings.aboutSectionAlignment ?? 'left',
+          aboutSectionBackgroundColor: initialSettings.aboutSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
           teamMembers: initialSettings.teamMembers && initialSettings.teamMembers.length > 0 ? initialSettings.teamMembers : defaultTeam,
           teamMemberNameColor: initialSettings.teamMemberNameColor ?? 'text-foreground',
           teamMemberNameSize: initialSettings.teamMemberNameSize ?? 18,
@@ -596,6 +598,8 @@ export default function CmsHomePage() {
           customersSectionDescriptionSize: initialSettings.customersSectionDescriptionSize ?? 18,
           customersSectionBackgroundColor: initialSettings.customersSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
           customersSectionAlignment: initialSettings.customersSectionAlignment ?? 'center',
+
+          contactSectionBackgroundColor: initialSettings.contactSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
 
           sectionPadding: initialSettings.sectionPadding ?? {},
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
@@ -1422,6 +1426,14 @@ export default function CmsHomePage() {
                             ))}
                         </Accordion>
                         <Button variant="outline" onClick={() => handleListAdd('cases', { title: 'Ny Case', description: '', imageUrl: '', link: '#', aiHint: '' })}>Tilføj Case</Button>
+                        
+                        {settings.casesSectionBackgroundColor && (
+                          <HslColorPicker
+                            label="Baggrundsfarve"
+                            color={settings.casesSectionBackgroundColor}
+                            onChange={(hsl) => handleInputChange('casesSectionBackgroundColor', hsl)}
+                          />
+                        )}
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>
@@ -1543,6 +1555,14 @@ export default function CmsHomePage() {
                             ))}
                         </Accordion>
                         <Button variant="outline" onClick={() => handleListAdd('teamMembers', { name: 'Nyt Medlem', title: '', description: '', imageUrl: '', linkedinUrl: '#', aiHint: '' })}>Tilføj Medlem</Button>
+                        
+                        {settings.aboutSectionBackgroundColor && (
+                            <HslColorPicker
+                                label="Baggrundsfarve"
+                                color={settings.aboutSectionBackgroundColor}
+                                onChange={(hsl) => handleInputChange('aboutSectionBackgroundColor', hsl)}
+                            />
+                        )}
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>
@@ -1669,6 +1689,13 @@ export default function CmsHomePage() {
                             onPaddingChange={(v, p) => handlePaddingChange('contact', v, p)}
                             previewMode={previewMode}
                         />
+                         {settings.contactSectionBackgroundColor && (
+                            <HslColorPicker
+                                label="Kontakt Baggrundsfarve"
+                                color={settings.contactSectionBackgroundColor}
+                                onChange={(hsl) => handleInputChange('contactSectionBackgroundColor', hsl)}
+                            />
+                         )}
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>
