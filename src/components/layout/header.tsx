@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import Logo from '@/components/logo';
 import type { NavLink, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 const defaultNavLinks: NavLink[] = [
@@ -21,22 +21,33 @@ const defaultNavLinks: NavLink[] = [
 function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
     ? settings.headerNavLinks 
     : defaultNavLinks;
 
   useEffect(() => {
-    if (!settings?.headerIsSticky) return;
     const handleScroll = () => {
       const offset = window.scrollY;
       setIsScrolled(offset > 10);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check on initial load
+    if (settings?.headerIsSticky) {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Check on initial load
+    }
+    
+    // Set scroll-padding-top based on header height
+    if (headerRef.current) {
+        document.documentElement.style.setProperty('scroll-padding-top', `${headerRef.current.offsetHeight}px`);
+    }
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      if (settings?.headerIsSticky) {
+        window.removeEventListener('scroll', handleScroll);
+      }
+      document.documentElement.style.removeProperty('scroll-padding-top');
     };
   }, [settings?.headerIsSticky]);
 
@@ -54,8 +65,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, top 0.3s ease',
-    // The top position now depends on the banner's height
-    top: 'var(--announcement-banner-height, 0px)',
+    top: '0',
   };
 
   if (currentBgColor) {
@@ -99,9 +109,10 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
 
   return (
     <header 
+      ref={headerRef}
       className={cn(
-        "left-0 w-full z-40 flex items-center border-b", // Use z-40 to be below banner
-        isSticky && "sticky", // Changed to sticky to flow with the banner
+        "left-0 w-full z-40 flex items-center border-b",
+        isSticky && "sticky",
         isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}

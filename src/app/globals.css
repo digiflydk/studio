@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 html {
-  scroll-padding-top: 100px; /* Adjust this value based on header height */
+  /* scroll-padding-top will be set dynamically by the header component */
 }
 
 body {

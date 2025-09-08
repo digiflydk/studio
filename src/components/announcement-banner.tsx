@@ -9,28 +9,14 @@ import { cn } from '@/lib/utils';
 
 export default function AnnouncementBanner() {
   const [isVisible, setIsVisible] = useState(true);
-  const bannerRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const root = document.documentElement;
-    if (isVisible && bannerRef.current) {
-        root.style.setProperty('--announcement-banner-height', `${bannerRef.current.offsetHeight}px`);
-    } else {
-        root.style.setProperty('--announcement-banner-height', '0px');
-    }
-  }, [isVisible]);
-
+  
   if (!isVisible) {
     return null;
   }
 
   return (
     <div 
-        ref={bannerRef} 
-        className={cn(
-            "relative bg-primary text-primary-foreground transition-all duration-300 ease-in-out",
-            "sticky top-0 z-50"
-        )}
+        className="relative bg-primary text-primary-foreground"
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6 py-2.5 text-sm font-medium">
         <div className="flex items-center justify-center text-center">
