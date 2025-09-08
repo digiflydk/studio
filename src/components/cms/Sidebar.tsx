@@ -23,25 +23,18 @@ const settingsNavLinks = [
 
 function SidebarInner() {
   const pathname = usePathname();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.startsWith('/cms/settings'));
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
 
-  // This data fetching is safe because it only runs on the client-side
-  // after the initial render, avoiding build-time errors.
-  useEffect(() => {
-      async function loadSettings() {
-          const loadedSettings = await getGeneralSettings();
-          setSettings(loadedSettings);
-      }
-      if (typeof window !== 'undefined') {
-        loadSettings();
-      }
-  }, []);
-  
   useEffect(() => {
     setIsSettingsOpen(pathname.startsWith('/cms/settings'));
+    async function loadSettings() {
+        const loadedSettings = await getGeneralSettings();
+        setSettings(loadedSettings);
+    }
+    loadSettings();
   }, [pathname]);
-
+  
   return (
     <aside className="hidden border-r bg-black text-white md:block">
       <div className="flex h-14 items-center border-b border-gray-800 px-4 lg:h-[60px] lg:px-6">

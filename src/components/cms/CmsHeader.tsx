@@ -6,7 +6,7 @@ import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Logo from "../logo";
 import { getGeneralSettings } from "@/services/settings";
 import type { GeneralSettings } from "@/types/settings";
@@ -23,7 +23,7 @@ const settingsNavLinks = [
     { href: "#", label: "Business listing", icon: Building },
 ]
 
-export default function CmsHeader() {
+function CmsHeaderInner() {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
@@ -112,4 +112,12 @@ export default function CmsHeader() {
         </div>
     </header>
   );
+}
+
+export default function CmsHeader() {
+    return (
+        <Suspense fallback={<header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6"></header>}>
+            <CmsHeaderInner />
+        </Suspense>
+    )
 }
