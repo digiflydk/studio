@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useRef, useLayoutEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function AnnouncementBanner() {
   const [isVisible, setIsVisible] = useState(true);
@@ -24,7 +25,13 @@ export default function AnnouncementBanner() {
   }
 
   return (
-    <div ref={bannerRef} className="relative bg-primary text-primary-foreground transition-all duration-300 ease-in-out">
+    <div 
+        ref={bannerRef} 
+        className={cn(
+            "relative bg-primary text-primary-foreground transition-all duration-300 ease-in-out",
+            "sticky top-0 z-50"
+        )}
+    >
       <div className="container mx-auto max-w-7xl px-4 md:px-6 py-2.5 text-sm font-medium">
         <div className="flex items-center justify-center text-center">
           <Badge variant="secondary" className="bg-white/20 text-white mr-3 hidden sm:inline-flex">NEW</Badge>

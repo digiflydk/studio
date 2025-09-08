@@ -54,6 +54,8 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, top 0.3s ease',
+    // The top position now depends on the banner's height
+    top: 'var(--announcement-banner-height, 0px)',
   };
 
   if (currentBgColor) {
@@ -98,8 +100,8 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   return (
     <header 
       className={cn(
-        "left-0 w-full z-50 flex items-center border-b top-[var(--announcement-banner-height,0px)]",
-        isSticky && "fixed",
+        "left-0 w-full z-40 flex items-center border-b", // Use z-40 to be below banner
+        isSticky && "sticky", // Changed to sticky to flow with the banner
         isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}
