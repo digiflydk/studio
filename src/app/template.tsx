@@ -33,13 +33,13 @@ function StickyHeaderManager({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <div ref={bannerRef} className="relative z-50">
-                <AnnouncementBanner />
-            </div>
             <div className={cn("sticky top-0 z-40", isSticky ? "shadow-md" : "")}>
                 <Suspense fallback={<header className="h-16 w-full"></header>}>
                     <Header settings={useGeneralSettings()} isSticky={isSticky} />
                 </Suspense>
+            </div>
+             <div ref={bannerRef} className="relative z-30">
+                <AnnouncementBanner />
             </div>
             {children}
         </>
