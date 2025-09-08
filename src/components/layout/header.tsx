@@ -18,32 +18,48 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-function HeaderInner({ settings, isSticky }: { settings: GeneralSettings | null, isSticky: boolean }) {
+function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
     ? settings.headerNavLinks 
     : defaultNavLinks;
   
   useEffect(() => {
-    // Set scroll-padding-top based on header height
-    if (headerRef.current) {
-        document.documentElement.style.setProperty('scroll-padding-top', `${headerRef.current.offsetHeight}px`);
-    }
-
-    return () => {
-      document.documentElement.style.removeProperty('scroll-padding-top');
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 10);
     };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Set scroll-padding-top based on header and banner height
+    const updateScrollPadding = () => {
+        if (headerRef.current) {
+            const banner = document.getElementById('announcement-banner');
+            const bannerHeight = banner ? banner.offsetHeight : 0;
+            const totalOffset = headerRef.current.offsetHeight + bannerHeight;
+            document.documentElement.style.setProperty('scroll-padding-top', `${totalOffset}px`);
+        }
+    };
+
+    updateScrollPadding();
+    // Re-calculate on resize
+    window.addEventListener('resize', updateScrollPadding);
+    return () => window.removeEventListener('resize', updateScrollPadding);
+
   }, []);
 
   const height = settings?.headerHeight || 64;
 
-  const currentBgColor = isSticky 
+  const currentBgColor = isScrolled 
     ? settings?.headerScrolledBackgroundColor 
     : settings?.headerInitialBackgroundColor;
 
-  const currentOpacity = isSticky 
+  const currentOpacity = isScrolled 
     ? (settings?.headerScrolledBackgroundOpacity ?? 95) / 100 
     : (settings?.headerInitialBackgroundOpacity ?? 0) / 100;
 
@@ -55,7 +71,7 @@ function HeaderInner({ settings, isSticky }: { settings: GeneralSettings | null,
   if (currentBgColor) {
     const { h, s, l } = currentBgColor;
     headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${currentOpacity})`;
-    if (currentOpacity > 0.8 && isSticky) {
+    if (currentOpacity > 0.8 && isScrolled) {
         headerStyle.borderColor = `hsla(${h}, ${s}%, ${l-10}%, ${currentOpacity})`;
     }
   } else {
@@ -94,8 +110,8 @@ function HeaderInner({ settings, isSticky }: { settings: GeneralSettings | null,
     <header 
       ref={headerRef}
       className={cn(
-        "left-0 w-full flex items-center border-b",
-        isSticky ? "border-border/40" : "border-transparent"
+        "sticky top-0 w-full flex items-center z-50 border-b",
+        isScrolled ? "border-border/40 shadow-sm" : "border-transparent"
       )}
       style={headerStyle}
       >
@@ -170,10 +186,10 @@ function HeaderInner({ settings, isSticky }: { settings: GeneralSettings | null,
 }
 
 
-export default function Header({ settings, isSticky }: { settings: GeneralSettings | null, isSticky: boolean }) {
+export default function Header({ settings }: { settings: GeneralSettings | null }) {
     return (
         <Suspense fallback={<header className="h-16 w-full"></header>}>
-            <HeaderInner settings={settings} isSticky={isSticky} />
+            <HeaderInner settings={settings} />
         </Suspense>
     );
 }

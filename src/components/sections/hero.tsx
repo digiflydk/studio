@@ -54,7 +54,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
   return (
     <section
       id="hero"
-      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
+      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] -mt-[64px] pt-[64px]"
       style={heroStyles}
     >
       <style>
