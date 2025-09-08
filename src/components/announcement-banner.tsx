@@ -8,6 +8,8 @@ import { useState, useRef, useLayoutEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export default function AnnouncementBanner() {
+  return null;
+  
   const [isVisible, setIsVisible] = useState(true);
   
   if (!isVisible) {
