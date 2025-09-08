@@ -29,28 +29,17 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   
   useEffect(() => {
     const handleScroll = () => {
-        setIsScrolled(window.scrollY > 10);
+        setIsScrolled(window.scrollY > 50); // Juster tærsklen for, hvornår headeren bliver sticky
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    // Set scroll-padding-top based on header and banner height
-    const updateScrollPadding = () => {
-        if (headerRef.current) {
-            const banner = document.getElementById('announcement-banner');
-            const bannerHeight = banner ? banner.offsetHeight : 0;
-            const totalOffset = headerRef.current.offsetHeight + bannerHeight;
-            document.documentElement.style.setProperty('scroll-padding-top', `${totalOffset}px`);
-        }
-    };
-
-    updateScrollPadding();
-    // Re-calculate on resize
-    window.addEventListener('resize', updateScrollPadding);
-    return () => window.removeEventListener('resize', updateScrollPadding);
-
+    if (headerRef.current) {
+        const headerHeight = headerRef.current.offsetHeight;
+        document.documentElement.style.setProperty('scroll-padding-top', `${headerHeight}px`);
+    }
   }, []);
 
   const height = settings?.headerHeight || 64;
@@ -65,7 +54,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
 
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
-    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
   };
 
   if (currentBgColor) {
@@ -110,8 +99,8 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     <header 
       ref={headerRef}
       className={cn(
-        "sticky top-0 w-full flex items-center z-50 border-b",
-        isScrolled ? "border-border/40 shadow-sm" : "border-transparent"
+        "w-full flex items-center z-50",
+        isScrolled ? "sticky top-0 border-b border-border/40 shadow-sm" : "absolute top-0 border-b border-transparent"
       )}
       style={headerStyle}
       >
@@ -122,7 +111,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
               logoUrl={settings?.logoUrl} 
               logoAlt={settings?.logoAlt} 
               width={settings?.headerLogoWidth || 96}
-              isDark={currentBgColor ? currentBgColor.l < 50 : true}
+              isDark={!isScrolled || (currentBgColor ? currentBgColor.l < 50 : false)}
             />
           </Link>
         </div>

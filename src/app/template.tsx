@@ -15,12 +15,11 @@ export default function Template({ children }: { children: ReactNode }) {
     
     return (
         <ThemeContextWrapper settings={settings}>
-            <Suspense fallback={<header className="h-16 w-full"></header>}>
-               <Header settings={settings} />
-            </Suspense>
+            <Header settings={settings} />
             <AnnouncementBanner />
-
-            {children}
+            <main>
+                {children}
+            </main>
 
             <Suspense fallback={<footer></footer>}>
                 <Footer settings={settings} />

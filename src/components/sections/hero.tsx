@@ -20,6 +20,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
   const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
   const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
   const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
+  const headerHeight = settings?.headerHeight || 64;
 
   const heroStyles = {
     '--headline-desktop-size': `${headlineDesktopSize}px`,
@@ -27,6 +28,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
     '--description-desktop-size': `${descriptionDesktopSize}px`,
     '--description-mobile-size': `${descriptionMobileSize}px`,
     '--text-max-width': `${textMaxWidth}px`,
+    'paddingTop': `${headerHeight}px`,
   } as CSSProperties;
   
   const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
@@ -54,8 +56,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
   return (
     <section
       id="hero"
-      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] -mt-[64px] pt-[64px]"
-      style={heroStyles}
+      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
     >
       <style>
         {`
@@ -92,7 +93,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
       <div className={cn(
           "relative h-full container mx-auto px-4 md:px-6 flex flex-col",
            verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
-      )}>
+      )} style={{ paddingTop: `${headerHeight}px` }}>
         <div className={cn(
             "flex flex-col space-y-6 hero-text-container w-full text-white",
             horizontalAlignmentClasses[settings?.heroAlignment || 'center']

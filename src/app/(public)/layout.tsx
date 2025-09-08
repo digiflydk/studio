@@ -8,8 +8,8 @@ export default async function PublicLayout({
 }) {
 
   return (
-      <main className="flex-1">
+      <>
         {children}
-      </main>
+      </>
   );
 }
