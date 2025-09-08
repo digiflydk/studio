@@ -21,16 +21,12 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
   const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
   const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
-  const headerHeight = settings?.headerHeight || 64;
-
   const heroStyles = {
     '--headline-desktop-size': `${headlineDesktopSize}px`,
     '--headline-mobile-size': `${headlineMobileSize}px`,
     '--description-desktop-size': `${descriptionDesktopSize}px`,
     '--description-mobile-size': `${descriptionMobileSize}px`,
     '--text-max-width': `${textMaxWidth}px`,
-    '--header-height': `${headerHeight}px`,
-    paddingTop: `var(--header-height)`,
   } as CSSProperties;
   
   const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};

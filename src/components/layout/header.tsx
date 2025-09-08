@@ -20,14 +20,23 @@ const defaultNavLinks: NavLink[] = [
 
 function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [bannerHeight, setBannerHeight] = useState(0);
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
     ? settings.headerNavLinks 
     : defaultNavLinks;
-
+  
   useEffect(() => {
+    // Find banner and set its height
+    const bannerElement = document.getElementById('announcement-banner');
+    if (bannerElement) {
+        setBannerHeight(bannerElement.offsetHeight);
+    } else {
+        setBannerHeight(0);
+    }
+    
     const handleScroll = () => {
       const offset = window.scrollY;
       setIsScrolled(offset > 10);
@@ -65,8 +74,12 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, top 0.3s ease',
-    top: '0',
+    top: isSticky ? `${bannerHeight}px` : '0',
   };
+  
+  if (isScrolled) {
+    headerStyle.top = '0';
+  }
 
   if (currentBgColor) {
     const { h, s, l } = currentBgColor;
@@ -112,7 +125,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       ref={headerRef}
       className={cn(
         "left-0 w-full z-40 flex items-center border-b",
-        isSticky && isScrolled ? "sticky" : "absolute",
+        isSticky ? "sticky" : "absolute",
         isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}

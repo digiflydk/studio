@@ -16,6 +16,7 @@ export default function AnnouncementBanner() {
 
   return (
     <div 
+        id="announcement-banner"
         className="relative bg-primary text-primary-foreground"
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6 py-2.5 text-sm font-medium">
