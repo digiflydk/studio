@@ -1,7 +1,7 @@
 
 import CmsHeader from "@/components/cms/CmsHeader";
 import Sidebar from "@/components/cms/Sidebar";
-import { ThemeContextWrapper } from "@/context/ThemeContextWrapper";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { getGeneralSettings } from "@/services/settings";
 
 export default async function CmsLayout({
@@ -11,7 +11,7 @@ export default async function CmsLayout({
 }) {
   const settings = await getGeneralSettings();
   return (
-    <ThemeContextWrapper settings={settings}>
+    <ThemeProvider settings={settings}>
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <Sidebar />
         <div className="flex flex-col">
@@ -21,6 +21,6 @@ export default async function CmsLayout({
           </main>
         </div>
       </div>
-    </ThemeContextWrapper>
+    </ThemeProvider>
   );
 }
