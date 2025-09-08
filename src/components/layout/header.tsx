@@ -53,7 +53,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
 
   const headerStyle: React.CSSProperties = {
     height: `${height}px`,
-    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease, top 0.3s ease',
   };
 
   if (currentBgColor) {
@@ -98,7 +98,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   return (
     <header 
       className={cn(
-        "top-0 left-0 w-full z-50 flex items-center border-b",
+        "left-0 w-full z-50 flex items-center border-b top-[var(--announcement-banner-height,0px)]",
         isSticky && "fixed",
         isScrolled ? "border-border/40" : "border-transparent"
       )}

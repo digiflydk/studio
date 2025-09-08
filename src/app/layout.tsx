@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
       template: `%s | ${settings?.websiteTitle || 'Digifly'}`
     },
-    description: settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger. Book et møde i dag.',
+    description: settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.',
     openGraph: {
       title: settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
       description: settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.',
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
           shortcut: [{ url: faviconUrl, rel: "shortcut icon" }],
           apple: [{ url: faviconUrl, rel: "apple-touch-icon" }],
         }
-      : null,
+      : undefined,
   };
 }
 

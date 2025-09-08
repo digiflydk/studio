@@ -8,12 +8,14 @@ import Analytics from '@/components/analytics';
 import { Toaster } from '@/components/ui/toaster';
 import { useGeneralSettings } from '@/hooks/use-general-settings';
 import { ThemeContextWrapper } from '@/context/ThemeContextWrapper';
+import AnnouncementBanner from '@/components/announcement-banner';
 
 export default function Template({ children }: { children: ReactNode }) {
     const settings = useGeneralSettings();
     
     return (
         <ThemeContextWrapper settings={settings}>
+            <AnnouncementBanner />
             <Suspense fallback={<header className="h-16 w-full"></header>}>
                <Header settings={settings} />
             </Suspense>
