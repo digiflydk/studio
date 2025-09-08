@@ -484,6 +484,7 @@ export default function CmsHomePage() {
           ...initialSettings,
           homePageSectionOrder: initialSettings.homePageSectionOrder?.filter(id => id !== 'blog') ?? defaultSectionOrder,
           
+          heroLayout: initialSettings.heroLayout ?? 'fullWidthImage',
           heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
           heroHeadlineColor: initialSettings.heroHeadlineColor ?? 'text-white',
           heroHeadlineSize: initialSettings.heroHeadlineSize ?? 64,
@@ -493,6 +494,14 @@ export default function CmsHomePage() {
           heroDescriptionSize: initialSettings.heroDescriptionSize ?? 18,
           heroDescriptionSizeMobile: initialSettings.heroDescriptionSizeMobile ?? 16,
           heroImageUrl: initialSettings.heroImageUrl ?? 'https://picsum.photos/1920/1280',
+          heroGridImage1Url: initialSettings.heroGridImage1Url ?? 'https://picsum.photos/400/300?random=11',
+          heroGridImage1AiHint: initialSettings.heroGridImage1AiHint ?? '',
+          heroGridImage2Url: initialSettings.heroGridImage2Url ?? 'https://picsum.photos/400/300?random=12',
+          heroGridImage2AiHint: initialSettings.heroGridImage2AiHint ?? '',
+          heroGridImage3Url: initialSettings.heroGridImage3Url ?? 'https://picsum.photos/400/300?random=13',
+          heroGridImage3AiHint: initialSettings.heroGridImage3AiHint ?? '',
+          heroGridImage4Url: initialSettings.heroGridImage4Url ?? 'https://picsum.photos/400/300?random=14',
+          heroGridImage4AiHint: initialSettings.heroGridImage4AiHint ?? '',
           heroAlignment: initialSettings.heroAlignment ?? 'center',
           heroVerticalAlignment: initialSettings.heroVerticalAlignment ?? 'center',
           heroTextMaxWidth: initialSettings.heroTextMaxWidth ?? 700,
@@ -711,12 +720,23 @@ export default function CmsHomePage() {
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
                          <div className="space-y-2">
+                            <Label htmlFor="hero-layout">Layout</Label>
+                            <Select value={settings.heroLayout || 'fullWidthImage'} onValueChange={(v) => handleInputChange('heroLayout', v)}>
+                                <SelectTrigger id="hero-layout"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="fullWidthImage">Fuldt baggrundsbillede</SelectItem>
+                                    <SelectItem value="textWithImageGrid">Tekst med billedgitter</SelectItem>
+                                </SelectContent>
+                            </Select>
+                         </div>
+                         <hr/>
+                         <div className="space-y-2">
                             <Label htmlFor="hero-headline">Overskrift</Label>
                             <Input id="hero-headline" value={settings.heroHeadline || ''} onChange={e => handleInputChange('heroHeadline', e.target.value)} className="w-full" />
                         </div>
                         <TextStyleEditor 
                             label="Design for Overskrift"
-                            colorValue={settings.heroHeadlineColor as ThemeColor}
+                            colorValue={(settings.heroLayout === 'textWithImageGrid' ? 'text-foreground' : settings.heroHeadlineColor) as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
                             desktopSize={settings.heroHeadlineSize || 64}
                             onDesktopSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
@@ -730,7 +750,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Beskrivelse"
-                            colorValue={settings.heroDescriptionColor as ThemeColor}
+                            colorValue={(settings.heroLayout === 'textWithImageGrid' ? 'text-muted-foreground' : settings.heroDescriptionColor) as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
                             desktopSize={settings.heroDescriptionSize || 18}
                             onDesktopSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}
@@ -863,17 +883,50 @@ export default function CmsHomePage() {
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
-                            <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} className="w-full" />
-                             <p className="text-sm text-muted-foreground">
-                                Find gratis billeder i høj kvalitet på f.eks. 
-                                <Link href="https://unsplash.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Unsplash</Link> 
-                                eller
-                                <Link href="https://pexels.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Pexels</Link>.
-                                Sørg for at du har rettighederne til det billede, du bruger.
-                            </p>
-                        </div>
+                        {settings.heroLayout === 'fullWidthImage' ? (
+                             <div className="space-y-2">
+                                <Label htmlFor="hero-image">Baggrundsbillede URL</Label>
+                                <Input id="hero-image" value={settings.heroImageUrl || ''} onChange={e => handleInputChange('heroImageUrl', e.target.value)} className="w-full" />
+                                <p className="text-sm text-muted-foreground">
+                                    Find gratis billeder i høj kvalitet på f.eks. 
+                                    <Link href="https://unsplash.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Unsplash</Link> 
+                                    eller
+                                    <Link href="https://pexels.com" target="_blank" className="text-primary underline hover:text-primary/80 mx-1">Pexels</Link>.
+                                    Sørg for at du har rettighederne til det billede, du bruger.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className='p-4 border rounded-lg space-y-4 bg-muted/20'>
+                                <h3 className="font-semibold">Billedgitter</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="hero-grid-1-url">Billede 1 URL</Label>
+                                        <Input id="hero-grid-1-url" value={settings.heroGridImage1Url || ''} onChange={e => handleInputChange('heroGridImage1Url', e.target.value)} />
+                                        <Label htmlFor="hero-grid-1-hint">Billede 1 AI Hint</Label>
+                                        <Input id="hero-grid-1-hint" value={settings.heroGridImage1AiHint || ''} onChange={e => handleInputChange('heroGridImage1AiHint', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="hero-grid-2-url">Billede 2 URL</Label>
+                                        <Input id="hero-grid-2-url" value={settings.heroGridImage2Url || ''} onChange={e => handleInputChange('heroGridImage2Url', e.target.value)} />
+                                         <Label htmlFor="hero-grid-2-hint">Billede 2 AI Hint</Label>
+                                        <Input id="hero-grid-2-hint" value={settings.heroGridImage2AiHint || ''} onChange={e => handleInputChange('heroGridImage2AiHint', e.target.value)} />
+                                    </div>
+                                     <div className="space-y-2">
+                                        <Label htmlFor="hero-grid-3-url">Billede 3 URL</Label>
+                                        <Input id="hero-grid-3-url" value={settings.heroGridImage3Url || ''} onChange={e => handleInputChange('heroGridImage3Url', e.target.value)} />
+                                         <Label htmlFor="hero-grid-3-hint">Billede 3 AI Hint</Label>
+                                        <Input id="hero-grid-3-hint" value={settings.heroGridImage3AiHint || ''} onChange={e => handleInputChange('heroGridImage3AiHint', e.target.value)} />
+                                    </div>
+                                     <div className="space-y-2">
+                                        <Label htmlFor="hero-grid-4-url">Billede 4 URL</Label>
+                                        <Input id="hero-grid-4-url" value={settings.heroGridImage4Url || ''} onChange={e => handleInputChange('heroGridImage4Url', e.target.value)} />
+                                         <Label htmlFor="hero-grid-4-hint">Billede 4 AI Hint</Label>
+                                        <Input id="hero-grid-4-hint" value={settings.heroGridImage4AiHint || ''} onChange={e => handleInputChange('heroGridImage4AiHint', e.target.value)} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                       
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>

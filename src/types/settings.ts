@@ -63,6 +63,11 @@ export interface SectionVisibility {
 
 export type Alignment = 'left' | 'center' | 'right';
 
+export interface HeroGridImage {
+    url: string;
+    aiHint: string;
+}
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -146,6 +151,16 @@ export interface GeneralSettings {
     // Home Page Content
     homePageSectionOrder?: string[];
 
+    heroLayout?: 'fullWidthImage' | 'textWithImageGrid';
+    heroImageUrl?: string;
+    heroGridImage1Url?: string;
+    heroGridImage1AiHint?: string;
+    heroGridImage2Url?: string;
+    heroGridImage2AiHint?: string;
+    heroGridImage3Url?: string;
+    heroGridImage3AiHint?: string;
+    heroGridImage4Url?: string;
+    heroGridImage4AiHint?: string;
     heroHeadline?: string;
     heroHeadlineColor?: string;
     heroHeadlineSize?: number;
@@ -154,7 +169,6 @@ export interface GeneralSettings {
     heroDescriptionColor?: string;
     heroDescriptionSize?: number;
     heroDescriptionSizeMobile?: number;
-    heroImageUrl?: string;
     heroAlignment?: Alignment;
     heroVerticalAlignment?: 'top' | 'center' | 'bottom';
     heroTextMaxWidth?: number;

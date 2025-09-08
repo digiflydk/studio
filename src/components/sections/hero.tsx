@@ -9,142 +9,270 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
-function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
-  const pathname = usePathname();
-  const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
-  const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
-  const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
-  
-  const headlineDesktopSize = settings?.heroHeadlineSize ?? 64;
-  const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
-  const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
-  const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
-  const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
-  const headerHeight = settings?.headerHeight || 64;
+function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) {
+    const pathname = usePathname();
+    const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
+    const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
+    const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
+    
+    const headlineDesktopSize = settings?.heroHeadlineSize ?? 64;
+    const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
+    const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
+    const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
+    const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
+    const headerHeight = settings?.headerHeight || 64;
 
-  const heroStyles = {
-    '--headline-desktop-size': `${headlineDesktopSize}px`,
-    '--headline-mobile-size': `${headlineMobileSize}px`,
-    '--description-desktop-size': `${descriptionDesktopSize}px`,
-    '--description-mobile-size': `${descriptionMobileSize}px`,
-    '--text-max-width': `${textMaxWidth}px`,
-  } as CSSProperties;
-  
-  const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
-  const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
+    const heroStyles = {
+        '--headline-desktop-size': `${headlineDesktopSize}px`,
+        '--headline-mobile-size': `${headlineMobileSize}px`,
+        '--description-desktop-size': `${descriptionDesktopSize}px`,
+        '--description-mobile-size': `${descriptionMobileSize}px`,
+        '--text-max-width': `${textMaxWidth}px`,
+    } as CSSProperties;
+    
+    const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
+    const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
 
-  const getLinkHref = (href: string) => {
-    if (href.startsWith('#') && pathname !== '/') {
-      return `/${href}`;
+    const getLinkHref = (href: string) => {
+        if (href.startsWith('#') && pathname !== '/') {
+        return `/${href}`;
+        }
+        return href;
     }
-    return href;
-  }
-  
-  const verticalAlignmentClasses = {
-      top: 'justify-start pt-32',
-      center: 'justify-center',
-      bottom: 'justify-end pb-20'
-  }
-  
-  const horizontalAlignmentClasses = {
-        left: 'items-start text-left',
-        center: 'items-center text-center',
-        right: 'items-end text-right'
-  }
+    
+    const verticalAlignmentClasses = {
+        top: 'justify-start pt-32',
+        center: 'justify-center',
+        bottom: 'justify-end pb-20'
+    }
+    
+    const horizontalAlignmentClasses = {
+            left: 'items-start text-left',
+            center: 'items-center text-center',
+            right: 'items-end text-right'
+    }
 
-  return (
-    <section
-      id="hero"
-      className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
-      style={heroStyles}
-    >
-      <style>
-        {`
-          .hero-headline {
-            font-size: var(--headline-mobile-size);
-          }
-          .hero-description {
-            font-size: var(--description-mobile-size);
-          }
-          .hero-text-container {
-            max-width: var(--text-max-width);
-          }
-          @media (min-width: 768px) {
+    return (
+        <section
+        id="hero"
+        className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
+        style={heroStyles}
+        >
+        <style>
+            {`
             .hero-headline {
-              font-size: var(--headline-desktop-size);
+                font-size: var(--headline-mobile-size);
             }
             .hero-description {
-              font-size: var(--description-desktop-size);
+                font-size: var(--description-mobile-size);
             }
-          }
-        `}
-      </style>
-      <div className="absolute inset-0">
-         <Image
-            src={imageUrl}
-            alt="Tech background"
-            data-ai-hint="tech background"
-            fill
-            className="object-cover brightness-50"
-            priority
-        />
-      </div>
-     
-      <div className={cn(
-          "relative h-full container mx-auto px-4 md:px-6 flex flex-col",
-           verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
-      )} style={{ paddingTop: `${headerHeight}px` }}>
-        <div className={cn(
-            "flex flex-col space-y-6 hero-text-container w-full text-white",
-            horizontalAlignmentClasses[settings?.heroAlignment || 'center']
-        )}>
-          <h1 
-            className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
-          >
-            {headline}
-          </h1>
-          <p 
-            className={cn("hero-description", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
-          >
-            {description}
-          </p>
-          {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
-             <div className="pt-4">
-                <Button
-                  asChild
-                  size={settings.heroCtaSize || 'lg'}
-                  variant={settings.heroCtaVariant || 'default'}
-                  className="md:hidden"
-                  style={ctaStyle}
-                >
-                  <Link href={getLinkHref(settings.heroCtaLink)}>
-                    {settings.heroCtaText}
-                    {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Link>
-                </Button>
-                 <Button
-                  asChild
-                  size={settings.heroCtaSize || 'lg'}
-                  variant={settings.heroCtaVariant || 'default'}
-                  className="hidden md:inline-flex"
-                  style={ctaStyleDesktop}
-                >
-                  <Link href={getLinkHref(settings.heroCtaLink)}>
-                    {settings.heroCtaText}
-                    {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                  </Link>
-                </Button>
-            </div>
-          )}
+            .hero-text-container {
+                max-width: var(--text-max-width);
+            }
+            @media (min-width: 768px) {
+                .hero-headline {
+                font-size: var(--headline-desktop-size);
+                }
+                .hero-description {
+                font-size: var(--description-desktop-size);
+                }
+            }
+            `}
+        </style>
+        <div className="absolute inset-0">
+            <Image
+                src={imageUrl}
+                alt="Tech background"
+                data-ai-hint="tech background"
+                fill
+                className="object-cover brightness-50"
+                priority
+            />
         </div>
-      </div>
-    </section>
-  );
+        
+        <div className={cn(
+            "relative h-full container mx-auto px-4 md:px-6 flex flex-col",
+            verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
+        )}>
+            <div className={cn(
+                "flex flex-col space-y-6 hero-text-container w-full text-white",
+                horizontalAlignmentClasses[settings?.heroAlignment || 'center']
+            )} style={{ paddingTop: `${headerHeight}px` }}>
+            <h1 
+                className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
+            >
+                {headline}
+            </h1>
+            <p 
+                className={cn("hero-description", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+            >
+                {description}
+            </p>
+            {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
+                <div className="pt-4">
+                    <Button
+                    asChild
+                    size={settings.heroCtaSize || 'lg'}
+                    variant={settings.heroCtaVariant || 'default'}
+                    className="md:hidden"
+                    style={ctaStyle}
+                    >
+                    <Link href={getLinkHref(settings.heroCtaLink)}>
+                        {settings.heroCtaText}
+                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Link>
+                    </Button>
+                    <Button
+                    asChild
+                    size={settings.heroCtaSize || 'lg'}
+                    variant={settings.heroCtaVariant || 'default'}
+                    className="hidden md:inline-flex"
+                    style={ctaStyleDesktop}
+                    >
+                    <Link href={getLinkHref(settings.heroCtaLink)}>
+                        {settings.heroCtaText}
+                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Link>
+                    </Button>
+                </div>
+            )}
+            </div>
+        </div>
+        </section>
+    );
+}
+
+function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null }) {
+    const pathname = usePathname();
+    const headline = settings?.heroHeadline || 'The all-in-one platform built for restaurants';
+    const description = settings?.heroDescription || 'AI-powered restaurant software that makes daily operations easier and drives more orders.';
+
+    const headlineDesktopSize = settings?.heroHeadlineSize ?? 64;
+    const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
+    const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
+    const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
+    const headerHeight = settings?.headerHeight || 64;
+    const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
+
+    const heroStyles = {
+        '--headline-desktop-size': `${headlineDesktopSize}px`,
+        '--headline-mobile-size': `${headlineMobileSize}px`,
+        '--description-desktop-size': `${descriptionDesktopSize}px`,
+        '--description-mobile-size': `${descriptionMobileSize}px`,
+         '--text-max-width': `${textMaxWidth}px`,
+    } as CSSProperties;
+
+    const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
+    const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
+    
+    const getLinkHref = (href: string) => {
+        if (href.startsWith('#') && pathname !== '/') {
+            return `/${href}`;
+        }
+        return href;
+    };
+
+    const images = [
+        { url: settings?.heroGridImage1Url || 'https://picsum.photos/400/300?random=11', hint: settings?.heroGridImage1AiHint || 'restaurant order' },
+        { url: settings?.heroGridImage2Url || 'https://picsum.photos/400/300?random=12', hint: settings?.heroGridImage2AiHint || 'laptop restaurant' },
+        { url: settings?.heroGridImage3Url || 'https://picsum.photos/400/300?random=13', hint: settings?.heroGridImage3AiHint || 'phone payment' },
+        { url: settings?.heroGridImage4Url || 'https://picsum.photos/400/300?random=14', hint: settings?.heroGridImage4AiHint || 'tablet POS' },
+    ];
+
+    return (
+        <section id="hero" className="w-full bg-background" style={heroStyles}>
+             <style>
+                {`
+                .hero-headline {
+                    font-size: var(--headline-mobile-size);
+                }
+                .hero-description {
+                    font-size: var(--description-mobile-size);
+                }
+                 .hero-text-container {
+                    max-width: var(--text-max-width);
+                }
+                @media (min-width: 768px) {
+                    .hero-headline {
+                    font-size: var(--headline-desktop-size);
+                    }
+                    .hero-description {
+                    font-size: var(--description-desktop-size);
+                    }
+                }
+                `}
+            </style>
+            <div className="container mx-auto max-w-7xl px-4 md:px-6">
+                <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center" style={{ paddingTop: `${headerHeight}px`, minHeight: 'calc(75vh - 64px)' }}>
+                    <div className="flex flex-col space-y-6 hero-text-container">
+                        <h1 className="hero-headline font-bold tracking-tight text-foreground">
+                            {headline}
+                        </h1>
+                        <p className="hero-description text-muted-foreground">
+                            {description}
+                        </p>
+                        {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
+                            <div className="pt-4">
+                                 <Button
+                                    asChild
+                                    size={settings.heroCtaSize || 'lg'}
+                                    variant={settings.heroCtaVariant || 'default'}
+                                    className="md:hidden"
+                                    style={ctaStyle}
+                                    >
+                                    <Link href={getLinkHref(settings.heroCtaLink)}>
+                                        {settings.heroCtaText}
+                                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                                    </Link>
+                                </Button>
+                                <Button
+                                    asChild
+                                    size={settings.heroCtaSize || 'lg'}
+                                    variant={settings.heroCtaVariant || 'default'}
+                                    className="hidden md:inline-flex"
+                                    style={ctaStyleDesktop}
+                                    >
+                                    <Link href={getLinkHref(settings.heroCtaLink)}>
+                                        {settings.heroCtaText}
+                                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                     <div className="grid grid-cols-2 gap-4">
+                        {images.map((image, index) => (
+                            <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg group">
+                                <Image
+                                    src={image.url}
+                                    alt={`Hero image ${index + 1}`}
+                                    data-ai-hint={image.hint}
+                                    fill
+                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
+    const layout = settings?.heroLayout || 'fullWidthImage';
+    
+    if (layout === 'textWithImageGrid') {
+        return <TextWithImageGridHero settings={settings} />;
+    }
+    
+    return <FullWidthImageHero settings={settings} />;
 }
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
     return (
-        <Suspense fallback={<section id="hero" className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] bg-gray-800"></section>}>
+        <Suspense fallback={<section id="hero" className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] bg-gray-200"></section>}>
             <HeroSectionInner settings={settings} />
         </Suspense>
     )
