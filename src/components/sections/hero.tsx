@@ -28,7 +28,6 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
     '--description-desktop-size': `${descriptionDesktopSize}px`,
     '--description-mobile-size': `${descriptionMobileSize}px`,
     '--text-max-width': `${textMaxWidth}px`,
-    'paddingTop': `${headerHeight}px`,
   } as CSSProperties;
   
   const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
@@ -57,6 +56,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
     <section
       id="hero"
       className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
+      style={heroStyles}
     >
       <style>
         {`
@@ -99,12 +99,12 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
             horizontalAlignmentClasses[settings?.heroAlignment || 'center']
         )}>
           <h1 
-            className={cn("hero-headline font-bold tracking-tight font-headline", settings?.heroHeadlineColor)}
+            className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
           >
             {headline}
           </h1>
           <p 
-            className={cn("hero-description text-body", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+            className={cn("hero-description", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
           >
             {description}
           </p>
