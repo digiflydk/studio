@@ -107,15 +107,13 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       ref={headerRef}
       className={cn(
         "w-full flex flex-col z-50",
-        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 border-b border-border/40 shadow-sm" : "absolute top-0 border-b border-transparent")
+        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 bg-clip-padding border-b-0" : "absolute top-0 border-b-0")
       )}
       >
-      {settings?.headerTopBorderEnabled && (
-         <div style={topBorderStyle} className="w-full"></div>
-      )}
+      
       <div 
         className="w-full flex items-center"
-        style={{height: `${height}px`}}
+        style={{...headerStyle}}
       >
         <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
           <div className="flex items-center">
@@ -184,6 +182,9 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
 
         </div>
       </div>
+      {settings?.headerTopBorderEnabled && (
+         <div style={topBorderStyle} className="w-full"></div>
+      )}
     </header>
   );
 }
