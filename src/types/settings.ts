@@ -184,6 +184,7 @@ export interface GeneralSettings {
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
     heroSectionBackgroundColor?: HSLColor;
+    heroSectionPadding?: SectionPadding;
 
     featureSectionHeading?: string;
     featureSectionHeadingColor?: string;
@@ -273,7 +274,7 @@ export interface GeneralSettings {
     contactSectionBackgroundColor?: HSLColor;
 
     // Spacing
-    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact', SectionPadding>>;
+    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact' | 'hero', SectionPadding>>;
     
     // Section Visibility
     sectionVisibility?: Partial<SectionVisibility>;

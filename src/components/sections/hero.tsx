@@ -1,7 +1,7 @@
 
 'use client';
 import Image from 'next/image';
-import type { GeneralSettings } from '@/types/settings';
+import type { GeneralSettings, SectionPadding } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { CSSProperties, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
@@ -20,15 +20,20 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
     const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
-    const headerHeight = settings?.headerHeight || 64;
 
-    const heroStyles = {
+    const sectionPadding = settings?.heroSectionPadding;
+
+    const heroStyles: CSSProperties & { [key: string]: string } = {
         '--headline-desktop-size': `${headlineDesktopSize}px`,
         '--headline-mobile-size': `${headlineMobileSize}px`,
         '--description-desktop-size': `${descriptionDesktopSize}px`,
         '--description-mobile-size': `${descriptionMobileSize}px`,
         '--text-max-width': `${textMaxWidth}px`,
-    } as CSSProperties;
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '128px',
+        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '192px',
+        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '192px',
+    };
     
     const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
     const ctaStyleDesktop: React.CSSProperties = settings?.heroCtaTextSize ? { fontSize: `${settings.heroCtaTextSize}px` } : {};
@@ -41,9 +46,9 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     }
     
     const verticalAlignmentClasses = {
-        top: 'justify-start pt-32',
+        top: 'justify-start',
         center: 'justify-center',
-        bottom: 'justify-end pb-20'
+        bottom: 'justify-end'
     }
     
     const horizontalAlignmentClasses = {
@@ -54,90 +59,91 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
 
     return (
         <section
-        id="hero"
-        className="relative w-full h-[75vh] min-h-[500px] max-h-[800px]"
-        style={heroStyles}
+            id="hero"
+            className="relative w-full"
+            style={heroStyles}
         >
-        <style>
-            {`
-            .hero-headline {
-                font-size: var(--headline-mobile-size);
-            }
-            .hero-description {
-                font-size: var(--description-mobile-size);
-            }
-            .hero-text-container {
-                max-width: var(--text-max-width);
-            }
-            @media (min-width: 768px) {
+            <style>
+                {`
                 .hero-headline {
-                font-size: var(--headline-desktop-size);
+                    font-size: var(--headline-mobile-size);
                 }
                 .hero-description {
-                font-size: var(--description-desktop-size);
+                    font-size: var(--description-mobile-size);
                 }
-            }
-            `}
-        </style>
-        <div className="absolute inset-0">
-            <Image
-                src={imageUrl}
-                alt="Tech background"
-                data-ai-hint="tech background"
-                fill
-                className="object-cover brightness-50"
-                priority
-            />
-        </div>
-        
-        <div className={cn(
-            "relative h-full container mx-auto px-4 md:px-6 flex flex-col",
-            verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
-        )}>
-            <div className={cn(
-                "flex flex-col space-y-6 hero-text-container w-full text-white",
-                horizontalAlignmentClasses[settings?.heroAlignment || 'center']
-            )} style={{ paddingTop: `${headerHeight}px` }}>
-            <h1 
-                className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
-            >
-                {headline}
-            </h1>
-            <p 
-                className={cn("hero-description", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
-            >
-                {description}
-            </p>
-            {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
-                <div className="pt-4">
-                    <Button
-                    asChild
-                    size={settings.heroCtaSize || 'lg'}
-                    variant={settings.heroCtaVariant || 'default'}
-                    className="md:hidden"
-                    style={ctaStyle}
-                    >
-                    <Link href={getLinkHref(settings.heroCtaLink)}>
-                        {settings.heroCtaText}
-                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                    </Link>
-                    </Button>
-                    <Button
-                    asChild
-                    size={settings.heroCtaSize || 'lg'}
-                    variant={settings.heroCtaVariant || 'default'}
-                    className="hidden md:inline-flex"
-                    style={ctaStyleDesktop}
-                    >
-                    <Link href={getLinkHref(settings.heroCtaLink)}>
-                        {settings.heroCtaText}
-                        {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                    </Link>
-                    </Button>
-                </div>
-            )}
+                .hero-text-container {
+                    max-width: var(--text-max-width);
+                }
+                @media (min-width: 768px) {
+                    .hero-headline {
+                    font-size: var(--headline-desktop-size);
+                    }
+                    .hero-description {
+                    font-size: var(--description-desktop-size);
+                    }
+                }
+                `}
+            </style>
+            <div className="absolute inset-0">
+                <Image
+                    src={imageUrl}
+                    alt="Tech background"
+                    data-ai-hint="tech background"
+                    fill
+                    className="object-cover brightness-50"
+                    priority
+                />
             </div>
-        </div>
+            
+            <div className={cn(
+                "relative container mx-auto px-4 md:px-6 flex flex-col min-h-[500px]",
+                "pt-[var(--padding-top-mobile)] pb-[var(--padding-bottom-mobile)] md:pt-[var(--padding-top)] md:pb-[var(--padding-bottom)]",
+                verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
+            )}>
+                <div className={cn(
+                    "flex flex-col space-y-6 hero-text-container w-full text-white",
+                    horizontalAlignmentClasses[settings?.heroAlignment || 'center']
+                )}>
+                <h1 
+                    className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
+                >
+                    {headline}
+                </h1>
+                <p 
+                    className={cn("hero-description", settings?.heroDescriptionColor || 'text-primary-foreground/80')}
+                >
+                    {description}
+                </p>
+                {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
+                    <div className="pt-4">
+                        <Button
+                        asChild
+                        size={settings.heroCtaSize || 'lg'}
+                        variant={settings.heroCtaVariant || 'default'}
+                        className="md:hidden"
+                        style={ctaStyle}
+                        >
+                        <Link href={getLinkHref(settings.heroCtaLink)}>
+                            {settings.heroCtaText}
+                            {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Link>
+                        </Button>
+                        <Button
+                        asChild
+                        size={settings.heroCtaSize || 'lg'}
+                        variant={settings.heroCtaVariant || 'default'}
+                        className="hidden md:inline-flex"
+                        style={ctaStyleDesktop}
+                        >
+                        <Link href={getLinkHref(settings.heroCtaLink)}>
+                            {settings.heroCtaText}
+                            {settings.heroCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Link>
+                        </Button>
+                    </div>
+                )}
+                </div>
+            </div>
         </section>
     );
 }
@@ -151,16 +157,21 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
     const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
     const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
-    const headerHeight = settings?.headerHeight || 64;
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
-    const heroStyles = {
+    const sectionPadding = settings?.heroSectionPadding;
+
+    const heroStyles: CSSProperties & { [key: string]: string } = {
         '--headline-desktop-size': `${headlineDesktopSize}px`,
         '--headline-mobile-size': `${headlineMobileSize}px`,
         '--description-desktop-size': `${descriptionDesktopSize}px`,
         '--description-mobile-size': `${descriptionMobileSize}px`,
          '--text-max-width': `${textMaxWidth}px`,
-    } as CSSProperties;
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
+    };
 
     if (settings?.heroSectionBackgroundColor) {
         const { h, s, l } = settings.heroSectionBackgroundColor;
@@ -185,7 +196,10 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     ];
 
     return (
-        <section id="hero" className={cn("w-full", !settings?.heroSectionBackgroundColor && "bg-background")} style={heroStyles}>
+        <section id="hero" 
+            className={cn("w-full py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.heroSectionBackgroundColor && "bg-background")} 
+            style={heroStyles}
+        >
              <style>
                 {`
                 .hero-headline {
@@ -208,7 +222,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
                 `}
             </style>
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
-                <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center" style={{ paddingTop: `${headerHeight}px`, minHeight: 'calc(75vh - 64px)' }}>
+                <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6 hero-text-container">
                         <h1 className="hero-headline font-bold tracking-tight text-foreground">
                             {headline}

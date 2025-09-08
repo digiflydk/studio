@@ -10,6 +10,7 @@ export function ensureAllSectionPadding(
 ): Record<SectionKey, SectionPadding> {
   const m = input ?? {};
   return {
+    hero: m.hero ?? def,
     feature: m.feature ?? def,
     services: m.services ?? def,
     aiProject: m.aiProject ?? def,

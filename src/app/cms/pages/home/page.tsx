@@ -122,6 +122,8 @@ const defaultTeam: TeamMember[] = [
 const defaultAboutText = "Digifly er et agilt konsulenthus grundlagt af erfarne teknologer med en passion for at skabe flow. Vi tror på, at de rigtige digitale løsninger kan frigøre potentiale og drive markant vækst. Vores mission er at være jeres betroede partner på den digitale rejse – fra idé til implementering og skalering.";
 
 const defaultPadding: SectionPadding = { top: 96, bottom: 96, topMobile: 64, bottomMobile: 64 };
+const defaultHeroPadding: SectionPadding = { top: 192, bottom: 192, topMobile: 128, bottomMobile: 128 };
+
 
 const defaultVisibility: SectionVisibility = {
     feature: true,
@@ -480,6 +482,11 @@ export default function CmsHomePage() {
       const loadedSettings = await getSettingsAction();
       const initialSettings = loadedSettings || {};
       
+      const sectionPadding = ensureAllSectionPadding(initialSettings.sectionPadding, defaultPadding);
+      if (!sectionPadding.hero) {
+          sectionPadding.hero = defaultHeroPadding;
+      }
+
       setSettings({
           ...initialSettings,
           homePageSectionOrder: initialSettings.homePageSectionOrder?.filter(id => id !== 'blog') ?? defaultSectionOrder,
@@ -602,7 +609,7 @@ export default function CmsHomePage() {
 
           contactSectionBackgroundColor: initialSettings.contactSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
 
-          sectionPadding: initialSettings.sectionPadding ?? {},
+          sectionPadding: sectionPadding,
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
       });
 
@@ -938,7 +945,12 @@ export default function CmsHomePage() {
                                 )}
                             </div>
                         )}
-                       
+                       <SpacingEditor
+                            label="Hero Sektion Afstand"
+                            padding={settings.sectionPadding?.hero || defaultHeroPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('hero', v, p)}
+                            previewMode={previewMode}
+                        />
                     </CardContent>
                 </AccordionContent>
             </AccordionItem>
