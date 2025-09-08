@@ -33,7 +33,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       setIsScrolled(offset > 10);
     };
 
-    if (settings?.headerIsSticky) {
+    if (settings?.headerIsSticky !== false) {
         window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll(); // Check on initial load
     }
@@ -44,7 +44,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     }
 
     return () => {
-      if (settings?.headerIsSticky) {
+      if (settings?.headerIsSticky !== false) {
         window.removeEventListener('scroll', handleScroll);
       }
       document.documentElement.style.removeProperty('scroll-padding-top');
@@ -112,7 +112,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       ref={headerRef}
       className={cn(
         "left-0 w-full z-40 flex items-center border-b",
-        isSticky && "sticky",
+        isSticky && isScrolled ? "sticky" : "absolute",
         isScrolled ? "border-border/40" : "border-transparent"
       )}
       style={headerStyle}

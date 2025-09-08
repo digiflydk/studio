@@ -30,6 +30,7 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
     '--description-mobile-size': `${descriptionMobileSize}px`,
     '--text-max-width': `${textMaxWidth}px`,
     '--header-height': `${headerHeight}px`,
+    paddingTop: `var(--header-height)`,
   } as CSSProperties;
   
   const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
