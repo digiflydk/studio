@@ -29,7 +29,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
   
   useEffect(() => {
     const handleScroll = () => {
-        setIsScrolled(window.scrollY > 50); // Juster tærsklen for, hvornår headeren bliver sticky
+        setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -56,20 +56,17 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     height: `${height}px`,
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
   };
-  
-  const topBorderStyle: React.CSSProperties = {};
-  if (settings?.headerTopBorderEnabled && settings?.headerTopBorderColor && settings?.headerTopBorderHeight) {
+
+  const bottomBorderStyle: React.CSSProperties = {};
+  if (settings?.headerTopBorderEnabled && settings?.headerTopBorderColor) {
       const { h, s, l } = settings.headerTopBorderColor;
-      topBorderStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
-      topBorderStyle.height = `${settings.headerTopBorderHeight}px`;
+      bottomBorderStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+      bottomBorderStyle.height = `1px`;
   }
 
   if (currentBgColor) {
     const { h, s, l } = currentBgColor;
     headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${currentOpacity})`;
-    if (currentOpacity > 0.8 && isScrolled) {
-        headerStyle.borderColor = `hsla(${h}, ${s}%, ${l-10}%, ${currentOpacity})`;
-    }
   } else {
      headerStyle.backgroundColor = 'transparent';
   }
@@ -107,13 +104,12 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       ref={headerRef}
       className={cn(
         "w-full flex flex-col z-50",
-        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 bg-clip-padding border-b-0" : "absolute top-0 border-b-0")
+        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 shadow-md" : "absolute top-0")
       )}
       >
-      
       <div 
         className="w-full flex items-center"
-        style={{...headerStyle}}
+        style={headerStyle}
       >
         <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
           <div className="flex items-center">
@@ -183,7 +179,7 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
         </div>
       </div>
       {settings?.headerTopBorderEnabled && (
-         <div style={topBorderStyle} className="w-full"></div>
+         <div style={bottomBorderStyle} className="w-full"></div>
       )}
     </header>
   );
