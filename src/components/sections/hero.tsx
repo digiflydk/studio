@@ -1,5 +1,4 @@
 
-
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings, SectionPadding } from '@/types/settings';
