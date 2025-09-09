@@ -1,7 +1,8 @@
 
-import type { GeneralSettings, SectionPadding } from '@/types/settings';
 
-export type SectionKey = keyof NonNullable<GeneralSettings['sectionPadding']>;
+import type { GeneralSettings, SectionPadding, SectionVisibility } from '@/types/settings';
+
+export type SectionKey = keyof SectionVisibility;
 
 // Sørger for at ALLE keys har en SectionPadding (ingen undefined)
 export function ensureAllSectionPadding(

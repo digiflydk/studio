@@ -48,10 +48,10 @@ export interface TabbedContentItem {
 }
 
 export type SectionPadding = {
-    top?: number;
-    bottom?: number;
-    topMobile?: number;
-    bottomMobile?: number;
+    top: number;
+    bottom: number;
+    topMobile: number;
+    bottomMobile: number;
 }
 
 export interface SectionVisibility {
@@ -282,10 +282,10 @@ export interface GeneralSettings {
 
 
     // Spacing
-    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact' | 'hero' | 'tabs', SectionPadding>>;
+    sectionPadding?: Partial<Record<keyof SectionVisibility, SectionPadding>>;
     
     // Section Visibility
-    sectionVisibility?: Partial<SectionVisibility>;
+    sectionVisibility?: SectionVisibility;
 
     // Customers
     customers?: Customer[];
