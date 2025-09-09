@@ -96,6 +96,34 @@ export interface TypographySettings {
     body: BodyTypographySettings;
 }
 
+export type ConsentCategories = {
+  necessary: true;
+  preferences: boolean;
+  analytics: boolean;
+  marketing: boolean;
+};
+
+export interface CookieSettings {
+    consentLifetimeDays: number;
+    defaults: Omit<ConsentCategories, 'necessary'>;
+    bannerTitle: string;
+    bannerBody: string;
+    acceptAllLabel: string;
+    acceptNecessaryLabel: string;
+    settingsLabel: string;
+    modalTitle: string;
+    modalBody: string;
+    saveLabel: string;
+    privacyPolicyLabel: string;
+    privacyPolicyUrl: string;
+    categoryPreferencesTitle: string;
+    categoryPreferencesBody: string;
+    categoryAnalyticsTitle: string;
+    categoryAnalyticsBody: string;
+    categoryMarketingTitle: string;
+    categoryMarketingBody: string;
+}
+
 
 export interface GeneralSettings {
     websiteTitle?: string;
@@ -131,6 +159,9 @@ export interface GeneralSettings {
     facebookPixelId?: string;
     enableGoogleAds?: boolean;
     googleAdsId?: string;
+
+    // Cookie Settings
+    cookies?: CookieSettings;
 
     // AI Settings
     aiProvider?: 'googleai' | 'openai';

@@ -2,7 +2,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
-import CookieConsent from '@/components/CookieConsent';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getGeneralSettings();
@@ -74,7 +73,6 @@ export default function RootLayout({
     <html lang="da" className="scroll-smooth">
       <body>
         {children}
-        <CookieConsent />
       </body>
     </html>
   );

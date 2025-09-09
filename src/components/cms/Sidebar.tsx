@@ -17,8 +17,7 @@ const settingsNavLinks = [
     { href: "/cms/settings/seo", label: "SEO", icon: Search },
     { href: "/cms/settings/social", label: "Social Share", icon: Share2 },
     { href: "/cms/settings/tracking", label: "Tracking", icon: MousePointerClick },
-    { href: "#", label: "Cookies", icon: Cookie },
-    { href: "#", label: "Business listing", icon: Building },
+    { href: "/cms/settings/cookies", label: "Cookies", icon: Cookie },
 ]
 
 function SidebarInner() {
