@@ -1,4 +1,3 @@
-
 'use client';
 
 import { ReactNode, Suspense, useRef, useLayoutEffect } from 'react';
@@ -20,7 +19,7 @@ export default function Template({ children }: { children: ReactNode }) {
         <ThemeProvider settings={settings}>
             <Header ref={headerRef} settings={settings} />
             <AnnouncementBanner ref={bannerRef} />
-            <main className={cn('pt-[var(--header-height)]')}>
+            <main>
                 {children}
             </main>
 

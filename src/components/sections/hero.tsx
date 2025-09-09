@@ -67,7 +67,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     return (
         <section
             id="hero"
-            className="relative w-full"
+            className="relative w-full pt-[var(--header-height)]"
             style={heroStyles}
         >
             <div className="absolute inset-0">
@@ -203,7 +203,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
 
     return (
         <section id="hero" 
-            className={cn("w-full py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.heroSectionBackgroundColor && "bg-background")} 
+            className={cn("w-full pt-[var(--header-height)] py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.heroSectionBackgroundColor && "bg-background")} 
             style={heroStyles}
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
