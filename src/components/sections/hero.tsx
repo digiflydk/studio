@@ -15,6 +15,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     const headline = settings?.heroHeadline || 'Flow. Automatisér. Skalér.';
     const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
     const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
+    const headlineColor = settings?.heroHeadlineColor || 'text-white';
     
     const headlineStyle: React.CSSProperties = {
         fontSize: settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : undefined,
@@ -90,13 +91,13 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
                 )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("text-h1 md:hidden", settings?.heroHeadlineColor || 'text-white')}
+                    className={cn("text-h1 md:hidden", headlineColor)}
                     style={headlineStyleMobile}
                 >
                     {headline}
                 </h1>
                  <h1 
-                    className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor || 'text-white')}
+                    className={cn("text-h1 hidden md:block", headlineColor)}
                     style={headlineStyle}
                 >
                     {headline}
@@ -151,6 +152,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const pathname = usePathname();
     const headline = settings?.heroHeadline || 'The all-in-one platform built for restaurants';
     const description = settings?.heroDescription || 'AI-powered restaurant software that makes daily operations easier and drives more orders.';
+    const headlineColor = settings?.heroHeadlineColor || 'text-foreground';
     
     const headlineStyle: React.CSSProperties = {
         fontSize: settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : undefined,
@@ -208,13 +210,13 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
                         <h1 
-                            className={cn("text-h1 md:hidden", settings?.heroHeadlineColor)}
+                            className={cn("text-h1 md:hidden", headlineColor)}
                             style={headlineStyleMobile}
                         >
                             {headline}
                         </h1>
                         <h1 
-                            className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor)}
+                            className={cn("text-h1 hidden md:block", headlineColor)}
                             style={headlineStyle}
                         >
                             {headline}

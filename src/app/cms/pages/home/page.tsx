@@ -518,7 +518,7 @@ export default function CmsHomePage() {
           
           heroLayout: initialSettings.heroLayout ?? 'fullWidthImage',
           heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
-          heroHeadlineColor: initialSettings.heroHeadlineColor || 'text-white',
+          heroHeadlineColor: initialSettings.heroLayout === 'fullWidthImage' ? (initialSettings.heroHeadlineColor || 'text-white') : (initialSettings.heroHeadlineColor || 'text-foreground'),
           heroHeadlineSize: initialSettings.heroHeadlineSize ?? 64,
           heroHeadlineSizeMobile: initialSettings.heroHeadlineSizeMobile ?? 40,
           heroDescription: initialSettings.heroDescription ?? 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
