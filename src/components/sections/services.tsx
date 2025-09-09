@@ -45,6 +45,19 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
   const alignment = settings?.servicesSectionAlignment || 'center';
   
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.servicesSectionTitleSize ? `${settings.servicesSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.servicesSectionDescriptionSize ? `${settings.servicesSectionDescriptionSize}px` : undefined,
+  };
+  const cardTitleStyle: React.CSSProperties = {
+    fontSize: settings?.serviceCardTitleSize ? `${settings.serviceCardTitleSize}px` : undefined,
+  };
+  const cardDescriptionStyle: React.CSSProperties = {
+    fontSize: settings?.serviceCardDescriptionSize ? `${settings.serviceCardDescriptionSize}px` : undefined,
+  };
+
   const ctaStyle: React.CSSProperties = settings?.servicesCtaTextSizeMobile ? { fontSize: `${settings.servicesCtaTextSizeMobile}px` } : {};
   const ctaStyleDesktop: React.CSSProperties = settings?.servicesCtaTextSize ? { fontSize: `${settings.servicesCtaTextSize}px` } : {};
 
@@ -80,6 +93,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
         <div className={cn("mb-12", alignmentClasses[alignment])}>
           <h2 
             className={cn("text-h2", settings?.servicesSectionTitleColor || "text-black")}
+            style={titleStyle}
           >
             {title}
           </h2>
@@ -88,6 +102,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                 'mx-auto': alignment === 'center',
                 'ml-auto': alignment === 'right',
             })}
+            style={descriptionStyle}
           >
             {description}
           </p>
@@ -108,6 +123,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
               <CardHeader>
                 <CardTitle 
                     className={cn("text-h4", settings?.serviceCardTitleColor)}
+                    style={cardTitleStyle}
                 >
                     {service.title}
                 </CardTitle>
@@ -115,6 +131,7 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
               <CardContent className="flex-grow">
                 <p 
                     className={cn("text-sm", settings?.serviceCardDescriptionColor)}
+                    style={cardDescriptionStyle}
                 >
                     {service.description}
                 </p>

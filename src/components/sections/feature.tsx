@@ -21,6 +21,13 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
     const ctaLink = settings?.featureSectionCtaLink || '#';
     const ctaVariant = settings?.featureSectionCtaVariant || 'default';
     const ctaSize = settings?.featureSectionCtaSize || 'lg';
+    
+    const headingStyle: React.CSSProperties = {
+        fontSize: settings?.featureSectionHeadingSize ? `${settings.featureSectionHeadingSize}px` : undefined,
+    };
+    const bodyStyle: React.CSSProperties = {
+        fontSize: settings?.featureSectionBodySize ? `${settings.featureSectionBodySize}px` : undefined,
+    };
 
     const sectionPadding = settings?.sectionPadding?.feature;
 
@@ -60,11 +67,13 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
         <div className={cn('flex flex-col space-y-6', alignmentClasses[alignment])}>
             <h2
                 className={cn("text-h2", settings?.featureSectionHeadingColor)}
+                style={headingStyle}
             >
                 {heading}
             </h2>
             <p
                 className={cn("text-body", settings?.featureSectionBodyColor || 'text-muted-foreground')}
+                style={bodyStyle}
             >
                 {body}
             </p>

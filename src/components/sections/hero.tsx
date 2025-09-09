@@ -15,6 +15,19 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
     const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
     
+    const headlineStyle: React.CSSProperties = {
+        fontSize: settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : undefined,
+    };
+    const headlineStyleMobile: React.CSSProperties = {
+        fontSize: settings?.heroHeadlineSizeMobile ? `${settings.heroHeadlineSizeMobile}px` : undefined,
+    };
+    const descriptionStyle: React.CSSProperties = {
+        fontSize: settings?.heroDescriptionSize ? `${settings.heroDescriptionSize}px` : undefined,
+    };
+     const descriptionStyleMobile: React.CSSProperties = {
+        fontSize: settings?.heroDescriptionSizeMobile ? `${settings.heroDescriptionSizeMobile}px` : undefined,
+    };
+    
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
     const sectionPadding = settings?.sectionPadding?.hero;
@@ -76,11 +89,27 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
                 )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("text-h1", settings?.heroHeadlineColor)}
+                    className={cn("text-h1 md:hidden", settings?.heroHeadlineColor)}
+                    style={headlineStyleMobile}
                 >
                     {headline}
                 </h1>
-                <p className={cn("text-body", settings?.heroDescriptionColor)}>
+                 <h1 
+                    className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor)}
+                    style={headlineStyle}
+                >
+                    {headline}
+                </h1>
+                <p 
+                    className={cn("text-body md:hidden", settings?.heroDescriptionColor)}
+                    style={descriptionStyleMobile}
+                >
+                    {description}
+                </p>
+                 <p 
+                    className={cn("text-body hidden md:block", settings?.heroDescriptionColor)}
+                    style={descriptionStyle}
+                >
                     {description}
                 </p>
                 {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
@@ -121,6 +150,19 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const pathname = usePathname();
     const headline = settings?.heroHeadline || 'The all-in-one platform built for restaurants';
     const description = settings?.heroDescription || 'AI-powered restaurant software that makes daily operations easier and drives more orders.';
+    
+    const headlineStyle: React.CSSProperties = {
+        fontSize: settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : undefined,
+    };
+    const headlineStyleMobile: React.CSSProperties = {
+        fontSize: settings?.heroHeadlineSizeMobile ? `${settings.heroHeadlineSizeMobile}px` : undefined,
+    };
+    const descriptionStyle: React.CSSProperties = {
+        fontSize: settings?.heroDescriptionSize ? `${settings.heroDescriptionSize}px` : undefined,
+    };
+     const descriptionStyleMobile: React.CSSProperties = {
+        fontSize: settings?.heroDescriptionSizeMobile ? `${settings.heroDescriptionSizeMobile}px` : undefined,
+    };
     
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
@@ -164,10 +206,28 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
-                        <h1 className="text-h1 text-foreground">
+                        <h1 
+                            className="text-h1 text-foreground md:hidden"
+                            style={headlineStyleMobile}
+                        >
                             {headline}
                         </h1>
-                        <p className="text-body text-muted-foreground">
+                        <h1 
+                            className="text-h1 text-foreground hidden md:block"
+                            style={headlineStyle}
+                        >
+                            {headline}
+                        </h1>
+                        <p 
+                            className="text-body text-muted-foreground md:hidden"
+                             style={descriptionStyleMobile}
+                        >
+                            {description}
+                        </p>
+                         <p 
+                            className="text-body text-muted-foreground hidden md:block"
+                             style={descriptionStyle}
+                        >
                             {description}
                         </p>
                         {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (

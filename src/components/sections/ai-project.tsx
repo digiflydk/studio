@@ -35,6 +35,13 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const title = settings?.aiProjectSectionTitle || 'Har du en idé? Lad os validere den sammen.';
   const description = settings?.aiProjectSectionDescription || 'Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.';
   const alignment = settings?.aiProjectSectionAlignment || 'left';
+  
+  const titleStyle: React.CSSProperties = {
+    fontSize: settings?.aiProjectSectionTitleSize ? `${settings.aiProjectSectionTitleSize}px` : undefined,
+  };
+  const descriptionStyle: React.CSSProperties = {
+    fontSize: settings?.aiProjectSectionDescriptionSize ? `${settings.aiProjectSectionDescriptionSize}px` : undefined,
+  };
 
   useEffect(() => {
     setMessages([{
@@ -149,6 +156,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                 </div>
                 <h2 
                   className={cn("text-h2", settings?.aiProjectSectionTitleColor || 'text-white')}
+                  style={titleStyle}
                 >
                   {title}
                 </h2>
@@ -157,6 +165,7 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                     'mx-auto': alignment === 'center',
                     'ml-auto': alignment === 'right'
                   })}
+                   style={descriptionStyle}
                 >
                   {description}
                 </p>

@@ -68,7 +68,7 @@ export default function CustomersSection({ settings }: CustomersSectionProps) {
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
         <div className={cn("mb-12", alignmentClasses[alignment])}>
             <h3 
-                className={cn("text-lg font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground', {
+                className={cn("text-h3 font-semibold tracking-wider uppercase", settings?.customersSectionTitleColor || 'text-muted-foreground', {
                     'mx-auto': alignment === 'center',
                     'ml-auto': alignment === 'right',
                 })}
