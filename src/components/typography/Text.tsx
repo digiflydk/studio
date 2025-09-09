@@ -43,6 +43,7 @@ const Text = forwardRef<HTMLElement, Props>(function Text(
       ref={ref}
       className={cn(
         variantMap[variant],
+        'leading-[var(--body-lh)]',
         alignMap[align],
         weightMap[weight],
         c,

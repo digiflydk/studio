@@ -18,11 +18,11 @@ const config: Config = {
     },
     extend: {
       fontSize: {
-        'h1': ['var(--font-size-h1)', { lineHeight: '1.2' }],
-        'h2': ['var(--font-size-h2)', { lineHeight: '1.2' }],
-        'h3': ['var(--font-size-h3)', { lineHeight: '1.2' }],
-        'h4': ['var(--font-size-h4)', { lineHeight: '1.2' }],
-        'body': ['var(--font-size-body)', { lineHeight: '1.75' }],
+        'h1': ['calc(var(--h1-size-mobile) * 1px)', { lineHeight: 'var(--h1-lh)' }],
+        'h2': ['calc(var(--h2-size-mobile) * 1px)', { lineHeight: 'var(--h2-lh)' }],
+        'h3': ['calc(var(--h3-size-mobile) * 1px)', { lineHeight: 'var(--h3-lh)' }],
+        'h4': ['calc(var(--h4-size-mobile) * 1px)', { lineHeight: 'var(--h4-lh)' }],
+        'body': ['calc(var(--body-size) * 1px)', { lineHeight: 'var(--body-lh)' }],
       },
       colors: {
         border: "hsl(var(--border))",

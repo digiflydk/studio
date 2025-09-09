@@ -20,7 +20,7 @@ const H4 = forwardRef<HTMLElement, Props>(function H4(
     <Tag
       ref={ref}
       className={cn(
-        'text-h4',
+        'text-h4 leading-[var(--h4-lh)]',
         alignMap[align],
         weightMap[weight],
         colorMap[color],

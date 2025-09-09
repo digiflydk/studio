@@ -43,6 +43,13 @@ export const defaultTheme: Theme = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function sanitizeLH(v: number | string, fallback = 1.4) {
+  const n = Number(String(v).replace(',', '.'));
+  if (!isFinite(n)) return fallback;
+  return Math.min(2.0, Math.max(1.0, n));
+}
+
+
 function applyTypographyVars(t: TypographySettings) {
   const r = document.documentElement.style;
   r.setProperty('--font-primary', t.fontPrimary || 'Inter, ui-sans-serif, system-ui');
@@ -52,26 +59,26 @@ function applyTypographyVars(t: TypographySettings) {
   r.setProperty('--h1-size-mobile', String(t.h1.sizeMobile));
   r.setProperty('--h1-size-desktop', String(t.h1.sizeDesktop));
   r.setProperty('--h1-weight', String(t.h1.weight));
-  r.setProperty('--h1-lh', String(t.h1.lineHeight));
+  r.setProperty('--h1-lh', String(sanitizeLH(t.h1.lineHeight)));
   
   r.setProperty('--h2-size-mobile', String(t.h2.sizeMobile));
   r.setProperty('--h2-size-desktop', String(t.h2.sizeDesktop));
   r.setProperty('--h2-weight', String(t.h2.weight));
-  r.setProperty('--h2-lh', String(t.h2.lineHeight));
+  r.setProperty('--h2-lh', String(sanitizeLH(t.h2.lineHeight)));
 
   r.setProperty('--h3-size-mobile', String(t.h3.sizeMobile));
   r.setProperty('--h3-size-desktop', String(t.h3.sizeDesktop));
   r.setProperty('--h3-weight', String(t.h3.weight));
-  r.setProperty('--h3-lh', String(t.h3.lineHeight));
+  r.setProperty('--h3-lh', String(sanitizeLH(t.h3.lineHeight)));
   
   r.setProperty('--h4-size-mobile', String(t.h4.sizeMobile));
   r.setProperty('--h4-size-desktop', String(t.h4.sizeDesktop));
   r.setProperty('--h4-weight', String(t.h4.weight));
-  r.setProperty('--h4-lh', String(t.h4.lineHeight));
+  r.setProperty('--h4-lh', String(sanitizeLH(t.h4.lineHeight)));
   
   r.setProperty('--body-size', String(t.body.size));
   r.setProperty('--body-weight', String(t.body.weight));
-  r.setProperty('--body-lh', String(t.body.lineHeight));
+  r.setProperty('--body-lh', String(sanitizeLH(t.body.lineHeight)));
 }
 
 

@@ -167,9 +167,8 @@ function TypographyControl({
         </div>
       </div>
        <div className="space-y-2">
-          <Label>Line Height</Label>
+          <Label>Line Height ({settings.lineHeight.toFixed(2)})</Label>
           <Slider value={[settings.lineHeight]} onValueChange={([v]) => onUpdate({ lineHeight: v })} min={1.0} max={2.0} step={0.05} />
-          <span className="text-xs text-muted-foreground">{settings.lineHeight.toFixed(2)}</span>
         </div>
     </div>
   );

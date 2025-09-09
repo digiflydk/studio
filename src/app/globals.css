@@ -108,6 +108,20 @@ body {
     h3 { font-size: calc(var(--h3-size-desktop) * 1px); }
     h4 { font-size: calc(var(--h4-size-desktop) * 1px); }
   }
+
+  /* Sikr at base-headings følger CMS line-height, selv hvis utils bruges andre steder */
+  h1 { line-height: var(--h1-lh) !important; }
+  h2 { line-height: var(--h2-lh) !important; }
+  h3 { line-height: var(--h3-lh) !important; }
+  h4 { line-height: var(--h4-lh) !important; }
+  p  { line-height: var(--body-lh) !important; }
+
+  /* Hvis @tailwindcss/typography bruges (prose), tving samme variabler igennem */
+  .prose h1 { line-height: var(--h1-lh) !important; }
+  .prose h2 { line-height: var(--h2-lh) !important; }
+  .prose h3 { line-height: var(--h3-lh) !important; }
+  .prose h4 { line-height: var(--h4-lh) !important; }
+  .prose p  { line-height: var(--body-lh) !important; }
 }
 
 @layer base {
