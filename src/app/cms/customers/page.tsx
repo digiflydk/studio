@@ -217,7 +217,7 @@ export default function CmsCustomersPage() {
                       <Alert>
                         <AlertTitle>Ingen kunder tilføjet</AlertTitle>
                         <AlertDescription>
-                            Der er endnu ikke tilføjet nogle kundelogoer. Klik på "Tilføj Ny Kunde" for at oprette en.
+                            Der er endnu ikke tilføjet nogle kundelogoer. Klik på &quot;Tilføj Ny Kunde&quot; for at oprette en.
                         </AlertDescription>
                     </Alert>
                 )}

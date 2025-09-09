@@ -17,23 +17,27 @@ export default function Template({ children }: { children: ReactNode }) {
     const bannerRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
+        const mainEl = mainRef.current;
+        const headerEl = headerRef.current;
+        const bannerEl = bannerRef.current;
+    
         const calculatePadding = () => {
-            if (mainRef.current) {
-                const headerHeight = headerRef.current?.offsetHeight || 0;
-                const bannerHeight = bannerRef.current?.offsetHeight || 0;
-                mainRef.current.style.paddingTop = `${headerHeight + bannerHeight}px`;
+            if (mainEl && headerEl && bannerEl) {
+                const headerHeight = headerEl.offsetHeight || 0;
+                const bannerHeight = bannerEl.offsetHeight || 0;
+                mainEl.style.paddingTop = `${headerHeight + bannerHeight}px`;
             }
         };
 
         calculatePadding();
 
         const resizeObserver = new ResizeObserver(calculatePadding);
-        if (headerRef.current) resizeObserver.observe(headerRef.current);
-        if (bannerRef.current) resizeObserver.observe(bannerRef.current);
+        if (headerEl) resizeObserver.observe(headerEl);
+        if (bannerEl) resizeObserver.observe(bannerEl);
 
         return () => {
-            if (headerRef.current) resizeObserver.unobserve(headerRef.current);
-            if (bannerRef.current) resizeObserver.unobserve(bannerRef.current);
+            if (headerEl) resizeObserver.unobserve(headerEl);
+            if (bannerEl) resizeObserver.unobserve(bannerEl);
         };
     }, [settings?.headerIsSticky]);
 

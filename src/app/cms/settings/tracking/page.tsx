@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
@@ -116,12 +115,12 @@ export default function TrackingSettingsPage() {
               Gem Ændringer
             </Button>
        </div>
-       <p className="text-muted-foreground">Administrer dine sporings-ID'er og aktiver/deaktiver integrationer.</p>
+       <p className="text-muted-foreground">Administrer dine sporings-ID&#39;er og aktiver/deaktiver integrationer.</p>
 
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Sporings-integrationer</CardTitle>
-          <CardDescription>Indtast dine sporings-ID'er og aktiver de tjenester, du vil bruge.</CardDescription>
+          <CardDescription>Indtast dine sporings-ID&#39;er og aktiver de tjenester, du vil bruge.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
             <Alert>
