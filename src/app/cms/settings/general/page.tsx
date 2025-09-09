@@ -135,7 +135,7 @@ export default function GeneralSettingsPage() {
                 <Label>Logo</Label>
                 {settings.logoUrl && (
                     <div className="relative w-48 h-12 bg-muted rounded-md p-2 flex items-center justify-center">
-                        <Image src={settings.logoUrl} alt={settings.logoAlt || 'Logo preview'} layout="fill" objectFit="contain" />
+                        <Image src={settings.logoUrl} alt={settings.logoAlt || 'Logo preview'} fill style={{objectFit: 'contain'}} />
                          <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white" onClick={() => removeImage('logo')}>
                             <X className="h-4 w-4" />
                         </Button>
@@ -149,7 +149,7 @@ export default function GeneralSettingsPage() {
                 <Label>Favicon</Label>
                 {settings.faviconUrl && (
                      <div className="relative w-8 h-8 bg-muted rounded-md p-1 flex items-center justify-center">
-                        <Image src={settings.faviconUrl} alt="Favicon preview" layout="fill" objectFit="contain" />
+                        <Image src={settings.faviconUrl} alt="Favicon preview" fill style={{objectFit: 'contain'}} />
                          <Button variant="ghost" size="icon" className="absolute -top-2 -right-2 h-6 w-6 bg-black/50 hover:bg-black/70 text-white rounded-full" onClick={() => removeImage('favicon')}>
                             <X className="h-4 w-4" />
                         </Button>

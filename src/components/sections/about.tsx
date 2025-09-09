@@ -116,7 +116,7 @@ export default function AboutSection({ settings }: AboutSectionProps) {
                     <h3 className={cn("font-semibold text-h4", settings?.teamMemberNameColor)} style={teamMemberNameStyle}>{member.name}</h3>
                     <p className={cn("text-sm", settings?.teamMemberTitleColor)} style={teamMemberTitleStyle}>{member.title}</p>
                     </div>
-                    <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
+                    <Link href={member.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} on LinkedIn`}>
                         <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
                     </Link>
                 </div>

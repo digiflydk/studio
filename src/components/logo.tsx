@@ -11,7 +11,6 @@ interface LogoProps extends React.SVGProps<SVGSVGElement> {
 }
 
 const Logo = ({ logoUrl, logoAlt, width = 96, height = 28, isDark = false, ...props }: LogoProps) => {
-  const aspectRatio = width / height;
   const calculatedHeight = Math.round(width / (96 / 28));
 
   if (logoUrl) {
