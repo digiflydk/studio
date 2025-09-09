@@ -35,10 +35,10 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
         sectionStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
     }
 
-    const ctaStyle: CSSProperties = {
+    const ctaStyle: React.CSSProperties = {
         fontSize: settings?.featureSectionCtaTextSizeMobile ? `${settings.featureSectionCtaTextSizeMobile}px` : undefined,
     };
-    const ctaStyleDesktop: CSSProperties = {
+    const ctaStyleDesktop: React.CSSProperties = {
         fontSize: settings?.featureSectionCtaTextSize ? `${settings.featureSectionCtaTextSize}px` : undefined,
     };
 
