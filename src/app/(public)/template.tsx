@@ -15,11 +15,25 @@ export default function Template({ children }: { children: ReactNode }) {
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
 
+    useLayoutEffect(() => {
+        const headerEl = headerRef.current;
+        const bannerEl = bannerRef.current;
+        if (!headerEl) return;
+
+        const headerH = headerEl.getBoundingClientRect().height ?? 0;
+        const bannerH = bannerEl?.getBoundingClientRect().height ?? 0;
+        const totalOffset = Math.max(0, headerH + bannerH);
+
+        const root = document.documentElement;
+        root.style.setProperty('--header-offset', `${totalOffset}px`);
+        root.style.scrollPaddingTop = `${totalOffset + 8}px`; // 8px luft
+    }, []);
+
     return (
         <ThemeProvider settings={settings}>
             <Header ref={headerRef} settings={settings} />
             <AnnouncementBanner ref={bannerRef} />
-            <main>
+            <main className="pt-[var(--header-offset)]">
                 {children}
             </main>
 

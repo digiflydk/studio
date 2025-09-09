@@ -1,5 +1,4 @@
 
-
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings, SectionPadding } from '@/types/settings';
@@ -36,10 +35,10 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
         '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
-        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
-        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '192px',
+        '--section-pt-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
+        '--section-pb-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
+        '--section-pt': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
+        '--section-pb': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '192px',
     };
     
     const ctaStyle: React.CSSProperties = settings?.heroCtaTextSizeMobile ? { fontSize: `${settings.heroCtaTextSizeMobile}px` } : {};
@@ -67,10 +66,10 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     return (
         <section
             id="hero"
-            className="relative w-full pt-[var(--header-height)]"
+            className="section relative w-full"
             style={heroStyles}
         >
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 -z-10">
                 <Image
                     src={imageUrl}
                     alt="Tech background"
@@ -82,8 +81,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
             </div>
             
             <div className={cn(
-                "relative container mx-auto px-4 md:px-6 flex flex-col min-h-fit",
-                "py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]",
+                "relative container mx-auto px-4 md:px-6 flex flex-col min-h-fit h-full",
                 verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
             )}>
                 <div className={cn(
@@ -91,25 +89,25 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
                 )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("text-h1 md:hidden", headlineColor)}
+                    className={cn("md:hidden", headlineColor)}
                     style={headlineStyleMobile}
                 >
                     {headline}
                 </h1>
                  <h1 
-                    className={cn("text-h1 hidden md:block", headlineColor)}
+                    className={cn("hidden md:block", headlineColor)}
                     style={headlineStyle}
                 >
                     {headline}
                 </h1>
                 <p 
-                    className={cn("text-body md:hidden", settings?.heroDescriptionColor)}
+                    className={cn("md:hidden", settings?.heroDescriptionColor)}
                     style={descriptionStyleMobile}
                 >
                     {description}
                 </p>
                  <p 
-                    className={cn("text-body hidden md:block", settings?.heroDescriptionColor)}
+                    className={cn("hidden md:block", settings?.heroDescriptionColor)}
                     style={descriptionStyle}
                 >
                     {description}
@@ -172,11 +170,11 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const sectionPadding = settings?.sectionPadding?.hero;
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
-         '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
-        '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
-        '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
+        '--text-max-width': `${textMaxWidth}px`,
+        '--section-pt-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
+        '--section-pb-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
+        '--section-pt': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
+        '--section-pb': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
 
     if (settings?.heroSectionBackgroundColor) {
@@ -203,32 +201,32 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
 
     return (
         <section id="hero" 
-            className={cn("w-full pt-[var(--header-height)] py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.heroSectionBackgroundColor && "bg-background")} 
+            className={cn("section w-full", !settings?.heroSectionBackgroundColor && "bg-background")} 
             style={heroStyles}
         >
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
                         <h1 
-                            className={cn("text-h1 md:hidden", headlineColor)}
+                            className={cn("md:hidden", headlineColor)}
                             style={headlineStyleMobile}
                         >
                             {headline}
                         </h1>
                         <h1 
-                            className={cn("text-h1 hidden md:block", headlineColor)}
+                            className={cn("hidden md:block", headlineColor)}
                             style={headlineStyle}
                         >
                             {headline}
                         </h1>
                         <p 
-                            className={cn("text-body md:hidden", settings?.heroDescriptionColor)}
+                            className={cn("md:hidden", settings?.heroDescriptionColor)}
                              style={descriptionStyleMobile}
                         >
                             {description}
                         </p>
                          <p 
-                            className={cn("text-body hidden md:block", settings?.heroDescriptionColor)}
+                            className={cn("hidden md:block", settings?.heroDescriptionColor)}
                              style={descriptionStyle}
                         >
                             {description}
@@ -299,5 +297,3 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         </Suspense>
     )
 }
-
-    
