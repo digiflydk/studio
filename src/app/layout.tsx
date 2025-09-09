@@ -2,11 +2,14 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
+import CookieConsent from '@/components/CookieConsent';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getGeneralSettings();
   const allowIndex = settings?.allowSearchEngineIndexing !== false;
   const faviconUrl = settings?.faviconUrl;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://digifly.dk';
+  const ogImage = settings?.socialShareImageUrl || `${siteUrl}/og-image.png`;
 
   const icons = faviconUrl
     ? {
@@ -18,17 +21,35 @@ export async function generateMetadata(): Promise<Metadata> {
         icon: "/favicon.ico",
       };
 
+  const title = settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
+  const description = settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.';
+
   return {
+    metadataBase: new URL(siteUrl),
     title: {
-      default: settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
+      default: title,
       template: `%s | ${settings?.websiteTitle || 'Digifly'}`
     },
-    description: settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.',
+    description: description,
     openGraph: {
-      title: settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
-      description: settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.',
+      title: title,
+      description: description,
+      url: siteUrl,
+      siteName: settings?.websiteTitle || 'Digifly',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+        },
+      ],
       type: 'website',
-      images: settings?.socialShareImageUrl ? [settings.socialShareImageUrl] : [],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: title,
+        description: description,
+        images: [ogImage],
     },
     robots: {
       index: allowIndex,
@@ -49,9 +70,10 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="da" className="scroll-smooth">
       <body>
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

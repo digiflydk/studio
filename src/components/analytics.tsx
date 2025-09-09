@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import type { GeneralSettings } from '@/types/settings';
@@ -128,14 +128,24 @@ function AnalyticsInner({ settings }: { settings: GeneralSettings | null }) {
             {settings?.enableGtm && settings.gtmId && <GTMDeclarations gtmId={settings.gtmId} />}
             {settings?.enableGoogleAnalytics && settings.googleAnalyticsId && <GA4Declarations gaId={settings.googleAnalyticsId} />}
             {settings?.enableFacebookPixel && settings.facebookPixelId && <FBPixelDeclarations pixelId={settings.facebookPixelId} />}
-            {/* Google Ads can be loaded via GTM, but if a direct tag is needed, it would be added here */}
         </>
     );
 }
 
 
 export default function Analytics({ settings }: { settings: GeneralSettings | null }) {
-    if (!settings) {
+    const [consent, setConsent] = useState(false);
+
+    useEffect(() => {
+        try {
+            const consentValue = localStorage.getItem("cookie-consent");
+            setConsent(consentValue === 'accepted');
+        } catch (e) {
+            // localStorage is not available
+        }
+    }, []);
+
+    if (!settings || !consent) {
         return null;
     }
 
