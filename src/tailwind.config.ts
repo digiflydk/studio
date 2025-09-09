@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 const config: Config = {
@@ -17,9 +16,6 @@ const config: Config = {
       },
     },
     extend: {
-      fontFamily: {
-        sans: ["var(--font-sans)", "sans-serif"],
-      },
       fontSize: {
         'h1': ['var(--font-size-h1)', { lineHeight: '1', fontWeight: '700' }],
         'h2': ['var(--font-size-h2)', { lineHeight: '1', fontWeight: '700' }],

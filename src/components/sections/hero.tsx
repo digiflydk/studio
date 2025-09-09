@@ -14,19 +14,11 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     const description = settings?.heroDescription || 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
     const imageUrl = settings?.heroImageUrl || 'https://picsum.photos/1920/1280';
     
-    const headlineDesktopSize = settings?.heroHeadlineSize ?? 64;
-    const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
-    const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
-    const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
     const sectionPadding = settings?.sectionPadding?.hero;
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
-        '--headline-desktop-size': `${headlineDesktopSize}px`,
-        '--headline-mobile-size': `${headlineMobileSize}px`,
-        '--description-desktop-size': `${descriptionDesktopSize}px`,
-        '--description-mobile-size': `${descriptionMobileSize}px`,
         '--text-max-width': `${textMaxWidth}px`,
         '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
@@ -62,27 +54,6 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
             className="relative w-full"
             style={heroStyles}
         >
-            <style>
-                {`
-                .hero-headline {
-                    font-size: var(--headline-mobile-size);
-                }
-                .hero-description {
-                    font-size: var(--description-mobile-size);
-                }
-                .hero-text-container {
-                    max-width: var(--text-max-width);
-                }
-                @media (min-width: 768px) {
-                    .hero-headline {
-                    font-size: var(--headline-desktop-size);
-                    }
-                    .hero-description {
-                    font-size: var(--description-desktop-size);
-                    }
-                }
-                `}
-            </style>
             <div className="absolute inset-0">
                 <Image
                     src={imageUrl}
@@ -100,15 +71,15 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                 verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
             )}>
                 <div className={cn(
-                    "flex flex-col space-y-6 hero-text-container w-full text-white",
+                    "flex flex-col space-y-6 w-full text-white",
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
-                )}>
+                )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("hero-headline font-bold tracking-tight", settings?.heroHeadlineColor)}
+                    className={cn("text-h1 font-bold tracking-tight", settings?.heroHeadlineColor)}
                 >
                     {headline}
                 </h1>
-                <p>
+                <p className="text-body">
                     {description}
                 </p>
                 {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
@@ -149,20 +120,12 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const pathname = usePathname();
     const headline = settings?.heroHeadline || 'The all-in-one platform built for restaurants';
     const description = settings?.heroDescription || 'AI-powered restaurant software that makes daily operations easier and drives more orders.';
-
-    const headlineDesktopSize = settings?.heroHeadlineSize ?? 64;
-    const headlineMobileSize = settings?.heroHeadlineSizeMobile ?? 40;
-    const descriptionDesktopSize = settings?.heroDescriptionSize ?? 18;
-    const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
+    
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
     const sectionPadding = settings?.sectionPadding?.hero;
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
-        '--headline-desktop-size': `${headlineDesktopSize}px`,
-        '--headline-mobile-size': `${headlineMobileSize}px`,
-        '--description-desktop-size': `${descriptionDesktopSize}px`,
-        '--description-mobile-size': `${descriptionMobileSize}px`,
          '--text-max-width': `${textMaxWidth}px`,
         '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
@@ -197,34 +160,13 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
             className={cn("w-full py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]", !settings?.heroSectionBackgroundColor && "bg-background")} 
             style={heroStyles}
         >
-             <style>
-                {`
-                .hero-headline {
-                    font-size: var(--headline-mobile-size);
-                }
-                .hero-description {
-                    font-size: var(--description-mobile-size);
-                }
-                 .hero-text-container {
-                    max-width: var(--text-max-width);
-                }
-                @media (min-width: 768px) {
-                    .hero-headline {
-                    font-size: var(--headline-desktop-size);
-                    }
-                    .hero-description {
-                    font-size: var(--description-desktop-size);
-                    }
-                }
-                `}
-            </style>
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
-                    <div className="flex flex-col space-y-6 hero-text-container">
-                        <h1 className="hero-headline font-bold tracking-tight text-foreground">
+                    <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
+                        <h1 className="text-h1 font-bold tracking-tight text-foreground">
                             {headline}
                         </h1>
-                        <p className="hero-description text-muted-foreground">
+                        <p className="text-body text-muted-foreground">
                             {description}
                         </p>
                         {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
