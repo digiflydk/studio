@@ -127,6 +127,7 @@ const defaultHeroPadding: SectionPadding = { top: 192, bottom: 192, topMobile: 1
 
 
 const defaultVisibility: SectionVisibility = {
+    hero: true,
     feature: true,
     services: true,
     aiProject: true,
@@ -670,6 +671,7 @@ export default function CmsHomePage() {
         const prevVis = (prev.sectionVisibility ?? {}) as Partial<SectionVisibility>;
 
         const nextVis: SectionVisibility = {
+            hero:      prevVis.hero      ?? defaultVisibility.hero!,
             feature:   prevVis.feature   ?? defaultVisibility.feature!,
             services:  prevVis.services  ?? defaultVisibility.services!,
             aiProject: prevVis.aiProject ?? defaultVisibility.aiProject!,
@@ -1880,6 +1882,7 @@ export default function CmsHomePage() {
     </div>
   );
 }
+
 
 
 
