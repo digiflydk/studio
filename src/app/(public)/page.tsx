@@ -9,8 +9,9 @@ import ContactSection from '@/components/sections/contact';
 import StickyCta from '@/components/sticky-cta';
 import { getGeneralSettings } from '@/services/settings';
 import CustomersSection from '@/components/sections/customers';
+import TabsSection from '@/components/sections/tabs-section';
 
-const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
+const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'tabs'];
 
 export default async function Home() {
   const settings = await getGeneralSettings();
@@ -24,6 +25,7 @@ export default async function Home() {
     cases: visibility?.cases !== false && <CasesSection settings={settings} />,
     about: visibility?.about !== false && <AboutSection settings={settings} />,
     customers: visibility?.customers !== false && <CustomersSection settings={settings} />,
+    tabs: visibility?.tabs !== false && <TabsSection settings={settings} />,
   };
   
   return (

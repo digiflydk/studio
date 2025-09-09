@@ -1,4 +1,5 @@
 
+
 type HSLColor = { h: number; s: number; l: number };
 
 export interface Service {
@@ -37,6 +38,15 @@ export interface Customer {
     aiHint: string;
 }
 
+export interface TabbedContentItem {
+    title: string;
+    description: string;
+    imageUrl: string;
+    aiHint: string;
+    link: string;
+    linkText: string;
+}
+
 export type SectionPadding = {
     top?: number;
     bottom?: number;
@@ -52,6 +62,7 @@ export interface SectionVisibility {
     about?: boolean;
     customers?: boolean;
     contact?: boolean;
+    tabs?: boolean;
 }
 
 export type Alignment = 'left' | 'center' | 'right';
@@ -265,8 +276,13 @@ export interface GeneralSettings {
 
     contactSectionBackgroundColor?: HSLColor;
 
+    tabbedContentSectionTitle?: string;
+    tabbedContentItems?: TabbedContentItem[];
+    tabbedContentSectionBackgroundColor?: HSLColor;
+
+
     // Spacing
-    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact' | 'hero', SectionPadding>>;
+    sectionPadding?: Partial<Record<keyof SectionVisibility | 'contact' | 'hero' | 'tabs', SectionPadding>>;
     
     // Section Visibility
     sectionVisibility?: Partial<SectionVisibility>;

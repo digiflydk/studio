@@ -1,7 +1,5 @@
 
 import Link from 'next/link';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 export default function NotFound() {
   return (
@@ -11,7 +9,7 @@ export default function NotFound() {
           <Link href="/" className="flex items-center gap-2 font-semibold">
             Digifly
           </Link>
-          <Link href="/" className={cn(buttonVariants({ variant: "secondary" }))}>
+          <Link href="/" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2">
             Go to Homepage
           </Link>
         </div>
@@ -23,7 +21,7 @@ export default function NotFound() {
           <p className="mt-4 text-muted-foreground">
             Beklager, vi kunne ikke finde den side, du ledte efter. Måske er den flyttet, eller også har du tastet forkert.
           </p>
-          <Link href="/" className={cn(buttonVariants({ size: "lg" }), "mt-8")}>
+          <Link href="/" className="mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-12">
             Gå til forsiden
           </Link>
         </div>

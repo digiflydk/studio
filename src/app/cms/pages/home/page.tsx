@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink } from '@/types/settings';
+import { Service, Case, TeamMember, SectionPadding, SectionVisibility, Alignment, NavLink, TabbedContentItem } from '@/types/settings';
 import type { GeneralSettings } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2, Monitor, Smartphone, AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd, AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, ArrowRight, GripVertical } from 'lucide-react';
@@ -40,7 +40,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { ensureAllSectionPadding, SectionKey } from '@/lib/settings-utils';
 
-const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers'];
+const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'tabs'];
 
 const defaultServices: Service[] = [
   {
@@ -134,7 +134,27 @@ const defaultVisibility: SectionVisibility = {
     about: true,
     customers: true,
     contact: true,
+    tabs: true,
 }
+
+const defaultTabbedContent: TabbedContentItem[] = [
+  {
+    title: 'Branded website & app',
+    description: 'Grow your customer base with your own AI-optimised, direct-to-consumer ordering website and mobile app. Built to maximise conversions and keep your brand front and centre, our platforms are fast, intuitive, and SEO-friendly, helping you capture more orders without giving up margin to third-party marketplaces.',
+    imageUrl: 'https://picsum.photos/800/600?random=1',
+    aiHint: 'branded website app',
+    link: '#',
+    linkText: 'Learn More',
+  },
+  {
+    title: 'Loyalty & retention',
+    description: 'Turn first-time customers into lifelong fans with our automated loyalty and retention tools. From personalised rewards to targeted marketing campaigns, we make it easy to keep your customers coming back for more.',
+    imageUrl: 'https://picsum.photos/800/600?random=2',
+    aiHint: 'customer loyalty program',
+    link: '#',
+    linkText: 'Discover Features',
+  },
+];
 
 const themeColorOptions = [
     { value: 'text-primary', label: 'Primary' },
@@ -487,6 +507,10 @@ export default function CmsHomePage() {
       if (!sectionPadding.hero) {
           sectionPadding.hero = defaultHeroPadding;
       }
+       if (!sectionPadding.tabs) {
+          sectionPadding.tabs = defaultPadding;
+      }
+
 
       setSettings({
           ...initialSettings,
@@ -494,11 +518,11 @@ export default function CmsHomePage() {
           
           heroLayout: initialSettings.heroLayout ?? 'fullWidthImage',
           heroHeadline: initialSettings.heroHeadline ?? 'Flow. Automatisér. Skalér.',
-          heroHeadlineColor: initialSettings.heroHeadlineColor ?? 'text-white',
+          heroHeadlineColor: initialSettings.heroHeadlineColor || 'text-white',
           heroHeadlineSize: initialSettings.heroHeadlineSize ?? 64,
           heroHeadlineSizeMobile: initialSettings.heroHeadlineSizeMobile ?? 40,
           heroDescription: initialSettings.heroDescription ?? 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.',
-          heroDescriptionColor: initialSettings.heroDescriptionColor ?? 'text-primary-foreground/80',
+          heroDescriptionColor: initialSettings.heroDescriptionColor || 'text-primary-foreground/80',
           heroDescriptionSize: initialSettings.heroDescriptionSize ?? 18,
           heroDescriptionSizeMobile: initialSettings.heroDescriptionSizeMobile ?? 16,
           heroImageUrl: initialSettings.heroImageUrl ?? 'https://picsum.photos/1920/1280',
@@ -610,6 +634,10 @@ export default function CmsHomePage() {
 
           contactSectionBackgroundColor: initialSettings.contactSectionBackgroundColor ?? { h: 0, s: 0, l: 100 },
 
+          tabbedContentSectionTitle: initialSettings.tabbedContentSectionTitle ?? 'Grow your orders',
+          tabbedContentItems: initialSettings.tabbedContentItems?.length ? initialSettings.tabbedContentItems : defaultTabbedContent,
+          tabbedContentSectionBackgroundColor: initialSettings.tabbedContentSectionBackgroundColor ?? { h: 210, s: 60, l: 98 },
+
           sectionPadding: sectionPadding,
           sectionVisibility: { ...defaultVisibility, ...initialSettings.sectionVisibility },
       });
@@ -649,6 +677,7 @@ export default function CmsHomePage() {
             about:     prevVis.about     ?? defaultVisibility.about!,
             customers: prevVis.customers ?? defaultVisibility.customers!,
             contact:   prevVis.contact   ?? defaultVisibility.contact!,
+            tabs:      prevVis.tabs      ?? defaultVisibility.tabs!,
         };
 
         nextVis[section] = isVisible;
@@ -1657,6 +1686,66 @@ export default function CmsHomePage() {
             </AccordionItem>
         </Card>
     ),
+    tabs: (
+        <Card className="shadow-lg">
+            <AccordionItem value="tabs">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <CardTitle>Tab Sektion</CardTitle>
+                        <CardDescription className="mt-1">Administrer den interaktive sektion med faneblade.</CardDescription>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t">
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="tabs-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="tabs-visible"
+                                checked={settings.sectionVisibility?.tabs}
+                                onCheckedChange={(value) => handleVisibilityChange('tabs', value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="tabs-title">Sektionstitel</Label>
+                            <Input id="tabs-title" value={settings.tabbedContentSectionTitle || ''} onChange={e => handleInputChange('tabbedContentSectionTitle', e.target.value)} className="w-full" />
+                        </div>
+                         {settings.tabbedContentSectionBackgroundColor && (
+                            <HslColorPicker
+                                label="Baggrundsfarve"
+                                color={settings.tabbedContentSectionBackgroundColor}
+                                onChange={(hsl) => handleInputChange('tabbedContentSectionBackgroundColor', hsl)}
+                            />
+                        )}
+                        <Label>Faneblade</Label>
+                        <Accordion type="multiple" className="w-full border rounded-md">
+                            {(settings.tabbedContentItems || []).map((item, index) => (
+                                <EditableListItem 
+                                    key={index}
+                                    index={index}
+                                    item={item}
+                                    updateItem={(i, data) => handleListUpdate('tabbedContentItems', i, data)}
+                                    removeItem={(i) => handleListRemove('tabbedContentItems', i)}
+                                    fields={[
+                                        {key: 'title', label: 'Titel'},
+                                        {key: 'description', label: 'Beskrivelse', type: 'textarea'},
+                                        {key: 'imageUrl', label: 'Billede URL'},
+                                        {key: 'aiHint', label: 'AI Billede Hint'},
+                                        {key: 'link', label: 'Link URL'},
+                                        {key: 'linkText', label: 'Link Tekst'},
+                                    ]}
+                                    titleField="title"
+                                />
+                            ))}
+                        </Accordion>
+                        <Button variant="outline" onClick={() => handleListAdd('tabbedContentItems', { title: 'Ny Fane', description: '', imageUrl: '', aiHint: '', link: '#', linkText: 'Lær mere' })}>Tilføj Faneblad</Button>
+                    </CardContent>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+    ),
     spacing: (
         <Card className="shadow-lg">
             <AccordionItem value="spacing">
@@ -1672,6 +1761,12 @@ export default function CmsHomePage() {
                             label="Fremhævet Sektion"
                             padding={settings.sectionPadding?.feature || defaultPadding}
                             onPaddingChange={(v, p) => handlePaddingChange('feature', v, p)}
+                            previewMode={previewMode}
+                        />
+                         <SpacingEditor
+                            label="Tab Sektion"
+                            padding={settings.sectionPadding?.tabs || defaultPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('tabs', v, p)}
                             previewMode={previewMode}
                         />
                         <SpacingEditor

@@ -18,5 +18,6 @@ export function ensureAllSectionPadding(
     about: m.about ?? def,
     customers: m.customers ?? def,
     contact: m.contact ?? def,
+    tabs: m.tabs ?? def,
   };
 }
