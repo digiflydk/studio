@@ -74,9 +74,6 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-  section {
-    @apply w-full;
-  }
 }
 
 @layer utilities {
