@@ -81,22 +81,7 @@ body {
     @apply bg-background text-foreground;
   }
   section {
-    @apply w-full py-12 md:py-24 lg:py-32;
-  }
-  h1, .text-h1 {
-    font-size: var(--font-size-h1);
-  }
-  h2, .text-h2 {
-    font-size: var(--font-size-h2);
-  }
-  h3, .text-h3 {
-    font-size: var(--font-size-h3);
-  }
-  h4, .text-h4 {
-    font-size: var(--font-size-h4);
-  }
-  p, .text-body {
-    font-size: var(--font-size-body);
+    @apply w-full;
   }
 }
 

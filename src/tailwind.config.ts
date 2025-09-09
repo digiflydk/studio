@@ -17,6 +17,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "sans-serif"],
+      },
       fontSize: {
         'h1': ['var(--font-size-h1)', { lineHeight: '1', fontWeight: '700' }],
         'h2': ['var(--font-size-h2)', { lineHeight: '1', fontWeight: '700' }],
@@ -87,7 +90,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+  ],
 }
 
 export default config;
