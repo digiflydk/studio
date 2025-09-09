@@ -18,11 +18,11 @@ const config: Config = {
     },
     extend: {
       fontSize: {
-        'h1': ['4rem', { lineHeight: '1.2', fontWeight: '700' }],
-        'h2': ['2.25rem', { lineHeight: '1.2', fontWeight: '700' }],
-        'h3': ['1.875rem', { lineHeight: '1.2', fontWeight: '700' }],
-        'h4': ['1.5rem', { lineHeight: '1.2', fontWeight: '700' }],
-        'body': ['1.125rem', { lineHeight: '1.75rem', fontWeight: '400' }],
+        'h1': ['var(--font-size-h1)', { lineHeight: '1.2', fontWeight: '800' }],
+        'h2': ['var(--font-size-h2)', { lineHeight: '1.2', fontWeight: '700' }],
+        'h3': ['var(--font-size-h3)', { lineHeight: '1.2', fontWeight: '700' }],
+        'h4': ['var(--font-size-h4)', { lineHeight: '1.2', fontWeight: '700' }],
+        'body': ['var(--font-size-body)', { lineHeight: '1.75rem', fontWeight: '400' }],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -87,9 +87,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-  ],
+  plugins: [require("tailwindcss-animate")],
 }
 
 export default config;
