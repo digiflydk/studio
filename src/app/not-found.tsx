@@ -1,6 +1,7 @@
 
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function NotFound() {
   return (
@@ -10,9 +11,9 @@ export default function NotFound() {
           <Link href="/" className="flex items-center gap-2 font-semibold">
             Digifly
           </Link>
-          <Button asChild variant="secondary">
-            <Link href="/">Go to Homepage</Link>
-          </Button>
+          <Link href="/" className={cn(buttonVariants({ variant: "secondary" }))}>
+            Go to Homepage
+          </Link>
         </div>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
@@ -22,9 +23,9 @@ export default function NotFound() {
           <p className="mt-4 text-muted-foreground">
             Beklager, vi kunne ikke finde den side, du ledte efter. Måske er den flyttet, eller også har du tastet forkert.
           </p>
-          <Button asChild className="mt-8" size="lg">
-            <Link href="/">Gå til forsiden</Link>
-          </Button>
+          <Link href="/" className={cn(buttonVariants({ size: "lg" }), "mt-8")}>
+            Gå til forsiden
+          </Link>
         </div>
       </main>
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
