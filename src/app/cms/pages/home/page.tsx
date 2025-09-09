@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -748,7 +749,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Overskrift"
-                            colorValue={(settings.heroLayout === 'textWithImageGrid' ? 'text-foreground' : settings.heroHeadlineColor) as ThemeColor}
+                            colorValue={settings.heroHeadlineColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroHeadlineColor', v)}
                             desktopSize={settings.heroHeadlineSize || 64}
                             onDesktopSizeChange={(v) => handleInputChange('heroHeadlineSize', v)}
@@ -762,7 +763,7 @@ export default function CmsHomePage() {
                         </div>
                         <TextStyleEditor 
                             label="Design for Beskrivelse"
-                            colorValue={(settings.heroLayout === 'textWithImageGrid' ? 'text-muted-foreground' : settings.heroDescriptionColor) as ThemeColor}
+                            colorValue={settings.heroDescriptionColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('heroDescriptionColor', v)}
                             desktopSize={settings.heroDescriptionSize || 18}
                             onDesktopSizeChange={(v) => handleInputChange('heroDescriptionSize', v)}

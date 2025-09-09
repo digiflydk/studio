@@ -1,4 +1,5 @@
 
+
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings, SectionPadding } from '@/types/settings';
@@ -207,25 +208,25 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
                         <h1 
-                            className="text-h1 text-foreground md:hidden"
+                            className={cn("text-h1 md:hidden", settings?.heroHeadlineColor)}
                             style={headlineStyleMobile}
                         >
                             {headline}
                         </h1>
                         <h1 
-                            className="text-h1 text-foreground hidden md:block"
+                            className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor)}
                             style={headlineStyle}
                         >
                             {headline}
                         </h1>
                         <p 
-                            className="text-body text-muted-foreground md:hidden"
+                            className={cn("text-body md:hidden", settings?.heroDescriptionColor)}
                              style={descriptionStyleMobile}
                         >
                             {description}
                         </p>
                          <p 
-                            className="text-body text-muted-foreground hidden md:block"
+                            className={cn("text-body hidden md:block", settings?.heroDescriptionColor)}
                              style={descriptionStyle}
                         >
                             {description}
