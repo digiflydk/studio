@@ -1882,8 +1882,3 @@ export default function CmsHomePage() {
     </div>
   );
 }
-
-
-
-
-
