@@ -256,7 +256,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
                             </div>
                         )}
                     </div>
-                     <div className="grid grid-cols-2 gap-4 scale-90">
+                     <div className="grid grid-cols-2 gap-4">
                         {images.map((image, index) => (
                             <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg group">
                                 <Image
