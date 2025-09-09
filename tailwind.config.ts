@@ -17,10 +17,10 @@ const config: Config = {
     },
     extend: {
       fontSize: {
-        'h1': ['var(--font-size-h1)', { lineHeight: '1.1', fontWeight: '700' }],
-        'h2': ['var(--font-size-h2)', { lineHeight: '2.5rem', fontWeight: '700' }],
-        'h3': ['var(--font-size-h3)', { lineHeight: '1.875rem', fontWeight: '700' }],
-        'h4': ['var(--font-size-h4)', { lineHeight: '1.5rem', fontWeight: '700' }],
+        'h1': ['var(--font-size-h1)', { lineHeight: '1.2', fontWeight: '700' }],
+        'h2': ['var(--font-size-h2)', { lineHeight: '1.2', fontWeight: '700' }],
+        'h3': ['var(--font-size-h3)', { lineHeight: '1.2', fontWeight: '700' }],
+        'h4': ['var(--font-size-h4)', { lineHeight: '1.2', fontWeight: '700' }],
         'body': ['var(--font-size-body)', { lineHeight: '1.75rem', fontWeight: '400' }],
       },
       colors: {
