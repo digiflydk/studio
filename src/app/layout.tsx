@@ -15,10 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
     ? {
         icon: [{ url: faviconUrl, rel: "icon" }, { url: "/favicon.ico", sizes: "any", rel: "icon" }],
         shortcut: [{ url: faviconUrl, rel: "shortcut icon" }],
-        apple: [{ url: faviconUrl, rel: "apple-touch-icon" }],
+        apple: [{ url: faviconUrl, rel: "apple-touch-icon" }, {url: '/apple-touch-icon.png', rel: 'apple-touch-icon'}]
       }
     : {
         icon: "/favicon.ico",
+        apple: '/apple-touch-icon.png'
       };
 
   const title = settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
