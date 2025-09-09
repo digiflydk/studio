@@ -1,5 +1,4 @@
 
-
 import type { GeneralSettings, SectionPadding, SectionVisibility } from '@/types/settings';
 
 export type SectionKey = keyof SectionVisibility;
