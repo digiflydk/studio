@@ -27,11 +27,9 @@ const nextConfig = {
     buildActivity: true,
   },
   ...(process.env.NODE_ENV === 'development' && {
-    experimental: {
-        allowedDevOrigins: [
-            'https://6000-firebase-studio-1756450523972.cluster-3gc7bglotjgwuxlqpiut7yyqt4.cloudworkstations.dev',
-        ]
-    }
+    allowedDevOrigins: [
+        'https://6000-firebase-studio-1756450523972.cluster-3gc7bglotjgwuxlqpiut7yyqt4.cloudworkstations.dev',
+    ]
   })
 };
 
