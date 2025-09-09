@@ -127,13 +127,13 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     {alignment === 'right' ? (
                         <>
-                            {imageContent}
                             {textContent}
+                            {imageContent}
                         </>
                     ) : (
                         <>
-                            {textContent}
                             {imageContent}
+                            {textContent}
                         </>
                     )}
                 </div>
