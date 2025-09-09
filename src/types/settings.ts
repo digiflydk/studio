@@ -73,6 +73,30 @@ export interface HeroGridImage {
     aiHint: string;
 }
 
+export type TypographyElementSettings = {
+    sizeMobile: number;
+    sizeDesktop: number;
+    weight: number;
+    lineHeight: number;
+};
+
+export type BodyTypographySettings = {
+    size: number;
+    weight: number;
+    lineHeight: number;
+}
+
+export interface TypographySettings {
+    fontPrimary: string;
+    fontSecondary: string;
+    h1: TypographyElementSettings;
+    h2: TypographyElementSettings;
+    h3: TypographyElementSettings;
+    h4: TypographyElementSettings;
+    body: BodyTypographySettings;
+}
+
+
 export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
@@ -121,6 +145,7 @@ export interface GeneralSettings {
         background: HSLColor;
         accent: HSLColor;
     };
+    typography?: TypographySettings;
     
     // Header Settings
     headerNavLinks?: NavLink[];

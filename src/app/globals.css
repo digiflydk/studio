@@ -8,20 +8,15 @@ html {
 }
 
 body {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--font-primary), Helvetica, Arial, sans-serif;
 }
 
 @layer base {
   :root {
     /* Typografi – mobil defaults */
-    --font-size-h1: clamp(2rem, 4.5vw, 2.5rem);   /* ca. 32–40px */
-    --font-size-h2: clamp(1.625rem, 3.2vw, 2rem); /* ca. 26–32px */
-    --font-size-h3: clamp(1.375rem, 2.6vw, 1.75rem); /* 22–28px */
-    --font-size-h4: clamp(1.125rem, 2.2vw, 1.375rem); /* 18–22px */
-    --font-size-body: 1rem; /* 16px */
-    /* Header offset default (opdateres dynamisk fra Template) */
     --header-offset: 64px;
 
+    /* Colors */
     --background: 210 100% 95%;
     --foreground: 224 71.4% 4.1%;
     --card: 210 100% 100%;
@@ -47,7 +42,33 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    /* Fonts */
+    --font-primary: "Inter", ui-sans-serif, system-ui, -apple-system;
+    --font-secondary: var(--font-primary);
+
+    /* Sizes (px) – Mobile defaults overskrives ved runtime fra CMS */
+    --h1-size-mobile: 32;
+    --h2-size-mobile: 26;
+    --h3-size-mobile: 22;
+    --h4-size-mobile: 18;
+
+    --h1-size-desktop: 48;
+    --h2-size-desktop: 36;
+    --h3-size-desktop: 28;
+    --h4-size-desktop: 22;
+
+    --body-size: 16;
+
+    /* Weights */
+    --h1-weight: 700; --h2-weight: 700; --h3-weight: 700; --h4-weight: 700;
+    --body-weight: 400;
+
+    /* Line-heights */
+    --h1-lh: 1.2; --h2-lh: 1.25; --h3-lh: 1.3; --h4-lh: 1.35;
+    --body-lh: 1.6;
   }
+
   .dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
@@ -75,14 +96,17 @@ body {
     --chart-5: 340 75% 55%;
   }
 
+  h1 { font-family: var(--font-primary); font-size: calc(var(--h1-size-mobile) * 1px); font-weight: var(--h1-weight); line-height: var(--h1-lh); }
+  h2 { font-family: var(--font-primary); font-size: calc(var(--h2-size-mobile) * 1px); font-weight: var(--h2-weight); line-height: var(--h2-lh); }
+  h3 { font-family: var(--font-primary); font-size: calc(var(--h3-size-mobile) * 1px); font-weight: var(--h3-weight); line-height: var(--h3-lh); }
+  h4 { font-family: var(--font-primary); font-size: calc(var(--h4-size-mobile) * 1px); font-weight: var(--h4-weight); line-height: var(--h4-lh); }
+  p  { font-family: var(--font-primary); font-size: calc(var(--body-size) * 1px); font-weight: var(--body-weight); line-height: var(--body-lh); }
+
   @media (min-width: 768px) {
-    :root {
-      /* Typografi – desktop defaults */
-      --font-size-h1: clamp(2.5rem, 3.2vw, 3.5rem);  /* 40–56px */
-      --font-size-h2: clamp(2rem, 2.6vw, 2.75rem);   /* 32–44px */
-      --font-size-h3: clamp(1.5rem, 2.1vw, 2rem);    /* 24–32px */
-      --font-size-h4: clamp(1.25rem, 1.8vw, 1.5rem); /* 20–24px */
-    }
+    h1 { font-size: calc(var(--h1-size-desktop) * 1px); }
+    h2 { font-size: calc(var(--h2-size-desktop) * 1px); }
+    h3 { font-size: calc(var(--h3-size-desktop) * 1px); }
+    h4 { font-size: calc(var(--h4-size-desktop) * 1px); }
   }
 }
 
@@ -93,11 +117,6 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-  h1 { @apply text-h1 font-bold; }
-  h2 { @apply text-h2 font-bold; }
-  h3 { @apply text-h3 font-bold; }
-  h4 { @apply text-h4 font-bold; }
-  p  { @apply text-body; }
 }
 
 @layer utilities {

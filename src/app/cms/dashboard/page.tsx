@@ -11,6 +11,8 @@ import { useState, useEffect, useTransition } from "react";
 import { saveSettingsAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { TypographySettings, TypographyElementSettings, BodyTypographySettings } from "@/types/settings";
 
 
 function hslToHex(h: number, s: number, l: number) {
@@ -125,8 +127,56 @@ function ColorPicker({ label, colorName }: { label: string; colorName: keyof Ret
   );
 }
 
+function TypographyControl({
+  label,
+  settings,
+  onUpdate,
+  isBody = false,
+}: {
+  label: string;
+  settings: TypographyElementSettings | BodyTypographySettings;
+  onUpdate: (data: Partial<TypographyElementSettings | BodyTypographySettings>) => void;
+  isBody?: boolean;
+}) {
+  return (
+    <div className="p-4 border rounded-lg space-y-4">
+      <h4 className="font-semibold">{label}</h4>
+      <div className="grid grid-cols-2 gap-4">
+        {!isBody && (
+          <>
+            <div className="space-y-2">
+              <Label>Size Mobile (px)</Label>
+              <Input type="number" value={(settings as TypographyElementSettings).sizeMobile} onChange={(e) => onUpdate({ sizeMobile: Number(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Size Desktop (px)</Label>
+              <Input type="number" value={(settings as TypographyElementSettings).sizeDesktop} onChange={(e) => onUpdate({ sizeDesktop: Number(e.target.value) })} />
+            </div>
+          </>
+        )}
+        {isBody && (
+          <div className="space-y-2">
+            <Label>Size (px)</Label>
+            <Input type="number" value={(settings as BodyTypographySettings).size} onChange={(e) => onUpdate({ size: Number(e.target.value) })} />
+          </div>
+        )}
+        <div className="space-y-2">
+          <Label>Weight</Label>
+          <Slider value={[settings.weight]} onValueChange={([v]) => onUpdate({ weight: v })} min={300} max={900} step={100} />
+          <span className="text-xs text-muted-foreground">{settings.weight}</span>
+        </div>
+      </div>
+       <div className="space-y-2">
+          <Label>Line Height</Label>
+          <Slider value={[settings.lineHeight]} onValueChange={([v]) => onUpdate({ lineHeight: v })} min={1.0} max={2.0} step={0.05} />
+          <span className="text-xs text-muted-foreground">{settings.lineHeight.toFixed(2)}</span>
+        </div>
+    </div>
+  );
+}
+
 export default function CmsDashboardPage() {
-  const { theme, isLoaded, setTheme } = useTheme();
+  const { theme, isLoaded, setTheme, setTypography, typography } = useTheme();
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
 
@@ -134,6 +184,7 @@ export default function CmsDashboardPage() {
     startSaving(async () => {
         const result = await saveSettingsAction({
             themeColors: theme.colors,
+            typography: typography,
         });
         toast({
             title: result.success ? "Gemt!" : "Fejl!",
@@ -164,17 +215,65 @@ export default function CmsDashboardPage() {
               Gem Ændringer
             </Button>
        </div>
-        <Card className="shadow-lg max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Farver</CardTitle>
-            <CardDescription>Juster sidens primære farver.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ColorPicker label="Primær farve" colorName="primary" />
-            <ColorPicker label="Baggrundsfarve" colorName="background" />
-            <ColorPicker label="Accent farve" colorName="accent" />
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Farver</CardTitle>
+              <CardDescription>Juster sidens primære farver.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ColorPicker label="Primær farve" colorName="primary" />
+              <ColorPicker label="Baggrundsfarve" colorName="background" />
+              <ColorPicker label="Accent farve" colorName="accent" />
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Typografi</CardTitle>
+              <CardDescription>Juster sidens skrifttyper, størrelser og vægt.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label>Primær Skrifttype</Label>
+                    <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
+                    <p className="text-xs text-muted-foreground">F.eks. &quot;Inter&quot;, &quot;Roboto&quot;. Sørg for at skrifttypen er indlæst.</p>
+                </div>
+                <Accordion type="multiple" className="w-full">
+                    <AccordionItem value="h1">
+                        <AccordionTrigger>H1</AccordionTrigger>
+                        <AccordionContent>
+                           <TypographyControl label="H1" settings={typography.h1} onUpdate={(data) => setTypography({ ...typography, h1: { ...typography.h1, ...data } })} />
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="h2">
+                        <AccordionTrigger>H2</AccordionTrigger>
+                        <AccordionContent>
+                           <TypographyControl label="H2" settings={typography.h2} onUpdate={(data) => setTypography({ ...typography, h2: { ...typography.h2, ...data } })} />
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="h3">
+                        <AccordionTrigger>H3</AccordionTrigger>
+                        <AccordionContent>
+                           <TypographyControl label="H3" settings={typography.h3} onUpdate={(data) => setTypography({ ...typography, h3: { ...typography.h3, ...data } })} />
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="h4">
+                        <AccordionTrigger>H4</AccordionTrigger>
+                        <AccordionContent>
+                           <TypographyControl label="H4" settings={typography.h4} onUpdate={(data) => setTypography({ ...typography, h4: { ...typography.h4, ...data } })} />
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="body">
+                        <AccordionTrigger>Body</AccordionTrigger>
+                        <AccordionContent>
+                           <TypographyControl label="Body" settings={typography.body} onUpdate={(data) => setTypography({ ...typography, body: { ...typography.body, ...data } })} isBody />
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </CardContent>
+          </Card>
+        </div>
     </div>
   );
 }
