@@ -55,6 +55,7 @@ export type SectionPadding = {
 }
 
 export interface SectionVisibility {
+    hero?: boolean;
     feature?: boolean;
     services?: boolean;
     aiProject?: boolean;
@@ -187,8 +188,7 @@ export interface GeneralSettings {
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
     heroSectionBackgroundColor?: HSLColor;
-    heroSectionPadding?: SectionPadding;
-
+    
     featureSectionHeading?: string;
     featureSectionHeadingColor?: string;
     featureSectionHeadingSize?: number;
