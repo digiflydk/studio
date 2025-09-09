@@ -21,7 +21,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
     const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
-    const sectionPadding = settings?.heroSectionPadding;
+    const sectionPadding = settings?.sectionPadding?.hero;
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
         '--headline-desktop-size': `${headlineDesktopSize}px`,
@@ -29,9 +29,9 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
         '--description-desktop-size': `${descriptionDesktopSize}px`,
         '--description-mobile-size': `${descriptionMobileSize}px`,
         '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '128px',
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '192px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '0px',
         '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '192px',
     };
     
@@ -96,7 +96,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
             </div>
             
             <div className={cn(
-                "relative container mx-auto px-4 md:px-6 flex flex-col min-h-[500px]",
+                "relative container mx-auto px-4 md:px-6 flex flex-col min-h-fit",
                 "pt-[var(--padding-top-mobile)] pb-[var(--padding-bottom-mobile)] md:pt-[var(--padding-top)] md:pb-[var(--padding-bottom)]",
                 verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
             )}>
@@ -159,7 +159,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     const descriptionMobileSize = settings?.heroDescriptionSizeMobile ?? 16;
     const textMaxWidth = settings?.heroTextMaxWidth ?? 700;
 
-    const sectionPadding = settings?.heroSectionPadding;
+    const sectionPadding = settings?.sectionPadding?.hero;
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
         '--headline-desktop-size': `${headlineDesktopSize}px`,
@@ -167,9 +167,9 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
         '--description-desktop-size': `${descriptionDesktopSize}px`,
         '--description-mobile-size': `${descriptionMobileSize}px`,
          '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '48px',
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '96px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '0px',
         '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
 

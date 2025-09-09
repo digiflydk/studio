@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import Logo from '@/components/logo';
 import type { NavLink, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, Suspense, useRef } from 'react';
+import { useEffect, useState, Suspense, forwardRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 const defaultNavLinks: NavLink[] = [
@@ -18,9 +18,8 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Kontakt' },
 ];
 
-function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
+const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }>(({ settings }, ref) => {
   const pathname = usePathname();
-  const headerRef = useRef<HTMLElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   
   const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
@@ -33,13 +32,6 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (headerRef.current) {
-        const headerHeight = headerRef.current.offsetHeight;
-        document.documentElement.style.setProperty('scroll-padding-top', `${headerHeight}px`);
-    }
   }, []);
 
   const height = settings?.headerHeight || 64;
@@ -101,10 +93,11 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
 
   return (
     <header 
-      ref={headerRef}
+      ref={ref}
       className={cn(
         "w-full flex flex-col z-50",
-        settings?.headerIsSticky !== false && (isScrolled ? "sticky top-0 shadow-md" : "absolute top-0")
+        settings?.headerIsSticky !== false ? "fixed top-0" : "absolute top-0",
+        isScrolled && 'shadow-md'
       )}
       >
       <div 
@@ -183,13 +176,17 @@ function HeaderInner({ settings }: { settings: GeneralSettings | null }) {
       )}
     </header>
   );
-}
+});
+HeaderInner.displayName = "HeaderInner";
 
 
-export default function Header({ settings }: { settings: GeneralSettings | null }) {
+const Header = forwardRef<HTMLElement, { settings: GeneralSettings | null }>(({ settings }, ref) => {
     return (
-        <Suspense fallback={<header className="h-16 w-full"></header>}>
-            <HeaderInner settings={settings} />
+        <Suspense fallback={<header ref={ref} className="h-16 w-full"></header>}>
+            <HeaderInner ref={ref} settings={settings} />
         </Suspense>
     );
-}
+});
+Header.displayName = "Header";
+
+export default Header;

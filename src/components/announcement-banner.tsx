@@ -4,13 +4,14 @@
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, X } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export default function AnnouncementBanner() {
-  return null;
-  
+const AnnouncementBanner = forwardRef<HTMLDivElement>((props, ref) => {
   const [isVisible, setIsVisible] = useState(true);
+  
+  // This component is currently disabled. To enable, remove the following line.
+  return null;
   
   if (!isVisible) {
     return null;
@@ -19,6 +20,7 @@ export default function AnnouncementBanner() {
   return (
     <div 
         id="announcement-banner"
+        ref={ref}
         className="relative bg-primary text-primary-foreground"
     >
       <div className="container mx-auto max-w-7xl px-4 md:px-6 py-2.5 text-sm font-medium">
@@ -44,4 +46,8 @@ export default function AnnouncementBanner() {
       </button>
     </div>
   );
-}
+});
+
+AnnouncementBanner.displayName = "AnnouncementBanner";
+
+export default AnnouncementBanner;
