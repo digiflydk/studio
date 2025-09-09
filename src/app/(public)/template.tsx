@@ -9,43 +9,18 @@ import { Toaster } from '@/components/ui/toaster';
 import { useGeneralSettings } from '@/hooks/use-general-settings';
 import { ThemeProvider } from '@/context/ThemeContext';
 import AnnouncementBanner from '@/components/announcement-banner';
+import { cn } from '@/lib/utils';
 
 export default function Template({ children }: { children: ReactNode }) {
     const settings = useGeneralSettings();
-    const mainRef = useRef<HTMLElement>(null);
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
-
-    useLayoutEffect(() => {
-        const mainEl = mainRef.current;
-        const headerEl = headerRef.current;
-        const bannerEl = bannerRef.current;
-    
-        const calculatePadding = () => {
-            if (mainEl && headerEl && bannerEl) {
-                const headerHeight = headerEl.offsetHeight || 0;
-                const bannerHeight = bannerEl.offsetHeight || 0;
-                mainEl.style.paddingTop = `${headerHeight + bannerHeight}px`;
-            }
-        };
-
-        calculatePadding();
-
-        const resizeObserver = new ResizeObserver(calculatePadding);
-        if (headerEl) resizeObserver.observe(headerEl);
-        if (bannerEl) resizeObserver.observe(bannerEl);
-
-        return () => {
-            if (headerEl) resizeObserver.unobserve(headerEl);
-            if (bannerEl) resizeObserver.unobserve(bannerEl);
-        };
-    }, [settings?.headerIsSticky]);
 
     return (
         <ThemeProvider settings={settings}>
             <Header ref={headerRef} settings={settings} />
             <AnnouncementBanner ref={bannerRef} />
-            <main ref={mainRef}>
+            <main className={cn('pt-[var(--header-height)]')}>
                 {children}
             </main>
 

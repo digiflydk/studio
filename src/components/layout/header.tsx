@@ -44,8 +44,9 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
     ? (settings?.headerScrolledBackgroundOpacity ?? 95) / 100 
     : (settings?.headerInitialBackgroundOpacity ?? 0) / 100;
 
-  const headerStyle: React.CSSProperties = {
-    height: `${height}px`,
+  const headerStyle: React.CSSProperties & { [key: string]: any } = {
+    '--header-height': `${height}px`,
+    height: 'var(--header-height)',
     transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
   };
 
@@ -99,10 +100,10 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
         settings?.headerIsSticky !== false ? "fixed top-0" : "absolute top-0",
         isScrolled && 'shadow-md'
       )}
+      style={headerStyle}
       >
       <div 
-        className="w-full flex items-center"
-        style={headerStyle}
+        className="w-full flex items-center h-full"
       >
         <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
           <div className="flex items-center">
