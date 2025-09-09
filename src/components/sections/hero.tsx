@@ -36,9 +36,9 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
         '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '128px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '0px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
         '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '192px',
     };
     
@@ -83,7 +83,7 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
             
             <div className={cn(
                 "relative container mx-auto px-4 md:px-6 flex flex-col min-h-fit",
-                "pt-[var(--padding-top-mobile)] pb-[var(--padding-bottom-mobile)] md:pt-[var(--padding-top)] md:pb-[var(--padding-bottom)]",
+                "py-[var(--padding-top-mobile)] md:py-[var(--padding-top)] pb-[var(--padding-bottom-mobile)] md:pb-[var(--padding-bottom)]",
                 verticalAlignmentClasses[settings?.heroVerticalAlignment || 'center']
             )}>
                 <div className={cn(
@@ -173,9 +173,9 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
 
     const heroStyles: CSSProperties & { [key: string]: string } = {
          '--text-max-width': `${textMaxWidth}px`,
-        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '0px',
+        '--padding-top-mobile': sectionPadding?.topMobile !== undefined ? `${sectionPadding.topMobile}px` : '64px',
         '--padding-bottom-mobile': sectionPadding?.bottomMobile !== undefined ? `${sectionPadding.bottomMobile}px` : '48px',
-        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '0px',
+        '--padding-top': sectionPadding?.top !== undefined ? `${sectionPadding.top}px` : '128px',
         '--padding-bottom': sectionPadding?.bottom !== undefined ? `${sectionPadding.bottom}px` : '96px',
     };
 
@@ -299,3 +299,5 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         </Suspense>
     )
 }
+
+    
