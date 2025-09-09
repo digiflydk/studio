@@ -19,14 +19,12 @@ export interface Theme {
     background: HSLColor;
     accent: HSLColor;
   };
-  fontSizes: FontSizes;
 }
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   setThemeColor: (colorName: keyof Theme['colors'], hsl: HSLColor) => void;
-  setFontSize: (sizeName: keyof FontSizes, sizeInRem: number) => void;
   isLoaded: boolean;
 }
 
@@ -36,13 +34,6 @@ export const defaultTheme: Theme = {
     background: { h: 210, s: 100, l: 95 },
     accent: { h: 211, s: 100, l: 40 },
   },
-  fontSizes: {
-    h1: 4,
-    h2: 2.25,
-    h3: 1.875,
-    h4: 1.5,
-    body: 1.125,
-  },
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -51,7 +42,6 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
   const [theme, setTheme] = useState<Theme>(() => {
     return {
         colors: settings?.themeColors || defaultTheme.colors,
-        fontSizes: settings?.themeFontSizes || defaultTheme.fontSizes,
     }
   });
   const [isLoaded, setIsLoaded] = useState(false);
@@ -61,10 +51,6 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
     // Colors
     Object.entries(themeToApply.colors).forEach(([name, hsl]) => {
       root.style.setProperty(`--${name}`, `${hsl.h} ${hsl.s}% ${hsl.l}%`);
-    });
-    // Font Sizes
-    Object.entries(themeToApply.fontSizes).forEach(([name, size]) => {
-      root.style.setProperty(`--font-size-${name}`, `${size}rem`);
     });
   }, []);
 
@@ -83,12 +69,11 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
   };
   
   const setFontSize = (sizeName: keyof FontSizes, sizeInRem: number) => {
-     const newTheme = { ...theme, fontSizes: { ...theme.fontSizes, [sizeName]: sizeInRem } };
-     handleSetTheme(newTheme);
+     // This function is now a no-op as font sizes are handled by Tailwind
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, setThemeColor, setFontSize, isLoaded }}>
+    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, setThemeColor, isLoaded }}>
       {children}
     </ThemeContext.Provider>
   );

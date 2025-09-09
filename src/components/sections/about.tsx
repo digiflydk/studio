@@ -89,13 +89,13 @@ export default function AboutSection({ settings }: AboutSectionProps) {
          <div className={cn("space-y-6", alignmentClasses[alignment])}>
             <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.aboutSectionTitleColor || "text-black")}
-            style={titleStyle}
+            
             >
             {title}
             </h2>
             <p 
             className={cn("text-body whitespace-pre-wrap", settings?.aboutTextColor || "text-muted-foreground")}
-            style={textStyle}
+            
             >
             {aboutText}
             </p>
@@ -113,14 +113,14 @@ export default function AboutSection({ settings }: AboutSectionProps) {
                 <div className="flex-1">
                 <div className="flex items-center justify-between">
                     <div>
-                    <h3 className={cn("font-semibold", settings?.teamMemberNameColor)} style={teamMemberNameStyle}>{member.name}</h3>
-                    <p className={cn("text-sm", settings?.teamMemberTitleColor)} style={teamMemberTitleStyle}>{member.title}</p>
+                    <h3 className={cn("font-semibold text-h4", settings?.teamMemberNameColor)}>{member.name}</h3>
+                    <p className={cn("text-sm", settings?.teamMemberTitleColor)}>{member.title}</p>
                     </div>
                     <Link href={member.linkedinUrl} target="_blank" aria-label={`${member.name} on LinkedIn`}>
                         <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
                     </Link>
                 </div>
-                <p className={cn("mt-2 text-sm", settings?.teamMemberDescriptionColor)} style={teamMemberDescriptionStyle}>{member.description}</p>
+                <p className={cn("mt-2 text-sm", settings?.teamMemberDescriptionColor)}>{member.description}</p>
                 </div>
             </div>
             ))}

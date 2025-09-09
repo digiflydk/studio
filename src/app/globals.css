@@ -38,12 +38,6 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-
-    --font-size-h1: 4rem;
-    --font-size-h2: 2.25rem;
-    --font-size-h3: 1.875rem;
-    --font-size-h4: 1.5rem;
-    --font-size-body: 1.125rem;
   }
   .dark {
     --background: 224 71.4% 4.1%;

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, useTransition } from 'react';
@@ -34,13 +35,6 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
   const title = settings?.aiProjectSectionTitle || 'Har du en idé? Lad os validere den sammen.';
   const description = settings?.aiProjectSectionDescription || 'Vores AI-assistent er designet til at forstå din vision. Start en samtale, og lad os sammen afdække potentialet i dit projekt. Det er det første, uforpligtende skridt mod at realisere din idé.';
   const alignment = settings?.aiProjectSectionAlignment || 'left';
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: settings?.aiProjectSectionTitleSize ? `${settings.aiProjectSectionTitleSize}px` : undefined,
-  };
-  const descriptionStyle: React.CSSProperties = {
-    fontSize: settings?.aiProjectSectionDescriptionSize ? `${settings.aiProjectSectionDescriptionSize}px` : undefined,
-  };
 
   useEffect(() => {
     setMessages([{
@@ -154,17 +148,15 @@ export default function AiProjectSection({ settings }: { settings: GeneralSettin
                     {iconText}
                 </div>
                 <h2 
-                  className={cn("text-h2 font-bold tracking-tight", settings?.aiProjectSectionTitleColor || 'text-white')}
-                  style={titleStyle}
+                  className={cn("text-h2", settings?.aiProjectSectionTitleColor || 'text-white')}
                 >
                   {title}
                 </h2>
                 <p 
-                  className={cn("text-lg", settings?.aiProjectSectionDescriptionColor || 'text-gray-300', {
+                  className={cn("text-body", settings?.aiProjectSectionDescriptionColor || 'text-gray-300', {
                     'mx-auto': alignment === 'center',
                     'ml-auto': alignment === 'right'
                   })}
-                  style={descriptionStyle}
                 >
                   {description}
                 </p>

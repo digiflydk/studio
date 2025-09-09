@@ -125,32 +125,6 @@ function ColorPicker({ label, colorName }: { label: string; colorName: keyof Ret
   );
 }
 
-function FontSizeSlider({ label, sizeName }: { label: string; sizeName: keyof ReturnType<typeof useTheme>['theme']['fontSizes'] }) {
-    const { theme, setFontSize } = useTheme();
-    const sizeInRem = theme.fontSizes[sizeName];
-    const sizeInPx = Math.round(sizeInRem * 16);
-
-    const handleSliderChange = (pxValue: number) => {
-        setFontSize(sizeName, pxValue / 16);
-    }
-
-    return (
-        <div className="space-y-2">
-            <div className="flex justify-between items-center">
-                <Label>{label}</Label>
-                <span className="text-sm text-muted-foreground">{sizeInPx}px</span>
-            </div>
-            <Slider
-                value={[sizeInPx]}
-                onValueChange={([v]) => handleSliderChange(v)}
-                min={8}
-                max={sizeName === 'h1' ? 128 : 64}
-                step={1}
-            />
-        </div>
-    )
-}
-
 export default function CmsDashboardPage() {
   const { theme, isLoaded, setTheme } = useTheme();
   const [isSaving, startSaving] = useTransition();
@@ -160,7 +134,6 @@ export default function CmsDashboardPage() {
     startSaving(async () => {
         const result = await saveSettingsAction({
             themeColors: theme.colors,
-            themeFontSizes: theme.fontSizes
         });
         toast({
             title: result.success ? "Gemt!" : "Fejl!",
@@ -191,9 +164,7 @@ export default function CmsDashboardPage() {
               Gem Ændringer
             </Button>
        </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Color Settings */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Farver</CardTitle>
             <CardDescription>Juster sidens primære farver.</CardDescription>
@@ -204,22 +175,6 @@ export default function CmsDashboardPage() {
             <ColorPicker label="Accent farve" colorName="accent" />
           </CardContent>
         </Card>
-
-        {/* Font Size Settings */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle>Tekststørrelser</CardTitle>
-            <CardDescription>Juster størrelsen på overskrifter og brødtekst.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <FontSizeSlider label="Heading 1" sizeName="h1" />
-            <FontSizeSlider label="Heading 2" sizeName="h2" />
-            <FontSizeSlider label="Heading 3" sizeName="h3" />
-            <FontSizeSlider label="Heading 4" sizeName="h4" />
-            <FontSizeSlider label="Body" sizeName="body" />
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

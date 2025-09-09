@@ -1,12 +1,5 @@
 
 type HSLColor = { h: number; s: number; l: number };
-type FontSizes = {
-  h1: number;
-  h2: number;
-  h3: number;
-  h4: number;
-  body: number;
-};
 
 export interface Service {
     title: string;
@@ -116,7 +109,6 @@ export interface GeneralSettings {
         background: HSLColor;
         accent: HSLColor;
     };
-    themeFontSizes?: FontSizes;
     
     // Header Settings
     headerNavLinks?: NavLink[];

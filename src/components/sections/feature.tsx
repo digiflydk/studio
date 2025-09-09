@@ -35,18 +35,6 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
         sectionStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
     }
 
-    const headingStyle: CSSProperties = {
-        fontSize: settings?.featureSectionHeadingSizeMobile ? `${settings.featureSectionHeadingSizeMobile}px` : undefined,
-    };
-     const headingStyleDesktop: CSSProperties = {
-        fontSize: settings?.featureSectionHeadingSize ? `${settings.featureSectionHeadingSize}px` : undefined,
-    };
-    const bodyStyle: CSSProperties = {
-         fontSize: settings?.featureSectionBodySizeMobile ? `${settings.featureSectionBodySizeMobile}px` : undefined,
-    };
-    const bodyStyleDesktop: CSSProperties = {
-        fontSize: settings?.featureSectionBodySize ? `${settings.featureSectionBodySize}px` : undefined,
-    };
     const ctaStyle: CSSProperties = {
         fontSize: settings?.featureSectionCtaTextSizeMobile ? `${settings.featureSectionCtaTextSizeMobile}px` : undefined,
     };
@@ -71,26 +59,12 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
     const textContent = (
         <div className={cn('flex flex-col space-y-6', alignmentClasses[alignment])}>
             <h2
-                className={cn("text-h2 font-bold tracking-tight md:hidden", settings?.featureSectionHeadingColor)}
-                style={headingStyle}
-            >
-                {heading}
-            </h2>
-            <h2
-                className={cn("text-h2 font-bold tracking-tight hidden md:block", settings?.featureSectionHeadingColor)}
-                style={headingStyleDesktop}
+                className={cn("text-h2", settings?.featureSectionHeadingColor)}
             >
                 {heading}
             </h2>
             <p
-                className={cn("text-body md:hidden", settings?.featureSectionBodyColor || 'text-muted-foreground')}
-                style={bodyStyle}
-            >
-                {body}
-            </p>
-             <p
-                className={cn("text-body hidden md:block", settings?.featureSectionBodyColor || 'text-muted-foreground')}
-                style={bodyStyleDesktop}
+                className={cn("text-body", settings?.featureSectionBodyColor || 'text-muted-foreground')}
             >
                 {body}
             </p>

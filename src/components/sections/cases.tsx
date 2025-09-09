@@ -41,13 +41,6 @@ export default function CasesSection({ settings }: CasesSectionProps) {
   const title = settings?.casesSectionTitle || "Vores Arbejde";
   const description = settings?.casesSectionDescription || "Se eksempler på, hvordan vi har hjulpet andre virksomheder med at opnå deres mål.";
   const alignment = settings?.casesSectionAlignment || 'center';
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: settings?.casesSectionTitleSize ? `${settings.casesSectionTitleSize}px` : undefined,
-  };
-  const descriptionStyle: React.CSSProperties = {
-    fontSize: settings?.casesSectionDescriptionSize ? `${settings.casesSectionDescriptionSize}px` : undefined,
-  };
   
   const sectionPadding = settings?.sectionPadding?.cases;
   const style: React.CSSProperties & { [key: string]: string } = {
@@ -78,7 +71,6 @@ export default function CasesSection({ settings }: CasesSectionProps) {
         <div className={cn("mb-12", alignmentClasses[alignment])}>
            <h2 
             className={cn("text-h2 font-bold tracking-tight", settings?.casesSectionTitleColor || "text-black")}
-            style={titleStyle}
           >
             {title}
           </h2>
@@ -87,7 +79,6 @@ export default function CasesSection({ settings }: CasesSectionProps) {
                 'mx-auto': alignment === 'center',
                 'ml-auto': alignment === 'right',
             })}
-            style={descriptionStyle}
           >
             {description}
           </p>

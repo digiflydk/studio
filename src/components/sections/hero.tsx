@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings, SectionPadding } from '@/types/settings';
@@ -75,11 +76,11 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
                 )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("text-h1 font-bold tracking-tight", settings?.heroHeadlineColor)}
+                    className={cn("text-h1", settings?.heroHeadlineColor)}
                 >
                     {headline}
                 </h1>
-                <p className="text-body">
+                <p className={cn("text-body", settings?.heroDescriptionColor)}>
                     {description}
                 </p>
                 {settings?.heroCtaEnabled && settings?.heroCtaText && settings?.heroCtaLink && (
@@ -163,7 +164,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
             <div className="container mx-auto max-w-7xl px-4 md:px-6">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
                     <div className="flex flex-col space-y-6" style={{maxWidth: `${textMaxWidth}px`}}>
-                        <h1 className="text-h1 font-bold tracking-tight text-foreground">
+                        <h1 className="text-h1 text-foreground">
                             {headline}
                         </h1>
                         <p className="text-body text-muted-foreground">
