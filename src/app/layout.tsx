@@ -8,6 +8,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const allowIndex = settings?.allowSearchEngineIndexing !== false;
   const faviconUrl = settings?.faviconUrl;
 
+  const icons = faviconUrl
+    ? {
+        icon: [{ url: faviconUrl, rel: "icon" }, { url: "/favicon.ico", sizes: "any", rel: "icon" }],
+        shortcut: [{ url: faviconUrl, rel: "shortcut icon" }],
+        apple: [{ url: faviconUrl, rel: "apple-touch-icon" }],
+      }
+    : {
+        icon: "/favicon.ico",
+      };
+
   return {
     title: {
       default: settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering',
@@ -27,13 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
         ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
         : 'noindex,nofollow',
     },
-    icons: faviconUrl
-      ? {
-          icon: [{ url: faviconUrl, rel: "icon" }],
-          shortcut: [{ url: faviconUrl, rel: "shortcut icon" }],
-          apple: [{ url: faviconUrl, rel: "apple-touch-icon" }],
-        }
-      : undefined,
+    icons,
   };
 }
 
