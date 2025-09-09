@@ -1,4 +1,5 @@
 
+
 'use client';
 import Image from 'next/image';
 import type { GeneralSettings, SectionPadding } from '@/types/settings';
@@ -89,13 +90,13 @@ function FullWidthImageHero({ settings }: { settings: GeneralSettings | null }) 
                     horizontalAlignmentClasses[settings?.heroAlignment || 'center']
                 )} style={{maxWidth: `${textMaxWidth}px`}}>
                 <h1 
-                    className={cn("text-h1 md:hidden", settings?.heroHeadlineColor)}
+                    className={cn("text-h1 md:hidden", settings?.heroHeadlineColor || 'text-white')}
                     style={headlineStyleMobile}
                 >
                     {headline}
                 </h1>
                  <h1 
-                    className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor)}
+                    className={cn("text-h1 hidden md:block", settings?.heroHeadlineColor || 'text-white')}
                     style={headlineStyle}
                 >
                     {headline}
