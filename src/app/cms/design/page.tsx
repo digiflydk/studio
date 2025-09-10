@@ -188,7 +188,7 @@ const fontWeightOptions = [
     { label: 'Black', value: 900 },
 ];
 
-function CmsDesignContent() {
+function CmsDesignPageContent() {
   const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
@@ -422,7 +422,7 @@ export default function CmsDesignPage() {
     
     return (
         <ThemeProvider settings={settings}>
-            <CmsDesignContent />
+            <CmsDesignPageContent />
         </ThemeProvider>
     )
 }
