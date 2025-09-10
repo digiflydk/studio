@@ -45,14 +45,32 @@ export default function Template({ children }: { children: ReactNode }) {
         const bannerEl = bannerRef.current;
         if (!headerEl) return;
 
-        const headerH = headerEl.getBoundingClientRect().height ?? 0;
-        const bannerH = bannerEl?.getBoundingClientRect().height ?? 0;
-        const totalOffset = Math.max(0, headerH + bannerH);
+        const applyOffset = () => {
+            const headerH = headerEl.getBoundingClientRect().height ?? 0;
+            const bannerH = bannerEl?.getBoundingClientRect().height ?? 0;
+            const totalOffset = Math.max(0, headerH + bannerH);
 
-        const root = document.documentElement;
-        root.style.setProperty('--header-offset', `${totalOffset}px`);
-        root.style.scrollPaddingTop = `${totalOffset + 8}px`; // 8px buffer
-    }, []);
+            const root = document.documentElement;
+            root.style.setProperty('--header-offset', `${totalOffset}px`);
+            document.body.style.paddingTop = `var(--header-offset)`;
+            root.style.scrollPaddingTop = `calc(var(--header-offset) + 16px)`; // 16px buffer for anchor links
+        }
+
+        applyOffset();
+
+        const resizeObserver = new ResizeObserver(applyOffset);
+        if(headerEl) resizeObserver.observe(headerEl);
+        if(bannerEl) resizeObserver.observe(bannerEl);
+        
+        window.addEventListener('resize', applyOffset);
+        window.addEventListener('orientationchange', applyOffset);
+
+        return () => {
+            resizeObserver.disconnect();
+            window.removeEventListener('resize', applyOffset);
+            window.removeEventListener('orientationchange', applyOffset);
+        }
+    }, [settings]); // Re-run if settings change, which might affect header/banner
     
     const handleSaveConsent = (consent: ConsentCategories) => {
         const lifetime = settings?.cookies?.consentLifetimeDays ?? 180;
