@@ -46,9 +46,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
 
+    // Use default from CMS settings if available, otherwise use component default
+    const finalVariant = variant ?? 'default';
+    const finalSize = size ?? 'default';
+
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant: finalVariant, size: finalSize, className }))}
         ref={ref}
         {...props}
       />
