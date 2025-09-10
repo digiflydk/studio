@@ -225,9 +225,10 @@ function CmsDesignPageContent() {
         version: useVersion ?? version,
     };
     
-    // Safety check for destructive changes
     const diff = simpleDiff(serverSettings || {}, settingsToSave);
-    if (Object.keys(diff.removed).length > 0 && !force) {
+    const criticalKeysRemoved = ['themeColors', 'typography', 'buttonSettings'].some(key => key in diff.removed);
+
+    if (criticalKeysRemoved && !force) {
         setShowDiff(true);
         setIsSaving(false);
         return;
@@ -256,7 +257,8 @@ function CmsDesignPageContent() {
 
         window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
         
-        // This is important to sync the form state with the server state after save
+        setServerSettings(json.data);
+        
         if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
         if(json.data.typography) themeCtx.setTypography(json.data.typography);
         if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
