@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import type { GeneralSettings, NavLink } from '@/types/settings';
+import type { GeneralSettings, NavLink, HeaderCTASettings } from '@/types/settings';
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -313,6 +313,16 @@ const defaultNavLinks: NavLink[] = [
   { href: '#kontakt', label: 'Contact' },
 ];
 
+const defaultCtaSettings: HeaderCTASettings = {
+    enabled: false,
+    label: 'Get started',
+    href: '#kontakt',
+    linkType: 'internal',
+    variant: 'default',
+    size: 'default',
+}
+
+
 export default function CmsHeaderPage() {
     const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -340,6 +350,7 @@ export default function CmsHeaderPage() {
             newSettings.headerMenuIconColor = newSettings.headerMenuIconColor || 'text-foreground';
             newSettings.headerTopBorderEnabled = newSettings.headerTopBorderEnabled ?? false;
             newSettings.headerTopBorderColor = newSettings.headerTopBorderColor || { h: 211, s: 100, l: 50 };
+            newSettings.headerCtaSettings = newSettings.headerCtaSettings || defaultCtaSettings;
             
             setSettings(newSettings);
             setIsLoading(false);
@@ -349,6 +360,16 @@ export default function CmsHeaderPage() {
 
     const handleInputChange = (field: keyof GeneralSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
+    };
+    
+    const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
+        setSettings(prev => ({
+            ...prev,
+            headerCtaSettings: {
+                ...(prev.headerCtaSettings ?? defaultCtaSettings),
+                [field]: value
+            }
+        }));
     };
 
     const handleListUpdate = <T,>(listName: keyof GeneralSettings, index: number, data: T) => {
@@ -530,6 +551,69 @@ export default function CmsHeaderPage() {
                         </div>
                     </div>
                  </CardContent>
+            </Card>
+            
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle>Header Call-to-Action Button</CardTitle>
+                    <CardDescription>Configure the main CTA button in the header.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                     <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="cta-enabled" className="text-base">Enable CTA Button</Label>
+                        </div>
+                        <Switch
+                            id="cta-enabled"
+                            checked={settings.headerCtaSettings?.enabled}
+                            onCheckedChange={(value) => handleCtaChange('enabled', value)}
+                        />
+                    </div>
+                    {settings.headerCtaSettings?.enabled && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Label</Label>
+                                    <Input value={settings.headerCtaSettings.label} onChange={(e) => handleCtaChange('label', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Link Type</Label>
+                                    <Select value={settings.headerCtaSettings.linkType} onValueChange={(v: 'internal'|'external') => handleCtaChange('linkType', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="internal">Internal (anchor)</SelectItem>
+                                            <SelectItem value="external">External (URL)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Link (Href)</Label>
+                                <Input value={settings.headerCtaSettings.href} onChange={(e) => handleCtaChange('href', e.target.value)} placeholder={settings.headerCtaSettings.linkType === 'internal' ? '#section-id' : 'https://example.com'} />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Variant</Label>
+                                    <Select value={settings.headerCtaSettings.variant} onValueChange={(v) => handleCtaChange('variant', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                             {['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'].map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Size</Label>
+                                    <Select value={settings.headerCtaSettings.size} onValueChange={(v) => handleCtaChange('size', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                            {['default', 'sm', 'lg', 'icon'].map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
             </Card>
 
 

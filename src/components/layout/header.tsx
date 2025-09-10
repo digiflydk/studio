@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
+import { Menu, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import Logo from '@/components/logo';
@@ -92,6 +92,8 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
     return href;
   }
 
+  const cta = settings?.headerCtaSettings;
+
   return (
     <header 
       ref={ref}
@@ -128,6 +130,14 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
                 {link.label}
               </Link>
             ))}
+             {cta?.enabled && (
+                <Button asChild size={cta.size} variant={cta.variant}>
+                    <Link href={cta.href}>
+                        {cta.label}
+                        {cta.variant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Link>
+                </Button>
+            )}
           </nav>
 
           <div className="flex items-center md:hidden">

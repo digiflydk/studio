@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Home, ArrowUp, ArrowDown, PanelTop, PanelBottom } from "lucide-react";
+import { ChevronRight, Home, ArrowUp, ArrowDown, PanelTop, PanelBottom, RadioTower } from "lucide-react";
 import Link from "next/link";
 
 const pageSections = [
@@ -13,7 +13,7 @@ const pageSections = [
   },
    {
     name: "Header",
-    description: "Edit the site header and navigation.",
+    description: "Edit the site header, navigation and CTA button.",
     href: "/cms/pages/header",
     icon: PanelTop,
   },

@@ -19,8 +19,8 @@ export interface Case {
 
 export interface TeamMember {
     name: string;
-    title: string;
-    description:string;
+    title:string;
+    description: string;
     imageUrl: string;
     linkedinUrl: string;
     aiHint: string;
@@ -142,6 +142,15 @@ export interface ButtonSettings {
   defaultSize: ButtonSizeOption;
 }
 
+export type HeaderCTASettings = {
+  enabled: boolean;
+  label: string;
+  linkType: 'internal' | 'external';
+  href: string;
+  variant: 'primary'|'secondary'|'outline'|'destructive' | 'default' | 'ghost' | 'link' | 'pill';
+  size: 'sm'|'md'|'lg' | 'default' | 'icon';
+};
+
 
 export interface GeneralSettings {
     websiteTitle?: string;
@@ -213,7 +222,7 @@ export interface GeneralSettings {
     headerTopBorderEnabled?: boolean;
     headerTopBorderColor?: HSLColor;
     headerTopBorderHeight?: number;
-
+    headerCtaSettings?: HeaderCTASettings;
 
     // Footer Settings
     footerTagline?: string;
