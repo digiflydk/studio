@@ -1,5 +1,6 @@
+
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,9 +29,10 @@ function toPlainObject(obj: any) {
 
 
 export async function GET() {
+  const db = getAdminDb();
   const [settingsSnap, headerSnap] = await Promise.all([
-    adminDb.doc(SETTINGS_PATH).get(),
-    adminDb.doc(HEADER_PATH).get(),
+    db.doc(SETTINGS_PATH).get(),
+    db.doc(HEADER_PATH).get(),
   ]);
 
   const settings = settingsSnap.exists ? settingsSnap.data() : null;
@@ -49,8 +51,8 @@ export async function GET() {
   let lastDesignAudit: any = null;
   let lastHeaderAudit: any = null;
   try {
-    const q1 = await adminDb.collection('audit').where('type','==','designSettings').orderBy('ts','desc').limit(1).get();
-    const q2 = await adminDb.collection('audit').where('type','==','headerSettings').orderBy('ts','desc').limit(1).get();
+    const q1 = await db.collection('audit').where('type','==','designSettings').orderBy('ts','desc').limit(1).get();
+    const q2 = await db.collection('audit').where('type','==','headerSettings').orderBy('ts','desc').limit(1).get();
     lastDesignAudit = q1.empty ? null : q1.docs[0].data();
     lastHeaderAudit = q2.empty ? null : q2.docs[0].data();
   } catch { /* audit er valgfri */ }

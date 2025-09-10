@@ -1,4 +1,5 @@
-import { adminDb } from '@/lib/server/firebaseAdmin';
+
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 import { unstable_cache } from 'next/cache';
 
@@ -6,6 +7,7 @@ const PATH = 'pages/header';
 
 export const getHeaderSettings = unstable_cache(
     async (): Promise<HeaderCTASettings> => {
+        const db = getAdminDb();
         const headerDefaults: HeaderCTASettings = {
           enabled: false,
           label: 'Kom i gang',
@@ -16,7 +18,7 @@ export const getHeaderSettings = unstable_cache(
           mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
         };
         try {
-            const snap = await adminDb.doc(PATH).get();
+            const snap = await db.doc(PATH).get();
             if (snap.exists) {
                 return { ...headerDefaults, ...(snap.data() as any) };
             }

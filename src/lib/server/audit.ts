@@ -1,5 +1,5 @@
 
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 import type { AuditRecord } from '@/types/audit';
 
 function shallowDiff(a: any = {}, b: any = {}) {
@@ -7,7 +7,7 @@ function shallowDiff(a: any = {}, b: any = {}) {
   const out: Record<string, { from: any; to: any }> = {};
   for (const k of keys) {
     const av = (a as any)?.[k];
-    const bv = (b as any)?.[k];
+    const bv = (b as any)[k];
     if (JSON.stringify(av) !== JSON.stringify(bv)) {
         out[k] = { from: av, to: bv };
     }
@@ -17,6 +17,7 @@ function shallowDiff(a: any = {}, b: any = {}) {
 
 export async function logAudit<T>(record: AuditRecord<T>) {
   try {
+    const db = getAdminDb();
     // cap payload size (50KB) ved at nøjes med diff
     const afterStr = JSON.stringify(record.after ?? {});
     const size = Buffer.byteLength(afterStr, 'utf8');
@@ -39,7 +40,7 @@ export async function logAudit<T>(record: AuditRecord<T>) {
         diff,
     };
     
-    await adminDb.collection('audit').add(trimmed as any);
+    await db.collection('audit').add(trimmed as any);
   } catch(e) { 
     console.error("AUDIT_LOG_FAILED", e);
     /* no-op: audit må aldrig blokere gemning */ 

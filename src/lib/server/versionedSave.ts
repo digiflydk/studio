@@ -1,5 +1,5 @@
 
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 import { stripUndefined } from '@/lib/utils/sanitize';
 import { z } from 'zod';
 
@@ -40,12 +40,13 @@ type ErrorResponse = {
 };
 
 export async function txSaveVersioned<T>({ path, schema, data, author='studio', mergeDeep=true }: Opts<T>): Promise<SuccessResponse<T> | ErrorResponse> {
-  const ref = adminDb.doc(path);
+  const db = getAdminDb();
+  const ref = db.doc(path);
   const clean = stripUndefined(data);
   
   const parsed = schema.parse(clean);
 
-  return adminDb.runTransaction(async (tx) => {
+  return db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const now = new Date().toISOString();
     const current = snap.exists ? (snap.data() as any) : null;

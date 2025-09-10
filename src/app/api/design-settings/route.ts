@@ -1,5 +1,6 @@
+
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 
@@ -13,7 +14,8 @@ const PATH = `${SETTINGS_COLLECTION_ID}/${SETTINGS_DOC_ID}`;
 
 export async function GET() {
   try {
-    const snap = await adminDb.doc(PATH).get();
+    const db = getAdminDb();
+    const snap = await db.doc(PATH).get();
     if (!snap.exists) {
         return NextResponse.json({ ok: false, data: null, message: 'No design settings found.' }, { status: 404 });
     }

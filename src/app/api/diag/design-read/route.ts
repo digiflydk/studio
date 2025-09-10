@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-import { adminDb } from '@/lib/server/firebaseAdmin';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
 const PATH = 'settings/general';
 
 export async function GET() {
   try {
-    const snap = await adminDb.doc(PATH).get();
+    const db = getAdminDb();
+    const snap = await db.doc(PATH).get();
     return NextResponse.json({
       ok: true,
       path: PATH,

@@ -1,41 +1,43 @@
+// src/lib/server/firebaseAdmin.ts
+// Robust Firebase Admin init for Node runtime (Next.js App Router)
 
-import * as admin from 'firebase-admin';
+import { getApps, getApp, initializeApp, cert, App } from 'firebase-admin/app';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
-// This is a more robust singleton pattern for Firebase Admin initialization.
-// It ensures that initialization happens only once and that adminDb is always
-// a valid Firestore instance if no exception is thrown.
+let _app: App | null = null;
+let _db: Firestore | null = null;
 
-let adminDb: admin.firestore.Firestore;
-
-if (!admin.apps.length) {
-  try {
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-
-    // This check is critical. It throws a clear error if the environment variables are missing.
-    if (!privateKey || !clientEmail || !projectId) {
-      throw new Error('Firebase credentials are not set in the environment. Please check your .env file.');
-    }
-
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: projectId,
-        clientEmail: clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
-      }),
-    });
-    
-    console.log("Firebase Admin SDK initialized successfully.");
-
-  } catch (error: any) {
-    console.error("CRITICAL: Firebase Admin SDK initialization failed.", error);
-    // We throw the error to stop the process if initialization fails.
-    // This prevents downstream errors like "adminDb.doc is not a function".
-    throw new Error(`Firebase Admin SDK could not be initialized: ${error.message}`);
+function ensureEnv(name: string): string {
+  const v = process.env[name];
+  if (!v) {
+    throw new Error(`[firebaseAdmin] Missing env ${name}`);
   }
+  return v;
 }
 
-adminDb = admin.firestore();
+function initApp(): App {
+  if (_app) return _app;
+  const projectId = ensureEnv('FIREBASE_PROJECT_ID');
+  const clientEmail = ensureEnv('FIREBASE_CLIENT_EMAIL');
+  const privateKeyRaw = ensureEnv('FIREBASE_PRIVATE_KEY');
+  const privateKey = privateKeyRaw.replace(/\\n/g, '\n'); // important!
 
-export { adminDb };
+  _app = getApps().length
+    ? getApp()
+    : initializeApp({
+        credential: cert({ projectId, clientEmail, privateKey }),
+      });
+
+  return _app;
+}
+
+/** Preferred: get a Firestore instance when you need it */
+export function getAdminDb(): Firestore {
+  if (_db) return _db;
+  const app = initApp();
+  _db = getFirestore(app);
+  return _db;
+}
+
+/** Backwards compatible constant (be sure to import as a **named** import) */
+export const adminDb: Firestore = getAdminDb();
