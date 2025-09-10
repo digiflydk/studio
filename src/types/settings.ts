@@ -124,6 +124,9 @@ export interface CookieSettings {
     categoryMarketingBody: string;
 }
 
+export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+export type ButtonSize = 'default' | 'sm' | 'lg';
+
 
 export interface GeneralSettings {
     websiteTitle?: string;
@@ -239,8 +242,8 @@ export interface GeneralSettings {
     heroCtaEnabled?: boolean;
     heroCtaText?: string;
     heroCtaLink?: string;
-    heroCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
-    heroCtaSize?: 'default' | 'sm' | 'lg' | 'icon';
+    heroCtaVariant?: ButtonVariant;
+    heroCtaSize?: ButtonSize;
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
     heroSectionBackgroundColor?: HSLColor;
@@ -255,10 +258,11 @@ export interface GeneralSettings {
     featureSectionBodySizeMobile?: number;
     featureSectionImageUrl?: string;
     featureSectionAiHint?: string;
+    featureSectionCtaEnabled?: boolean;
     featureSectionCtaText?: string;
     featureSectionCtaLink?: string;
-    featureSectionCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
-    featureSectionCtaSize?: 'default' | 'sm' | 'lg';
+    featureSectionCtaVariant?: ButtonVariant;
+    featureSectionCtaSize?: ButtonSize;
     featureSectionCtaTextSize?: number;
     featureSectionCtaTextSizeMobile?: number;
     featureSectionBackgroundColor?: HSLColor;
@@ -280,8 +284,8 @@ export interface GeneralSettings {
     servicesCtaEnabled?: boolean;
     servicesCtaText?: string;
     servicesCtaLink?: string;
-    servicesCtaVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
-    servicesCtaSize?: 'default' | 'sm' | 'lg';
+    servicesCtaVariant?: ButtonVariant;
+    servicesCtaSize?: ButtonSize;
     servicesCtaTextSize?: number;
     servicesCtaTextSizeMobile?: number;
 

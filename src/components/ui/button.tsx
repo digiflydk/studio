@@ -30,7 +30,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "pill",
+      variant: "default",
       size: "default",
     },
   }

@@ -17,10 +17,6 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
     const body = settings?.featureSectionBody || 'Dette er en beskrivelse af den fremhævede funktion. Du kan redigere denne tekst i CMS\'et. Det er et godt sted at uddybe fordelene ved dit produkt eller din service.';
     const imageUrl = settings?.featureSectionImageUrl || 'https://picsum.photos/800/600';
     const aiHint = settings?.featureSectionAiHint || 'featured content';
-    const ctaText = settings?.featureSectionCtaText || 'Lær Mere';
-    const ctaLink = settings?.featureSectionCtaLink || '#';
-    const ctaVariant = settings?.featureSectionCtaVariant || 'default';
-    const ctaSize = settings?.featureSectionCtaSize || 'lg';
     
     const headingStyle: React.CSSProperties = {
         fontSize: settings?.featureSectionHeadingSize ? `${settings.featureSectionHeadingSize}px` : undefined,
@@ -77,30 +73,30 @@ function FeatureSectionInner({ settings }: { settings: GeneralSettings | null })
             >
                 {body}
             </p>
-            {ctaText && ctaLink && (
+            {settings?.featureSectionCtaEnabled && settings.featureSectionCtaText && settings.featureSectionCtaLink && (
                 <div className="pt-4">
                     <Button
                         asChild
-                        size={ctaSize}
-                        variant={ctaVariant}
+                        size={settings.featureSectionCtaSize || 'lg'}
+                        variant={settings.featureSectionCtaVariant || 'default'}
                         className="md:hidden"
                         style={ctaStyle}
                     >
-                        <Link href={getLinkHref(ctaLink)}>
-                            {ctaText}
-                            {ctaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        <Link href={getLinkHref(settings.featureSectionCtaLink)}>
+                            {settings.featureSectionCtaText}
+                            {settings.featureSectionCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                         </Link>
                     </Button>
                      <Button
                         asChild
-                        size={ctaSize}
-                        variant={ctaVariant}
+                        size={settings.featureSectionCtaSize || 'lg'}
+                        variant={settings.featureSectionCtaVariant || 'default'}
                         className="hidden md:inline-flex"
                         style={ctaStyleDesktop}
                     >
-                        <Link href={getLinkHref(ctaLink)}>
-                            {ctaText}
-                            {ctaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
+                        <Link href={getLinkHref(settings.featureSectionCtaLink)}>
+                            {settings.featureSectionCtaText}
+                            {settings.featureSectionCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                         </Link>
                     </Button>
                 </div>

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 const defaultServices: Service[] = [
   {
@@ -40,6 +41,7 @@ interface ServicesSectionProps {
 }
 
 export default function ServicesSection({ settings }: ServicesSectionProps) {
+  const pathname = usePathname();
   const services = settings?.services && settings.services.length > 0 ? settings.services : defaultServices;
   const title = settings?.servicesSectionTitle || "Vores Services";
   const description = settings?.servicesSectionDescription || "Vi tilbyder en bred vifte af ydelser for at accelerere jeres digitale rejse.";
@@ -61,6 +63,12 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
   const ctaStyle: React.CSSProperties = settings?.servicesCtaTextSizeMobile ? { fontSize: `${settings.servicesCtaTextSizeMobile}px` } : {};
   const ctaStyleDesktop: React.CSSProperties = settings?.servicesCtaTextSize ? { fontSize: `${settings.servicesCtaTextSize}px` } : {};
 
+  const getLinkHref = (href: string) => {
+    if (href.startsWith('#') && pathname !== '/') {
+        return `/${href}`;
+    }
+    return href;
+  };
 
   const sectionPadding = settings?.sectionPadding?.services;
 
@@ -148,8 +156,9 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                     className="md:hidden"
                     style={ctaStyle}
                 >
-                    <Link href={settings.servicesCtaLink || '#kontakt'}>
+                    <Link href={getLinkHref(settings.servicesCtaLink || '#kontakt')}>
                         {settings.servicesCtaText || 'Book et møde med os'}
+                        {settings.servicesCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Link>
                 </Button>
                 <Button
@@ -159,8 +168,9 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                     className="hidden md:inline-flex"
                     style={ctaStyleDesktop}
                 >
-                    <Link href={settings.servicesCtaLink || '#kontakt'}>
+                    <Link href={getLinkHref(settings.servicesCtaLink || '#kontakt')}>
                         {settings.servicesCtaText || 'Book et møde med os'}
+                         {settings.servicesCtaVariant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Link>
                 </Button>
             </div>
