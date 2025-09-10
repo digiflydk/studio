@@ -1,201 +1,91 @@
+
 'use client';
 
 import Link from 'next/link';
-import { Menu, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import Logo from '@/components/logo';
-import type { NavLink, GeneralSettings } from '@/types/settings';
+import { useEffect, useState, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, Suspense, forwardRef } from 'react';
-import { usePathname } from 'next/navigation';
-import HeaderCTA from '@/components/common/HeaderCTA';
+import HeaderCTA from '@/components/common/HeaderCTA'; // vores CMS-styrede CTA
+import MobileMenu from './MobileMenu';
+import Logo from '../logo';
+import type { NavLink } from '@/types/settings';
 
-const defaultNavLinks: NavLink[] = [
-  { href: '#services', label: 'Services' },
-  { href: '#cases', label: 'Cases' },
-  { href: '#om-os', label: 'Om os' },
-  { href: '#kontakt', label: 'Kontakt' },
-];
+interface HeaderProps {
+  links: NavLink[];
+  logoUrl?: string;
+  logoAlt?: string;
+}
 
-const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }>(({ settings }, ref) => {
-  const pathname = usePathname();
-  const [isScrolled, setIsScrolled] = useState(false);
-  
-  const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
-    ? settings.headerNavLinks 
-    : defaultNavLinks;
-  
-  useEffect(() => {
-    const handleScroll = () => {
-        setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+const Header = forwardRef<HTMLElement, HeaderProps>(
+  ({ links, logoUrl, logoAlt = 'Digifly' }, ref) => {
+    const [scrolled, setScrolled] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
-  const height = settings?.headerHeight || 64;
+    useEffect(() => {
+      const onScroll = () => setScrolled(window.scrollY > 8);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }, []);
 
-  const currentBgColor = isScrolled 
-    ? settings?.headerScrolledBackgroundColor 
-    : settings?.headerInitialBackgroundColor;
-
-  const currentOpacity = isScrolled 
-    ? (settings?.headerScrolledBackgroundOpacity ?? 95) / 100 
-    : (settings?.headerInitialBackgroundOpacity ?? 0) / 100;
-
-  const headerStyle: React.CSSProperties & { [key: string]: any } = {
-    '--header-height': `${height}px`,
-    height: 'var(--header-height)',
-    transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
-  };
-
-  const bottomBorderStyle: React.CSSProperties = {};
-  if (settings?.headerTopBorderEnabled && settings?.headerTopBorderColor) {
-      const { h, s, l } = settings.headerTopBorderColor;
-      bottomBorderStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
-      bottomBorderStyle.height = `1px`;
-  }
-
-  if (currentBgColor) {
-    const { h, s, l } = currentBgColor;
-    headerStyle.backgroundColor = `hsla(${h}, ${s}%, ${l}%, ${currentOpacity})`;
-  } else {
-     headerStyle.backgroundColor = 'transparent';
-  }
-  
-  const linkStyle: React.CSSProperties = {
-    fontSize: settings?.headerLinkSize ? `${settings.headerLinkSize}px` : undefined,
-  };
-
-  const navLinkClasses = cn(
-    "font-medium transition-colors",
-    settings?.headerLinkColor || "text-foreground/70",
-    `hover:${settings?.headerLinkHoverColor || 'text-foreground'}`
-  );
-  
-  const mobileNavLinkClasses = cn(
-    "text-lg font-medium transition-colors",
-    settings?.headerLinkColor || "text-foreground",
-    `hover:${settings?.headerLinkHoverColor || 'text-primary'}`
-  );
-  
-  const menuIconClasses = cn(
-    "h-6 w-6",
-    settings?.headerMenuIconColor || "text-foreground"
-  );
-  
-  const getLinkHref = (href: string) => {
-    if (href.startsWith('#') && pathname !== '/') {
-        return `/${href}`;
-    }
-    return href;
-  }
-
-  return (
-    <header 
-      ref={ref}
-      className={cn(
-        "w-full flex flex-col z-50",
-        settings?.headerIsSticky !== false ? "fixed top-0" : "absolute top-0",
-        isScrolled && 'shadow-md'
-      )}
-      style={headerStyle}
+    return (
+      <header
+        ref={ref}
+        className={cn(
+          'sticky top-0 z-50 border-b transition-colors',
+          scrolled ? 'bg-white/90 backdrop-blur border-black/10' : 'bg-white border-transparent'
+        )}
+        style={{ '--header-h': '72px' } as React.CSSProperties}
       >
-      <div 
-        className="w-full flex items-center h-full"
-      >
-        <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo 
-                logoUrl={settings?.logoUrl} 
-                logoAlt={settings?.logoAlt} 
-                width={settings?.headerLogoWidth || 96}
-                isDark={!isScrolled || (currentBgColor ? currentBgColor.l < 50 : false)}
-              />
-            </Link>
-          </div>
+        <div className="mx-auto flex h-[var(--header-h)] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Logo */}
+          <Link href="/" className="shrink-0" aria-label="Forside">
+            <Logo logoUrl={logoUrl} logoAlt={logoAlt} width={120} />
+          </Link>
 
-          <nav className="hidden md:flex md:items-center md:gap-6">
-            {navLinks.map((link) => (
-               <Link
-                  key={link.href}
-                  href={getLinkHref(link.href)}
-                  className={navLinkClasses}
-                  style={linkStyle}
+          {/* Desktop nav – kun én! */}
+          <nav
+            className="hidden md:flex items-center gap-8"
+            aria-label="Hovednavigation"
+            data-testid="header-desktop-nav"
+          >
+            {links?.map((l) => (
+              <Link
+                key={l.href + l.label}
+                href={l.href}
+                className="text-[15px] leading-none text-black/80 hover:text-black transition-colors"
               >
-                {link.label}
+                {l.label}
               </Link>
             ))}
-            <Suspense fallback={null}>
-                <HeaderCTA />
-            </Suspense>
           </nav>
 
-          <div className="flex items-center md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className={menuIconClasses} />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right">
-                  <SheetTitle className="sr-only">{settings?.logoAlt || 'Menu'}</SheetTitle>
-                  <SheetDescription className="sr-only">
-                      Hovednavigation med links til sidens sektioner.
-                  </SheetDescription>
-                <div className="flex flex-col p-6">
-                  <div className="mb-8">
-                    <Link href="/" className="flex items-center gap-2">
-                      <Logo 
-                          logoUrl={settings?.logoUrl} 
-                          logoAlt={settings?.logoAlt}
-                          width={settings?.headerLogoWidth || 96}
-                      />
-                    </Link>
-                  </div>
-                  <nav className="flex flex-col space-y-4">
-                    {navLinks.map((link) => (
-                       <Link
-                          key={link.href}
-                          href={getLinkHref(link.href)}
-                          className={mobileNavLinkClasses}
-                          style={linkStyle}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                    <div className="pt-4">
-                        <Suspense fallback={null}>
-                            <HeaderCTA />
-                        </Suspense>
-                    </div>
-                  </nav>
-                </div>
-              </SheetContent>
-            </Sheet>
+          {/* CTA (CMS-styret) – én instans */}
+          <div className="hidden md:block">
+            <HeaderCTA />
           </div>
 
+          {/* Mobile toggle */}
+          <button
+            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded border border-black/10"
+            aria-label="Åbn menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((v) => !v)}
+          >
+            <span className="sr-only">Menu</span>
+            {/* simpel hamburger */}
+            <div className="relative h-4 w-5">
+              <span className="absolute inset-x-0 top-0 block h-0.5 bg-black"></span>
+              <span className="absolute inset-x-0 top-1/2 block h-0.5 -translate-y-1/2 bg-black"></span>
+              <span className="absolute inset-x-0 bottom-0 block h-0.5 bg-black"></span>
+            </div>
+          </button>
         </div>
-      </div>
-      {settings?.headerTopBorderEnabled && (
-         <div style={bottomBorderStyle} className="w-full"></div>
-      )}
-    </header>
-  );
-});
-HeaderInner.displayName = "HeaderInner";
 
-
-const Header = forwardRef<HTMLElement, { settings: GeneralSettings | null }>(({ settings }, ref) => {
-    return (
-        <Suspense fallback={<header ref={ref} className="h-16 w-full"></header>}>
-            <HeaderInner ref={ref} settings={settings} />
-        </Suspense>
+        {/* Mobile menu – separat, så vi ikke dobbelt-renderer på desktop */}
+        <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={links} />
+      </header>
     );
-});
-Header.displayName = "Header";
-
+  }
+);
+Header.displayName = 'Header';
 export default Header;

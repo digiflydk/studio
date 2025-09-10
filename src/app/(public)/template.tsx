@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ReactNode, Suspense, useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { ReactNode, Suspense, useRef, useState, useEffect } from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Analytics from '@/components/analytics';
@@ -10,13 +10,17 @@ import AnnouncementBanner from '@/components/announcement-banner';
 import CookieBanner from '@/components/cookies/CookieBanner';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 import { getConsent, saveConsent } from '@/lib/cookie-consent';
-import type { ConsentCategories, GeneralSettings } from '@/types/settings';
+import type { ConsentCategories, GeneralSettings, NavLink } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
-import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 
+const defaultNavLinks: NavLink[] = [
+  { href: '#services', label: 'Services' },
+  { href: '#cases', label: 'Cases' },
+  { href: '#om-os', label: 'Om os' },
+  { href: '#kontakt', label: 'Kontakt' },
+];
 
 export default function Template({ children, settings }: { children: ReactNode, settings: GeneralSettings | null }) {
-    const { settings: headerSettings } = useHeaderSettings(settings?.headerCtaSettings);
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
     const [cookieConsent, setCookieConsent] = useState<ConsentCategories | null>(null);
@@ -63,10 +67,19 @@ export default function Template({ children, settings }: { children: ReactNode, 
         analytics: settings?.cookies?.defaults.analytics ?? false,
         marketing: settings?.cookies?.defaults.marketing ?? false,
     };
+    
+    const navLinks = settings?.headerNavLinks && settings.headerNavLinks.length > 0 
+    ? settings.headerNavLinks 
+    : defaultNavLinks;
 
     return (
         <>
-            <Header ref={headerRef} settings={settings} />
+            <Header 
+                ref={headerRef} 
+                links={navLinks} 
+                logoUrl={settings?.logoUrl}
+                logoAlt={settings?.logoAlt}
+            />
             <AnnouncementBanner ref={bannerRef} />
             <main className="pt-16">
                 {children}
