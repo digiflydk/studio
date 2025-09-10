@@ -32,9 +32,11 @@ export function DiffDialog({ isOpen, onOpenChange, diff, onConfirm }: DiffDialog
           <AlertDialogDescription>
             You are about to make a change that removes or resets data. This might be unintentional.
             The following top-level fields will be removed:
+          </AlertDialogDescription>
             <pre className="mt-2 text-xs bg-muted p-2 rounded-md font-mono overflow-x-auto">
                 {JSON.stringify(Object.keys(diff.removed), null, 2)}
             </pre>
+          <AlertDialogDescription>
             To proceed, type <strong className='text-foreground'>"CONFIRM"</strong> below.
           </AlertDialogDescription>
         </AlertDialogHeader>
