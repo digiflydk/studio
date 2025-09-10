@@ -15,6 +15,7 @@ import { TypographySettings, TypographyElementSettings, BodyTypographySettings, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGeneralSettings } from "@/hooks/use-general-settings";
 import { DiffDialog } from "@/components/admin/DiffDialog";
+import { ConflictDialog } from "@/components/admin/ConflictDialog";
 import { simpleDiff } from "@/lib/utils/diff";
 
 function hslToHex(h: number, s: number, l: number) {
@@ -195,17 +196,27 @@ function CmsDesignPageContent() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
+  const [version, setVersion] = useState(0);
+  const [conflict, setConflict] = useState<any>(null);
   
   const { toast } = useToast();
+  
+  useEffect(() => {
+    if(serverSettings) {
+        setVersion((serverSettings as any).version || 0);
+    }
+  }, [serverSettings]);
 
-  const handleSaveChanges = async (force = false) => {
+  const handleSaveChanges = async (force = false, useVersion?: number) => {
     setIsSaving(true);
     setShowDiff(false);
+    setConflict(null);
 
-    const settingsToSave: Partial<GeneralSettings> = {
+    const settingsToSave: Partial<GeneralSettings> & { version?: number } = {
         themeColors: themeCtx.theme.colors,
         typography: themeCtx.typography,
         buttonSettings: themeCtx.buttonSettings,
+        version: useVersion ?? version,
     };
     
     // Safety check for destructive changes
@@ -219,13 +230,20 @@ function CmsDesignPageContent() {
     try {
         const res = await fetch('/api/design-settings/save', {
             method: 'POST',
-            headers: { 'content-type': 'application/json' },
+            headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
             body: JSON.stringify(settingsToSave),
             cache: 'no-store',
         });
         
         const json = await res.json();
         
+        if (res.status === 409) {
+            setConflict({ server: json.data, serverVersion: json.version });
+            toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
+            setIsSaving(false);
+            return;
+        }
+
         if (!res.ok || !json?.ok) {
             throw new Error(json.error || 'Save failed');
         }
@@ -236,6 +254,7 @@ function CmsDesignPageContent() {
         if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
         if(json.data.typography) themeCtx.setTypography(json.data.typography);
         if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
+        if(json.data.version) setVersion(json.data.version);
 
         toast({
             title: "Saved!",
@@ -292,6 +311,20 @@ function CmsDesignPageContent() {
             onOpenChange={setShowDiff}
             diff={diff}
             onConfirm={() => handleSaveChanges(true)}
+        />
+        <ConflictDialog
+            isOpen={!!conflict}
+            onOpenChange={() => setConflict(null)}
+            onReload={(serverData, serverVersion) => {
+                if(serverData.themeColors) themeCtx.setTheme({ colors: serverData.themeColors });
+                if(serverData.typography) themeCtx.setTypography(serverData.typography);
+                if(serverData.buttonSettings) themeCtx.setButtonSettings(serverData.buttonSettings);
+                setVersion(serverVersion);
+                setConflict(null);
+            }}
+            onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
+            serverData={conflict?.server}
+            serverVersion={conflict?.serverVersion}
         />
         <div className="flex justify-between items-start">
             <div>

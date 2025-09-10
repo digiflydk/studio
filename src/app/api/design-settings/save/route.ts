@@ -1,10 +1,8 @@
 
 import { NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { adminDb } from '@/lib/server/firebaseAdmin';
 import { GeneralSettings } from '@/types/settings';
-import { deepMerge } from '@/lib/utils/deepMerge';
-import { stripUndefined } from '@/lib/utils/sanitize';
+import { txSaveVersioned } from '@/lib/server/versionedSave';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,28 +12,27 @@ const PATH = 'settings/general';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const cleanPayload = stripUndefined(body);
-
-    const ref = adminDb.doc(PATH);
-    const snap = await ref.get();
-    const currentData = snap.exists ? snap.data() : {};
-
-    const mergedData = deepMerge(currentData as GeneralSettings, cleanPayload);
-    (mergedData as any).updatedAt = new Date().toISOString();
+    const author = request.headers.get('x-user') ?? 'studio';
     
-    await ref.set(mergedData, { merge: true });
+    const res = await txSaveVersioned<Partial<GeneralSettings>>({ 
+        path: PATH, 
+        data: body,
+        author: author,
+    });
+    
+    if (!res.ok) {
+        // Returnerer 409 conflict eller anden fejlstatus
+        return NextResponse.json({ ok: false, error: res.error, data: res.current, version: res.currentVersion }, { status: res.status });
+    }
 
     revalidatePath('/', 'layout');
     revalidatePath('/cms', 'layout');
     revalidateTag('design-settings');
 
-    const updatedSnap = await ref.get();
-    const updatedData = updatedSnap.data();
-
     return NextResponse.json({ 
         ok: true, 
         message: 'Design settings saved.',
-        data: updatedData,
+        data: res.data,
     }, { headers: { 'cache-control': 'no-store' } });
 
   } catch (error: any)
