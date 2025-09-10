@@ -13,6 +13,7 @@ export const headerSettingsSchema = z.object({
     offsetX: z.number().int().min(0).optional(),
     offsetY: z.number().int().min(0).optional(),
   }),
+  version: z.number().optional(), // Add version for conflict management
 });
 
 export type HeaderSettingsInput = z.infer<typeof headerSettingsSchema>;

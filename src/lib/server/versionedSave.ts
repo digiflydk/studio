@@ -5,7 +5,7 @@ import { stripUndefined } from '@/lib/utils/sanitize';
 
 type Opts<T> = {
   path: string;
-  schema?: { parse: (v: any) => T }; // Schema is now optional
+  schema: { parse: (v: any) => T }; // Schema is now required
   data: any;
   author?: string;
   mergeDeep?: boolean; // default true
@@ -15,8 +15,7 @@ export async function txSaveVersioned<T>({ path, schema, data, author='studio', 
   const ref = adminDb.doc(path);
   const clean = stripUndefined(data);
   
-  // Only parse if a schema is provided
-  const parsed = schema ? schema.parse(clean) : clean;
+  const parsed = schema.parse(clean);
 
   return adminDb.runTransaction(async (tx) => {
     const snap = await tx.get(ref);

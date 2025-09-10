@@ -35,11 +35,22 @@ export const getGeneralSettings = unstable_cache(
                 return data;
             }
 
-            return { headerCtaSettings: headerDefaults };
+            // If doc doesn't exist, create it with a lock to prevent backfill races (DF231)
+            console.log("Settings document not found, creating with defaults and lock.");
+            const defaultData: Partial<GeneralSettings> = { 
+                headerCtaSettings: headerDefaults,
+                locked: true, // Anti-backfill lock
+            };
+            await setDoc(settingsDocRef, defaultData);
+            return defaultData as GeneralSettings;
 
         } catch (error) {
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
-            return { headerCtaSettings: headerDefaults }; // Return defaults on error to allow build to continue
+            // On error, return a minimal default object to allow build/app to continue
+            const minimalDefaults: Partial<GeneralSettings> = {
+                headerCtaSettings: headerDefaults
+            };
+            return minimalDefaults as GeneralSettings;
         }
     },
     ['design-settings'],
@@ -49,12 +60,13 @@ export const getGeneralSettings = unstable_cache(
 )
 
 
-export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<void> {
+export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<{ success: boolean, message: string }> {
     try {
         const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
         await setDoc(settingsDocRef, settings, { merge: true });
+        return { success: true, message: 'Settings saved.' };
     } catch (error) {
         console.error("Error saving general settings: ", error);
-        throw new Error("Could not save settings.");
+        return { success: false, message: 'Could not save settings.' };
     }
 }

@@ -43,5 +43,12 @@ export function useHeaderSettings(initial?: HeaderCTASettings) {
     return () => window.removeEventListener('pages:header:updated', onUpdate);
   }, [settings, fetchNow]);
 
-  return { settings, isLoading, error, refresh: fetchNow };
+  const updateSettings = useCallback((newSettings: HeaderCTASettings | undefined) => {
+      setSettings(newSettings);
+      if(newSettings) {
+        cache = newSettings;
+      }
+  }, []);
+
+  return { settings, setSettings: updateSettings, isLoading, error, refresh: fetchNow };
 }

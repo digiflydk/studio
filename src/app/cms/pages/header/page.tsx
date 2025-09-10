@@ -11,10 +11,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { getSettingsAction, saveSettingsAction } from '@/app/actions';
+import { saveSettingsAction } from '@/app/actions';
 import { Slider } from '@/components/ui/slider';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import { ConflictDialog } from '@/components/admin/ConflictDialog';
+import { getGeneralSettings } from '@/services/settings';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -165,17 +166,11 @@ function GeneralHeaderSettings({ settings, setSettings }: { settings: Partial<Ge
 }
 
 function CtaSettingsForm() {
-    const { settings: initialSettings, isLoading, refresh } = useHeaderSettings();
-    const [ctaSettings, setCtaSettings] = useState<HeaderCTASettings | undefined>(undefined);
+    const { settings: initialSettings, isLoading, refresh, setSettings } = useHeaderSettings();
+    const ctaSettings = initialSettings;
     const [isSaving, startSaving] = useTransition();
     const [conflict, setConflict] = useState<any>(null);
     const { toast } = useToast();
-
-    useEffect(() => {
-        if(initialSettings) {
-            setCtaSettings(initialSettings);
-        }
-    }, [initialSettings]);
 
     if (isLoading || !ctaSettings) {
         return (
@@ -186,11 +181,11 @@ function CtaSettingsForm() {
     }
   
     const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
-        setCtaSettings(prev => prev ? ({ ...prev, [field]: value }) : undefined);
+        setSettings(prev => prev ? ({ ...prev, [field]: value }) : undefined);
     }
 
     const handleMobileCtaChange = (field: keyof HeaderCTASettings['mobileFloating'], value: any) => {
-        setCtaSettings(prev => prev ? ({
+        setSettings(prev => prev ? ({
             ...prev,
             mobileFloating: {
                 ...(prev.mobileFloating ?? { enabled: false, position: 'br' }),
@@ -203,6 +198,7 @@ function CtaSettingsForm() {
         if (!ctaSettings) return;
 
         startSaving(async () => {
+            setConflict(null);
             const payload = {
                 ...ctaSettings,
                 version: useVersion ?? (ctaSettings as any).version,
@@ -227,10 +223,19 @@ function CtaSettingsForm() {
                  toast({ title: "Error!", description: json.error || 'Save failed', variant: 'destructive' });
                  return;
             }
+            
+            // Write-through verification (DF230)
+            const verifyRes = await fetch('/api/pages/header');
+            const verifyJson = await verifyRes.json();
+            if (JSON.stringify(verifyJson.data) !== JSON.stringify(json.data)) {
+                console.error('persist_mismatch', { sent: json.data, got: verifyJson.data });
+                toast({ title: "Save Failed (Verification Error)", description: "Server did not persist the changes correctly.", variant: "destructive" });
+            } else {
+                toast({ title: "Saved!", description: "CTA settings have been saved." });
+            }
 
-            setCtaSettings(json.data);
-            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: json.data }));
-            toast({ title: "Saved!", description: "CTA settings have been saved." });
+            setSettings(verifyJson.data); // Always use the verified data as the source of truth
+            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: verifyJson.data }));
         });
     }
 
@@ -240,7 +245,7 @@ function CtaSettingsForm() {
                 isOpen={!!conflict}
                 onOpenChange={() => setConflict(null)}
                 onReload={(serverData, serverVersion) => {
-                    setCtaSettings({ ...serverData, version: serverVersion });
+                    setSettings({ ...serverData, version: serverVersion } as HeaderCTASettings);
                     setConflict(null);
                 }}
                 onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
@@ -373,7 +378,7 @@ export default function HeaderPage(){
   useEffect(() => {
     async function loadSettings() {
       setIsLoading(true);
-      const loadedSettings = await getSettingsAction();
+      const loadedSettings = await getGeneralSettings();
       if (loadedSettings) {
         setSettings(loadedSettings);
       }
@@ -390,7 +395,6 @@ export default function HeaderPage(){
         toast({
             title: result.success ? "Saved!" : "Error!",
             description: result.message,
-            duration: 1000,
         });
         if (result.success) {
             window.dispatchEvent(new CustomEvent('design:updated', { detail: settings }));

@@ -155,10 +155,12 @@ export type HeaderCTASettings = {
     offsetX?: number; 
     offsetY?: number; 
   };
+  version?: number;
 };
 
 
 export interface GeneralSettings {
+    locked?: boolean;
     websiteTitle?: string;
     logoUrl?: string;
     logoAlt?: string;

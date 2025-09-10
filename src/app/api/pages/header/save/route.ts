@@ -30,6 +30,7 @@ export async function POST(req: Request){
     return NextResponse.json({ ok: true, data: res.data }, { headers:{'cache-control':'no-store'} });
 
   } catch (e: any) {
-     return NextResponse.json({ ok:false, error: e?.message ?? 'save_failed' }, { status: 400 });
+     // If Zod validation fails, it will throw an error which is caught here.
+     return NextResponse.json({ ok:false, error: e?.message ?? 'save_failed', issues: e.issues }, { status: 400 });
   }
 }
