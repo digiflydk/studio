@@ -14,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ThemeContextWrapper } from "@/context/ThemeContextWrapper";
 
 
 function hslToHex(h: number, s: number, l: number) {
@@ -187,7 +188,7 @@ const fontWeightOptions = [
     { label: 'Black', value: 900 },
 ];
 
-export default function CmsDashboardPage() {
+function CmsDashboardContent() {
   const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
@@ -274,7 +275,7 @@ export default function CmsDashboardPage() {
                         <div className="space-y-2">
                             <Label>Primary Font</Label>
                             <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
-                            <p className="text-xs text-muted-foreground">E.g. &quot;Inter&quot;, &quot;Roboto&quot;. Make sure the font is loaded.</p>
+                            <p className="text-xs text-muted-foreground">E.g. "Inter", "Roboto". Make sure the font is loaded.</p>
                         </div>
                         <Accordion type="multiple" className="w-full">
                             <AccordionItem value="h1">
@@ -415,3 +416,13 @@ export default function CmsDashboardPage() {
     </div>
   );
 }
+
+export default function CmsDashboardPage() {
+    return (
+        <ThemeContextWrapper>
+            <CmsDashboardContent />
+        </ThemeContextWrapper>
+    )
+}
+
+    

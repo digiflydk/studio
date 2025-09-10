@@ -4,7 +4,6 @@ import Sidebar from "@/components/cms/Sidebar";
 import { getGeneralSettings } from "@/services/settings";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import CmsTemplate from "./template";
 
 export default async function CmsLayout({
   children,
@@ -13,7 +12,6 @@ export default async function CmsLayout({
 }) {
   const settings = await getGeneralSettings();
   return (
-    <CmsTemplate>
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <Sidebar />
         <div className="flex flex-col bg-white">
@@ -25,6 +23,7 @@ export default async function CmsLayout({
           </main>
         </div>
       </div>
-    </CmsTemplate>
   );
 }
+
+    
