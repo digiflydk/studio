@@ -89,8 +89,8 @@ export async function getSettingsAction(): Promise<GeneralSettings | null> {
 export async function saveSettingsAction(settings: Partial<GeneralSettings>): Promise<{ success: boolean; message: string }> {
     try {
         await saveGeneralSettings(settings);
-        revalidatePath('/cms', 'layout');
-        revalidatePath('/', 'layout');
+        await revalidatePath('/cms', 'layout');
+        await revalidatePath('/', 'layout');
         return { success: true, message: 'Settings have been saved.' };
     } catch (error) {
         console.error(error);
@@ -129,7 +129,8 @@ export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Pr
         const newCustomer: Customer = { ...customerData, id: uuidv4() };
         const updatedCustomers = [...customers, newCustomer];
         await saveGeneralSettings({ customers: updatedCustomers });
-        revalidatePath('/cms/customers');
+        await revalidatePath('/cms/customers');
+        await revalidatePath('/');
         return { success: true, message: 'Customer added.', customers: updatedCustomers };
     } catch (error) {
         console.error(error);
@@ -143,7 +144,8 @@ export async function deleteCustomerAction(customerId: string): Promise<{ succes
         const customers = settings?.customers || [];
         const updatedCustomers = customers.filter(c => c.id !== customerId);
         await saveGeneralSettings({ customers: updatedCustomers });
-        revalidatePath('/cms/customers');
+        await revalidatePath('/cms/customers');
+        await revalidatePath('/');
         return { success: true, message: 'Customer deleted.', customers: updatedCustomers };
     } catch (error) {
         console.error(error);
@@ -160,3 +162,4 @@ export async function getCustomersAction(): Promise<Customer[]> {
         return [];
     }
 }
+
