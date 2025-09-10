@@ -20,10 +20,28 @@ const settingsNavLinks = [
     { href: "/cms/settings/cookies", label: "Cookies", icon: Cookie },
 ]
 
+const pageTitles: Record<string, string> = {
+    '/cms/dashboard': 'Dashboard',
+    '/cms/pages': 'Page Content',
+    '/cms/pages/home': 'Home Page Settings',
+    '/cms/pages/header': 'Header Settings',
+    '/cms/pages/footer': 'Footer Settings',
+    '/cms/design': 'Design Settings',
+    '/cms/leads': 'Customer Leads',
+    '/cms/customers': 'Customers',
+    '/cms/settings': 'Settings',
+    '/cms/settings/general': 'General Settings',
+    '/cms/settings/ai': 'AI Prompt Settings',
+    '/cms/settings/seo': 'SEO Settings',
+    '/cms/settings/social': 'Social Share Settings',
+    '/cms/settings/tracking': 'Tracking Settings',
+    '/cms/settings/cookies': 'Cookie Settings',
+};
+
 export default function CmsHeader({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
   const isSettingsPage = pathname.startsWith('/cms/settings');
-
+  const title = pageTitles[pathname] || 'CMS';
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -92,7 +110,7 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                 </nav>
             </SheetContent>
         </Sheet>
-        <h1 className="text-xl font-bold">Design Settings</h1>
+        <h1 className="text-xl font-semibold">{title}</h1>
         <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="outline" size="icon">
                 <Link href="/" aria-label="Go to homepage">
