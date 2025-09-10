@@ -73,7 +73,9 @@ export default async function RootLayout({
 
   return (
     <html lang="da" className="scroll-smooth">
-      {css && <style id="theme-vars">{css}</style>}
+      <head>
+        {css && <style id="theme-vars">{css}</style>}
+      </head>
       <body>
         <ThemeProvider settings={settings}>
             <DesignProvider initialDesign={settings}>
