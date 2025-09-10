@@ -6,7 +6,6 @@ import { getGeneralSettings } from '@/services/settings';
 export default async function NotFound() {
   const settings = await getGeneralSettings();
   const companyName = settings?.companyName || 'Digifly';
-  const currentYear = new Date().getFullYear();
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -33,7 +32,7 @@ export default async function NotFound() {
         </div>
       </main>
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {currentYear} {companyName}. Alle rettigheder forbeholdes.
+        © 2024 {companyName}. Alle rettigheder forbeholdes.
       </footer>
     </div>
   );

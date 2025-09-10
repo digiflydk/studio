@@ -40,39 +40,6 @@ export default function Template({ children, settings }: { children: ReactNode, 
             })
         }
     }, [settings]);
-
-
-    useLayoutEffect(() => {
-        const headerEl = headerRef.current;
-        const bannerEl = bannerRef.current;
-        if (!headerEl) return;
-
-        const applyOffset = () => {
-            const headerH = headerEl.getBoundingClientRect().height ?? 0;
-            const bannerH = bannerEl?.getBoundingClientRect().height ?? 0;
-            const totalOffset = Math.max(0, headerH + bannerH);
-
-            const root = document.documentElement;
-            root.style.setProperty('--header-offset', `${totalOffset}px`);
-            document.body.style.paddingTop = `var(--header-offset)`;
-            root.style.scrollPaddingTop = `calc(var(--header-offset) + 16px)`; // 16px buffer for anchor links
-        }
-
-        applyOffset();
-
-        const resizeObserver = new ResizeObserver(applyOffset);
-        if(headerEl) resizeObserver.observe(headerEl);
-        if(bannerEl) resizeObserver.observe(bannerEl);
-        
-        window.addEventListener('resize', applyOffset);
-        window.addEventListener('orientationchange', applyOffset);
-
-        return () => {
-            resizeObserver.disconnect();
-            window.removeEventListener('resize', applyOffset);
-            window.removeEventListener('orientationchange', applyOffset);
-        }
-    }, [settings]); // Re-run if settings change, which might affect header/banner
     
     const handleSaveConsent = (consent: ConsentCategories) => {
         const lifetime = settings?.cookies?.consentLifetimeDays ?? 180;
@@ -101,7 +68,7 @@ export default function Template({ children, settings }: { children: ReactNode, 
         <>
             <Header ref={headerRef} settings={settings} />
             <AnnouncementBanner ref={bannerRef} />
-            <main>
+            <main className="pt-16">
                 {children}
             </main>
             <Suspense fallback={null}>
