@@ -1,36 +1,42 @@
 import * as admin from 'firebase-admin';
 
+// This is a more robust singleton pattern for Firebase Admin initialization.
+// It ensures that initialization happens only once and that adminDb is always
+// a valid Firestore instance if no exception is thrown.
+
 let adminDb: admin.firestore.Firestore;
 
-if (admin.apps.length === 0) {
+if (!admin.apps.length) {
   try {
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     const projectId = process.env.FIREBASE_PROJECT_ID;
 
+    // This check is critical. It throws a clear error if the environment variables are missing.
     if (!privateKey || !clientEmail || !projectId) {
-      throw new Error('Firebase environment variables (FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID) must be set.');
+      throw new Error('Firebase credentials are not set in the environment. Please check your .env file.');
     }
-    
+
     admin.initializeApp({
       credential: admin.credential.cert({
-        clientEmail: clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
         projectId: projectId,
+        clientEmail: clientEmail,
+        // The private key must have its newlines escaped (e.g., using `\n`) when stored in an env var.
+        // The `replace` call ensures they are correctly interpreted.
+        privateKey: privateKey.replace(/\\n/g, '\n'),
       }),
     });
-
-    adminDb = admin.firestore();
     
+    console.log("Firebase Admin SDK initialized successfully.");
+
   } catch (error: any) {
-     console.error('CRITICAL: Failed to initialize Firebase Admin SDK. Ensure FIREBASE_... environment variables are set correctly.', error.message);
-     // In a real production environment, you might want to exit the process
-     // process.exit(1);
-     // For now, we will let it crash on usage to make the error visible.
-     adminDb = {} as admin.firestore.Firestore;
+    console.error("CRITICAL: Firebase Admin SDK initialization failed.", error);
+    // We throw the error to stop the process if initialization fails.
+    // This prevents downstream errors like "adminDb.doc is not a function".
+    throw new Error(`Firebase Admin SDK could not be initialized: ${error.message}`);
   }
-} else {
-  adminDb = admin.firestore();
 }
+
+adminDb = admin.firestore();
 
 export { adminDb };

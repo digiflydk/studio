@@ -1,7 +1,6 @@
 
 'use server';
-import { collection, addDoc, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 
 const LEADS_COLLECTION_ID = 'leads';
 
@@ -17,7 +16,7 @@ export interface Lead {
 
 export async function saveLead(leadData: Omit<Lead, 'id'>): Promise<string> {
     try {
-        const docRef = await addDoc(collection(db, LEADS_COLLECTION_ID), leadData);
+        const docRef = await adminDb.collection(LEADS_COLLECTION_ID).add(leadData);
         return docRef.id;
     } catch (error) {
         console.error("Error saving lead: ", error);
@@ -27,9 +26,9 @@ export async function saveLead(leadData: Omit<Lead, 'id'>): Promise<string> {
 
 export async function getAllLeads(): Promise<Lead[]> {
     try {
-        const leadsCollection = collection(db, LEADS_COLLECTION_ID);
-        const q = query(leadsCollection, orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
+        const leadsCollection = adminDb.collection(LEADS_COLLECTION_ID);
+        const q = leadsCollection.orderBy('createdAt', 'desc');
+        const querySnapshot = await q.get();
         return querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...(doc.data() as Omit<Lead, 'id'>),

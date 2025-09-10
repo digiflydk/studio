@@ -1,7 +1,6 @@
 
 'use server';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 import type { GeneralSettings, HeaderCTASettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
 import { headerDefaults } from '@/lib/cms/pages-header';
@@ -14,10 +13,10 @@ const SETTINGS_DOC_ID = 'general';
 export const getGeneralSettings = unstable_cache(
     async (): Promise<GeneralSettings | null> => {
         try {
-            const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
-            const docSnap = await getDoc(settingsDocRef);
+            const settingsDocRef = adminDb.collection(SETTINGS_COLLECTION_ID).doc(SETTINGS_DOC_ID);
+            const docSnap = await settingsDocRef.get();
 
-            if (docSnap.exists()) {
+            if (docSnap.exists) {
                 const data = docSnap.data() as GeneralSettings;
                 
                 // Ensure headerCtaSettings has defaults
@@ -41,7 +40,7 @@ export const getGeneralSettings = unstable_cache(
                 headerCtaSettings: headerDefaults,
                 locked: true, // Anti-backfill lock
             };
-            await setDoc(settingsDocRef, defaultData);
+            await settingsDocRef.set(defaultData);
             return defaultData as GeneralSettings;
 
         } catch (error) {
@@ -62,8 +61,8 @@ export const getGeneralSettings = unstable_cache(
 
 export async function saveGeneralSettings(settings: Partial<GeneralSettings>): Promise<{ success: boolean, message: string }> {
     try {
-        const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
-        await setDoc(settingsDocRef, settings, { merge: true });
+        const settingsDocRef = adminDb.collection(SETTINGS_COLLECTION_ID).doc(SETTINGS_DOC_ID);
+        await settingsDocRef.set(settings, { merge: true });
         return { success: true, message: 'Settings saved.' };
     } catch (error) {
         console.error("Error saving general settings: ", error);
