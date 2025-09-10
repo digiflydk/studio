@@ -1,3 +1,4 @@
+
 import * as admin from 'firebase-admin';
 
 // This is a more robust singleton pattern for Firebase Admin initialization.
@@ -21,8 +22,6 @@ if (!admin.apps.length) {
       credential: admin.credential.cert({
         projectId: projectId,
         clientEmail: clientEmail,
-        // The private key must have its newlines escaped (e.g., using `\n`) when stored in an env var.
-        // The `replace` call ensures they are correctly interpreted.
         privateKey: privateKey.replace(/\\n/g, '\n'),
       }),
     });

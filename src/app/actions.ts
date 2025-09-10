@@ -108,10 +108,10 @@ export async function getLeadsAction(): Promise<Lead[]> {
     }
 }
 
-export async function getLeadsForClient(): Promise<Lead[]> {
+export async function getLeadsForClient(): Promise<any[]> {
     try {
         const leads = await getAllLeads();
-        // Sikrer at 'createdAt' er en streng, som er sikker at sende til klienten
+        // Ensure 'createdAt' is a string, which is safe to send to the client
         return leads.map(lead => ({
             ...lead,
             createdAt: lead.createdAt.toISOString(),
