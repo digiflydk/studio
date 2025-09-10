@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
 import DesignProvider from '@/providers/DesignProvider';
-import { makeVarsCss } from '@/lib/ui/applyDesignVars';
+import { makeVarsCss } from '@/lib/ui/makeVarsCss';
 import { AdminToolbar } from '@/components/admin/AdminToolbar';
 import { ThemeProvider } from '@/context/ThemeContext';
 
@@ -74,7 +74,7 @@ export default async function RootLayout({
   return (
     <html lang="da" className="scroll-smooth">
       <head>
-        {css && <style id="theme-vars">{css}</style>}
+        {css && <style id="theme-vars-ssr">{css}</style>}
       </head>
       <body>
         <ThemeProvider settings={settings}>

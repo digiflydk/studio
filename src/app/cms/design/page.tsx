@@ -255,7 +255,9 @@ function CmsDesignPageContent() {
             throw new Error(json.error || 'Save failed');
         }
 
-        window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
+        window.dispatchEvent(new CustomEvent('design:updated', { 
+             detail: { buttonSettings: json.data }
+        }));
         
         setServerSettings(json.data);
         
