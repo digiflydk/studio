@@ -1,13 +1,19 @@
 
 import Link from 'next/link';
+import type { GeneralSettings } from '@/types/settings';
+import { getGeneralSettings } from '@/services/settings';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const settings = await getGeneralSettings();
+  const companyName = settings?.companyName || 'Digifly';
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 flex items-center h-16 border-b">
         <div className="container mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            Digifly
+            {companyName}
           </Link>
           <Link href="/" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2">
             Go to Homepage
@@ -27,7 +33,7 @@ export default function NotFound() {
         </div>
       </main>
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Digifly. Alle rettigheder forbeholdes.
+        © {currentYear} {companyName}. Alle rettigheder forbeholdes.
       </footer>
     </div>
   );
