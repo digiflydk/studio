@@ -12,7 +12,6 @@ import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useGeneralSettings } from "@/hooks/use-general-settings";
 
 
@@ -212,12 +211,6 @@ function CmsDesignPageContent() {
             throw new Error(json.message || 'Save failed');
         }
 
-        // Keep form in sync with server's truth
-        setTheme({ colors: json.data.themeColors || defaultTheme.colors });
-        setTypography(json.data.typography);
-        setButtonSettings(json.data.buttonSettings);
-        
-        // Dispatch event for live UI update
         window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
         
         toast({
@@ -343,105 +336,6 @@ function CmsDesignPageContent() {
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="buttons" className="border rounded-lg shadow-sm">
-                <AccordionTrigger className="px-6 py-4">
-                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">Buttons</h3>
-                        <p className="text-sm text-muted-foreground">Define the global design for buttons.</p>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-6 border-t">
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className="space-y-2">
-                            <Label>Design Type</Label>
-                             <Select value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="default">Default</SelectItem>
-                                    <SelectItem value="pill">Pill</SelectItem>
-                                </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Font</Label>
-                            <Select value={buttonSettings.fontFamily} onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Inter">Inter</SelectItem>
-                                    <SelectItem value="Manrope">Manrope</SelectItem>
-                                    <SelectItem value="System">System</SelectItem>
-                                </SelectContent>
-                            </Select>
-                          </div>
-                           <div className="space-y-2">
-                              <Label>Font Weight</Label>
-                              <Select value={String(buttonSettings.fontWeight)} onValueChange={(v) => handleButtonSettingChange('fontWeight', Number(v))}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    {fontWeightOptions.map(opt => (
-                                        <SelectItem key={opt.value} value={String(opt.value)}>{opt.label} ({opt.value})</SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                           </div>
-                        </div>
-                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                                <Label>Primary Color</Label>
-                                <Input type="color" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} className="w-full h-10"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label>Secondary Color</Label>
-                                <Input type="color" value={buttonSettings.colors.secondary} onChange={(e) => handleButtonColorChange('secondary', e.target.value)} className="w-full h-10"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label>Hover Color</Label>
-                                <Input type="color" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} className="w-full h-10"/>
-                            </div>
-                        </div>
-
-                        <div className="p-4 border rounded-lg space-y-4">
-                            <h4 className="font-semibold">Default Values</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label>Variant</Label>
-                                    <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="primary">Primary</SelectItem>
-                                            <SelectItem value="secondary">Secondary</SelectItem>
-                                            <SelectItem value="outline">Outline</SelectItem>
-                                            <SelectItem value="destructive">Destructive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Size</Label>
-                                     <Select value={buttonSettings.defaultSize} onValueChange={(v: ButtonSizeOption) => handleButtonSettingChange('defaultSize', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="sm">Small</SelectItem>
-                                            <SelectItem value="md">Medium</SelectItem>
-                                            <SelectItem value="lg">Large</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </div>
-
-                         <div>
-                            <h4 className="font-semibold mb-2">Live Preview</h4>
-                            <div className="p-6 border rounded-lg bg-background flex flex-wrap items-center justify-center gap-4">
-                                <Button variant="primary" size="lg">Primary LG</Button>
-                                <Button variant="secondary" size="md">Secondary MD</Button>
-                                <Button variant="outline" size="sm">Outline SM</Button>
-                                <Button variant="destructive" size="md">Destructive</Button>
-                            </div>
-                        </div>
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
         </Accordion>
     </div>
   );
