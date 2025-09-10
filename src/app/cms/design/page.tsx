@@ -1,6 +1,6 @@
 
 "use client";
-import { useTheme, defaultTheme } from "@/context/ThemeContext";
+import { useTheme, defaultTheme, ThemeProvider } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -14,7 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { ThemeContextWrapper } from "@/context/ThemeContextWrapper";
+import { useGeneralSettings } from "@/hooks/use-general-settings";
 
 
 function hslToHex(h: number, s: number, l: number) {
@@ -418,11 +418,11 @@ function CmsDesignContent() {
 }
 
 export default function CmsDesignPage() {
+    const settings = useGeneralSettings();
+    
     return (
-        <ThemeContextWrapper>
+        <ThemeProvider settings={settings}>
             <CmsDesignContent />
-        </ThemeContextWrapper>
+        </ThemeProvider>
     )
 }
-
-    
