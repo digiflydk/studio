@@ -1,7 +1,31 @@
 'use client';
 import { ElementType, HTMLAttributes, forwardRef } from 'react';
-import { Align, Weight, Color, alignMap, weightMap, colorMap } from './index';
 import { cn } from '@/lib/utils';
+
+export type Align = 'left' | 'center' | 'right';
+export type Weight = 'regular' | 'medium' | 'semibold' | 'bold';
+export type Color = 'default' | 'muted' | 'primary' | 'secondary';
+
+export const alignMap: Record<Align, string> = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
+};
+
+export const weightMap: Record<Weight, string> = {
+  regular: 'font-normal',
+  medium: 'font-medium',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
+};
+
+export const colorMap: Record<Color, string> = {
+  default: 'text-foreground',
+  muted: 'text-muted-foreground',
+  primary: 'text-primary',
+  secondary: 'text-secondary-foreground',
+};
+
 
 type Props = {
   as?: ElementType;

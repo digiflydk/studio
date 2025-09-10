@@ -1,6 +1,6 @@
 'use client';
 import { ElementType, HTMLAttributes, forwardRef } from 'react';
-import { Align, Weight, Color, alignMap, weightMap, colorMap } from './index';
+import { Align, Weight, Color, alignMap, weightMap, colorMap } from './H1';
 import { cn } from '@/lib/utils';
 
 type Props = {
