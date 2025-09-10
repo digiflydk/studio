@@ -3,21 +3,25 @@ import * as admin from 'firebase-admin';
 let adminDb: admin.firestore.Firestore;
 
 if (admin.apps.length === 0) {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
 
-  if (!process.env.FIREBASE_CLIENT_EMAIL || !privateKey || !process.env.FIREBASE_PROJECT_ID) {
-    console.error('Firebase admin environment variables not set. Skipping admin initialization.');
+  if (!serviceAccountBase64) {
+    console.error('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable not set. Skipping admin initialization.');
     // Mock the db to avoid crashes during build if env vars are not set
     adminDb = {} as admin.firestore.Firestore;
   } else {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-        projectId: process.env.FIREBASE_PROJECT_ID,
-      }),
-    });
-    adminDb = admin.firestore();
+    try {
+      const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('ascii');
+      const serviceAccount = JSON.parse(serviceAccountJson);
+
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      adminDb = admin.firestore();
+    } catch (error) {
+       console.error('Failed to parse Firebase service account credentials. Make sure the Base64 string is correct.', error);
+       adminDb = {} as admin.firestore.Firestore;
+    }
   }
 } else {
   adminDb = admin.firestore();
