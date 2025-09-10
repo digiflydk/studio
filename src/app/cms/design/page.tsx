@@ -336,6 +336,63 @@ function CmsDesignPageContent() {
                 </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="buttons" className="border rounded-lg shadow-sm">
+                <AccordionTrigger className="px-6 py-4">
+                    <div className="text-left">
+                        <h3 className="font-semibold text-lg">Buttons</h3>
+                        <p className="text-sm text-muted-foreground">Customize the global button styles.</p>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="p-6 border-t">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label>Button Shape</Label>
+                            <Select
+                                value={buttonSettings.designType}
+                                onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}
+                            >
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="default">Default (Slightly Rounded)</SelectItem>
+                                    <SelectItem value="pill">Pill (Very Rounded)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Font Family</Label>
+                            <Select
+                                value={buttonSettings.fontFamily}
+                                onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}
+                            >
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Inter">Inter (Default)</SelectItem>
+                                    <SelectItem value="Manrope">Manrope</SelectItem>
+                                    <SelectItem value="System">System UI</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <Label>Font Weight: {buttonSettings.fontWeight}</Label>
+                            <Slider
+                                value={[buttonSettings.fontWeight]}
+                                onValueChange={([v]) => handleButtonSettingChange('fontWeight', v)}
+                                min={300} max={800} step={100}
+                            />
+                        </div>
+
+                         <div className="space-y-2">
+                            <Label>Primary Color</Label>
+                            <Input type="text" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Hover Color</Label>
+                            <Input type="text" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} />
+                        </div>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
         </Accordion>
     </div>
   );
