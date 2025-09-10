@@ -19,13 +19,13 @@ export default async function Home() {
   const order = (settings?.homePageSectionOrder || defaultSectionOrder).filter(id => id !== 'blog');
 
   const sections: Record<string, React.ReactNode> = {
-    feature: visibility?.feature !== false && <FeatureSection settings={settings} />,
-    services: visibility?.services !== false && <ServicesSection settings={settings} />,
-    aiProject: visibility?.aiProject !== false && <AiProjectSection settings={settings} />,
-    cases: visibility?.cases !== false && <CasesSection settings={settings} />,
-    about: visibility?.about !== false && <AboutSection settings={settings} />,
-    customers: visibility?.customers !== false && <CustomersSection settings={settings} />,
-    tabs: visibility?.tabs !== false && <TabsSection settings={settings} />,
+    feature: visibility?.feature !== false ? <FeatureSection settings={settings} /> : null,
+    services: visibility?.services !== false ? <ServicesSection settings={settings} /> : null,
+    aiProject: visibility?.aiProject !== false ? <AiProjectSection settings={settings} /> : null,
+    cases: visibility?.cases !== false ? <CasesSection settings={settings} /> : null,
+    about: visibility?.about !== false ? <AboutSection settings={settings} /> : null,
+    customers: visibility?.customers !== false ? <CustomersSection settings={settings} /> : null,
+    tabs: visibility?.tabs !== false ? <TabsSection settings={settings} /> : null,
   };
   
   return (

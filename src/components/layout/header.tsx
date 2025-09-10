@@ -1,13 +1,13 @@
-
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState, forwardRef, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import HeaderCTA from '@/components/common/HeaderCTA'; // vores CMS-styrede CTA
 import MobileMenu from './MobileMenu';
 import Logo from '../logo';
 import type { NavLink } from '@/types/settings';
+import { Button } from '../ui/button';
 
 interface HeaderProps {
   links: NavLink[];
@@ -19,6 +19,14 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
   ({ links, logoUrl, logoAlt = 'Digifly' }, ref) => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      useEffect(() => {
+        const n = document.querySelectorAll('[data-role="site-header"]').length;
+        if (n > 1) console.warn(`[Header] Mounted ${n} times. Remove duplicates in layouts/pages.`);
+      }, []);
+    }
 
     useEffect(() => {
       const onScroll = () => setScrolled(window.scrollY > 8);
@@ -30,6 +38,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
     return (
       <header
         ref={ref}
+        data-role="site-header"
         className={cn(
           'sticky top-0 z-50 border-b transition-colors',
           scrolled ? 'bg-white/90 backdrop-blur border-black/10' : 'bg-white border-transparent'
