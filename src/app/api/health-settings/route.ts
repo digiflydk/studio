@@ -7,6 +7,26 @@ export const dynamic = 'force-dynamic';
 const SETTINGS_PATH = 'settings/general';
 const HEADER_PATH = 'pages/header';
 
+function toPlainObject(obj: any) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+    if (obj.toDate) { // Firestore Timestamp
+        return obj.toDate().toISOString();
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(toPlainObject);
+    }
+    const plain: { [key: string]: any } = {};
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            plain[key] = toPlainObject(obj[key]);
+        }
+    }
+    return plain;
+}
+
+
 export async function GET() {
   const [settingsSnap, headerSnap] = await Promise.all([
     adminDb.doc(SETTINGS_PATH).get(),
@@ -53,8 +73,8 @@ export async function GET() {
         header: HEADER_PATH,
     },
     lastAudit: {
-        design: lastDesignAudit?.ts ?? null,
-        header: lastHeaderAudit?.ts ?? null
+        design: lastDesignAudit ? toPlainObject(lastDesignAudit)?.ts : null,
+        header: lastHeaderAudit ? toPlainObject(lastHeaderAudit)?.ts : null
     },
   }, { headers: { 'cache-control': 'no-store' }});
 }

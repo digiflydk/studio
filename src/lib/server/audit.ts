@@ -31,7 +31,7 @@ export async function logAudit<T>(record: AuditRecord<T>) {
     const trimmed: Omit<AuditRecord, 'before' | 'after'> & { size: number; diff: Record<string, {from: any, to: any}>} = { 
         type: record.type,
         path: record.path,
-        ts: record.ts,
+        ts: new Date().toISOString(), // Ensure ts is always a string
         by: record.by,
         ua: record.ua,
         version: record.version,
