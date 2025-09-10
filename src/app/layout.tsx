@@ -12,6 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = settings?.seoTitle || 'Digifly – Konsulentydelser i AI, automatisering og digital skalering';
   const description = settings?.metaDescription || 'Vi hjælper virksomheder med digital transformation, automatisering og AI-drevne løsninger.';
 
+  const faviconUrl = settings?.faviconUrl || '/favicon.ico';
+
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -47,8 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
         : 'noindex,nofollow',
     },
     icons: {
-        icon: "/favicon.ico",
-        shortcut: "/favicon.ico",
+        icon: faviconUrl,
+        shortcut: faviconUrl,
         apple: "/apple-touch-icon.png",
     },
   };
