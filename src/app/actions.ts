@@ -3,10 +3,11 @@
 import { z } from 'zod';
 import { aiProjectQualification, type AIProjectQualificationInput, type AIProjectQualificationOutput } from '@/ai/flows/ai-project-qualification';
 import { getGeneralSettings, saveGeneralSettings } from '@/services/settings';
-import type { GeneralSettings, Customer } from '@/types/settings';
+import type { GeneralSettings, Customer, HeaderCTASettings } from '@/types/settings';
 import { revalidatePath } from 'next/cache';
 import { getAllLeads, Lead } from '@/services/leads';
 import { v4 as uuidv4 } from 'uuid';
+import { headerSettingsSchema } from '@/lib/validators/headerSettings.zod';
 
 
 export async function qualifyProjectAction(input: AIProjectQualificationInput): Promise<AIProjectQualificationOutput> {
@@ -93,6 +94,19 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
         revalidatePath('/cms', 'layout');
         return { success: true, message: 'Settings have been saved.' };
     } catch (error) {
+        console.error(error);
+        return { success: false, message: 'An error occurred during saving.' };
+    }
+}
+
+export async function saveHeaderCtaSettingsAction(settings: HeaderCTASettings): Promise<{ success: boolean; message: string }> {
+    try {
+        const validatedSettings = headerSettingsSchema.parse(settings);
+        await saveGeneralSettings({ headerCtaSettings: validatedSettings });
+        revalidatePath('/', 'layout');
+        revalidatePath('/cms', 'layout');
+        return { success: true, message: 'CTA settings have been saved.' };
+    } catch(error) {
         console.error(error);
         return { success: false, message: 'An error occurred during saving.' };
     }

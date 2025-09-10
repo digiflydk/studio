@@ -2,9 +2,9 @@
 'use server';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { GeneralSettings } from '@/types/settings';
+import type { GeneralSettings, HeaderCTASettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
-import { getHeaderSettings } from '@/lib/cms/pages-header';
+import { headerDefaults } from '@/lib/cms/pages-header';
 
 
 const SETTINGS_COLLECTION_ID = 'settings';
@@ -17,11 +17,13 @@ export const getGeneralSettings = unstable_cache(
             const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
             const docSnap = await getDoc(settingsDocRef);
 
-            // Fetch header settings and merge them in
-            const headerSettings = await getHeaderSettings();
-
             if (docSnap.exists()) {
                 const data = docSnap.data() as GeneralSettings;
+                
+                // Ensure headerCtaSettings has defaults
+                const headerCtaSettings = { ...headerDefaults, ...data.headerCtaSettings };
+                data.headerCtaSettings = headerCtaSettings;
+
                 // Backwards compatibility for old header settings
                 if (data && 'headerBackgroundColor' in data && !data.headerScrolledBackgroundColor) {
                     data.headerScrolledBackgroundColor = (data as any).headerBackgroundColor;
@@ -30,19 +32,19 @@ export const getGeneralSettings = unstable_cache(
                     data.headerScrolledBackgroundOpacity = (data as any).headerBackgroundOpacity;
                 }
                 
-                return { ...data, headerCtaSettings: headerSettings };
+                return data;
             }
 
-            return { headerCtaSettings: headerSettings };
+            return { headerCtaSettings: headerDefaults };
 
         } catch (error) {
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
-            return null; // Return null on error to allow build to continue
+            return { headerCtaSettings: headerDefaults }; // Return defaults on error to allow build to continue
         }
     },
-    ['design-settings', 'pages:header'],
+    ['design-settings'],
     {
-        tags: ['design-settings', 'pages:header'],
+        tags: ['design-settings'],
     }
 )
 

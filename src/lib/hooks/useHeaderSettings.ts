@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import type { HeaderCTASettings } from '@/types/settings';
+import { getSettingsAction } from '@/app/actions';
 
 let cache: HeaderCTASettings | undefined;
 
@@ -12,11 +13,12 @@ export function useHeaderSettings(initial?: HeaderCTASettings) {
   const fetchNow = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/pages/header', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Failed to fetch header settings');
-      const json = await res.json();
-      cache = json.data; // Update cache
-      setSettings(json.data);
+      const fullSettings = await getSettingsAction();
+      const headerSettings = fullSettings?.headerCtaSettings;
+      if (headerSettings) {
+        cache = headerSettings; // Update cache
+        setSettings(headerSettings);
+      }
     } catch (e: any) {
       setError(e);
     } finally {
@@ -29,13 +31,15 @@ export function useHeaderSettings(initial?: HeaderCTASettings) {
         fetchNow();
     }
     const onUpdate = (e: Event) => {
-        const customEvent = e as CustomEvent<HeaderCTASettings>;
-        cache = customEvent.detail; // Update cache
-        setSettings(customEvent.detail)
+        const customEvent = e as CustomEvent<{ headerCtaSettings?: HeaderCTASettings }>;
+        if (customEvent.detail.headerCtaSettings) {
+          cache = customEvent.detail.headerCtaSettings; // Update cache
+          setSettings(customEvent.detail.headerCtaSettings);
+        }
     };
     
-    window.addEventListener('pages:header:updated', onUpdate);
-    return () => window.removeEventListener('pages:header:updated', onUpdate);
+    window.addEventListener('design:updated', onUpdate);
+    return () => window.removeEventListener('design:updated', onUpdate);
   }, [settings, fetchNow]);
 
   return { settings, isLoading: loading, error, refresh: fetchNow };
