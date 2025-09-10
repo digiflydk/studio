@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -10,6 +9,7 @@ import type { NavLink, GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { useEffect, useState, Suspense, forwardRef } from 'react';
 import { usePathname } from 'next/navigation';
+import HeaderCTA from '@/components/common/HeaderCTA';
 
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
@@ -92,8 +92,6 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
     return href;
   }
 
-  const cta = settings?.headerCtaSettings;
-
   return (
     <header 
       ref={ref}
@@ -130,14 +128,9 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
                 {link.label}
               </Link>
             ))}
-             {cta?.enabled && (
-                <Button asChild size={cta.size} variant={cta.variant}>
-                    <Link href={cta.href}>
-                        {cta.label}
-                        {cta.variant === 'pill' && <ArrowRight className="ml-2 h-4 w-4" />}
-                    </Link>
-                </Button>
-            )}
+            <Suspense fallback={null}>
+                <HeaderCTA />
+            </Suspense>
           </nav>
 
           <div className="flex items-center md:hidden">
@@ -174,6 +167,11 @@ const HeaderInner = forwardRef<HTMLElement, { settings: GeneralSettings | null }
                         {link.label}
                       </Link>
                     ))}
+                    <div className="pt-4">
+                        <Suspense fallback={null}>
+                            <HeaderCTA />
+                        </Suspense>
+                    </div>
                   </nav>
                 </div>
               </SheetContent>

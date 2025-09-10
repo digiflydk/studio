@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { GeneralSettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
+import { getHeaderSettings } from '@/lib/cms/pages-header';
 
 
 const SETTINGS_COLLECTION_ID = 'settings';
@@ -15,6 +16,10 @@ export const getGeneralSettings = unstable_cache(
         try {
             const settingsDocRef = doc(db, SETTINGS_COLLECTION_ID, SETTINGS_DOC_ID);
             const docSnap = await getDoc(settingsDocRef);
+
+            // Fetch header settings and merge them in
+            const headerSettings = await getHeaderSettings();
+
             if (docSnap.exists()) {
                 const data = docSnap.data() as GeneralSettings;
                 // Backwards compatibility for old header settings
@@ -24,17 +29,20 @@ export const getGeneralSettings = unstable_cache(
                 if (data && 'headerBackgroundOpacity' in data && !data.headerScrolledBackgroundOpacity) {
                     data.headerScrolledBackgroundOpacity = (data as any).headerBackgroundOpacity;
                 }
-                return data;
+                
+                return { ...data, headerCtaSettings: headerSettings };
             }
-            return null;
+
+            return { headerCtaSettings: headerSettings };
+
         } catch (error) {
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
             return null; // Return null on error to allow build to continue
         }
     },
-    ['design-settings'],
+    ['design-settings', 'pages:header'],
     {
-        tags: ['design-settings'],
+        tags: ['design-settings', 'pages:header'],
     }
 )
 

@@ -125,9 +125,9 @@ export interface CookieSettings {
 }
 
 export type ButtonDesignType = 'default' | 'pill';
-export type ButtonVariantOption = 'primary' | 'secondary' | 'outline' | 'destructive';
+export type ButtonVariantOption = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
 export type ButtonFontOption = 'Inter' | 'Manrope' | 'System';
-export type ButtonSizeOption = 'sm' | 'md' | 'lg';
+export type ButtonSizeOption = 'default' | 'sm' | 'lg' | 'icon';
 
 export interface ButtonSettings {
   designType: ButtonDesignType;
@@ -147,8 +147,14 @@ export type HeaderCTASettings = {
   label: string;
   linkType: 'internal' | 'external';
   href: string;
-  variant: 'primary'|'secondary'|'outline'|'destructive' | 'default' | 'ghost' | 'link' | 'pill';
-  size: 'sm'|'md'|'lg' | 'default' | 'icon';
+  variant: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+  size: 'default' | 'sm' | 'lg' | 'icon';
+  mobileFloating: { 
+    enabled: boolean; 
+    position: 'br'|'bl'; 
+    offsetX?: number; 
+    offsetY?: number; 
+  };
 };
 
 

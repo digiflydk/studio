@@ -11,10 +11,12 @@ import CookieBanner from '@/components/cookies/CookieBanner';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 import { getConsent, saveConsent } from '@/lib/cookie-consent';
 import type { ConsentCategories } from '@/types/settings';
-import { Button } from '@/components/ui/button';
+import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
+import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 
 export default function Template({ children }: { children: ReactNode }) {
     const settings = useGeneralSettings();
+    const { settings: headerSettings } = useHeaderSettings(settings?.headerCtaSettings);
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
     const [cookieConsent, setCookieConsent] = useState<ConsentCategories | null>(null);
@@ -101,7 +103,9 @@ export default function Template({ children }: { children: ReactNode }) {
             <main>
                 {children}
             </main>
-
+            <Suspense fallback={null}>
+                <MobileFloatingCTA />
+            </Suspense>
             <Suspense fallback={<footer></footer>}>
                 <Footer settings={settings} onOpenCookieSettings={() => setShowSettings(true)} />
             </Suspense>
