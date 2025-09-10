@@ -4,12 +4,12 @@ import { adminDb } from '@/lib/server/firebaseAdmin';
 export const runtime='nodejs'; 
 export const dynamic='force-dynamic';
 
-const DESIGN_PATH = 'settings/general'; // Keeping this path as it is the one being used in the app
-const HEADER_PATH = 'pages/header';
+const SETTINGS_PATH = 'settings/general';
+const HEADER_PATH = 'pages/header'; // This remains separate as it is managed by a different logic path
 
 export async function GET() {
   const [settingsSnap, headerSnap] = await Promise.all([
-    adminDb.doc(DESIGN_PATH).get(),
+    adminDb.doc(SETTINGS_PATH).get(),
     adminDb.doc(HEADER_PATH).get(),
   ]);
 
@@ -49,7 +49,7 @@ export async function GET() {
       header: header?.version ?? null,
     },
     paths: {
-        settings: DESIGN_PATH,
+        settings: SETTINGS_PATH,
         header: HEADER_PATH,
     },
     lastAudit: {
