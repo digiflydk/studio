@@ -32,9 +32,3 @@ export const getHeaderSettings = unstable_cache(
         tags: ['pages:header'],
     }
 );
-
-export async function saveHeaderSettings(input: HeaderCTASettings) {
-  await adminDb.doc(PATH).set(input, { merge: true });
-  const fresh = await adminDb.doc(PATH).get();
-  return fresh.data() as HeaderCTASettings;
-}

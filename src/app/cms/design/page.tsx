@@ -13,10 +13,10 @@ import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, GeneralSettings } from "@/types/settings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGeneralSettings } from "@/hooks/use-general-settings";
 import { DiffDialog } from "@/components/admin/DiffDialog";
 import { ConflictDialog } from "@/components/admin/ConflictDialog";
 import { simpleDiff } from "@/lib/utils/diff";
+import { getGeneralSettings } from "@/services/settings";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -192,7 +192,7 @@ const defaultButtonSettings: ButtonSettings = {
 
 function CmsDesignPageContent() {
   const { isLoaded: isThemeLoaded, ...themeCtx } = useTheme();
-  const serverSettings = useGeneralSettings();
+  const [serverSettings, setServerSettings] = useState<GeneralSettings|null>(null);
   
   const [isSaving, setIsSaving] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
@@ -200,12 +200,18 @@ function CmsDesignPageContent() {
   const [conflict, setConflict] = useState<any>(null);
   
   const { toast } = useToast();
-  
+
   useEffect(() => {
-    if(serverSettings) {
-        setVersion((serverSettings as any).version || 0);
+    async function load() {
+        const s = await getGeneralSettings();
+        setServerSettings(s);
+        if (s) {
+            setVersion((s as any).version || 0);
+        }
     }
-  }, [serverSettings]);
+    load();
+  }, []);
+  
 
   const handleSaveChanges = async (force = false, useVersion?: number) => {
     setIsSaving(true);
@@ -470,7 +476,15 @@ function CmsDesignPageContent() {
 }
 
 export default function CmsDesignPage() {
-    const settings = useGeneralSettings();
+    const [settings, setSettings] = useState<GeneralSettings|null>(null);
+
+    useEffect(() => {
+        async function load() {
+            const s = await getGeneralSettings();
+            setSettings(s);
+        }
+        load();
+    }, []);
     
     return (
         <ThemeProvider settings={settings}>

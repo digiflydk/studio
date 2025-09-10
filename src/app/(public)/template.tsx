@@ -5,17 +5,17 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Analytics from '@/components/analytics';
 import { Toaster } from '@/components/ui/toaster';
-import { useGeneralSettings } from '@/hooks/use-general-settings';
 import AnnouncementBanner from '@/components/announcement-banner';
 import CookieBanner from '@/components/cookies/CookieBanner';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 import { getConsent, saveConsent } from '@/lib/cookie-consent';
-import type { ConsentCategories } from '@/types/settings';
+import type { ConsentCategories, GeneralSettings } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
+import { getGeneralSettings } from '@/services/settings';
 
 export default function Template({ children }: { children: ReactNode }) {
-    const settings = useGeneralSettings();
+    const [settings, setSettings] = useState<GeneralSettings | null>(null);
     const { settings: headerSettings } = useHeaderSettings(settings?.headerCtaSettings);
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
@@ -24,6 +24,15 @@ export default function Template({ children }: { children: ReactNode }) {
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
+      async function loadSettings() {
+        const s = await getGeneralSettings();
+        setSettings(s);
+      }
+      loadSettings();
+    }, []);
+
+    useEffect(() => {
+        if (!settings) return;
         const consent = getConsent();
         if (consent) {
             setCookieConsent(consent);
