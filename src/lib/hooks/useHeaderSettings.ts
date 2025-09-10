@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import type { HeaderCTASettings } from '@/types/settings';
+import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 
 let cache: HeaderCTASettings | undefined;
 

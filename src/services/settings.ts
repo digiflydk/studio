@@ -1,7 +1,8 @@
 
 'use server';
 import { adminDb } from '@/lib/server/firebaseAdmin';
-import type { GeneralSettings, HeaderCTASettings } from '@/types/settings';
+import type { GeneralSettings } from '@/types/settings';
+import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 import { unstable_cache } from 'next/cache';
 
 const SETTINGS_COLLECTION_ID = 'settings';

@@ -1,9 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import { headerSettingsSchema } from '@/lib/validators/headerSettings.zod';
+import { headerSettingsSchema, HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 import { revalidateTag } from 'next/cache';
 import { txSaveVersioned } from '@/lib/server/versionedSave';
-import { HeaderCTASettings } from '@/types/settings';
 import { logAudit } from '@/lib/server/audit';
 
 export const runtime='nodejs'; 

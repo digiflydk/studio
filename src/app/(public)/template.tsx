@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ReactNode, Suspense, useRef, useLayoutEffect, useState, useEffect } from 'react';
@@ -12,24 +13,15 @@ import { getConsent, saveConsent } from '@/lib/cookie-consent';
 import type { ConsentCategories, GeneralSettings } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
-import { getGeneralSettings } from '@/services/settings';
 
-export default function Template({ children }: { children: ReactNode }) {
-    const [settings, setSettings] = useState<GeneralSettings | null>(null);
+
+export default function Template({ children, settings }: { children: ReactNode, settings: GeneralSettings | null }) {
     const { settings: headerSettings } = useHeaderSettings(settings?.headerCtaSettings);
     const headerRef = useRef<HTMLElement>(null);
     const bannerRef = useRef<HTMLDivElement>(null);
     const [cookieConsent, setCookieConsent] = useState<ConsentCategories | null>(null);
     const [showBanner, setShowBanner] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-
-    useEffect(() => {
-      async function loadSettings() {
-        const s = await getGeneralSettings();
-        setSettings(s);
-      }
-      loadSettings();
-    }, []);
 
     useEffect(() => {
         if (!settings) return;

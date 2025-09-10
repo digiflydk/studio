@@ -1,5 +1,6 @@
 
 
+import type { HeaderCTASettings } from "@/lib/validators/headerSettings.zod";
 type HSLColor = { h: number; s: number; l: number };
 
 export interface Service {
@@ -141,23 +142,6 @@ export interface ButtonSettings {
   defaultVariant: ButtonVariantOption;
   defaultSize: ButtonSizeOption;
 }
-
-export type HeaderCTASettings = {
-  enabled: boolean;
-  label: string;
-  linkType: 'internal' | 'external';
-  href: string;
-  variant: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
-  size: 'default' | 'sm' | 'lg' | 'icon';
-  mobileFloating: { 
-    enabled: boolean; 
-    position: 'br'|'bl'; 
-    offsetX?: number; 
-    offsetY?: number; 
-  };
-  version?: number;
-};
-
 
 export interface GeneralSettings {
     locked?: boolean;

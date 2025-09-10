@@ -20,4 +20,4 @@ export const headerSettingsSchema = z.object({
   version: z.number().optional(),
 });
 
-export type HeaderSettingsInput = z.infer<typeof headerSettingsSchema>;
+export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;

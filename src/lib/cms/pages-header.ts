@@ -1,5 +1,5 @@
 import { adminDb } from '@/lib/server/firebaseAdmin';
-import type { HeaderCTASettings } from '@/types/settings';
+import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 import { unstable_cache } from 'next/cache';
 
 const PATH = 'pages/header';
