@@ -2,10 +2,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { getLeadsAction } from '@/app/actions';
 import { Users, BarChart as BarChartIcon } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import type { Lead } from '@/services/leads';
 
 export default function CmsDashboardPage() {
   const [totalLeads, setTotalLeads] = useState(0);
@@ -29,12 +29,20 @@ export default function CmsDashboardPage() {
 
   useEffect(() => {
     async function loadLeads() {
-      const leads = await getLeadsAction();
-      setTotalLeads(leads.length);
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      const recentLeads = leads.filter(lead => new Date(lead.createdAt) > oneMonthAgo);
-      setMonthlyLeads(recentLeads.length);
+      try {
+        const response = await fetch('/api/leads');
+        if (!response.ok) {
+            throw new Error('Failed to fetch leads');
+        }
+        const leads: Lead[] = await response.json();
+        setTotalLeads(leads.length);
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const recentLeads = leads.filter(lead => new Date(lead.createdAt) > oneMonthAgo);
+        setMonthlyLeads(recentLeads.length);
+      } catch (error) {
+        console.error("Failed to load leads:", error);
+      }
     }
     loadLeads();
   }, []);

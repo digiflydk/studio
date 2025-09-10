@@ -107,6 +107,21 @@ export async function getLeadsAction(): Promise<Lead[]> {
     }
 }
 
+export async function getLeadsForClient(): Promise<Lead[]> {
+    try {
+        const leads = await getAllLeads();
+        // Sikrer at 'createdAt' er en streng, som er sikker at sende til klienten
+        return leads.map(lead => ({
+            ...lead,
+            createdAt: lead.createdAt.toISOString(),
+        }));
+    } catch (error) {
+        console.error("Error in getLeadsForClient: ", error);
+        return [];
+    }
+}
+
+
 export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Promise<{ success: boolean; message: string; customers: Customer[] }> {
     try {
         const settings = await getGeneralSettings() || {};
