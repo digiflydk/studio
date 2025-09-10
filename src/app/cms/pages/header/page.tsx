@@ -10,8 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { getSettingsAction, saveSettingsAction, saveHeaderCtaSettingsAction } from '@/app/actions';
+import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Slider } from '@/components/ui/slider';
+import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -84,6 +85,258 @@ function HslColorPicker({
     )
 }
 
+function GeneralHeaderSettings({ settings, setSettings }: { settings: Partial<GeneralSettings>, setSettings: (s: Partial<GeneralSettings>) => void }) {
+  
+  const handleInputChange = (field: keyof GeneralSettings, value: any) => {
+    setSettings({ ...settings, [field]: value });
+  };
+  
+  const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
+    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks)];
+    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
+    handleInputChange('headerNavLinks', updatedLinks);
+  };
+
+  const addNavLink = () => {
+    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
+    handleInputChange('headerNavLinks', updatedLinks);
+  };
+
+  const removeNavLink = (index: number) => {
+    const updatedLinks = (settings.headerNavLinks || defaultNavLinks).filter((_, i) => i !== index);
+    handleInputChange('headerNavLinks', updatedLinks);
+  };
+
+  return (
+      <AccordionItem value="general" className="border rounded-lg shadow-sm">
+        <AccordionTrigger className="px-6 py-4"><h3 className="font-semibold text-lg">General Header Settings</h3></AccordionTrigger>
+        <AccordionContent className="p-6 border-t">
+            <div className="space-y-6">
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                       <Label>Logo Width</Label>
+                       <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 96}px</span>
+                   </div>
+                   <Slider 
+                       value={[settings.headerLogoWidth || 96]} 
+                       onValueChange={([v]) => handleInputChange('headerLogoWidth', v)}
+                       min={50}
+                       max={250}
+                       step={1}
+                   />
+                </div>
+                 <div className="space-y-2">
+                     <div className="flex justify-between items-center">
+                       <Label>Header Height</Label>
+                       <span className="text-sm text-muted-foreground">{settings.headerHeight || 64}px</span>
+                   </div>
+                   <Slider 
+                       value={[settings.headerHeight || 64]} 
+                       onValueChange={([v]) => handleInputChange('headerHeight', v)}
+                       min={50}
+                       max={120}
+                       step={1}
+                   />
+                </div>
+                <div className="space-y-2">
+                   <HslColorPicker
+                        label="Scrolled Background Color"
+                        color={settings.headerScrolledBackgroundColor || { h: 0, s: 0, l: 100 }}
+                        onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
+                    />
+                </div>
+                 <div className="space-y-4">
+                    <Label>Navigation Links</Label>
+                    {(settings.headerNavLinks || defaultNavLinks).map((link, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
+                            <Input value={link.label} onChange={(e) => handleNavLinkChange(index, 'label', e.target.value)} placeholder="Label" />
+                            <Input value={link.href} onChange={(e) => handleNavLinkChange(index, 'href', e.target.value)} placeholder="Href (#section or /path)" />
+                            <Button variant="ghost" size="icon" onClick={() => removeNavLink(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                        </div>
+                    ))}
+                    <Button variant="outline" onClick={addNavLink}>Add Link</Button>
+                </div>
+            </div>
+        </AccordionContent>
+    </AccordionItem>
+  )
+}
+
+function CtaSettingsForm() {
+    const { settings: initialSettings, isLoading, refresh } = useHeaderSettings();
+    const [ctaSettings, setCtaSettings] = useState<HeaderCTASettings | undefined>(undefined);
+    const [isSaving, startSaving] = useTransition();
+    const { toast } = useToast();
+
+    useEffect(() => {
+        if(initialSettings) {
+            setCtaSettings(initialSettings);
+        }
+    }, [initialSettings]);
+
+    if (isLoading || !ctaSettings) {
+        return (
+          <div className="flex justify-center items-center h-48">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        );
+    }
+  
+    const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
+        setCtaSettings(prev => prev ? ({ ...prev, [field]: value }) : undefined);
+    }
+
+    const handleMobileCtaChange = (field: keyof HeaderCTASettings['mobileFloating'], value: any) => {
+        setCtaSettings(prev => prev ? ({
+            ...prev,
+            mobileFloating: {
+                ...(prev.mobileFloating ?? { enabled: false, position: 'br' }),
+                [field]: value,
+            }
+        }) : undefined)
+    }
+
+    async function onSave(){
+        if (!ctaSettings) return;
+        startSaving(async () => {
+            const res = await fetch('/api/pages/header/save', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(ctaSettings),
+                cache: 'no-store',
+            });
+            const json = await res.json();
+            
+            if (!json.ok) {
+                 toast({ title: "Error!", description: json.error || 'Save failed', variant: 'destructive' });
+                 return;
+            }
+
+            setCtaSettings(json.data);
+            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: json.data }));
+            toast({ title: "Saved!", description: "CTA settings have been saved." });
+        });
+    }
+
+    return (
+        <AccordionItem value="cta" className="border rounded-lg shadow-sm">
+            <AccordionTrigger className="px-6 py-4 flex justify-between items-center w-full">
+                <h3 className="font-semibold text-lg text-left">Header CTA Settings</h3>
+            </AccordionTrigger>
+            <AccordionContent className="p-6 border-t">
+                 <div className="flex justify-end mb-6">
+                    <Button onClick={onSave} disabled={isSaving}>
+                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save CTA Settings
+                    </Button>
+                </div>
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="cta-enabled" className="text-base">Enable Header CTA</Label>
+                             <p className="text-sm text-muted-foreground">Show a Call-to-Action button in the header.</p>
+                        </div>
+                        <Switch
+                            id="cta-enabled"
+                            checked={ctaSettings.enabled}
+                            onCheckedChange={checked => handleCtaChange('enabled', checked)}
+                        />
+                    </div>
+
+                  {ctaSettings.enabled && (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                            <Label>Label</Label>
+                            <Input value={ctaSettings.label} onChange={e=>handleCtaChange('label',e.target.value)}/>
+                            </div>
+
+                            <div className="space-y-2">
+                            <Label>Link Type</Label>
+                            <Select value={ctaSettings.linkType} onValueChange={(v: 'internal' | 'external') => handleCtaChange('linkType', v)}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="internal">Internal (#section)</SelectItem>
+                                    <SelectItem value="external">External (URL)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            </div>
+
+                            <div className="md:col-span-2 space-y-2">
+                            <Label>Href</Label>
+                            <Input placeholder={ctaSettings.linkType==='internal'?'#section-id':'https://domain.com'}
+                                    value={ctaSettings.href} onChange={e=>handleCtaChange('href',e.target.value)}/>
+                            </div>
+
+                            <div className="space-y-2">
+                            <Label>Variant</Label>
+                            <Select value={ctaSettings.variant} onValueChange={(v: any) => handleCtaChange('variant', v)}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    {variants.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                            <Label>Size</Label>
+                            <Select value={ctaSettings.size} onValueChange={(v: any) => handleCtaChange('size', v)}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                     {sizes.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            </div>
+                        </div>
+
+                        <fieldset className="border rounded-lg p-4 space-y-4">
+                            <legend className="px-1 text-sm font-medium -ml-1">Mobile: Floating CTA</legend>
+                             <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="mobile-cta-enabled" className="text-base">Enable Mobile Floating</Label>
+                                    <p className="text-sm text-muted-foreground">Show a fixed button at the bottom on mobile screens.</p>
+                                </div>
+                                 <Switch
+                                    id="mobile-cta-enabled"
+                                    checked={ctaSettings.mobileFloating?.enabled}
+                                    onCheckedChange={checked => handleMobileCtaChange('enabled', checked)}
+                                />
+                            </div>
+
+                            {ctaSettings.mobileFloating?.enabled && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                <Label>Position</Label>
+                                 <Select value={ctaSettings.mobileFloating?.position} onValueChange={(v: any) => handleMobileCtaChange('position', v)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="br">Bottom Right</SelectItem>
+                                        <SelectItem value="bl">Bottom Left</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Offset X (px)</Label>
+                                    <Input type="number" min={0} value={ctaSettings.mobileFloating?.offsetX ?? 16}
+                                            onChange={e=>handleMobileCtaChange('offsetX', Number(e.target.value))}/>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Offset Y (px)</Label>
+                                    <Input type="number" min={0} value={ctaSettings.mobileFloating?.offsetY ?? 16}
+                                            onChange={e=>handleMobileCtaChange('offsetY', Number(e.target.value))}/>
+                                </div>
+                            </div>
+                            )}
+                        </fieldset>
+                    </div>
+                  )}
+                </div>
+            </AccordionContent>
+        </AccordionItem>
+    );
+}
+
+
 export default function HeaderPage(){
   const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -102,52 +355,11 @@ export default function HeaderPage(){
     loadSettings();
   }, []);
 
-  const handleInputChange = (field: keyof GeneralSettings, value: any) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
-  };
-  
-  const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
-      setSettings(prev => ({
-          ...prev,
-          headerCtaSettings: {
-              ...(prev.headerCtaSettings ?? {}),
-              [field]: value
-          } as HeaderCTASettings
-      }))
-  }
-
-  const handleMobileCtaChange = (field: keyof HeaderCTASettings['mobileFloating'], value: any) => {
-    setSettings(prev => ({
-        ...prev,
-        headerCtaSettings: {
-            ...(prev.headerCtaSettings as HeaderCTASettings),
-            mobileFloating: {
-                ...(prev.headerCtaSettings?.mobileFloating ?? { enabled: false, position: 'br' }),
-                [field]: value,
-            }
-        }
-    }))
-  }
-
-  const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
-    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks)];
-    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    handleInputChange('headerNavLinks', updatedLinks);
-  };
-
-  const addNavLink = () => {
-    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
-    handleInputChange('headerNavLinks', updatedLinks);
-  };
-
-  const removeNavLink = (index: number) => {
-    const updatedLinks = (settings.headerNavLinks || defaultNavLinks).filter((_, i) => i !== index);
-    handleInputChange('headerNavLinks', updatedLinks);
-  };
-
-  async function onSave(){
+  async function onSaveGeneral(){
     startSaving(async () => {
-        const result = await saveSettingsAction(settings);
+        // We only save the general settings here, CTA is separate
+        const { headerCtaSettings, ...generalSettings } = settings;
+        const result = await saveSettingsAction(generalSettings);
         toast({
             title: result.success ? "Saved!" : "Error!",
             description: result.message,
@@ -173,174 +385,18 @@ export default function HeaderPage(){
                 <h1 className="text-2xl font-bold">Header Settings</h1>
                 <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
             </div>
-            <Button onClick={onSave} disabled={isSaving}>
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-            </Button>
-      </div>
+        </div>
       <Accordion type="multiple" defaultValue={['general', 'cta']} className="w-full space-y-4">
-        <AccordionItem value="general" className="border rounded-lg shadow-sm">
-            <AccordionTrigger className="px-6 py-4"><h3 className="font-semibold text-lg">General Header Settings</h3></AccordionTrigger>
-            <AccordionContent className="p-6 border-t">
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Logo Width</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 96}px</span>
-                       </div>
-                       <Slider 
-                           value={[settings.headerLogoWidth || 96]} 
-                           onValueChange={([v]) => handleInputChange('headerLogoWidth', v)}
-                           min={50}
-                           max={250}
-                           step={1}
-                       />
-                    </div>
-                     <div className="space-y-2">
-                         <div className="flex justify-between items-center">
-                           <Label>Header Height</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerHeight || 64}px</span>
-                       </div>
-                       <Slider 
-                           value={[settings.headerHeight || 64]} 
-                           onValueChange={([v]) => handleInputChange('headerHeight', v)}
-                           min={50}
-                           max={120}
-                           step={1}
-                       />
-                    </div>
-                    <div className="space-y-2">
-                       <HslColorPicker
-                            label="Scrolled Background Color"
-                            color={settings.headerScrolledBackgroundColor || { h: 0, s: 0, l: 100 }}
-                            onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
-                        />
-                    </div>
-                </div>
-            </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="nav" className="border rounded-lg shadow-sm">
-             <AccordionTrigger className="px-6 py-4"><h3 className="font-semibold text-lg">Navigation Links</h3></AccordionTrigger>
-             <AccordionContent className="p-6 border-t">
-                <div className="space-y-4">
-                    {(settings.headerNavLinks || defaultNavLinks).map((link, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
-                            <Input value={link.label} onChange={(e) => handleNavLinkChange(index, 'label', e.target.value)} placeholder="Label" />
-                            <Input value={link.href} onChange={(e) => handleNavLinkChange(index, 'href', e.target.value)} placeholder="Href (#section or /path)" />
-                            <Button variant="ghost" size="icon" onClick={() => removeNavLink(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                        </div>
-                    ))}
-                    <Button variant="outline" onClick={addNavLink}>Add Link</Button>
-                </div>
-             </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="cta" className="border rounded-lg shadow-sm">
-            <AccordionTrigger className="px-6 py-4"><h3 className="font-semibold text-lg">Header CTA Settings</h3></AccordionTrigger>
-            <AccordionContent className="p-6 border-t">
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <Label htmlFor="cta-enabled" className="text-base">Enable Header CTA</Label>
-                             <p className="text-sm text-muted-foreground">Show a Call-to-Action button in the header.</p>
-                        </div>
-                        <Switch
-                            id="cta-enabled"
-                            checked={settings.headerCtaSettings?.enabled}
-                            onCheckedChange={checked => handleCtaChange('enabled', checked)}
-                        />
-                    </div>
-
-                  {settings.headerCtaSettings?.enabled && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                            <Label>Label</Label>
-                            <Input value={settings.headerCtaSettings?.label} onChange={e=>handleCtaChange('label',e.target.value)}/>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Link Type</Label>
-                            <Select value={settings.headerCtaSettings?.linkType} onValueChange={(v: 'internal' | 'external') => handleCtaChange('linkType', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="internal">Internal (#section)</SelectItem>
-                                    <SelectItem value="external">External (URL)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            </div>
-
-                            <div className="md:col-span-2 space-y-2">
-                            <Label>Href</Label>
-                            <Input placeholder={settings.headerCtaSettings?.linkType==='internal'?'#section-id':'https://domain.com'}
-                                    value={settings.headerCtaSettings?.href} onChange={e=>handleCtaChange('href',e.target.value)}/>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Variant</Label>
-                            <Select value={settings.headerCtaSettings?.variant} onValueChange={(v: any) => handleCtaChange('variant', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    {variants.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Size</Label>
-                            <Select value={settings.headerCtaSettings?.size} onValueChange={(v: any) => handleCtaChange('size', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                     {sizes.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            </div>
-                        </div>
-
-                        <fieldset className="border rounded-lg p-4 space-y-4">
-                            <legend className="px-1 text-sm font-medium -ml-1">Mobile: Floating CTA</legend>
-                             <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label htmlFor="mobile-cta-enabled" className="text-base">Enable Mobile Floating</Label>
-                                    <p className="text-sm text-muted-foreground">Show a fixed button at the bottom on mobile screens.</p>
-                                </div>
-                                 <Switch
-                                    id="mobile-cta-enabled"
-                                    checked={settings.headerCtaSettings?.mobileFloating?.enabled}
-                                    onCheckedChange={checked => handleMobileCtaChange('enabled', checked)}
-                                />
-                            </div>
-
-                            {settings.headerCtaSettings?.mobileFloating?.enabled && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                <Label>Position</Label>
-                                 <Select value={settings.headerCtaSettings?.mobileFloating?.position} onValueChange={(v: any) => handleMobileCtaChange('position', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="br">Bottom Right</SelectItem>
-                                        <SelectItem value="bl">Bottom Left</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Offset X (px)</Label>
-                                    <Input type="number" min={0} value={settings.headerCtaSettings?.mobileFloating?.offsetX ?? 16}
-                                            onChange={e=>handleMobileCtaChange('offsetX', Number(e.target.value))}/>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Offset Y (px)</Label>
-                                    <Input type="number" min={0} value={settings.headerCtaSettings?.mobileFloating?.offsetY ?? 16}
-                                            onChange={e=>handleMobileCtaChange('offsetY', Number(e.target.value))}/>
-                                </div>
-                            </div>
-                            )}
-                        </fieldset>
-                    </div>
-                  )}
-                </div>
-            </AccordionContent>
-        </AccordionItem>
+        <GeneralHeaderSettings settings={settings} setSettings={setSettings} />
+        <CtaSettingsForm />
       </Accordion>
+
+      <div className="flex justify-end mt-8">
+          <Button onClick={onSaveGeneral} disabled={isSaving}>
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save General Header Settings
+          </Button>
+      </div>
     </div>
   );
 }

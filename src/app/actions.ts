@@ -99,19 +99,6 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
     }
 }
 
-export async function saveHeaderCtaSettingsAction(settings: HeaderCTASettings): Promise<{ success: boolean; message: string }> {
-    try {
-        const validatedSettings = headerSettingsSchema.parse(settings);
-        await saveGeneralSettings({ headerCtaSettings: validatedSettings });
-        revalidatePath('/', 'layout');
-        revalidatePath('/cms', 'layout');
-        return { success: true, message: 'CTA settings have been saved.' };
-    } catch(error) {
-        console.error(error);
-        return { success: false, message: 'An error occurred during saving.' };
-    }
-}
-
 export async function getLeadsAction(): Promise<Lead[]> {
     try {
         return getAllLeads();
