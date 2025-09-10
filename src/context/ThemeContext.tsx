@@ -35,7 +35,6 @@ const defaultButtonSettings: ButtonSettings = {
     },
     defaultVariant: 'primary',
     defaultSize: 'md',
-    defaultTextSize: 16,
 };
 
 
@@ -109,7 +108,6 @@ function applyButtonVars(b: ButtonSettings) {
                                                 'Inter, ui-sans-serif, system-ui';
     r.setProperty('--btn-font-family', family);
     r.setProperty('--btn-font-weight', String(b.fontWeight || 600));
-    r.setProperty('--btn-text-size', `${b.defaultTextSize || 16}px`);
 
     if (b.colors?.primary)   r.setProperty('--btn-color-primary', b.colors.primary);
     if (b.colors?.secondary) r.setProperty('--btn-color-secondary', b.colors.secondary);

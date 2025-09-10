@@ -176,6 +176,18 @@ function TypographyControl({
   );
 }
 
+const fontWeightOptions = [
+    { label: 'Thin', value: 100 },
+    { label: 'Extra Light', value: 200 },
+    { label: 'Light', value: 300 },
+    { label: 'Normal', value: 400 },
+    { label: 'Medium', value: 500 },
+    { label: 'Semi Bold', value: 600 },
+    { label: 'Bold', value: 700 },
+    { label: 'Extra Bold', value: 800 },
+    { label: 'Black', value: 900 },
+];
+
 export default function CmsDashboardPage() {
   const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
   const [isSaving, startSaving] = useTransition();
@@ -292,13 +304,16 @@ export default function CmsDashboardPage() {
               <CardDescription>Definer det globale design for knapper.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label>Design Type</Label>
-                    <ToggleGroup type="single" value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => v && handleButtonSettingChange('designType', v)}>
-                        <ToggleGroupItem value="default">Default</ToggleGroupItem>
-                        <ToggleGroupItem value="pill">Pill</ToggleGroupItem>
-                    </ToggleGroup>
+                     <Select value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="default">Default</SelectItem>
+                            <SelectItem value="pill">Pill</SelectItem>
+                        </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Skrifttype</Label>
@@ -313,8 +328,14 @@ export default function CmsDashboardPage() {
                   </div>
                    <div className="space-y-2">
                       <Label>Font Weight</Label>
-                      <Slider value={[buttonSettings.fontWeight]} onValueChange={([v]) => handleButtonSettingChange('fontWeight', v)} min={300} max={900} step={100} />
-                      <span className="text-xs text-muted-foreground">{buttonSettings.fontWeight}</span>
+                      <Select value={String(buttonSettings.fontWeight)} onValueChange={(v) => handleButtonSettingChange('fontWeight', Number(v))}>
+                        <SelectTrigger><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            {fontWeightOptions.map(opt => (
+                                <SelectItem key={opt.value} value={String(opt.value)}>{opt.label} ({opt.value})</SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
                    </div>
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -334,7 +355,7 @@ export default function CmsDashboardPage() {
 
                 <div className="p-4 border rounded-lg space-y-4">
                     <h4 className="font-semibold">Standard Værdier</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label>Variant</Label>
                             <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
@@ -357,10 +378,6 @@ export default function CmsDashboardPage() {
                                     <SelectItem value="lg">Large</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-                         <div className="space-y-2">
-                            <Label>Tekststørrelse (px)</Label>
-                            <Input type="number" value={buttonSettings.defaultTextSize} onChange={(e) => handleButtonSettingChange('defaultTextSize', Number(e.target.value))}/>
                         </div>
                     </div>
                 </div>

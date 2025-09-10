@@ -140,7 +140,6 @@ export interface ButtonSettings {
   };
   defaultVariant: ButtonVariantOption;
   defaultSize: ButtonSizeOption;
-  defaultTextSize: number;
 }
 
 

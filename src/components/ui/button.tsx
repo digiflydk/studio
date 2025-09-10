@@ -18,11 +18,17 @@ const buttonVariants = cva(
         secondary: "btn--secondary",
         outline: "btn--outline",
         destructive: "btn--destructive",
+        default: "btn--primary",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        pill: "btn--primary rounded-full",
       },
       size: {
         sm: "btn--sm",
         md: "btn--md",
         lg: "btn--lg",
+        default: "btn--md",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {
@@ -36,8 +42,8 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  variant?: ButtonVariantOption;
-  size?: ButtonSizeOption;
+  variant?: ButtonVariantOption | 'default' | 'ghost' | 'link' | 'pill';
+  size?: ButtonSizeOption | 'default' | 'icon';
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
