@@ -2,16 +2,31 @@
 import { adminDb } from '@/lib/server/firebaseAdmin';
 import { deepMerge } from '@/lib/utils/deepMerge';
 import { stripUndefined } from '@/lib/utils/sanitize';
+import { z } from 'zod';
 
 type Opts<T> = {
   path: string;
-  schema: { parse: (v: any) => T }; // Schema is now required
+  schema: z.ZodType<T>; // Schema is now required
   data: any;
   author?: string;
   mergeDeep?: boolean; // default true
 };
 
-export async function txSaveVersioned<T>({ path, schema, data, author='studio', mergeDeep=true }: Opts<T>) {
+type SuccessResponse<T> = {
+    ok: true;
+    data: T & { version: number; updatedAt: string; updatedBy: string };
+    before: T | null;
+};
+
+type ErrorResponse = {
+    ok: false;
+    status: number;
+    error: string;
+    current: any;
+    currentVersion: number;
+};
+
+export async function txSaveVersioned<T>({ path, schema, data, author='studio', mergeDeep=true }: Opts<T>): Promise<SuccessResponse<T> | ErrorResponse> {
   const ref = adminDb.doc(path);
   const clean = stripUndefined(data);
   
@@ -20,23 +35,23 @@ export async function txSaveVersioned<T>({ path, schema, data, author='studio', 
   return adminDb.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const now = new Date().toISOString();
-    const current = snap.exists ? (snap.data() as any) : {};
+    const current = snap.exists ? (snap.data() as any) : null;
     const currentVersion = Number(current?.version ?? 0);
     
-    // The version from the client is in the raw 'data' object before parsing/cleaning
     const clientVersion = Number(data?.version ?? 0);
 
-    // Protect against lost updates
     if (snap.exists && clientVersion !== currentVersion) {
-      return { ok: false as const, status: 409, error: 'version_conflict', current, currentVersion };
+      return { ok: false, status: 409, error: 'version_conflict', current, currentVersion };
     }
 
-    const next = mergeDeep ? deepMerge(current, parsed) : parsed;
+    const next = mergeDeep && current ? deepMerge(current, parsed) : parsed;
+    
     (next as any).version = currentVersion + 1;
     (next as any).updatedAt = now;
     (next as any).updatedBy = author;
 
-    tx.set(ref, next, { merge: false }); // Use set with merge:false for a single source of truth
-    return { ok: true as const, data: next };
+    tx.set(ref, next, { merge: false });
+    
+    return { ok: true, data: next, before: current };
   });
 }
