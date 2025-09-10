@@ -1,428 +1,127 @@
 
-"use client";
-import { useTheme, defaultTheme } from "@/context/ThemeContext";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState, useEffect, useTransition } from "react";
-import { saveSettingsAction } from "@/app/actions";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { ThemeContextWrapper } from "@/context/ThemeContextWrapper";
+'use client';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { getLeadsAction } from '@/app/actions';
+import { BarChart, Users } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
-
-function hslToHex(h: number, s: number, l: number) {
-  l /= 100;
-  const a = (s * Math.min(l, 1 - l)) / 100;
-  const f = (n: number) => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
-      .toString(16)
-      .padStart(2, "0");
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
-}
-
-function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return null;
-
-  let r = parseInt(result[1], 16) / 255;
-  let g = parseInt(result[2], 16) / 255;
-  let b = parseInt(result[3], 16) / 255;
-
-  let max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h = 0, s = 0, l = (max + min) / 2;
-
-  if (max === min) {
-    h = s = 0; // achromatic
-  } else {
-    var d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
+export default function CmsDashboardPage() {
+  const [totalLeads, setTotalLeads] = useState(0);
+  const [monthlyLeads, setMonthlyLeads] = useState(0);
+  
+  // Dummy data for charts - replace with real data when available
+  const visitorData = [
+    { month: 'Jan', visitors: 186 },
+    { month: 'Feb', visitors: 305 },
+    { month: 'Mar', visitors: 237 },
+    { month: 'Apr', visitors: 73 },
+    { month: 'May', visitors: 209 },
+    { month: 'Jun', visitors: 214 },
+  ];
+  const chartConfig = {
+    visitors: {
+      label: "Visitors",
+      color: "hsl(var(--primary))",
+    },
   }
-
-  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-}
-
-
-function ColorPicker({ label, colorName }: { label: string; colorName: keyof ReturnType<typeof useTheme>['theme']['colors'] }) {
-  const { theme, setThemeColor } = useTheme();
-  const color = theme.colors[colorName];
-  const [hexInputValue, setHexInputValue] = useState('');
 
   useEffect(() => {
-    setHexInputValue(hslToHex(color.h, color.s, color.l));
-  }, [color]);
-
-  const handleColorChange = (part: 'h' | 's' | 'l', value: number) => {
-    setThemeColor(colorName, { ...color, [part]: value });
-  };
-  
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHexInputValue(e.target.value);
-  }
-
-  const handleHexBlur = () => {
-    const newHsl = hexToHsl(hexInputValue);
-    if(newHsl) {
-        setThemeColor(colorName, newHsl);
-    } else {
-        // If invalid hex, reset input to current valid color
-        setHexInputValue(hslToHex(color.h, color.s, color.l));
+    async function loadLeads() {
+      const leads = await getLeadsAction();
+      setTotalLeads(leads.length);
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      const recentLeads = leads.filter(lead => new Date(lead.createdAt) > oneMonthAgo);
+      setMonthlyLeads(recentLeads.length);
     }
-  }
-  
-  const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-        handleHexBlur();
-        (e.target as HTMLInputElement).blur();
-    }
-  }
-
-
-  return (
-    <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
-       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
-        <div className="flex items-center gap-2">
-            <span className="font-mono text-sm uppercase" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>HEX</span>
-            <Input 
-                value={hexInputValue}
-                onChange={handleHexChange}
-                onBlur={handleHexBlur}
-                onKeyDown={handleHexKeyPress}
-                className="w-24 font-mono"
-                style={{
-                    backgroundColor: 'hsla(0, 0%, 100%, 0.2)',
-                    color: color.l > 50 ? '#000' : '#FFF',
-                    borderColor: 'hsla(0, 0%, 100%, 0.3)'
-                }}
-            />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Hue ({color.h})</Label>
-        <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} />
-      </div>
-      <div className="space-y-2">
-        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Saturation ({color.s}%)</Label>
-        <Slider value={[color.s]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} />
-      </div>
-      <div className="space-y-2">
-        <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Lightness ({color.l}%)</Label>
-        <Slider value={[color.l]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} />
-      </div>
-    </div>
-  );
-}
-
-function TypographyControl({
-  label,
-  settings,
-  onUpdate,
-  isBody = false,
-}: {
-  label: string;
-  settings: TypographyElementSettings | BodyTypographySettings;
-  onUpdate: (data: Partial<TypographyElementSettings | BodyTypographySettings>) => void;
-  isBody?: boolean;
-}) {
-  return (
-    <div className="p-4 border rounded-lg space-y-4">
-      <h4 className="font-semibold">{label}</h4>
-      <div className="grid grid-cols-2 gap-4">
-        {!isBody && (
-          <>
-            <div className="space-y-2">
-              <Label>Size Mobile (px)</Label>
-              <Input type="number" value={(settings as TypographyElementSettings).sizeMobile} onChange={(e) => onUpdate({ sizeMobile: Number(e.target.value) })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Size Desktop (px)</Label>
-              <Input type="number" value={(settings as TypographyElementSettings).sizeDesktop} onChange={(e) => onUpdate({ sizeDesktop: Number(e.target.value) })} />
-            </div>
-          </>
-        )}
-        {isBody && (
-          <div className="space-y-2">
-            <Label>Size (px)</Label>
-            <Input type="number" value={(settings as BodyTypographySettings).size} onChange={(e) => onUpdate({ size: Number(e.target.value) })} />
-          </div>
-        )}
-        <div className="space-y-2">
-          <Label>Weight</Label>
-          <Slider value={[settings.weight]} onValueChange={([v]) => onUpdate({ weight: v })} min={300} max={900} step={100} />
-          <span className="text-xs text-muted-foreground">{settings.weight}</span>
-        </div>
-      </div>
-       <div className="space-y-2">
-          <Label>Line Height ({settings.lineHeight.toFixed(2)})</Label>
-          <Slider value={[settings.lineHeight]} onValueChange={([v]) => onUpdate({ lineHeight: v })} min={1.0} max={2.0} step={0.05} />
-        </div>
-    </div>
-  );
-}
-
-const fontWeightOptions = [
-    { label: 'Thin', value: 100 },
-    { label: 'Extra Light', value: 200 },
-    { label: 'Light', value: 300 },
-    { label: 'Normal', value: 400 },
-    { label: 'Medium', value: 500 },
-    { label: 'Semi Bold', value: 600 },
-    { label: 'Bold', value: 700 },
-    { label: 'Extra Bold', value: 800 },
-    { label: 'Black', value: 900 },
-];
-
-function CmsDashboardContent() {
-  const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
-  const [isSaving, startSaving] = useTransition();
-  const { toast } = useToast();
-
-  const handleSaveChanges = () => {
-    startSaving(async () => {
-        const result = await saveSettingsAction({
-            themeColors: theme.colors,
-            typography: typography,
-            buttonSettings: buttonSettings,
-        });
-        toast({
-            title: result.success ? "Saved!" : "Error!",
-            description: result.message,
-            variant: result.success ? "default" : "destructive",
-        });
-    });
-  }
-
-  const handleReset = () => {
-      // Note: This only resets theme colors for now.
-      // Typography and buttons could be added.
-      setTheme(defaultTheme);
-  }
-
-  const handleButtonSettingChange = <K extends keyof ButtonSettings>(field: K, value: ButtonSettings[K]) => {
-    setButtonSettings({ ...buttonSettings, [field]: value });
-  };
-
-  const handleButtonColorChange = <K extends keyof ButtonSettings['colors']>(field: K, value: string) => {
-    setButtonSettings({ ...buttonSettings, colors: { ...buttonSettings.colors, [field]: value } });
-  }
-
-  if (!isLoaded) {
-      return (
-        <div className="flex justify-center items-center h-full">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      );
-  }
+    loadLeads();
+  }, []);
 
   return (
     <div className="space-y-8">
-        <div className="flex justify-between items-start">
-            <div>
-                <h1 className="text-2xl font-bold">Design Settings</h1>
-                <p className="text-muted-foreground">Manage the visual appearance of your site.</p>
+      <div>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">Welcome back! Here's a quick overview of your site.</p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Visitors</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12,234</div>
+            <p className="text-xs text-muted-foreground">+15.2% from last month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">New Leads (All Time)</CardTitle>
+            <BarChart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+{totalLeads}</div>
+            <p className="text-xs text-muted-foreground">{monthlyLeads} in the last 30 days</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2.1%</div>
+            <p className="text-xs text-muted-foreground">+1.1% from last month</p>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">AI Interactions</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">573</div>
+            <p className="text-xs text-muted-foreground">+201 since last month</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Visitor Overview</CardTitle>
+          <CardDescription>A chart showing visitor traffic for the last 6 months.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="h-[300px] w-full">
+               <ChartContainer config={chartConfig} className="w-full h-full">
+                  <ResponsiveContainer>
+                    <BarChart data={visitorData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                      />
+                      <YAxis 
+                         tickLine={false}
+                         axisLine={false}
+                         tickMargin={8}
+                      />
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent />}
+                      />
+                      <Bar dataKey="visitors" fill="var(--color-visitors)" radius={4} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
             </div>
-            <div className="flex gap-4">
-                <Button variant="outline" onClick={handleReset} disabled={isSaving}>Reset</Button>
-                <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
-            </div>
-       </div>
-
-        <Accordion type="multiple" className="w-full space-y-4" defaultValue={['colors']}>
-            <AccordionItem value="colors" className="border rounded-lg shadow-sm">
-                <AccordionTrigger className="px-6 py-4">
-                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">Colors</h3>
-                        <p className="text-sm text-muted-foreground">Adjust the primary colors of your site.</p>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-6 border-t">
-                    <div className="space-y-6">
-                        <ColorPicker label="Primary Color" colorName="primary" />
-                        <ColorPicker label="Background Color" colorName="background" />
-                        <ColorPicker label="Accent Color" colorName="accent" />
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="typography" className="border rounded-lg shadow-sm">
-                 <AccordionTrigger className="px-6 py-4">
-                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">Typography</h3>
-                        <p className="text-sm text-muted-foreground">Adjust the fonts, sizes, and weights for your site.</p>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-6 border-t">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Primary Font</Label>
-                            <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
-                            <p className="text-xs text-muted-foreground">E.g. "Inter", "Roboto". Make sure the font is loaded.</p>
-                        </div>
-                        <Accordion type="multiple" className="w-full">
-                            <AccordionItem value="h1">
-                                <AccordionTrigger>H1</AccordionTrigger>
-                                <AccordionContent>
-                                   <TypographyControl label="H1" settings={typography.h1} onUpdate={(data) => setTypography({ ...typography, h1: { ...typography.h1, ...data } })} />
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="h2">
-                                <AccordionTrigger>H2</AccordionTrigger>
-                                <AccordionContent>
-                                   <TypographyControl label="H2" settings={typography.h2} onUpdate={(data) => setTypography({ ...typography, h2: { ...typography.h2, ...data } })} />
-                                </AccordionContent>
-                            </AccordionItem>
-                             <AccordionItem value="h3">
-                                <AccordionTrigger>H3</AccordionTrigger>
-                                <AccordionContent>
-                                   <TypographyControl label="H3" settings={typography.h3} onUpdate={(data) => setTypography({ ...typography, h3: { ...typography.h3, ...data } })} />
-                                </AccordionContent>
-                            </AccordionItem>
-                             <AccordionItem value="h4">
-                                <AccordionTrigger>H4</AccordionTrigger>
-                                <AccordionContent>
-                                   <TypographyControl label="H4" settings={typography.h4} onUpdate={(data) => setTypography({ ...typography, h4: { ...typography.h4, ...data } })} />
-                                </AccordionContent>
-                            </AccordionItem>
-                             <AccordionItem value="body">
-                                <AccordionTrigger>Body</AccordionTrigger>
-                                <AccordionContent>
-                                   <TypographyControl label="Body" settings={typography.body} onUpdate={(data) => setTypography({ ...typography, body: { ...typography.body, ...data } })} isBody />
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="buttons" className="border rounded-lg shadow-sm">
-                <AccordionTrigger className="px-6 py-4">
-                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">Buttons</h3>
-                        <p className="text-sm text-muted-foreground">Define the global design for buttons.</p>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-6 border-t">
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className="space-y-2">
-                            <Label>Design Type</Label>
-                             <Select value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="default">Default</SelectItem>
-                                    <SelectItem value="pill">Pill</SelectItem>
-                                </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Font</Label>
-                            <Select value={buttonSettings.fontFamily} onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Inter">Inter</SelectItem>
-                                    <SelectItem value="Manrope">Manrope</SelectItem>
-                                    <SelectItem value="System">System</SelectItem>
-                                </SelectContent>
-                            </Select>
-                          </div>
-                           <div className="space-y-2">
-                              <Label>Font Weight</Label>
-                              <Select value={String(buttonSettings.fontWeight)} onValueChange={(v) => handleButtonSettingChange('fontWeight', Number(v))}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    {fontWeightOptions.map(opt => (
-                                        <SelectItem key={opt.value} value={String(opt.value)}>{opt.label} ({opt.value})</SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                           </div>
-                        </div>
-                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                                <Label>Primary Color</Label>
-                                <Input type="color" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} className="w-full h-10"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label>Secondary Color</Label>
-                                <Input type="color" value={buttonSettings.colors.secondary} onChange={(e) => handleButtonColorChange('secondary', e.target.value)} className="w-full h-10"/>
-                            </div>
-                             <div className="space-y-2">
-                                <Label>Hover Color</Label>
-                                <Input type="color" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} className="w-full h-10"/>
-                            </div>
-                        </div>
-
-                        <div className="p-4 border rounded-lg space-y-4">
-                            <h4 className="font-semibold">Default Values</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label>Variant</Label>
-                                    <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="primary">Primary</SelectItem>
-                                            <SelectItem value="secondary">Secondary</SelectItem>
-                                            <SelectItem value="outline">Outline</SelectItem>
-                                            <SelectItem value="destructive">Destructive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Size</Label>
-                                     <Select value={buttonSettings.defaultSize} onValueChange={(v: ButtonSizeOption) => handleButtonSettingChange('defaultSize', v)}>
-                                        <SelectTrigger><SelectValue/></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="sm">Small</SelectItem>
-                                            <SelectItem value="md">Medium</SelectItem>
-                                            <SelectItem value="lg">Large</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </div>
-
-                         <div>
-                            <h4 className="font-semibold mb-2">Live Preview</h4>
-                            <div className="p-6 border rounded-lg bg-background flex flex-wrap items-center justify-center gap-4">
-                                <Button variant="primary" size="lg">Primary LG</Button>
-                                <Button variant="secondary" size="md">Secondary MD</Button>
-                                <Button variant="outline" size="sm">Outline SM</Button>
-                                <Button variant="destructive" size="md">Destructive</Button>
-                            </div>
-                        </div>
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
-        </Accordion>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-export default function CmsDashboardPage() {
-    return (
-        <ThemeContextWrapper>
-            <CmsDashboardContent />
-        </ThemeContextWrapper>
-    )
-}
-
-    

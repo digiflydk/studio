@@ -2,7 +2,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users, HeartHandshake } from "lucide-react";
+import { Home, PanelLeft, Brush, FileText, Settings, ChevronDown, Search, Share2, MousePointerClick, Cookie, Building, Sparkles, Users, HeartHandshake, LayoutDashboard } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
@@ -53,11 +53,15 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                     </SheetDescription>
                 </SheetHeader>
                 <nav className="grid gap-4 text-base font-medium">
+                     <Link href="/cms/dashboard" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms/dashboard' })}>
+                        <LayoutDashboard className="h-5 w-5" />
+                        Dashboard
+                    </Link>
                     <Link href="/cms/pages" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/pages') })}>
                         <FileText className="h-5 w-5" />
                         Content
                     </Link>
-                    <Link href="/cms/dashboard" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms/dashboard' })}>
+                    <Link href="/cms/design" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/design') })}>
                         <Brush className="h-5 w-5" />
                         Design
                     </Link>

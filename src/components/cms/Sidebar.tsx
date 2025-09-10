@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users, HeartHandshake } from "lucide-react";
+import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users, HeartHandshake, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -44,6 +44,16 @@ function SidebarInner() {
       <div className="flex-1">
         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <Link
+              href="/cms/dashboard"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
+                { "bg-gray-800 text-white": pathname === '/cms/dashboard' }
+              )}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Link>
+            <Link
               href="/cms/pages"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
@@ -54,10 +64,10 @@ function SidebarInner() {
               Content
             </Link>
             <Link
-              href="/cms/dashboard"
+              href="/cms/design"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800",
-                { "bg-gray-800 text-white": pathname === '/cms/dashboard' }
+                { "bg-gray-800 text-white": pathname.startsWith('/cms/design') }
               )}
             >
               <Brush className="h-4 w-4" />
