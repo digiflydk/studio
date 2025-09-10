@@ -3,12 +3,19 @@
 import { adminDb } from '@/lib/server/firebaseAdmin';
 import type { GeneralSettings, HeaderCTASettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
-import { headerDefaults } from '@/lib/cms/pages-header';
-
 
 const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
+const headerDefaults: HeaderCTASettings = {
+  enabled: false,
+  label: 'Kom i gang',
+  linkType: 'internal',
+  href: '#hero',
+  variant: 'default',
+  size: 'default',
+  mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
+};
 
 export const getGeneralSettings = unstable_cache(
     async (): Promise<GeneralSettings | null> => {

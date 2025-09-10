@@ -4,18 +4,17 @@ import { unstable_cache } from 'next/cache';
 
 const PATH = 'pages/header';
 
-export const headerDefaults: HeaderCTASettings = {
-  enabled: false,
-  label: 'Kom i gang',
-  linkType: 'internal',
-  href: '#hero',
-  variant: 'default',
-  size: 'default',
-  mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
-};
-
 export const getHeaderSettings = unstable_cache(
     async (): Promise<HeaderCTASettings> => {
+        const headerDefaults: HeaderCTASettings = {
+          enabled: false,
+          label: 'Kom i gang',
+          linkType: 'internal',
+          href: '#hero',
+          variant: 'default',
+          size: 'default',
+          mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
+        };
         try {
             const snap = await adminDb.doc(PATH).get();
             if (snap.exists) {
