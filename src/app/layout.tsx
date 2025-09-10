@@ -1,9 +1,12 @@
 
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
 import DesignProvider from '@/providers/DesignProvider';
 import { makeVarsCss } from '@/lib/ui/applyDesignVars';
+import { AdminToolbar } from '@/components/admin/AdminToolbar';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -72,9 +75,12 @@ export default async function RootLayout({
     <html lang="da" className="scroll-smooth">
       {css && <style id="theme-vars">{css}</style>}
       <body>
-        <DesignProvider initialDesign={settings}>
-            {children}
-        </DesignProvider>
+        <ThemeProvider settings={settings}>
+            <DesignProvider initialDesign={settings}>
+                {children}
+                <AdminToolbar />
+            </DesignProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

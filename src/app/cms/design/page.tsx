@@ -1,4 +1,5 @@
 
+
 "use client";
 import { useTheme, defaultTheme, ThemeProvider } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
+import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, GeneralSettings } from "@/types/settings";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGeneralSettings } from "@/hooks/use-general-settings";
-
+import { DiffDialog } from "@/components/admin/DiffDialog";
+import { simpleDiff } from "@/lib/utils/diff";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -188,20 +190,33 @@ const defaultButtonSettings: ButtonSettings = {
 };
 
 function CmsDesignPageContent() {
-  const { theme, isLoaded, setTheme, setTypography, typography, setButtonSettings, buttonSettings: initialButtonSettings } = useTheme();
+  const { isLoaded: isThemeLoaded, ...themeCtx } = useTheme();
+  const serverSettings = useGeneralSettings();
+  
   const [isSaving, setIsSaving] = useState(false);
+  const [showDiff, setShowDiff] = useState(false);
+  
   const { toast } = useToast();
-  const [buttonSettings, setButtonSettingsState] = useState({ ...defaultButtonSettings, ...(initialButtonSettings || {})});
 
-
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (force = false) => {
     setIsSaving(true);
+    setShowDiff(false);
+
+    const settingsToSave: Partial<GeneralSettings> = {
+        themeColors: themeCtx.theme.colors,
+        typography: themeCtx.typography,
+        buttonSettings: themeCtx.buttonSettings,
+    };
+    
+    // Safety check for destructive changes
+    const diff = simpleDiff(serverSettings || {}, settingsToSave);
+    if (Object.keys(diff.removed).length > 0 && !force) {
+        setShowDiff(true);
+        setIsSaving(false);
+        return;
+    }
+
     try {
-        const settingsToSave = {
-            themeColors: theme.colors,
-            typography: typography,
-            buttonSettings: buttonSettings,
-        };
         const res = await fetch('/api/design-settings/save', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
@@ -217,7 +232,10 @@ function CmsDesignPageContent() {
 
         window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
         
-        setButtonSettingsState({ ...defaultButtonSettings, ...(json.data.buttonSettings || {})});
+        // This is important to sync the form state with the server state after save
+        if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
+        if(json.data.typography) themeCtx.setTypography(json.data.typography);
+        if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
 
         toast({
             title: "Saved!",
@@ -238,20 +256,28 @@ function CmsDesignPageContent() {
   }
 
   const handleReset = () => {
-      // Note: This only resets theme colors for now.
-      // Typography and buttons could be added.
-      setTheme(defaultTheme);
+      themeCtx.setTheme(defaultTheme);
   }
 
   const handleButtonSettingChange = <K extends keyof ButtonSettings>(field: K, value: ButtonSettings[K]) => {
-    setButtonSettingsState({ ...buttonSettings, [field]: value });
+    themeCtx.setButtonSettings({ ...themeCtx.buttonSettings, [field]: value });
   };
 
   const handleButtonColorChange = <K extends keyof ButtonSettings['colors']>(field: K, value: string) => {
-    setButtonSettingsState({ ...buttonSettings, colors: { ...buttonSettings.colors, [field]: value } });
+    themeCtx.setButtonSettings({ ...themeCtx.buttonSettings, colors: { ...themeCtx.buttonSettings.colors, [field]: value } });
   }
 
-  if (!isLoaded) {
+  const diff = useMemo(() => {
+    const settingsToSave: Partial<GeneralSettings> = {
+        themeColors: themeCtx.theme.colors,
+        typography: themeCtx.typography,
+        buttonSettings: themeCtx.buttonSettings,
+    };
+    return simpleDiff(serverSettings || {}, settingsToSave);
+  }, [serverSettings, themeCtx.theme, themeCtx.typography, themeCtx.buttonSettings]);
+
+
+  if (!isThemeLoaded || !serverSettings) {
       return (
         <div className="flex justify-center items-center h-full">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -261,6 +287,12 @@ function CmsDesignPageContent() {
 
   return (
     <div className="space-y-8">
+        <DiffDialog 
+            isOpen={showDiff} 
+            onOpenChange={setShowDiff}
+            diff={diff}
+            onConfirm={() => handleSaveChanges(true)}
+        />
         <div className="flex justify-between items-start">
             <div>
                 <h1 className="text-2xl font-bold">Design Settings</h1>
@@ -268,7 +300,7 @@ function CmsDesignPageContent() {
             </div>
             <div className="flex gap-4">
                 <Button variant="outline" onClick={handleReset} disabled={isSaving}>Reset</Button>
-                <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+                <Button size="lg" onClick={() => handleSaveChanges()} disabled={isSaving}>
                   {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
                 </Button>
@@ -303,38 +335,38 @@ function CmsDesignPageContent() {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label>Primary Font</Label>
-                            <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
+                            <Input value={themeCtx.typography.fontPrimary} onChange={(e) => themeCtx.setTypography({ ...themeCtx.typography, fontPrimary: e.target.value })} />
                             <p className="text-xs text-muted-foreground">E.g. "Inter", "Roboto". Make sure the font is loaded.</p>
                         </div>
                         <Accordion type="multiple" className="w-full">
                             <AccordionItem value="h1">
                                 <AccordionTrigger>H1</AccordionTrigger>
                                 <AccordionContent>
-                                   <TypographyControl label="H1" settings={typography.h1} onUpdate={(data) => setTypography({ ...typography, h1: { ...typography.h1, ...data } })} />
+                                   <TypographyControl label="H1" settings={themeCtx.typography.h1} onUpdate={(data) => themeCtx.setTypography({ ...themeCtx.typography, h1: { ...themeCtx.typography.h1, ...data } })} />
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="h2">
                                 <AccordionTrigger>H2</AccordionTrigger>
                                 <AccordionContent>
-                                   <TypographyControl label="H2" settings={typography.h2} onUpdate={(data) => setTypography({ ...typography, h2: { ...typography.h2, ...data } })} />
+                                   <TypographyControl label="H2" settings={themeCtx.typography.h2} onUpdate={(data) => themeCtx.setTypography({ ...themeCtx.typography, h2: { ...themeCtx.typography.h2, ...data } })} />
                                 </AccordionContent>
                             </AccordionItem>
                              <AccordionItem value="h3">
                                 <AccordionTrigger>H3</AccordionTrigger>
                                 <AccordionContent>
-                                   <TypographyControl label="H3" settings={typography.h3} onUpdate={(data) => setTypography({ ...typography, h3: { ...typography.h3, ...data } })} />
+                                   <TypographyControl label="H3" settings={themeCtx.typography.h3} onUpdate={(data) => themeCtx.setTypography({ ...themeCtx.typography, h3: { ...themeCtx.typography.h3, ...data } })} />
                                 </AccordionContent>
                             </AccordionItem>
                              <AccordionItem value="h4">
                                 <AccordionTrigger>H4</AccordionTrigger>
                                 <AccordionContent>
-                                   <TypographyControl label="H4" settings={typography.h4} onUpdate={(data) => setTypography({ ...typography, h4: { ...typography.h4, ...data } })} />
+                                   <TypographyControl label="H4" settings={themeCtx.typography.h4} onUpdate={(data) => themeCtx.setTypography({ ...themeCtx.typography, h4: { ...themeCtx.typography.h4, ...data } })} />
                                 </AccordionContent>
                             </AccordionItem>
                              <AccordionItem value="body">
                                 <AccordionTrigger>Body</AccordionTrigger>
                                 <AccordionContent>
-                                   <TypographyControl label="Body" settings={typography.body} onUpdate={(data) => setTypography({ ...typography, body: { ...typography.body, ...data } })} isBody />
+                                   <TypographyControl label="Body" settings={themeCtx.typography.body} onUpdate={(data) => themeCtx.setTypography({ ...themeCtx.typography, body: { ...themeCtx.typography.body, ...data } })} isBody />
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
@@ -354,7 +386,7 @@ function CmsDesignPageContent() {
                         <div className="space-y-2">
                             <Label>Button Shape</Label>
                             <Select
-                                value={buttonSettings.designType}
+                                value={themeCtx.buttonSettings.designType}
                                 onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}
                             >
                                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -367,7 +399,7 @@ function CmsDesignPageContent() {
                         <div className="space-y-2">
                             <Label>Font Family</Label>
                             <Select
-                                value={buttonSettings.fontFamily}
+                                value={themeCtx.buttonSettings.fontFamily}
                                 onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}
                             >
                                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -379,9 +411,9 @@ function CmsDesignPageContent() {
                             </Select>
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <Label>Font Weight: {buttonSettings.fontWeight}</Label>
+                            <Label>Font Weight: {themeCtx.buttonSettings.fontWeight}</Label>
                             <Slider
-                                value={[buttonSettings.fontWeight]}
+                                value={[themeCtx.buttonSettings.fontWeight]}
                                 onValueChange={([v]) => handleButtonSettingChange('fontWeight', v)}
                                 min={300} max={800} step={100}
                             />
@@ -389,11 +421,11 @@ function CmsDesignPageContent() {
 
                          <div className="space-y-2">
                             <Label>Primary Color</Label>
-                            <Input type="text" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} />
+                            <Input type="text" value={themeCtx.buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} />
                         </div>
                          <div className="space-y-2">
                             <Label>Hover Color</Label>
-                            <Input type="text" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} />
+                            <Input type="text" value={themeCtx.buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} />
                         </div>
                     </div>
                 </AccordionContent>

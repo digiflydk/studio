@@ -6,7 +6,6 @@ import Footer from '@/components/layout/footer';
 import Analytics from '@/components/analytics';
 import { Toaster } from '@/components/ui/toaster';
 import { useGeneralSettings } from '@/hooks/use-general-settings';
-import { ThemeProvider } from '@/context/ThemeContext';
 import AnnouncementBanner from '@/components/announcement-banner';
 import CookieBanner from '@/components/cookies/CookieBanner';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
@@ -96,7 +95,7 @@ export default function Template({ children }: { children: ReactNode }) {
     };
 
     return (
-        <ThemeProvider settings={settings}>
+        <>
             <Header ref={headerRef} settings={settings} />
             <AnnouncementBanner ref={bannerRef} />
             <main>
@@ -129,6 +128,6 @@ export default function Template({ children }: { children: ReactNode }) {
             
             <Analytics consent={cookieConsent} settings={settings} />
             <Toaster />
-        </ThemeProvider>
+        </>
     )
 }
