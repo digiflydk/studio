@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useTransition } from "react";
-import { saveSettingsAction } from "@/app/actions";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -190,22 +189,53 @@ const fontWeightOptions = [
 
 function CmsDesignPageContent() {
   const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
-  const [isSaving, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const handleSaveChanges = () => {
-    startTransition(async () => {
-      const result = await saveSettingsAction({
-          themeColors: theme.colors,
-          typography: typography,
-          buttonSettings: buttonSettings,
-      });
-      toast({
-          title: result.success ? "Saved!" : "Error!",
-          description: result.message,
-          variant: result.success ? "default" : "destructive",
-      });
-    });
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    try {
+        const settingsToSave = {
+            themeColors: theme.colors,
+            typography: typography,
+            buttonSettings: buttonSettings,
+        };
+        const res = await fetch('/api/design-settings/save', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(settingsToSave),
+            cache: 'no-store',
+        });
+        const json = await res.json();
+        
+        if (!res.ok || !json?.data) {
+            throw new Error(json.message || 'Save failed');
+        }
+
+        // Keep form in sync with server's truth
+        setTheme({ colors: json.data.themeColors || defaultTheme.colors });
+        setTypography(json.data.typography);
+        setButtonSettings(json.data.buttonSettings);
+        
+        // Dispatch event for live UI update
+        window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
+        
+        toast({
+            title: "Saved!",
+            description: "Design settings have been saved.",
+            variant: "default",
+        });
+
+    } catch (error: any) {
+        console.error("Error saving settings:", error);
+        toast({
+            title: "Error!",
+            description: error.message || "An error occurred during saving.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsSaving(false);
+    }
   }
 
   const handleReset = () => {

@@ -2,6 +2,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
+import DesignProvider from '@/providers/DesignProvider';
+import { applyDesignVars, makeVarsCss } from '@/lib/ui/applyDesignVars';
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getGeneralSettings();
@@ -57,16 +60,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getGeneralSettings();
+  const css = makeVarsCss(settings);
 
   return (
     <html lang="da" className="scroll-smooth">
+      {css && <style id="theme-vars">{css}</style>}
       <body>
-        {children}
+        <DesignProvider initialDesign={settings}>
+            {children}
+        </DesignProvider>
       </body>
     </html>
   );
