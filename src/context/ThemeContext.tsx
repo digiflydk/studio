@@ -101,7 +101,7 @@ function applyButtonVars(b: ButtonSettings) {
     if(!b) return;
     const r = document.documentElement.style;
 
-    r.setProperty('--btn-radius', b.designType === 'pill' ? '9999px' : '10px');
+    r.setProperty('--btn-radius', b.designType === 'pill' ? '9999px' : '0.5rem');
 
     const family = b.fontFamily === 'Manrope' ? 'Manrope, ui-sans-serif, system-ui' :
                    b.fontFamily === 'System'  ? 'ui-sans-serif, system-ui' :
