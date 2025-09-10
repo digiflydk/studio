@@ -1,4 +1,3 @@
-
 // src/lib/ui/applyDesignVars.ts
 // Robust variabel-apply der virker med både "settings/general" (buttonSettings)
 // og eventuelle legacy-felter ("buttons")
@@ -18,6 +17,17 @@ function ensureStyleEl(id = 'theme-vars') {
   return el!;
 }
 
+// --- uddrag i src/lib/ui/applyDesignVars.ts ---
+function px(n?: number, fallback: number) {
+  return `${typeof n === 'number' && !Number.isNaN(n) ? n : fallback}px`;
+}
+function hslObjToCss(c?: { h: number; s: number; l: number }, fallback = 'rgba(0,0,0,.08)') {
+  if (!c || typeof c.h !== 'number') return fallback;
+  const s = `${Math.max(0, Math.min(100, c.s))}%`;
+  const l = `${Math.max(0, Math.min(100, c.l))}%`;
+  return `hsl(${c.h} ${s} ${l})`;
+}
+
 function pickButtonBlock(g: AnyGeneral) {
   // 1) nyt skema: settings/general.buttonSettings
   if ((g as any)?.buttonSettings) return (g as any).buttonSettings;
@@ -30,9 +40,9 @@ function pickButtonBlock(g: AnyGeneral) {
   return {};
 }
 
-export function applyDesignVars(general: AnyGeneral | null | undefined) {
+export function applyDesignVars(general: any) {
   const btn = pickButtonBlock(general || {});
-
+  
   // Farver
   const primary = btn?.colors?.primary ?? '#2563EB';
   const hover = btn?.colors?.hover ?? primary;
@@ -48,13 +58,37 @@ export function applyDesignVars(general: AnyGeneral | null | undefined) {
   const fontFamily = btn?.fontFamily ?? 'inherit';
   const fontWeight = btn?.fontWeight ?? 600;
 
-  const css = `:root{
+  // ----- HEADER (NY) -----
+  const header = general || {};
+  const height = header.headerHeight;                   // fx 100
+  const logoW = header.headerLogoWidth;                 // fx 150
+  const topBorderOn = header.headerTopBorderEnabled;    // bool
+  const topBorderH = header.headerTopBorderHeight;      // fx 2
+  const topBorderC = header.headerTopBorderColor;       // {h,s,l}
+
+  const initialBgC = header.headerInitialBackgroundColor;   // {h,s,l}
+  const initialBgO = header.headerInitialBackgroundOpacity; // 0..100
+  const scrolledBgC = header.headerScrolledBackgroundColor; // {h,s,l}
+  const scrolledBgO = header.headerScrolledBackgroundOpacity;
+
+  const css = `
+  :root{
     --btn-color-primary: ${primary};
     --btn-color-hover: ${hover};
     --btn-shape: ${radius};
     --btn-font: ${fontFamily};
     --btn-font-weight: ${fontWeight};
-  }`;
 
-  ensureStyleEl().textContent = css;
+    --header-h: ${px(height, 72)};
+    --header-logo-w: ${px(logoW, 140)};
+    --header-border-h: ${px(topBorderH, 1)};
+    --header-border-color: ${hslObjToCss(topBorderC)};
+    --header-border-enabled: ${topBorderOn ? 1 : 0};
+
+    --header-bg-initial: ${hslObjToCss(initialBgC, 'white')};
+    --header-bg-initial-alpha: ${(typeof initialBgO === 'number' ? initialBgO : 100) / 100};
+    --header-bg-scrolled: ${hslObjToCss(scrolledBgC, 'white')};
+    --header-bg-scrolled-alpha: ${(typeof scrolledBgO === 'number' ? scrolledBgO : 100) / 100};
+  }`;
+  ensureStyleEl().textContent = (ensureStyleEl().textContent || '') + css;
 }

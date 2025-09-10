@@ -17,8 +17,6 @@ interface HeaderProps {
 
 const Header = forwardRef<HTMLElement, HeaderProps>(
   ({ links, logoUrl, logoAlt = 'Digifly' }, ref) => {
-    const [scrolled, setScrolled] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
     
     if (process.env.NODE_ENV !== 'production') {
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -27,6 +25,9 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
         if (n > 1) console.warn(`[Header] Mounted ${n} times. Remove duplicates in layouts/pages.`);
       }, []);
     }
+
+    const [scrolled, setScrolled] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
       const onScroll = () => setScrolled(window.scrollY > 8);
@@ -40,12 +41,21 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
         ref={ref}
         data-role="site-header"
         className={cn(
-          'sticky top-0 z-50 border-b transition-colors',
-          scrolled ? 'bg-white/90 backdrop-blur border-black/10' : 'bg-white border-transparent'
+          'sticky top-0 z-[100] backdrop-blur supports-[backdrop-filter]:bg-transparent',
+          'border-b', // bund-linjen
         )}
-        style={{ '--header-h': '72px' } as React.CSSProperties}
+        style={{
+          // Border nederst (altid) – farve/tykkelse fra CMS
+          borderBottomColor: 'var(--header-border-color)',
+          borderBottomWidth: 'var(--header-border-h)',
+          // Baggrund (initial/scrolled) – overlay ovenpå hero
+          backgroundColor: scrolled
+            ? `color-mix(in oklab, var(--header-bg-scrolled) calc(var(--header-bg-scrolled-alpha)*100%), transparent)`
+            : `color-mix(in oklab, var(--header-bg-initial) calc(var(--header-bg-initial-alpha)*100%), transparent)`,
+        }}
       >
-        <div className="mx-auto flex h-[var(--header-h)] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+            style={{ height: 'var(--header-h)' }}>
           {/* Logo */}
           <Link href="/" className="shrink-0" aria-label="Forside">
             <Logo logoUrl={logoUrl} logoAlt={logoAlt} width={120} />
@@ -89,6 +99,16 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
             </div>
           </button>
         </div>
+        
+        {/* Valgfri top-border (fra CMS) */}
+        <div
+          aria-hidden
+          style={{
+            display: 'var(--header-border-enabled)' as any ? 'block' : 'none',
+            height: 0,
+            borderTop: 'var(--header-border-h) solid var(--header-border-color)',
+          }}
+        />
 
         {/* Mobile menu – separat, så vi ikke dobbelt-renderer på desktop */}
         <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={links} />
