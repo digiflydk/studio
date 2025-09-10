@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, useTransition } from 'react';
 import type { GeneralSettings, HeaderCTASettings, NavLink, HSLColor } from '@/types/settings';
@@ -13,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { getSettingsAction, saveSettingsAction } from '@/app/actions';
 import { Slider } from '@/components/ui/slider';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
+import { ConflictDialog } from '@/components/admin/ConflictDialog';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -166,6 +168,7 @@ function CtaSettingsForm() {
     const { settings: initialSettings, isLoading, refresh } = useHeaderSettings();
     const [ctaSettings, setCtaSettings] = useState<HeaderCTASettings | undefined>(undefined);
     const [isSaving, startSaving] = useTransition();
+    const [conflict, setConflict] = useState<any>(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -196,17 +199,30 @@ function CtaSettingsForm() {
         }) : undefined)
     }
 
-    async function onSave(){
+    const handleSaveChanges = async (force = false, useVersion?: number) => {
         if (!ctaSettings) return;
+
         startSaving(async () => {
+            const payload = {
+                ...ctaSettings,
+                version: useVersion ?? (ctaSettings as any).version,
+            };
+
             const res = await fetch('/api/pages/header/save', {
                 method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify(ctaSettings),
+                headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
+                body: JSON.stringify(payload),
                 cache: 'no-store',
             });
+
             const json = await res.json();
-            
+
+            if (res.status === 409) {
+                setConflict({ server: json.data, serverVersion: json.version });
+                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
+                return;
+            }
+
             if (!json.ok) {
                  toast({ title: "Error!", description: json.error || 'Save failed', variant: 'destructive' });
                  return;
@@ -220,12 +236,23 @@ function CtaSettingsForm() {
 
     return (
         <AccordionItem value="cta" className="border rounded-lg shadow-sm">
+             <ConflictDialog
+                isOpen={!!conflict}
+                onOpenChange={() => setConflict(null)}
+                onReload={(serverData, serverVersion) => {
+                    setCtaSettings({ ...serverData, version: serverVersion });
+                    setConflict(null);
+                }}
+                onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
+                serverData={conflict?.server}
+                serverVersion={conflict?.serverVersion}
+            />
             <AccordionTrigger className="px-6 py-4 flex justify-between items-center w-full">
                 <h3 className="font-semibold text-lg text-left">Header CTA Settings</h3>
             </AccordionTrigger>
             <AccordionContent className="p-6 border-t">
                  <div className="flex justify-end mb-6">
-                    <Button onClick={onSave} disabled={isSaving}>
+                    <Button onClick={() => handleSaveChanges()} disabled={isSaving}>
                         {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Save CTA Settings
                     </Button>
@@ -363,6 +390,7 @@ export default function HeaderPage(){
         toast({
             title: result.success ? "Saved!" : "Error!",
             description: result.message,
+            duration: 1000,
         });
         if (result.success) {
             window.dispatchEvent(new CustomEvent('design:updated', { detail: settings }));
@@ -385,18 +413,15 @@ export default function HeaderPage(){
                 <h1 className="text-2xl font-bold">Header Settings</h1>
                 <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
             </div>
+            <Button onClick={onSaveGeneral} disabled={isSaving}>
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save General Header Settings
+            </Button>
         </div>
       <Accordion type="multiple" defaultValue={['general', 'cta']} className="w-full space-y-4">
         <GeneralHeaderSettings settings={settings} setSettings={setSettings} />
         <CtaSettingsForm />
       </Accordion>
-
-      <div className="flex justify-end mt-8">
-          <Button onClick={onSaveGeneral} disabled={isSaving}>
-            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save General Header Settings
-          </Button>
-      </div>
     </div>
   );
 }
