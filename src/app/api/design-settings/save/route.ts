@@ -1,25 +1,35 @@
+
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { adminDb } from '@/lib/server/firebaseAdmin';
 import { GeneralSettings } from '@/types/settings';
+import { deepMerge } from '@/lib/utils/deepMerge';
+import { stripUndefined } from '@/lib/utils/sanitize';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SETTINGS_COLLECTION_ID = 'settings';
-const SETTINGS_DOC_ID = 'general';
-const PATH = `${SETTINGS_COLLECTION_ID}/${SETTINGS_DOC_ID}`;
+const PATH = 'settings/general';
 
 export async function POST(request: Request) {
   try {
-    const settingsToSave: Partial<GeneralSettings> = await request.json();
+    const body = await request.json();
+    const cleanPayload = stripUndefined(body);
+
+    const ref = adminDb.doc(PATH);
+    const snap = await ref.get();
+    const currentData = snap.exists ? snap.data() : {};
+
+    const mergedData = deepMerge(currentData as GeneralSettings, cleanPayload);
+    (mergedData as any).updatedAt = new Date().toISOString();
     
-    await adminDb.doc(PATH).set(settingsToSave, { merge: true });
+    await ref.set(mergedData, { merge: true });
 
     revalidatePath('/', 'layout');
     revalidatePath('/cms', 'layout');
+    revalidateTag('design-settings');
 
-    const updatedSnap = await adminDb.doc(PATH).get();
+    const updatedSnap = await ref.get();
     const updatedData = updatedSnap.data();
 
     return NextResponse.json({ 

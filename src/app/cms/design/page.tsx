@@ -174,22 +174,25 @@ function TypographyControl({
   );
 }
 
-const fontWeightOptions = [
-    { label: 'Thin', value: 100 },
-    { label: 'Extra Light', value: 200 },
-    { label: 'Light', value: 300 },
-    { label: 'Normal', value: 400 },
-    { label: 'Medium', value: 500 },
-    { label: 'Semi Bold', value: 600 },
-    { label: 'Bold', value: 700 },
-    { label: 'Extra Bold', value: 800 },
-    { label: 'Black', value: 900 },
-];
+const defaultButtonSettings: ButtonSettings = {
+    designType: 'default',
+    fontFamily: 'Inter',
+    fontWeight: 600,
+    colors: {
+      primary: '#2563EB',
+      secondary: '#1F2937',
+      hover: '#1D4ED8',
+    },
+    defaultVariant: 'primary',
+    defaultSize: 'md',
+};
 
 function CmsDesignPageContent() {
-  const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
+  const { theme, isLoaded, setTheme, setTypography, typography, setButtonSettings, buttonSettings: initialButtonSettings } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const [buttonSettings, setButtonSettingsState] = useState({ ...defaultButtonSettings, ...(initialButtonSettings || {})});
+
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -205,14 +208,17 @@ function CmsDesignPageContent() {
             body: JSON.stringify(settingsToSave),
             cache: 'no-store',
         });
+        
         const json = await res.json();
         
-        if (!res.ok || !json?.data) {
-            throw new Error(json.message || 'Save failed');
+        if (!res.ok || !json?.ok) {
+            throw new Error(json.error || 'Save failed');
         }
 
         window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
         
+        setButtonSettingsState({ ...defaultButtonSettings, ...(json.data.buttonSettings || {})});
+
         toast({
             title: "Saved!",
             description: "Design settings have been saved.",
@@ -238,11 +244,11 @@ function CmsDesignPageContent() {
   }
 
   const handleButtonSettingChange = <K extends keyof ButtonSettings>(field: K, value: ButtonSettings[K]) => {
-    setButtonSettings({ ...buttonSettings, [field]: value });
+    setButtonSettingsState({ ...buttonSettings, [field]: value });
   };
 
   const handleButtonColorChange = <K extends keyof ButtonSettings['colors']>(field: K, value: string) => {
-    setButtonSettings({ ...buttonSettings, colors: { ...buttonSettings.colors, [field]: value } });
+    setButtonSettingsState({ ...buttonSettings, colors: { ...buttonSettings.colors, [field]: value } });
   }
 
   if (!isLoaded) {
