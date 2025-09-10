@@ -3,28 +3,24 @@ import { NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
-
-// This is an alternative to `revalidate: 0` and `cache: 'no-store'`
-// It tells Next.js to always re-run this route handler on every request
 export const dynamic = 'force-dynamic';
 
-const SETTINGS_COLLECTION_ID = 'settings';
-const SETTINGS_DOC_ID = 'general';
-const PATH = `${SETTINGS_COLLECTION_ID}/${SETTINGS_DOC_ID}`;
-
 export async function GET() {
-  try {
-    const db = getAdminDb();
-    const snap = await db.doc(PATH).get();
-    if (!snap.exists) {
-        return NextResponse.json({ ok: false, data: null, message: 'No design settings found.' }, { status: 404 });
-    }
-    return NextResponse.json({
-        ok: true,
-        data: snap.data(),
-    }, { headers: { 'cache-control': 'no-store' }});
-  } catch (error: any) {
-    console.error('Error fetching design settings:', error);
-    return NextResponse.json({ ok: false, data: null, error: error.message }, { status: 500 });
+  const db = getAdminDb();
+  // Kanonisk doc
+  const refGen = db.doc('settings/general');
+  const snapGen = await refGen.get();
+
+  if (!snapGen.exists) {
+    return NextResponse.json({ ok: false, error: 'not_found', path: 'settings/general' }, { status: 404 });
   }
+
+  const g = snapGen.data() as any;
+  const version = typeof g.version === 'number' ? g.version : 0;
+  const buttonSettings = g.buttonSettings ?? {};
+
+  return NextResponse.json(
+    { ok: true, data: { version, ...buttonSettings } }, // <- gør livet nemt for din Form: den får direkte button felter + version
+    { headers: { 'cache-control': 'no-store' } }
+  );
 }

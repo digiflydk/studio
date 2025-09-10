@@ -1,49 +1,43 @@
 
 import { NextResponse } from 'next/server';
-import { headerSettingsSchema, HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
-import { revalidateTag } from 'next/cache';
-import { txSaveVersioned } from '@/lib/server/versionedSave';
-import { logAudit } from '@/lib/server/audit';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { headerSettingsSchema } from '@/lib/validators/headerSettings.zod';
 
-export const runtime='nodejs'; 
+export const runtime='nodejs';
 export const dynamic='force-dynamic';
 
-const PATH = 'pages/header';
+export async function POST(req: Request) {
+  const db = getAdminDb();
+  const body = await req.json();   // { version?: number, ...headerFields }
+  const clientVersion = Number(body?.version ?? 0);
+  const parsed = headerSettingsSchema.parse(body);
 
-export async function POST(req: Request){
-  try {
-    const body = await req.json();
-    const author = req.headers.get('x-user') ?? 'studio';
-    const ua = (req.headers.get('user-agent') || '').slice(0, 160);
+  const ref = db.doc('settings/general');
+  const result = await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const now = new Date().toISOString();
+    const current = snap.exists ? (snap.data() as any) : {};
+    const serverVersion = Number(current?.version ?? 0);
 
-    const res = await txSaveVersioned<HeaderCTASettings>({
-      path: PATH,
-      schema: headerSettingsSchema,
-      data: body,
-      author,
-    });
-
-    if (!res.ok) {
-        return NextResponse.json({ ok: false, error: res.error, data: res.current, version: res.currentVersion }, { status: res.status });
+    if (snap.exists && clientVersion !== serverVersion) {
+      return { ok:false as const, status:409, error:'version_conflict', current, currentVersion: serverVersion };
     }
-    
-    await logAudit({
-      type: 'headerSettings',
-      path: PATH,
-      ts: new Date().toISOString(),
-      by: author,
-      ua,
-      version: res.data?.version,
-      before: res.before,
-      after: res.data,
-    });
 
-    revalidateTag('pages:header');
+    const next = {
+      ...current,
+      headerCtaSettings: { ...(current?.headerCtaSettings ?? {}), ...parsed },
+      version: serverVersion + 1,
+      updatedAt: now,
+      updatedBy: 'cms-user',
+    };
 
-    return NextResponse.json({ ok: true, data: res.data }, { headers:{'cache-control':'no-store'} });
+    tx.set(ref, next, { merge:false });
+    return { ok:true as const, data: next };
+  });
 
-  } catch (e: any) {
-     // If Zod validation fails, it will throw an error which is caught here.
-     return NextResponse.json({ ok:false, error: e?.message ?? 'save_failed', issues: e.issues }, { status: 400 });
-  }
+  if (!result.ok) return NextResponse.json(result, { status: result.status ?? 400 });
+
+  const g = result.data as any;
+  const payload = { version: g.version ?? 0, ...(g.headerCtaSettings ?? {}) };
+  return NextResponse.json({ ok:true, data: payload }, { headers:{'cache-control':'no-store'}});
 }

@@ -5,9 +5,6 @@ import { getAdminDb } from '@/lib/server/firebaseAdmin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SETTINGS_PATH = 'settings/general';
-const HEADER_PATH = 'pages/header';
-
 function toPlainObject(obj: any) {
     if (obj === null || typeof obj !== 'object') {
         return obj;
@@ -30,53 +27,27 @@ function toPlainObject(obj: any) {
 
 export async function GET() {
   const db = getAdminDb();
-  const [settingsSnap, headerSnap] = await Promise.all([
-    db.doc(SETTINGS_PATH).get(),
-    db.doc(HEADER_PATH).get(),
-  ]);
 
-  const settings = settingsSnap.exists ? settingsSnap.data() : null;
-  const header = headerSnap.exists ? headerSnap.data() : null;
+  // primær: settings/general
+  const gen = await db.doc('settings/general').get();
+  const g = gen.exists ? (gen.data() as any) : null;
 
-  const okSettingsDoc = !!settingsSnap.exists;
-  const okHeaderDoc = !!headerSnap.exists;
+  // legacy: designSettings/global + pages/header
+  const ds = await db.doc('designSettings/global').get();
+  const ph = await db.doc('pages/header').get();
 
-  const okDesignVars = !!settings?.buttonSettings?.colors?.primary && !!settings?.buttonSettings?.designType;
-  const okVersioning = typeof settings?.version === 'number' && typeof header?.version === 'number';
-  const okLocked = settings?.locked === true;
+  const okGeneral = !!g;
+  const okButtons = !!g?.buttonSettings?.colors?.primary || !!(ds.exists && (ds.data() as any)?.buttons);
+  const okHeader = !!g?.headerCtaSettings || ph.exists;
 
-  const ok = okSettingsDoc && okHeaderDoc && okDesignVars && okVersioning && okLocked;
+  const okVersioning = typeof g?.version === 'number' || typeof (ds.data() as any)?.version === 'number';
 
-  // (valgfrit) hent seneste audit pr. type
-  let lastDesignAudit: any = null;
-  let lastHeaderAudit: any = null;
-  try {
-    const q1 = await db.collection('audit').where('type','==','designSettings').orderBy('ts','desc').limit(1).get();
-    const q2 = await db.collection('audit').where('type','==','headerSettings').orderBy('ts','desc').limit(1).get();
-    lastDesignAudit = q1.empty ? null : q1.docs[0].data();
-    lastHeaderAudit = q2.empty ? null : q2.docs[0].data();
-  } catch { /* audit er valgfri */ }
+  const ok = okGeneral && okButtons && okHeader && okVersioning;
 
   return NextResponse.json({
     ok,
-    checks: {
-      okSettingsDoc,
-      okHeaderDoc,
-      okDesignVars,
-      okVersioning,
-      okLocked,
-    },
-    versions: {
-      settings: settings?.version ?? null,
-      header: header?.version ?? null,
-    },
-    paths: {
-        settings: SETTINGS_PATH,
-        header: HEADER_PATH,
-    },
-    lastAudit: {
-        design: lastDesignAudit ? toPlainObject(lastDesignAudit)?.ts : null,
-        header: lastHeaderAudit ? toPlainObject(lastHeaderAudit)?.ts : null
-    },
-  }, { headers: { 'cache-control': 'no-store' }});
+    checks: { okGeneral, okButtons, okHeader, okVersioning },
+    paths: { general: 'settings/general', legacyDesign: 'designSettings/global', legacyHeader: 'pages/header' },
+    versions: { general: g?.version ?? null, legacyDesign: (ds.data() as any)?.version ?? null }
+  }, { headers: { 'cache-control':'no-store' }});
 }

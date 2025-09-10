@@ -1,67 +1,49 @@
 
 import { NextResponse } from 'next/server';
-import { revalidatePath, revalidateTag } from 'next/cache';
-import { GeneralSettings } from '@/types/settings';
-import { txSaveVersioned } from '@/lib/server/versionedSave';
-import { z } from 'zod';
-import { logAudit } from '@/lib/server/audit';
+import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { buttonSettingsSchema } from '@/lib/validators/buttonSettings.zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const PATH = 'settings/general';
+export async function POST(req: Request) {
+  const db = getAdminDb();
+  const body = await req.json(); // forventer { version?: number, ...buttonSettings }
+  const clientVersion = Number(body?.version ?? 0);
+  const parsed = buttonSettingsSchema.parse(body);
 
-// Define a schema for the specific settings this route can save
-const designSettingsSchema = z.object({
-  themeColors: z.any().optional(),
-  typography: z.any().optional(),
-  buttonSettings: z.any().optional(),
-  version: z.number().optional(),
-});
+  const ref = db.doc('settings/general');
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const author = request.headers.get('x-user') ?? 'studio';
-    const ua = (request.headers.get('user-agent') || '').slice(0, 160);
-    
-    const res = await txSaveVersioned<Partial<GeneralSettings>>({ 
-        path: PATH, 
-        schema: designSettingsSchema,
-        data: body,
-        author: author,
-    });
-    
-    if (!res.ok) {
-        return NextResponse.json({ ok: false, error: res.error, data: res.current, version: res.currentVersion }, { status: res.status });
+  // Versioneret save (simpel transaktion)
+  const res = await db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const now = new Date().toISOString();
+
+    const current = snap.exists ? (snap.data() as any) : {};
+    const serverVersion = Number(current?.version ?? 0);
+
+    // konflikt?
+    if (snap.exists && clientVersion !== serverVersion) {
+      return { ok: false as const, status: 409, error: 'version_conflict', current, currentVersion: serverVersion };
     }
 
-    await logAudit({
-      type: 'designSettings',
-      path: PATH,
-      ts: new Date().toISOString(),
-      by: author,
-      ua,
-      version: res.data?.version,
-      before: res.before,
-      after: res.data,
-    });
+    const next = {
+      ...current,
+      buttonSettings: { ...(current?.buttonSettings ?? {}), ...parsed },
+      version: serverVersion + 1,
+      updatedAt: now,
+      updatedBy: 'cms-user', // byt evt. til req.headers.get('x-user') ?? 'cms'
+    };
 
-    revalidatePath('/', 'layout');
-    revalidatePath('/cms', 'layout');
-    revalidateTag('design-settings');
+    tx.set(ref, next, { merge: false });
+    return { ok: true as const, data: next };
+  });
 
-    return NextResponse.json({ 
-        ok: true, 
-        message: 'Design settings saved.',
-        data: res.data,
-    }, { headers: { 'cache-control': 'no-store' } });
+  if (!res.ok) return NextResponse.json(res, { status: res.status ?? 400 });
 
-  } catch (error: any) {
-    console.error('Error saving design settings:', error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, message: 'Validation error.', error: error.issues }, { status: 400 });
-    }
-    return NextResponse.json({ ok: false, message: 'An error occurred during saving.', error: error.message }, { status: 500 });
-  }
+  // Returnér formen i samme format som GET (flatten + version)
+  const g = res.data as any;
+  const payload = { version: g.version ?? 0, ...(g.buttonSettings ?? {}) };
+
+  return NextResponse.json({ ok: true, data: payload }, { headers: { 'cache-control': 'no-store' } });
 }
