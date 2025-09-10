@@ -6,7 +6,6 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/ThemeContext";
 import type { ButtonVariantOption, ButtonSizeOption } from '@/types/settings';
 
 const buttonVariants = cva(
@@ -48,11 +47,10 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const { buttonSettings } = useTheme();
     const Comp = asChild ? Slot : "button";
 
-    const v = variant ?? buttonSettings?.defaultVariant ?? 'primary';
-    const s = size ?? buttonSettings?.defaultSize ?? 'md';
+    const v = variant ?? 'primary';
+    const s = size ?? 'md';
 
     return (
       <Comp
