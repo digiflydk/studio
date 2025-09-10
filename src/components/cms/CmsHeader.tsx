@@ -1,4 +1,3 @@
-
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -23,13 +22,7 @@ const settingsNavLinks = [
 
 export default function CmsHeader({ settings }: { settings: GeneralSettings | null }) {
   const pathname = usePathname();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-        setIsSettingsOpen(pathname.startsWith('/cms/settings'));
-    }
-  }, [pathname]);
+  const isSettingsPage = pathname.startsWith('/cms/settings');
 
 
   return (
@@ -73,13 +66,15 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                         <HeartHandshake className="h-5 w-5" />
                         Customers
                     </Link>
-                    <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                        <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
-                            <div className="flex items-center gap-4">
-                                <Settings className="h-5 w-5" />
-                                <span>Settings</span>
-                            </div>
-                            <ChevronDown className={cn("h-5 w-5 transition-transform", { "rotate-180": isSettingsOpen })} />
+                    <Collapsible open={isSettingsPage}>
+                        <CollapsibleTrigger asChild>
+                            <Link href="/cms/settings" className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
+                                <div className="flex items-center gap-4">
+                                    <Settings className="h-5 w-5" />
+                                    <span>Settings</span>
+                                </div>
+                                <ChevronDown className={cn("h-5 w-5 transition-transform", { "rotate-180": isSettingsPage })} />
+                            </Link>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pl-10">
                             <ul className="grid items-start py-2 text-sm font-medium">

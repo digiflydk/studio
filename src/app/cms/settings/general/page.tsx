@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
@@ -28,7 +26,7 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
 }, {} as Record<string, OpeningTime>);
 
 export default function GeneralSettingsPage() {
-    const [settings, setSettings] = useState<Partial<GeneralSettings>>({ openingHours: initialOpeningHours });
+    const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, startSaving] = useTransition();
     const { toast } = useToast();
@@ -42,6 +40,8 @@ export default function GeneralSettingsPage() {
                   ...loadedSettings,
                   openingHours: loadedSettings.openingHours || initialOpeningHours
                 });
+            } else {
+                setSettings({ openingHours: initialOpeningHours });
             }
             setIsLoading(false);
         }
