@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -163,7 +162,7 @@ function TextStyleEditor({
         <div className="p-4 border rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
             <h3 className="font-semibold md:col-span-2">{label}</h3>
             <div className="space-y-2">
-                <Label>Farve</Label>
+                <Label>Color</Label>
                 <Select value={colorValue} onValueChange={onColorChange}>
                     <SelectTrigger><SelectValue/></SelectTrigger>
                     <SelectContent>
@@ -175,7 +174,7 @@ function TextStyleEditor({
             </div>
             <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                    <Label>Tekststørrelse</Label>
+                    <Label>Text Size</Label>
                     <span className="text-sm text-muted-foreground">{sizeValue}px</span>
                 </div>
                 <Slider 
@@ -228,7 +227,7 @@ export default function CmsFooterPage() {
     startSaving(async () => {
       const result = await saveSettingsAction(settings);
       toast({
-        title: result.success ? "Gemt!" : "Fejl!",
+        title: result.success ? "Saved!" : "Error!",
         description: result.message,
         variant: result.success ? "default" : "destructive",
       });
@@ -247,17 +246,17 @@ export default function CmsFooterPage() {
     <div className="space-y-8">
         <div className="flex justify-between items-center">
             <div>
-                <h1 className="text-2xl font-bold">Footer Indstillinger</h1>
-                <p className="text-muted-foreground">Tilpas udseendet og indholdet af din sides footer.</p>
+                <h1 className="text-2xl font-bold">Footer Settings</h1>
+                <p className="text-muted-foreground">Customize the appearance and content of your site's footer.</p>
             </div>
             <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Gem Ændringer
+                Save Changes
             </Button>
        </div>
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Indhold & Design</CardTitle>
+          <CardTitle>Content & Design</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -266,41 +265,41 @@ export default function CmsFooterPage() {
                     id="footer-tagline" 
                     value={settings.footerTagline || ''} 
                     onChange={e => handleInputChange('footerTagline', e.target.value)}
-                    placeholder="Flow. Automatisér. Skalér."
+                    placeholder="Flow. Automate. Scale."
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="footer-description">Beskrivelse</Label>
+                <Label htmlFor="footer-description">Description</Label>
                 <Textarea
                     id="footer-description" 
                     value={settings.footerDescription || ''} 
                     onChange={e => handleInputChange('footerDescription', e.target.value)}
-                    placeholder="Kort beskrivelse under tagline..."
+                    placeholder="Short description under tagline..."
                 />
             </div>
             <TextStyleEditor 
-                label="Design for Beskrivelse"
+                label="Design for Description"
                 colorValue={settings.footerDescriptionColor as ThemeColor || 'text-muted-foreground'}
                 onColorChange={(v) => handleInputChange('footerDescriptionColor', v)}
                 sizeValue={settings.footerDescriptionSize || 14}
                 onSizeChange={(v) => handleInputChange('footerDescriptionSize', v)}
             />
             <TextStyleEditor 
-                label="Virksomhedsnavn"
+                label="Company Name"
                 colorValue={settings.footerCompanyNameColor as ThemeColor || 'text-foreground'}
                 onColorChange={(v) => handleInputChange('footerCompanyNameColor', v)}
                 sizeValue={settings.footerCompanyNameSize || 16}
                 onSizeChange={(v) => handleInputChange('footerCompanyNameSize', v)}
             />
             <TextStyleEditor 
-                label="Adresse"
+                label="Address"
                 colorValue={settings.footerAddressColor as ThemeColor || 'text-muted-foreground'}
                 onColorChange={(v) => handleInputChange('footerAddressColor', v)}
                 sizeValue={settings.footerAddressSize || 14}
                 onSizeChange={(v) => handleInputChange('footerAddressSize', v)}
             />
             <TextStyleEditor 
-                label="Kontakt (Tlf, Email, CVR)"
+                label="Contact (Phone, Email, CVR)"
                 colorValue={settings.footerContactColor as ThemeColor || 'text-muted-foreground'}
                 onColorChange={(v) => handleInputChange('footerContactColor', v)}
                 sizeValue={settings.footerContactSize || 14}
@@ -310,7 +309,7 @@ export default function CmsFooterPage() {
       </Card>
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Generelt Design</CardTitle>
+          <CardTitle>General Design</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -319,21 +318,21 @@ export default function CmsFooterPage() {
                     id="footer-logo-url" 
                     value={settings.footerLogoUrl || ''} 
                     onChange={e => handleInputChange('footerLogoUrl', e.target.value)}
-                    placeholder="Indsæt URL til footer logo (efterlad tom for at bruge standard logo)"
+                    placeholder="Insert URL for footer logo (leave empty to use default logo)"
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="footer-logo-alt">Footer Logo Alt Tekst</Label>
+                <Label htmlFor="footer-logo-alt">Footer Logo Alt Text</Label>
                 <Input 
                     id="footer-logo-alt" 
                     value={settings.footerLogoAlt || ''} 
                     onChange={e => handleInputChange('footerLogoAlt', e.target.value)}
-                    placeholder="Beskrivende tekst til logoet"
+                    placeholder="Descriptive text for the logo"
                 />
             </div>
             <div className="space-y-2">
                  <div className="flex justify-between items-center">
-                    <Label>Logo Bredde</Label>
+                    <Label>Logo Width</Label>
                     <span className="text-sm text-muted-foreground">{settings.footerLogoWidth || 96}px</span>
                 </div>
                 <Slider 
@@ -346,7 +345,7 @@ export default function CmsFooterPage() {
             </div>
             <div className="space-y-2">
                 <HslColorPicker 
-                    label="Baggrundsfarve"
+                    label="Background Color"
                     color={settings.footerBackgroundColor || { h: 210, s: 60, l: 98 }}
                     onChange={(hsl) => handleInputChange('footerBackgroundColor', hsl)}
                 />

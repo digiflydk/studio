@@ -1,5 +1,4 @@
 
-
 "use client";
 import { useTheme, defaultTheme } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -201,7 +200,7 @@ export default function CmsDashboardPage() {
             buttonSettings: buttonSettings,
         });
         toast({
-            title: result.success ? "Gemt!" : "Fejl!",
+            title: result.success ? "Saved!" : "Error!",
             description: result.message,
             variant: result.success ? "default" : "destructive",
         });
@@ -232,169 +231,187 @@ export default function CmsDashboardPage() {
 
   return (
     <div className="space-y-8">
-        <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={handleReset} disabled={isSaving}>Nulstil</Button>
-            <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Gem Ændringer
-            </Button>
+        <div className="flex justify-between items-start">
+            <div>
+                <h1 className="text-2xl font-bold">Design Settings</h1>
+                <p className="text-muted-foreground">Manage the visual appearance of your site.</p>
+            </div>
+            <div className="flex gap-4">
+                <Button variant="outline" onClick={handleReset} disabled={isSaving}>Reset</Button>
+                <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
+                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+            </div>
        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>Farver</CardTitle>
-              <CardDescription>Juster sidens primære farver.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ColorPicker label="Primær farve" colorName="primary" />
-              <ColorPicker label="Baggrundsfarve" colorName="background" />
-              <ColorPicker label="Accent farve" colorName="accent" />
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>Typografi</CardTitle>
-              <CardDescription>Juster sidens skrifttyper, størrelser og vægt.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label>Primær Skrifttype</Label>
-                    <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
-                    <p className="text-xs text-muted-foreground">F.eks. &quot;Inter&quot;, &quot;Roboto&quot;. Sørg for at skrifttypen er indlæst.</p>
-                </div>
-                <Accordion type="multiple" className="w-full">
-                    <AccordionItem value="h1">
-                        <AccordionTrigger>H1</AccordionTrigger>
-                        <AccordionContent>
-                           <TypographyControl label="H1" settings={typography.h1} onUpdate={(data) => setTypography({ ...typography, h1: { ...typography.h1, ...data } })} />
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="h2">
-                        <AccordionTrigger>H2</AccordionTrigger>
-                        <AccordionContent>
-                           <TypographyControl label="H2" settings={typography.h2} onUpdate={(data) => setTypography({ ...typography, h2: { ...typography.h2, ...data } })} />
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="h3">
-                        <AccordionTrigger>H3</AccordionTrigger>
-                        <AccordionContent>
-                           <TypographyControl label="H3" settings={typography.h3} onUpdate={(data) => setTypography({ ...typography, h3: { ...typography.h3, ...data } })} />
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="h4">
-                        <AccordionTrigger>H4</AccordionTrigger>
-                        <AccordionContent>
-                           <TypographyControl label="H4" settings={typography.h4} onUpdate={(data) => setTypography({ ...typography, h4: { ...typography.h4, ...data } })} />
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="body">
-                        <AccordionTrigger>Body</AccordionTrigger>
-                        <AccordionContent>
-                           <TypographyControl label="Body" settings={typography.body} onUpdate={(data) => setTypography({ ...typography, body: { ...typography.body, ...data } })} isBody />
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-            </CardContent>
-          </Card>
 
-          <Card className="shadow-lg lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Knapper</CardTitle>
-              <CardDescription>Definer det globale design for knapper.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label>Design Type</Label>
-                     <Select value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="default">Default</SelectItem>
-                            <SelectItem value="pill">Pill</SelectItem>
-                        </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Skrifttype</Label>
-                    <Select value={buttonSettings.fontFamily} onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Inter">Inter</SelectItem>
-                            <SelectItem value="Manrope">Manrope</SelectItem>
-                            <SelectItem value="System">System</SelectItem>
-                        </SelectContent>
-                    </Select>
-                  </div>
-                   <div className="space-y-2">
-                      <Label>Font Weight</Label>
-                      <Select value={String(buttonSettings.fontWeight)} onValueChange={(v) => handleButtonSettingChange('fontWeight', Number(v))}>
-                        <SelectTrigger><SelectValue/></SelectTrigger>
-                        <SelectContent>
-                            {fontWeightOptions.map(opt => (
-                                <SelectItem key={opt.value} value={String(opt.value)}>{opt.label} ({opt.value})</SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                   </div>
-                </div>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                        <Label>Primær Farve</Label>
-                        <Input type="color" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} className="w-full h-10"/>
+        <Accordion type="multiple" className="w-full space-y-4" defaultValue={['colors']}>
+            <AccordionItem value="colors" className="border rounded-lg shadow-sm">
+                <AccordionTrigger className="px-6 py-4">
+                     <div className="text-left">
+                        <h3 className="font-semibold text-lg">Colors</h3>
+                        <p className="text-sm text-muted-foreground">Adjust the primary colors of your site.</p>
                     </div>
-                     <div className="space-y-2">
-                        <Label>Sekundær Farve</Label>
-                        <Input type="color" value={buttonSettings.colors.secondary} onChange={(e) => handleButtonColorChange('secondary', e.target.value)} className="w-full h-10"/>
+                </AccordionTrigger>
+                <AccordionContent className="p-6 border-t">
+                    <div className="space-y-6">
+                        <ColorPicker label="Primary Color" colorName="primary" />
+                        <ColorPicker label="Background Color" colorName="background" />
+                        <ColorPicker label="Accent Color" colorName="accent" />
                     </div>
-                     <div className="space-y-2">
-                        <Label>Hover Farve</Label>
-                        <Input type="color" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} className="w-full h-10"/>
+                </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="typography" className="border rounded-lg shadow-sm">
+                 <AccordionTrigger className="px-6 py-4">
+                     <div className="text-left">
+                        <h3 className="font-semibold text-lg">Typography</h3>
+                        <p className="text-sm text-muted-foreground">Adjust the fonts, sizes, and weights for your site.</p>
                     </div>
-                </div>
-
-                <div className="p-4 border rounded-lg space-y-4">
-                    <h4 className="font-semibold">Standard Værdier</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </AccordionTrigger>
+                <AccordionContent className="p-6 border-t">
+                    <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label>Variant</Label>
-                            <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
+                            <Label>Primary Font</Label>
+                            <Input value={typography.fontPrimary} onChange={(e) => setTypography({ ...typography, fontPrimary: e.target.value })} />
+                            <p className="text-xs text-muted-foreground">E.g. &quot;Inter&quot;, &quot;Roboto&quot;. Make sure the font is loaded.</p>
+                        </div>
+                        <Accordion type="multiple" className="w-full">
+                            <AccordionItem value="h1">
+                                <AccordionTrigger>H1</AccordionTrigger>
+                                <AccordionContent>
+                                   <TypographyControl label="H1" settings={typography.h1} onUpdate={(data) => setTypography({ ...typography, h1: { ...typography.h1, ...data } })} />
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="h2">
+                                <AccordionTrigger>H2</AccordionTrigger>
+                                <AccordionContent>
+                                   <TypographyControl label="H2" settings={typography.h2} onUpdate={(data) => setTypography({ ...typography, h2: { ...typography.h2, ...data } })} />
+                                </AccordionContent>
+                            </AccordionItem>
+                             <AccordionItem value="h3">
+                                <AccordionTrigger>H3</AccordionTrigger>
+                                <AccordionContent>
+                                   <TypographyControl label="H3" settings={typography.h3} onUpdate={(data) => setTypography({ ...typography, h3: { ...typography.h3, ...data } })} />
+                                </AccordionContent>
+                            </AccordionItem>
+                             <AccordionItem value="h4">
+                                <AccordionTrigger>H4</AccordionTrigger>
+                                <AccordionContent>
+                                   <TypographyControl label="H4" settings={typography.h4} onUpdate={(data) => setTypography({ ...typography, h4: { ...typography.h4, ...data } })} />
+                                </AccordionContent>
+                            </AccordionItem>
+                             <AccordionItem value="body">
+                                <AccordionTrigger>Body</AccordionTrigger>
+                                <AccordionContent>
+                                   <TypographyControl label="Body" settings={typography.body} onUpdate={(data) => setTypography({ ...typography, body: { ...typography.body, ...data } })} isBody />
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="buttons" className="border rounded-lg shadow-sm">
+                <AccordionTrigger className="px-6 py-4">
+                     <div className="text-left">
+                        <h3 className="font-semibold text-lg">Buttons</h3>
+                        <p className="text-sm text-muted-foreground">Define the global design for buttons.</p>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="p-6 border-t">
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <Label>Design Type</Label>
+                             <Select value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => handleButtonSettingChange('designType', v)}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="primary">Primary</SelectItem>
-                                    <SelectItem value="secondary">Secondary</SelectItem>
-                                    <SelectItem value="outline">Outline</SelectItem>
-                                    <SelectItem value="destructive">Destructive</SelectItem>
+                                    <SelectItem value="default">Default</SelectItem>
+                                    <SelectItem value="pill">Pill</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Størrelse</Label>
-                             <Select value={buttonSettings.defaultSize} onValueChange={(v: ButtonSizeOption) => handleButtonSettingChange('defaultSize', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Font</Label>
+                            <Select value={buttonSettings.fontFamily} onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="sm">Small</SelectItem>
-                                    <SelectItem value="md">Medium</SelectItem>
-                                    <SelectItem value="lg">Large</SelectItem>
+                                    <SelectItem value="Inter">Inter</SelectItem>
+                                    <SelectItem value="Manrope">Manrope</SelectItem>
+                                    <SelectItem value="System">System</SelectItem>
                                 </SelectContent>
                             </Select>
+                          </div>
+                           <div className="space-y-2">
+                              <Label>Font Weight</Label>
+                              <Select value={String(buttonSettings.fontWeight)} onValueChange={(v) => handleButtonSettingChange('fontWeight', Number(v))}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    {fontWeightOptions.map(opt => (
+                                        <SelectItem key={opt.value} value={String(opt.value)}>{opt.label} ({opt.value})</SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                           </div>
+                        </div>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <Label>Primary Color</Label>
+                                <Input type="color" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} className="w-full h-10"/>
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Secondary Color</Label>
+                                <Input type="color" value={buttonSettings.colors.secondary} onChange={(e) => handleButtonColorChange('secondary', e.target.value)} className="w-full h-10"/>
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Hover Color</Label>
+                                <Input type="color" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} className="w-full h-10"/>
+                            </div>
+                        </div>
+
+                        <div className="p-4 border rounded-lg space-y-4">
+                            <h4 className="font-semibold">Default Values</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label>Variant</Label>
+                                    <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="primary">Primary</SelectItem>
+                                            <SelectItem value="secondary">Secondary</SelectItem>
+                                            <SelectItem value="outline">Outline</SelectItem>
+                                            <SelectItem value="destructive">Destructive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Size</Label>
+                                     <Select value={buttonSettings.defaultSize} onValueChange={(v: ButtonSizeOption) => handleButtonSettingChange('defaultSize', v)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="sm">Small</SelectItem>
+                                            <SelectItem value="md">Medium</SelectItem>
+                                            <SelectItem value="lg">Large</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div>
+                            <h4 className="font-semibold mb-2">Live Preview</h4>
+                            <div className="p-6 border rounded-lg bg-background flex flex-wrap items-center justify-center gap-4">
+                                <Button variant="primary" size="lg">Primary LG</Button>
+                                <Button variant="secondary" size="md">Secondary MD</Button>
+                                <Button variant="outline" size="sm">Outline SM</Button>
+                                <Button variant="destructive" size="md">Destructive</Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                 <div>
-                    <h4 className="font-semibold mb-2">Live Preview</h4>
-                    <div className="p-6 border rounded-lg bg-background flex flex-wrap items-center justify-center gap-4">
-                        <Button variant="primary" size="lg">Primary LG</Button>
-                        <Button variant="secondary" size="md">Secondary MD</Button>
-                        <Button variant="outline" size="sm">Outline SM</Button>
-                        <Button variant="destructive" size="md">Destructive</Button>
-                    </div>
-                </div>
-
-            </CardContent>
-          </Card>
-        </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
     </div>
   );
 }

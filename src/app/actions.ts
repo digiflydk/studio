@@ -19,17 +19,17 @@ export async function qualifyProjectAction(input: AIProjectQualificationInput): 
     // Return a structured error response that matches the expected output type
     return {
         qualified: false,
-        nextQuestion: 'Der opstod en uventet fejl. Prøv venligst igen senere.',
+        nextQuestion: 'An unexpected error occurred. Please try again later.',
     };
   }
 }
 
 const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Navn skal være mindst 2 tegn." }),
-  email: z.string().email({ message: "Indtast venligst en gyldig email." }),
-  message: z.string().min(10, { message: "Besked skal være mindst 10 tegn." }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email." }),
+  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
   gdpr: z.literal(true, {
-    errorMap: () => ({ message: "Du skal acceptere vilkårene." }),
+    errorMap: () => ({ message: "You must accept the terms." }),
   }),
 });
 
@@ -55,7 +55,7 @@ export async function sendContactMessage(prevState: FormState, formData: FormDat
     if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
-        message: 'Udfyld venligst alle felter korrekt.',
+        message: 'Please fill in all fields correctly.',
       };
     }
     
@@ -65,13 +65,13 @@ export async function sendContactMessage(prevState: FormState, formData: FormDat
     console.log(validatedFields.data);
 
     return {
-      message: 'Tak for din besked! Vi vender tilbage hurtigst muligt.',
+      message: 'Thank you for your message! We will get back to you as soon as possible.',
       errors: {},
     };
   } catch (error) {
       console.error("Error sending contact message:", error);
       return {
-          message: 'Der opstod en serverfejl. Prøv venligst igen.',
+          message: 'A server error occurred. Please try again.',
           errors: {},
       }
   }
@@ -91,10 +91,10 @@ export async function saveSettingsAction(settings: Partial<GeneralSettings>): Pr
         await saveGeneralSettings(settings);
         revalidatePath('/cms', 'layout');
         revalidatePath('/', 'layout');
-        return { success: true, message: 'Indstillinger er blevet gemt.' };
+        return { success: true, message: 'Settings have been saved.' };
     } catch (error) {
         console.error(error);
-        return { success: false, message: 'Der opstod en fejl under lagring.' };
+        return { success: false, message: 'An error occurred during saving.' };
     }
 }
 
@@ -115,10 +115,10 @@ export async function saveCustomerAction(customerData: Omit<Customer, 'id'>): Pr
         const updatedCustomers = [...customers, newCustomer];
         await saveGeneralSettings({ customers: updatedCustomers });
         revalidatePath('/cms/customers');
-        return { success: true, message: 'Kunde tilføjet.', customers: updatedCustomers };
+        return { success: true, message: 'Customer added.', customers: updatedCustomers };
     } catch (error) {
         console.error(error);
-        return { success: false, message: 'Der opstod en fejl.', customers: [] };
+        return { success: false, message: 'An error occurred.', customers: [] };
     }
 }
 
@@ -129,10 +129,10 @@ export async function deleteCustomerAction(customerId: string): Promise<{ succes
         const updatedCustomers = customers.filter(c => c.id !== customerId);
         await saveGeneralSettings({ customers: updatedCustomers });
         revalidatePath('/cms/customers');
-        return { success: true, message: 'Kunde slettet.', customers: updatedCustomers };
+        return { success: true, message: 'Customer deleted.', customers: updatedCustomers };
     } catch (error) {
         console.error(error);
-        return { success: false, message: 'Der opstod en fejl.', customers: [] };
+        return { success: false, message: 'An error occurred.', customers: [] };
     }
 }
 

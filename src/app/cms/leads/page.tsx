@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -29,13 +28,13 @@ export default function CmsLeadsPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold">Customer Leads</h1>
-                <p className="text-muted-foreground">Oversigt over leads indsamlet af AI-assistenten.</p>
+                <p className="text-muted-foreground">Overview of leads collected by the AI assistant.</p>
             </div>
 
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Indsamlede Leads</CardTitle>
-                    <CardDescription>Liste over potentielle kunder, der har interageret med AI-assistenten.</CardDescription>
+                    <CardTitle>Collected Leads</CardTitle>
+                    <CardDescription>List of potential customers who have interacted with the AI assistant.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
@@ -46,12 +45,12 @@ export default function CmsLeadsPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Dato</TableHead>
-                                    <TableHead>Navn</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Name</TableHead>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Telefon</TableHead>
+                                    <TableHead>Phone</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Projektidé</TableHead>
+                                    <TableHead>Project Idea</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -73,7 +72,7 @@ export default function CmsLeadsPage() {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center">
-                                            Ingen leads fundet.
+                                            No leads found.
                                         </TableCell>
                                     </TableRow>
                                 )}

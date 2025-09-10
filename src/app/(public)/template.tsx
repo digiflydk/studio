@@ -52,7 +52,7 @@ export default function Template({ children }: { children: ReactNode }) {
 
         const root = document.documentElement;
         root.style.setProperty('--header-offset', `${totalOffset}px`);
-        root.style.scrollPaddingTop = `${totalOffset + 8}px`; // 8px luft
+        root.style.scrollPaddingTop = `${totalOffset + 8}px`; // 8px buffer
     }, []);
     
     const handleSaveConsent = (consent: ConsentCategories) => {
@@ -92,7 +92,7 @@ export default function Template({ children }: { children: ReactNode }) {
             
             <div className="fixed bottom-4 right-4 z-50">
                 <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)}>
-                    Cookie-indstillinger
+                    Cookie Settings
                 </Button>
             </div>
 

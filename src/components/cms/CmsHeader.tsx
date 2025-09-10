@@ -49,13 +49,13 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                         </Link>
                     </SheetTitle>
                     <SheetDescription>
-                        Administrer din hjemmesides indstillinger og indhold.
+                        Manage your website's settings and content.
                     </SheetDescription>
                 </SheetHeader>
                 <nav className="grid gap-4 text-base font-medium">
                     <Link href="/cms/pages" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/pages') })}>
                         <FileText className="h-5 w-5" />
-                        Indhold
+                        Content
                     </Link>
                     <Link href="/cms/dashboard" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname === '/cms/dashboard' })}>
                         <Brush className="h-5 w-5" />
@@ -67,7 +67,7 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                     </Link>
                     <Link href="/cms/customers" className={cn("flex items-center gap-4 px-2.5 text-gray-400 hover:text-white", { "text-white": pathname.startsWith('/cms/customers') })}>
                         <HeartHandshake className="h-5 w-5" />
-                        Kunder
+                        Customers
                     </Link>
                     <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-2.5 text-gray-400 transition-all hover:text-white">
@@ -93,10 +93,10 @@ export default function CmsHeader({ settings }: { settings: GeneralSettings | nu
                 </nav>
             </SheetContent>
         </Sheet>
-        <h1 className="text-xl font-bold">Design Indstillinger</h1>
+        <h1 className="text-xl font-bold">Design Settings</h1>
         <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="outline" size="icon">
-                <Link href="/" aria-label="Gå til forside">
+                <Link href="/" aria-label="Go to homepage">
                     <Home className="h-4 w-4" />
                 </Link>
             </Button>

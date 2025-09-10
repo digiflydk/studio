@@ -51,7 +51,7 @@ function SidebarInner() {
               )}
             >
               <FileText className="h-4 w-4" />
-              Indhold
+              Content
             </Link>
             <Link
               href="/cms/dashboard"
@@ -81,7 +81,7 @@ function SidebarInner() {
               )}
             >
               <HeartHandshake className="h-4 w-4" />
-              Kunder
+              Customers
             </Link>
             <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-gray-400 transition-all hover:text-white hover:bg-gray-800">

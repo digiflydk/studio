@@ -39,7 +39,7 @@ function SubmitButton() {
   return (
     <Button type="submit" className="w-full" disabled={pending} data-cta="send_contact_message">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-      Send Besked
+      Send Message
     </Button>
   );
 }
@@ -56,13 +56,13 @@ export default function ContactSection({ settings }: ContactSectionProps) {
   useEffect(() => {
     if (state.message && (!state.errors || Object.keys(state.errors).length === 0)) {
       toast({
-        title: "Besked sendt!",
+        title: "Message sent!",
         description: state.message,
       });
       formRef.current?.reset();
     } else if (state.message && state.errors && Object.keys(state.errors).length > 0) {
         toast({
-            title: "Fejl",
+            title: "Error",
             description: state.message,
             variant: "destructive",
         })
@@ -91,32 +91,32 @@ export default function ContactSection({ settings }: ContactSectionProps) {
       <div className="container mx-auto max-w-xl px-4 md:px-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-h2">Kom i kontakt</CardTitle>
+            <CardTitle className="text-h2">Get in touch</CardTitle>
             <CardDescription className="mt-4 text-body text-muted-foreground">
-              Har du et projekt, eller vil du bare sige hej? Udfyld formularen, så vender vi tilbage.
+              Have a project in mind or just want to say hi? Fill out the form and we'll get back to you.
             </CardDescription>
           </CardHeader>
           <form ref={formRef} action={formAction} data-form="contact">
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Navn</Label>
-                <Input id="name" name="name" placeholder="Dit navn" required />
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" placeholder="Your name" required />
                 {state?.errors?.name?.[0] && <p className="text-sm text-destructive">{state.errors.name[0]}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="din@email.dk" required />
+                <Input id="email" name="email" type="email" placeholder="your@email.com" required />
                 {state?.errors?.email?.[0] && <p className="text-sm text-destructive">{state.errors.email[0]}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="message">Besked</Label>
-                <Textarea id="message" name="message" placeholder="Fortæl os lidt om, hvad du har på hjerte..." required minLength={10} />
+                <Label htmlFor="message">Message</Label>
+                <Textarea id="message" name="message" placeholder="Tell us a bit about what's on your mind..." required minLength={10} />
                 {state?.errors?.message?.[0] && <p className="text-sm text-destructive">{state.errors.message[0]}</p>}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="gdpr" name="gdpr" required />
                 <Label htmlFor="gdpr" className="text-sm font-normal text-muted-foreground">
-                  Jeg forstår, at Digifly indsamler mine oplysninger for at kunne kontakte mig.
+                  I understand that Digifly collects my information in order to contact me.
                 </Label>
               </div>
                {state?.errors?.gdpr?.[0] && <p className="text-sm text-destructive">{state.errors.gdpr[0]}</p>}

@@ -174,7 +174,7 @@ function NavLinkStyleEditor({
             <h3 className="font-semibold">{label}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label>Tekstfarve</Label>
+                    <Label>Text Color</Label>
                     <Select value={colorValue} onValueChange={onColorChange}>
                         <SelectTrigger><SelectValue/></SelectTrigger>
                         <SelectContent>
@@ -185,7 +185,7 @@ function NavLinkStyleEditor({
                     </Select>
                 </div>
                  <div className="space-y-2">
-                    <Label>Hover Farve</Label>
+                    <Label>Hover Color</Label>
                     <Select value={hoverColorValue} onValueChange={onHoverColorChange}>
                         <SelectTrigger><SelectValue/></SelectTrigger>
                         <SelectContent>
@@ -198,7 +198,7 @@ function NavLinkStyleEditor({
             </div>
             <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                    <Label>Tekststørrelse</Label>
+                    <Label>Text Size</Label>
                     <span className="text-sm text-muted-foreground">{sizeValue}px</span>
                 </div>
                 <Slider 
@@ -210,7 +210,7 @@ function NavLinkStyleEditor({
                 />
             </div>
             <div className="space-y-2">
-                <Label>Mobil Menu Ikonfarve</Label>
+                <Label>Mobile Menu Icon Color</Label>
                 <Select value={iconColorValue} onValueChange={onIconColorChange}>
                     <SelectTrigger><SelectValue/></SelectTrigger>
                     <SelectContent>
@@ -225,13 +225,13 @@ function NavLinkStyleEditor({
 }
 
 const sectionLinks = [
-    { value: '#hero', label: 'Hero Sektion' },
+    { value: '#hero', label: 'Hero Section' },
     { value: '#services', label: 'Services' },
-    { value: '#ai-project', label: 'AI Projekt' },
+    { value: '#ai-project', label: 'AI Project' },
     { value: '#cases', label: 'Cases' },
-    { value: '#om-os', label: 'Om Os' },
-    { value: '#kontakt', label: 'Kontakt' },
-    { value: 'custom', label: 'Brugerdefineret link' },
+    { value: '#om-os', label: 'About Us' },
+    { value: '#kontakt', label: 'Contact' },
+    { value: 'custom', label: 'Custom link' },
 ]
 
 function NavLinkEditor({ item, updateItem }: { item: NavLink, updateItem: (data: NavLink) => void }) {
@@ -249,7 +249,7 @@ function NavLinkEditor({ item, updateItem }: { item: NavLink, updateItem: (data:
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor={`label-${item.label}`}>Tekst</Label>
+                <Label htmlFor={`label-${item.label}`}>Text</Label>
                 <Input
                     id={`label-${item.label}`}
                     value={item.label}
@@ -257,7 +257,7 @@ function NavLinkEditor({ item, updateItem }: { item: NavLink, updateItem: (data:
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor={`href-select-${item.label}`}>Link til</Label>
+                <Label htmlFor={`href-select-${item.label}`}>Link To</Label>
                 <Select value={selectValue} onValueChange={handleSelectChange}>
                     <SelectTrigger id={`href-select-${item.label}`}><SelectValue/></SelectTrigger>
                     <SelectContent>
@@ -269,11 +269,11 @@ function NavLinkEditor({ item, updateItem }: { item: NavLink, updateItem: (data:
             </div>
             {selectValue === 'custom' && (
                 <div className="space-y-2">
-                    <Label htmlFor={`href-input-${item.label}`}>Brugerdefineret Link</Label>
+                    <Label htmlFor={`href-input-${item.label}`}>Custom Link</Label>
                      <Input
                         id={`href-input-${item.label}`}
                         value={item.href}
-                        placeholder="f.eks. https://eksempel.dk"
+                        placeholder="e.g. https://example.com"
                         onChange={e => updateItem({ ...item, href: e.target.value })}
                     />
                 </div>
@@ -293,7 +293,7 @@ function EditableNavLinkItem({ index, item, updateItem, removeItem }: {
         <AccordionItem value={`item-${index}`}>
             <div className="flex justify-between w-full items-center">
                 <AccordionTrigger className="flex-1 pr-4 text-left">
-                    <span>{item.label || `Nyt Link`}</span>
+                    <span>{item.label || `New Link`}</span>
                 </AccordionTrigger>
                 <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -309,8 +309,8 @@ function EditableNavLinkItem({ index, item, updateItem, removeItem }: {
 const defaultNavLinks: NavLink[] = [
   { href: '#services', label: 'Services' },
   { href: '#cases', label: 'Cases' },
-  { href: '#om-os', label: 'Om os' },
-  { href: '#kontakt', label: 'Kontakt' },
+  { href: '#om-os', label: 'About Us' },
+  { href: '#kontakt', label: 'Contact' },
 ];
 
 export default function CmsHeaderPage() {
@@ -373,7 +373,7 @@ export default function CmsHeaderPage() {
         startSaving(async () => {
             const result = await saveSettingsAction(settings);
             toast({
-                title: result.success ? "Gemt!" : "Fejl!",
+                title: result.success ? "Saved!" : "Error!",
                 description: result.message,
                 variant: result.success ? "default" : "destructive",
             });
@@ -392,24 +392,24 @@ export default function CmsHeaderPage() {
         <div className="space-y-8">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold">Header Indstillinger</h1>
-                    <p className="text-muted-foreground">Tilpas udseendet af din sides header.</p>
+                    <h1 className="text-2xl font-bold">Header Settings</h1>
+                    <p className="text-muted-foreground">Customize the appearance of your site's header.</p>
                 </div>
                 <Button size="lg" onClick={handleSaveChanges} disabled={isSaving}>
                     {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Gem Ændringer
+                    Save Changes
                 </Button>
             </div>
             
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Generelt Design & Funktion</CardTitle>
+                    <CardTitle>General Design & Function</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                             <Label htmlFor="sticky-header" className="text-base">Sticky Header</Label>
-                            <p className="text-sm text-muted-foreground">Gør headeren fastlåst i toppen af siden.</p>
+                            <p className="text-sm text-muted-foreground">Makes the header fixed at the top of the page.</p>
                         </div>
                         <Switch
                             id="sticky-header"
@@ -419,7 +419,7 @@ export default function CmsHeaderPage() {
                     </div>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label>Header Højde</Label>
+                            <Label>Header Height</Label>
                             <span className="text-sm text-muted-foreground">{settings.headerHeight || 64}px</span>
                         </div>
                         <Slider 
@@ -432,7 +432,7 @@ export default function CmsHeaderPage() {
                     </div>
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label>Logo Bredde</Label>
+                            <Label>Logo Width</Label>
                             <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 96}px</span>
                         </div>
                         <Slider 
@@ -448,14 +448,14 @@ export default function CmsHeaderPage() {
 
              <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Bundlinje</CardTitle>
-                    <CardDescription>Tilføj en farvet linje i bunden af headeren.</CardDescription>
+                    <CardTitle>Bottom Border</CardTitle>
+                    <CardDescription>Add a colored line at the bottom of the header.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                      <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                            <Label htmlFor="top-border-enabled" className="text-base">Aktivér Bundlinje</Label>
-                            <p className="text-sm text-muted-foreground">Viser en farvet linje i bunden af headeren.</p>
+                            <Label htmlFor="top-border-enabled" className="text-base">Enable Bottom Border</Label>
+                            <p className="text-sm text-muted-foreground">Shows a colored line at the bottom of the header.</p>
                         </div>
                         <Switch
                             id="top-border-enabled"
@@ -467,7 +467,7 @@ export default function CmsHeaderPage() {
                         <div className="space-y-4">
                             {settings.headerTopBorderColor && (
                                 <HslColorPicker
-                                    label="Linjens Farve"
+                                    label="Border Color"
                                     color={settings.headerTopBorderColor}
                                     onChange={(hsl) => handleInputChange('headerTopBorderColor', hsl)}
                                 />
@@ -479,22 +479,22 @@ export default function CmsHeaderPage() {
 
             <Card className="shadow-lg">
                  <CardHeader>
-                    <CardTitle>Baggrundsfarve</CardTitle>
-                    <CardDescription>Styr headerens udseende i toppen af siden og når der scrolles.</CardDescription>
+                    <CardTitle>Background Color</CardTitle>
+                    <CardDescription>Control the header's appearance at the top of the page and on scroll.</CardDescription>
                 </CardHeader>
                  <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="space-y-4 p-4 border rounded-lg">
-                         <h3 className="font-semibold">Normal Tilstand (Top)</h3>
+                         <h3 className="font-semibold">Normal State (Top)</h3>
                         {settings.headerInitialBackgroundColor &&
                             <HslColorPicker 
-                                label="Baggrundsfarve"
+                                label="Background Color"
                                 color={settings.headerInitialBackgroundColor}
                                 onChange={(hsl) => handleInputChange('headerInitialBackgroundColor', hsl)}
                             />
                         }
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <Label>Gennemsigtighed</Label>
+                                <Label>Opacity</Label>
                                 <span className="text-sm text-muted-foreground">{settings.headerInitialBackgroundOpacity || 0}%</span>
                             </div>
                             <Slider 
@@ -507,17 +507,17 @@ export default function CmsHeaderPage() {
                         </div>
                     </div>
                      <div className="space-y-4 p-4 border rounded-lg">
-                        <h3 className="font-semibold">Scrollet Tilstand</h3>
+                        <h3 className="font-semibold">Scrolled State</h3>
                         {settings.headerScrolledBackgroundColor &&
                             <HslColorPicker 
-                                label="Baggrundsfarve"
+                                label="Background Color"
                                 color={settings.headerScrolledBackgroundColor}
                                 onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
                             />
                         }
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <Label>Gennemsigtighed</Label>
+                                <Label>Opacity</Label>
                                 <span className="text-sm text-muted-foreground">{settings.headerScrolledBackgroundOpacity || 95}%</span>
                             </div>
                             <Slider 
@@ -535,11 +535,11 @@ export default function CmsHeaderPage() {
 
             <Card className="shadow-lg">
                 <CardHeader>
-                    <CardTitle>Navigationslinks & Menu</CardTitle>
-                    <CardDescription>Tilpas udseendet og indholdet af links og ikoner i headeren.</CardDescription>
+                    <CardTitle>Navigation Links & Menu</CardTitle>
+                    <CardDescription>Customize the appearance and content of links and icons in the header.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <Label>Navigationslinks</Label>
+                    <Label>Navigation Links</Label>
                     <Accordion type="multiple" className="w-full border rounded-md">
                         {(settings.headerNavLinks || []).map((link, index) => (
                            <EditableNavLinkItem
@@ -551,11 +551,11 @@ export default function CmsHeaderPage() {
                            />
                         ))}
                     </Accordion>
-                    <Button variant="outline" onClick={() => handleListAdd('headerNavLinks', { label: 'Nyt Link', href: '#' })}>Tilføj Link</Button>
+                    <Button variant="outline" onClick={() => handleListAdd('headerNavLinks', { label: 'New Link', href: '#' })}>Add Link</Button>
                     <hr/>
                    {settings.headerLinkColor && typeof settings.headerLinkSize !== 'undefined' && settings.headerLinkHoverColor && settings.headerMenuIconColor &&
                         <NavLinkStyleEditor 
-                            label="Styling for links og ikoner"
+                            label="Styling for links and icons"
                             colorValue={settings.headerLinkColor as ThemeColor}
                             onColorChange={(v) => handleInputChange('headerLinkColor', v)}
                             hoverColorValue={settings.headerLinkHoverColor as ThemeColor}

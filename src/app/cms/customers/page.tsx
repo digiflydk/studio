@@ -36,8 +36,8 @@ import {
 } from '@/components/ui/dialog';
 
 const customerFormSchema = z.object({
-  name: z.string().min(1, 'Navn er påkrævet'),
-  logoUrl: z.string().url('Ugyldig URL'),
+  name: z.string().min(1, 'Name is required'),
+  logoUrl: z.string().url('Invalid URL'),
   aiHint: z.string().optional(),
 });
 
@@ -74,7 +74,7 @@ export default function CmsCustomersPage() {
       const payload: Omit<Customer, 'id'> = { ...data, aiHint: data.aiHint ?? '' };
       const result = await saveCustomerAction(payload);
       toast({
-        title: result.success ? 'Succes!' : 'Fejl!',
+        title: result.success ? 'Success!' : 'Error!',
         description: result.message,
         variant: result.success ? 'default' : 'destructive',
       });
@@ -90,7 +90,7 @@ export default function CmsCustomersPage() {
     startTransition(async () => {
       const result = await deleteCustomerAction(id);
        toast({
-        title: result.success ? 'Succes!' : 'Fejl!',
+        title: result.success ? 'Success!' : 'Error!',
         description: result.message,
         variant: result.success ? 'default' : 'destructive',
       });
@@ -104,21 +104,21 @@ export default function CmsCustomersPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Kunder</h1>
+          <h1 className="text-2xl font-bold">Customers</h1>
           <p className="text-muted-foreground">
-            Administrer logoer for de kunder, der skal vises på din hjemmeside.
+            Manage the logos for the customers to be displayed on your homepage.
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
              <Button onClick={() => form.reset()}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Tilføj Ny Kunde
+                Add New Customer
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Tilføj Ny Kunde</DialogTitle>
+              <DialogTitle>Add New Customer</DialogTitle>
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -127,9 +127,9 @@ export default function CmsCustomersPage() {
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Kundenavn</FormLabel>
+                                <FormLabel>Customer Name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="F.eks. Google" {...field} />
+                                    <Input placeholder="E.g. Google" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -153,9 +153,9 @@ export default function CmsCustomersPage() {
                         name="aiHint"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>AI Billede Hint (valgfrit)</FormLabel>
+                                <FormLabel>AI Image Hint (optional)</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="F.eks. tech company" {...field} />
+                                    <Input placeholder="E.g. tech company" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -163,11 +163,11 @@ export default function CmsCustomersPage() {
                     />
                     <div className="flex justify-end gap-2">
                          <DialogClose asChild>
-                            <Button type="button" variant="secondary">Annuller</Button>
+                            <Button type="button" variant="secondary">Cancel</Button>
                          </DialogClose>
                         <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Gem Kunde
+                            Save Customer
                         </Button>
                     </div>
                 </form>
@@ -178,8 +178,8 @@ export default function CmsCustomersPage() {
 
         <Card className="shadow-lg">
             <CardHeader>
-                <CardTitle>Eksisterende Kunder</CardTitle>
-                <CardDescription>Disse logoer vises i karrusellen på forsiden.</CardDescription>
+                <CardTitle>Existing Customers</CardTitle>
+                <CardDescription>These logos are displayed in the carousel on the front page.</CardDescription>
             </CardHeader>
             <CardContent>
                   {isLoading ? (
@@ -215,9 +215,9 @@ export default function CmsCustomersPage() {
                     </div>
                 ) : (
                       <Alert>
-                        <AlertTitle>Ingen kunder tilføjet</AlertTitle>
+                        <AlertTitle>No customers added</AlertTitle>
                         <AlertDescription>
-                            Der er endnu ikke tilføjet nogle kundelogoer. Klik på &quot;Tilføj Ny Kunde&quot; for at oprette en.
+                            No customer logos have been added yet. Click &quot;Add New Customer&quot; to create one.
                         </AlertDescription>
                     </Alert>
                 )}

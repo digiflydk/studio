@@ -7,19 +7,19 @@ import Link from "next/link";
 const pageSections = [
   {
     name: "Home",
-    description: "Administrer indholdet på forsiden.",
+    description: "Manage the content on the home page.",
     href: "/cms/pages/home",
     icon: Home,
   },
    {
     name: "Header",
-    description: "Rediger sidens header og navigation.",
+    description: "Edit the site header and navigation.",
     href: "/cms/pages/header",
     icon: PanelTop,
   },
    {
     name: "Footer",
-    description: "Rediger sidens footer og kontaktoplysninger.",
+    description: "Edit the site footer and contact information.",
     href: "/cms/pages/footer",
     icon: PanelBottom,
   },
@@ -29,8 +29,8 @@ export default function CmsPagesPage() {
   return (
     <div className="space-y-8">
        <div>
-            <h1 className="text-2xl font-bold">Sideindhold</h1>
-            <p className="text-muted-foreground">Vælg en sektion for at redigere indholdet.</p>
+            <h1 className="text-2xl font-bold">Page Content</h1>
+            <p className="text-muted-foreground">Select a section to edit its content.</p>
        </div>
         <Card className="shadow-lg">
             <CardContent className="p-0">
