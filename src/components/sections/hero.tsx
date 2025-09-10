@@ -1,9 +1,9 @@
 
 'use client';
 import Image from 'next/image';
-import type { GeneralSettings, SectionPadding } from '@/types/settings';
+import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
-import { CSSProperties, Suspense } from 'react';
+import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -282,7 +282,7 @@ function TextWithImageGridHero({ settings }: { settings: GeneralSettings | null 
     );
 }
 
-function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
+export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
     const layout = settings?.heroLayout || 'fullWidthImage';
     
     if (layout === 'textWithImageGrid') {
@@ -290,12 +290,4 @@ function HeroSectionInner({ settings }: { settings: GeneralSettings | null }) {
     }
     
     return <FullWidthImageHero settings={settings} />;
-}
-
-export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
-    return (
-        <Suspense fallback={<section id="hero" className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] bg-gray-200"></section>}>
-            <HeroSectionInner settings={settings} />
-        </Suspense>
-    )
 }
