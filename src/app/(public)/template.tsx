@@ -1,4 +1,3 @@
-
 'use client';
 
 import { ReactNode, Suspense, useRef, useLayoutEffect, useState, useEffect } from 'react';
@@ -12,7 +11,7 @@ import AnnouncementBanner from '@/components/announcement-banner';
 import CookieBanner from '@/components/cookies/CookieBanner';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 import { getConsent, saveConsent } from '@/lib/cookie-consent';
-import { ConsentCategories, CookieSettings } from '@/types/settings';
+import type { ConsentCategories } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 
 export default function Template({ children }: { children: ReactNode }) {
@@ -87,14 +86,8 @@ export default function Template({ children }: { children: ReactNode }) {
             </main>
 
             <Suspense fallback={<footer></footer>}>
-                <Footer settings={settings} />
+                <Footer settings={settings} onOpenCookieSettings={() => setShowSettings(true)} />
             </Suspense>
-            
-            <div className="fixed bottom-4 right-4 z-50">
-                <Button variant="secondary" size="sm" onClick={() => setShowSettings(true)}>
-                    Cookie Settings
-                </Button>
-            </div>
 
             {showBanner && (
                 <CookieBanner 
@@ -116,7 +109,7 @@ export default function Template({ children }: { children: ReactNode }) {
                 initialConsent={initialConsent}
             />
             
-            <Analytics settings={settings} />
+            <Analytics consent={cookieConsent} settings={settings} />
             <Toaster />
         </ThemeProvider>
     )

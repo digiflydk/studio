@@ -1,10 +1,9 @@
-
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import type { GeneralSettings } from '@/types/settings';
+import type { GeneralSettings, ConsentCategories } from '@/types/settings';
 
 declare global {
   interface Window {
@@ -73,27 +72,33 @@ function GA4Declarations({ gaId }: { gaId: string }) {
     )
 }
 
-function AnalyticsInner({ settings }: { settings: GeneralSettings | null }) {
+function AnalyticsInner({ settings, consent }: { settings: GeneralSettings, consent: ConsentCategories }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    
+    const canTrackAnalytics = consent.analytics && settings.enableGoogleAnalytics && settings.googleAnalyticsId;
+    const canTrackMarketing = consent.marketing && settings.enableFacebookPixel && settings.facebookPixelId;
+    const canUseGtm = consent.marketing && settings.enableGtm && settings.gtmId;
 
     // Pageview event on path change
     useEffect(() => {
-        if (pathname && settings) {
+        if (pathname && canUseGtm) {
             pushToDataLayer({
                 event: 'page_view',
                 page_path: pathname + (searchParams?.toString() ? '?' + searchParams.toString() : ''),
                 page_title: document.title,
             });
-
-            if (settings.enableFacebookPixel && settings.facebookPixelId && window.fbq) {
-                window.fbq('track', 'PageView');
-            }
         }
-    }, [pathname, searchParams, settings]);
+        if (canTrackMarketing && window.fbq) {
+             window.fbq('track', 'PageView');
+        }
+
+    }, [pathname, searchParams, canUseGtm, canTrackMarketing]);
 
     // Delegated event listeners for tracking
     useEffect(() => {
+        if (!canUseGtm) return;
+
         const handleCtaClick = (e: MouseEvent) => {
             const el = (e.target as HTMLElement).closest('[data-cta]');
             if (!el) return;
@@ -121,37 +126,26 @@ function AnalyticsInner({ settings }: { settings: GeneralSettings | null }) {
             document.removeEventListener('click', handleCtaClick);
             document.removeEventListener('submit', handleFormSubmit);
         }
-    }, []);
+    }, [canUseGtm]);
 
     return (
         <>
-            {settings?.enableGtm && settings.gtmId && <GTMDeclarations gtmId={settings.gtmId} />}
-            {settings?.enableGoogleAnalytics && settings.googleAnalyticsId && <GA4Declarations gaId={settings.googleAnalyticsId} />}
-            {settings?.enableFacebookPixel && settings.facebookPixelId && <FBPixelDeclarations pixelId={settings.facebookPixelId} />}
+            {canUseGtm && <GTMDeclarations gtmId={settings.gtmId!} />}
+            {canTrackAnalytics && <GA4Declarations gaId={settings.googleAnalyticsId!} />}
+            {canTrackMarketing && <FBPixelDeclarations pixelId={settings.facebookPixelId!} />}
         </>
     );
 }
 
 
-export default function Analytics({ settings }: { settings: GeneralSettings | null }) {
-    const [consent, setConsent] = useState(false);
-
-    useEffect(() => {
-        try {
-            const consentValue = localStorage.getItem("cookie-consent");
-            setConsent(consentValue === 'accepted');
-        } catch (e) {
-            // localStorage is not available
-        }
-    }, []);
-
+export default function Analytics({ settings, consent }: { settings: GeneralSettings | null, consent: ConsentCategories | null }) {
     if (!settings || !consent) {
         return null;
     }
 
     return (
         <Suspense fallback={null}>
-           <AnalyticsInner settings={settings} />
+           <AnalyticsInner settings={settings} consent={consent} />
         </Suspense>
     );
 }

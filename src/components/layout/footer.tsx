@@ -1,9 +1,13 @@
 
+'use client';
+
 import { Linkedin, Facebook, Instagram, Twitter, Clapperboard, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/logo';
 import type { GeneralSettings } from '@/types/settings';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
 
 type SocialLink = {
   url: string;
@@ -21,7 +25,12 @@ const socialIcons = {
   tiktokUrl: { icon: Clapperboard, label: 'TikTok' },
 } as const;
 
-export default function Footer({ settings }: { settings: GeneralSettings | null }) {
+interface FooterProps {
+    settings: GeneralSettings | null,
+    onOpenCookieSettings: () => void;
+}
+
+export default function Footer({ settings, onOpenCookieSettings }: FooterProps) {
   if (!settings) {
       return null;
   }
@@ -111,7 +120,12 @@ export default function Footer({ settings }: { settings: GeneralSettings | null 
                 ))}
               </div>
             )}
-            <p className={cn("text-xs mt-4", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
+            <div className='flex flex-col items-center md:items-end gap-2 mt-4'>
+                <p className={cn("text-xs", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
+                <Button variant='link' className={cn('p-0 h-auto text-xs', mutedTextColorClass)} onClick={onOpenCookieSettings}>
+                    Cookie-indstillinger
+                </Button>
+            </div>
           </div>
         </div>
       </div>
