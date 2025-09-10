@@ -1,3 +1,4 @@
+
 import { GeneralSettings, ButtonSettings, TypographySettings } from "@/types/settings";
 
 function applyTypography(t: TypographySettings | undefined) {

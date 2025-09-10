@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { getGeneralSettings } from '@/services/settings';
 import DesignProvider from '@/providers/DesignProvider';
-import { applyDesignVars, makeVarsCss } from '@/lib/ui/applyDesignVars';
+import { makeVarsCss } from '@/lib/ui/applyDesignVars';
 
 
 export async function generateMetadata(): Promise<Metadata> {

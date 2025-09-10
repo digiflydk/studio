@@ -38,7 +38,8 @@ export async function POST(request: Request) {
         data: updatedData,
     }, { headers: { 'cache-control': 'no-store' } });
 
-  } catch (error: any) {
+  } catch (error: any)
+{
     console.error('Error saving design settings:', error);
     return NextResponse.json({ ok: false, message: 'An error occurred during saving.', error: error.message }, { status: 500 });
   }

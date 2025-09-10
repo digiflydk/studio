@@ -1,9 +1,10 @@
+
 import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { adminDb } from '@/lib/server/firebaseAdmin';
-const PATH = 'designSettings/global';
+const PATH = 'settings/general';
 
 export async function GET() {
   try {
