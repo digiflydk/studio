@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { saveSettingsAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -190,21 +190,21 @@ const fontWeightOptions = [
 
 function CmsDesignPageContent() {
   const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, startTransition] = useTransition();
   const { toast } = useToast();
 
-  const handleSaveChanges = async () => {
-    setIsSaving(true);
-    const result = await saveSettingsAction({
-        themeColors: theme.colors,
-        typography: typography,
-        buttonSettings: buttonSettings,
-    });
-    setIsSaving(false);
-    toast({
-        title: result.success ? "Saved!" : "Error!",
-        description: result.message,
-        variant: result.success ? "default" : "destructive",
+  const handleSaveChanges = () => {
+    startTransition(async () => {
+      const result = await saveSettingsAction({
+          themeColors: theme.colors,
+          typography: typography,
+          buttonSettings: buttonSettings,
+      });
+      toast({
+          title: result.success ? "Saved!" : "Error!",
+          description: result.message,
+          variant: result.success ? "default" : "destructive",
+      });
     });
   }
 
