@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useState, useCallback, useEffect, useContext } from 'react';
-import type { GeneralSettings, TypographySettings } from '@/types/settings';
+import type { GeneralSettings, TypographySettings, ButtonSettings } from '@/types/settings';
 
 type HSLColor = { h: number; s: number; l: number };
 
@@ -24,12 +24,29 @@ const defaultTypography: TypographySettings = {
     body: { size: 16, weight: 400, lineHeight: 1.6 },
 };
 
+const defaultButtonSettings: ButtonSettings = {
+    designType: 'default',
+    fontFamily: 'Inter',
+    fontWeight: 600,
+    colors: {
+      primary: '#2563EB',
+      secondary: '#1F2937',
+      hover: '#1D4ED8',
+    },
+    defaultVariant: 'primary',
+    defaultSize: 'md',
+    defaultTextSize: 16,
+};
+
+
 interface ThemeContextType {
   theme: Theme;
   typography: TypographySettings;
+  buttonSettings: ButtonSettings;
   setTheme: (theme: Theme) => void;
   setThemeColor: (colorName: keyof Theme['colors'], hsl: HSLColor) => void;
   setTypography: (typography: TypographySettings) => void;
+  setButtonSettings: (buttonSettings: ButtonSettings) => void;
   isLoaded: boolean;
 }
 
@@ -81,6 +98,24 @@ function applyTypographyVars(t: TypographySettings) {
   r.setProperty('--body-lh', String(sanitizeLH(t.body.lineHeight)));
 }
 
+function applyButtonVars(b: ButtonSettings) {
+    if(!b) return;
+    const r = document.documentElement.style;
+
+    r.setProperty('--btn-radius', b.designType === 'pill' ? '9999px' : '10px');
+
+    const family = b.fontFamily === 'Manrope' ? 'Manrope, ui-sans-serif, system-ui' :
+                   b.fontFamily === 'System'  ? 'ui-sans-serif, system-ui' :
+                                                'Inter, ui-sans-serif, system-ui';
+    r.setProperty('--btn-font-family', family);
+    r.setProperty('--btn-font-weight', String(b.fontWeight || 600));
+    r.setProperty('--btn-text-size', `${b.defaultTextSize || 16}px`);
+
+    if (b.colors?.primary)   r.setProperty('--btn-color-primary', b.colors.primary);
+    if (b.colors?.secondary) r.setProperty('--btn-color-secondary', b.colors.secondary);
+    if (b.colors?.hover)     r.setProperty('--btn-color-hover', b.colors.hover);
+}
+
 
 export const ThemeProvider = ({ settings, children }: { settings: GeneralSettings | null, children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => ({
@@ -89,9 +124,12 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
   const [typography, setTypographyState] = useState<TypographySettings>(() => (
     settings?.typography || defaultTypography
   ));
+  const [buttonSettings, setButtonSettingsState] = useState<ButtonSettings>(() => (
+    settings?.buttonSettings || defaultButtonSettings
+  ));
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const applyTheme = useCallback((themeToApply: Theme, typographyToApply: TypographySettings) => {
+  const applyTheme = useCallback((themeToApply: Theme, typographyToApply: TypographySettings, buttonsToApply: ButtonSettings) => {
     const root = document.documentElement;
     // Colors
     Object.entries(themeToApply.colors).forEach(([name, hsl]) => {
@@ -99,12 +137,14 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
     });
     // Typography
     applyTypographyVars(typographyToApply);
+    // Buttons
+    applyButtonVars(buttonsToApply);
   }, []);
 
   useEffect(() => {
-    applyTheme(theme, typography);
+    applyTheme(theme, typography, buttonSettings);
     setIsLoaded(true);
-  }, [theme, typography, applyTheme]);
+  }, [theme, typography, buttonSettings, applyTheme]);
   
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme);
@@ -114,13 +154,17 @@ export const ThemeProvider = ({ settings, children }: { settings: GeneralSetting
     setTypographyState(newTypography);
   }
   
+  const handleSetButtonSettings = (newButtonSettings: ButtonSettings) => {
+    setButtonSettingsState(newButtonSettings);
+  }
+
   const setThemeColor = (colorName: keyof Theme['colors'], hsl: HSLColor) => {
     const newTheme = { ...theme, colors: { ...theme.colors, [colorName]: hsl } };
     handleSetTheme(newTheme);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, setThemeColor, typography, setTypography: handleSetTypography, isLoaded }}>
+    <ThemeContext.Provider value={{ theme, setTheme: handleSetTheme, setThemeColor, typography, setTypography: handleSetTypography, buttonSettings, setButtonSettings: handleSetButtonSettings, isLoaded }}>
       {children}
     </ThemeContext.Provider>
   );

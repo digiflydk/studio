@@ -124,8 +124,24 @@ export interface CookieSettings {
     categoryMarketingBody: string;
 }
 
-export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
-export type ButtonSize = 'default' | 'sm' | 'lg';
+export type ButtonDesignType = 'default' | 'pill';
+export type ButtonVariantOption = 'primary' | 'secondary' | 'outline' | 'destructive';
+export type ButtonFontOption = 'Inter' | 'Manrope' | 'System';
+export type ButtonSizeOption = 'sm' | 'md' | 'lg';
+
+export interface ButtonSettings {
+  designType: ButtonDesignType;
+  fontFamily: ButtonFontOption;
+  fontWeight: number;
+  colors: {
+    primary: string;
+    secondary: string;
+    hover: string;
+  };
+  defaultVariant: ButtonVariantOption;
+  defaultSize: ButtonSizeOption;
+  defaultTextSize: number;
+}
 
 
 export interface GeneralSettings {
@@ -180,6 +196,7 @@ export interface GeneralSettings {
         accent: HSLColor;
     };
     typography?: TypographySettings;
+    buttonSettings?: ButtonSettings;
     
     // Header Settings
     headerNavLinks?: NavLink[];
@@ -242,8 +259,8 @@ export interface GeneralSettings {
     heroCtaEnabled?: boolean;
     heroCtaText?: string;
     heroCtaLink?: string;
-    heroCtaVariant?: ButtonVariant;
-    heroCtaSize?: ButtonSize;
+    heroCtaVariant?: ButtonVariantOption;
+    heroCtaSize?: ButtonSizeOption;
     heroCtaTextSize?: number;
     heroCtaTextSizeMobile?: number;
     heroSectionBackgroundColor?: HSLColor;
@@ -261,8 +278,8 @@ export interface GeneralSettings {
     featureSectionCtaEnabled?: boolean;
     featureSectionCtaText?: string;
     featureSectionCtaLink?: string;
-    featureSectionCtaVariant?: ButtonVariant;
-    featureSectionCtaSize?: ButtonSize;
+    featureSectionCtaVariant?: ButtonVariantOption;
+    featureSectionCtaSize?: ButtonSizeOption;
     featureSectionCtaTextSize?: number;
     featureSectionCtaTextSizeMobile?: number;
     featureSectionBackgroundColor?: HSLColor;
@@ -284,8 +301,8 @@ export interface GeneralSettings {
     servicesCtaEnabled?: boolean;
     servicesCtaText?: string;
     servicesCtaLink?: string;
-    servicesCtaVariant?: ButtonVariant;
-    servicesCtaSize?: ButtonSize;
+    servicesCtaVariant?: ButtonVariantOption;
+    servicesCtaSize?: ButtonSizeOption;
     servicesCtaTextSize?: number;
     servicesCtaTextSizeMobile?: number;
 
@@ -350,3 +367,7 @@ export interface GeneralSettings {
     // Customers
     customers?: Customer[];
 }
+
+// Keep ButtonVariant and ButtonSize here as they are used in sections
+export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+export type ButtonSize = 'default' | 'sm' | 'lg';

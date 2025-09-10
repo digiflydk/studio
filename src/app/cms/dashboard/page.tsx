@@ -12,7 +12,9 @@ import { saveSettingsAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TypographySettings, TypographyElementSettings, BodyTypographySettings } from "@/types/settings";
+import { TypographySettings, TypographyElementSettings, BodyTypographySettings, ButtonSettings, ButtonDesignType, ButtonFontOption, ButtonVariantOption, ButtonSizeOption } from "@/types/settings";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 
 function hslToHex(h: number, s: number, l: number) {
@@ -175,7 +177,7 @@ function TypographyControl({
 }
 
 export default function CmsDashboardPage() {
-  const { theme, isLoaded, setTheme, setTypography, typography } = useTheme();
+  const { theme, isLoaded, setTheme, setTypography, typography, buttonSettings, setButtonSettings } = useTheme();
   const [isSaving, startSaving] = useTransition();
   const { toast } = useToast();
 
@@ -184,6 +186,7 @@ export default function CmsDashboardPage() {
         const result = await saveSettingsAction({
             themeColors: theme.colors,
             typography: typography,
+            buttonSettings: buttonSettings,
         });
         toast({
             title: result.success ? "Gemt!" : "Fejl!",
@@ -194,7 +197,17 @@ export default function CmsDashboardPage() {
   }
 
   const handleReset = () => {
+      // Note: This only resets theme colors for now.
+      // Typography and buttons could be added.
       setTheme(defaultTheme);
+  }
+
+  const handleButtonSettingChange = <K extends keyof ButtonSettings>(field: K, value: ButtonSettings[K]) => {
+    setButtonSettings({ ...buttonSettings, [field]: value });
+  };
+
+  const handleButtonColorChange = <K extends keyof ButtonSettings['colors']>(field: K, value: string) => {
+    setButtonSettings({ ...buttonSettings, colors: { ...buttonSettings.colors, [field]: value } });
   }
 
   if (!isLoaded) {
@@ -270,6 +283,98 @@ export default function CmsDashboardPage() {
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Knapper</CardTitle>
+              <CardDescription>Definer det globale design for knapper.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Design Type</Label>
+                    <ToggleGroup type="single" value={buttonSettings.designType} onValueChange={(v: ButtonDesignType) => v && handleButtonSettingChange('designType', v)}>
+                        <ToggleGroupItem value="default">Default</ToggleGroupItem>
+                        <ToggleGroupItem value="pill">Pill</ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Skrifttype</Label>
+                    <Select value={buttonSettings.fontFamily} onValueChange={(v: ButtonFontOption) => handleButtonSettingChange('fontFamily', v)}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Inter">Inter</SelectItem>
+                            <SelectItem value="Manrope">Manrope</SelectItem>
+                            <SelectItem value="System">System</SelectItem>
+                        </SelectContent>
+                    </Select>
+                  </div>
+                   <div className="space-y-2">
+                      <Label>Font Weight</Label>
+                      <Slider value={[buttonSettings.fontWeight]} onValueChange={([v]) => handleButtonSettingChange('fontWeight', v)} min={300} max={900} step={100} />
+                      <span className="text-xs text-muted-foreground">{buttonSettings.fontWeight}</span>
+                   </div>
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Label>Primær Farve</Label>
+                        <Input type="color" value={buttonSettings.colors.primary} onChange={(e) => handleButtonColorChange('primary', e.target.value)} className="w-full h-10"/>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Sekundær Farve</Label>
+                        <Input type="color" value={buttonSettings.colors.secondary} onChange={(e) => handleButtonColorChange('secondary', e.target.value)} className="w-full h-10"/>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Hover Farve</Label>
+                        <Input type="color" value={buttonSettings.colors.hover} onChange={(e) => handleButtonColorChange('hover', e.target.value)} className="w-full h-10"/>
+                    </div>
+                </div>
+
+                <div className="p-4 border rounded-lg space-y-4">
+                    <h4 className="font-semibold">Standard Værdier</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                            <Label>Variant</Label>
+                            <Select value={buttonSettings.defaultVariant} onValueChange={(v: ButtonVariantOption) => handleButtonSettingChange('defaultVariant', v)}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="primary">Primary</SelectItem>
+                                    <SelectItem value="secondary">Secondary</SelectItem>
+                                    <SelectItem value="outline">Outline</SelectItem>
+                                    <SelectItem value="destructive">Destructive</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Størrelse</Label>
+                             <Select value={buttonSettings.defaultSize} onValueChange={(v: ButtonSizeOption) => handleButtonSettingChange('defaultSize', v)}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="sm">Small</SelectItem>
+                                    <SelectItem value="md">Medium</SelectItem>
+                                    <SelectItem value="lg">Large</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Tekststørrelse (px)</Label>
+                            <Input type="number" value={buttonSettings.defaultTextSize} onChange={(e) => handleButtonSettingChange('defaultTextSize', Number(e.target.value))}/>
+                        </div>
+                    </div>
+                </div>
+
+                 <div>
+                    <h4 className="font-semibold mb-2">Live Preview</h4>
+                    <div className="p-6 border rounded-lg bg-background flex flex-wrap items-center justify-center gap-4">
+                        <Button variant="primary" size="lg">Primary LG</Button>
+                        <Button variant="secondary" size="md">Secondary MD</Button>
+                        <Button variant="outline" size="sm">Outline SM</Button>
+                        <Button variant="destructive" size="md">Destructive</Button>
+                    </div>
+                </div>
+
             </CardContent>
           </Card>
         </div>
