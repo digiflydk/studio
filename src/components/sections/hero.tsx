@@ -1,4 +1,3 @@
-
 'use client';
 import { Button } from '@/components/ui/button';
 import { type GeneralSettings } from '@/types/settings';
@@ -113,7 +112,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     );
     
     const imageGrid = (
-        <div className="grid grid-cols-2 grid-rows-2 gap-4">
+        <div className="grid grid-cols-2 grid-rows-2 gap-4 md:scale-75 md:-translate-x-1/4">
             {[1, 2, 3, 4].map(i => (
                 <div key={i} className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
                     <Image 
@@ -179,5 +178,3 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         </section>
     );
 }
-
-    
