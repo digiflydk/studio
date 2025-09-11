@@ -32,7 +32,6 @@ export const headerAppearanceSchema = z.object({
     label: z.string(),
     href: z.string(),
   })).optional(),
-  version: z.number().optional(),
 });
 
 export type HeaderAppearanceInput = z.infer<typeof headerAppearanceSchema>;

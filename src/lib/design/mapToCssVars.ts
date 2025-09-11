@@ -40,7 +40,7 @@ const d: Partial<GeneralSettings> = {
   }
 };
 
-function hToHex(h: HSLColor){
+function hToHex(h?: HSLColor){
     if (!h) return '#000000';
     const {h:hue,s,l} = h;
     const lFix = l/100;
@@ -68,8 +68,8 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
                 initial: { ...d.header!.bg.initial, ...safeSettings.header?.bg?.initial },
                 scrolled: { ...d.header!.bg.scrolled, ...safeSettings.header?.bg?.scrolled },
             },
-            cta: { ...d.header!.cta, ...safeSettings.header?.cta, 
-                mobileFloating: { ...d.header!.cta?.mobileFloating, ...safeSettings.header?.cta?.mobileFloating}
+            cta: { ...(d.header?.cta || {}), ...(safeSettings.header?.cta || {}), 
+                mobileFloating: { ...(d.header?.cta?.mobileFloating || {}), ...(safeSettings.header?.cta?.mobileFloating || {})}
             }
         },
         footer: { ...d.footer!, ...safeSettings.footer,
@@ -79,10 +79,10 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
         buttonSettings: { ...d.buttonSettings!, ...safeSettings.buttonSettings },
     };
 
-  const initialBg = S.header!.bg?.initial?.h ? hToHex(S.header!.bg.initial) : '#FFFFFF';
+  const initialBg = hToHex(S.header!.bg?.initial);
   const initialOpacity = S.header!.bg?.initial?.opacity ?? 1;
 
-  const scrolledBgFromSettings = S.header!.bg?.scrolled?.h ? hToHex(S.header!.bg.scrolled) : undefined;
+  const scrolledBgFromSettings = hToHex(S.header!.bg?.scrolled);
   const scrolledBg = scrolledBgFromSettings ?? initialBg;
   const scrolledOpacity = S.header!.bg?.scrolled?.opacity ?? 1;
 
