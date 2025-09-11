@@ -21,8 +21,6 @@ export default function Header({
 }) {
   const { settings: headerSettings } = useHeaderSettings();
 
-  const showBorder = headerSettings?.border?.enabled === true;
-
   return (
     <>
       <header className="site-header" data-testid="site-header">
@@ -42,15 +40,6 @@ export default function Header({
             <HeaderCTA />
           </nav>
         </div>
-        {showBorder && (
-          <div
-            className="absolute bottom-0 left-0 right-0"
-            style={{
-              height: 'var(--header-border-width)',
-              backgroundColor: 'var(--header-border-color)',
-            }}
-          />
-        )}
       </header>
       <MobileFloatingCTA />
     </>

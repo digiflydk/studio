@@ -238,6 +238,9 @@ main > div:first-of-type {
   background: var(--header-bg);
   backdrop-filter: saturate(1);
   transition: background 160ms ease, border-color 160ms ease;
+  border-bottom-width: var(--header-border-width);
+  border-bottom-style: solid;
+  border-bottom-color: var(--header-border-color);
 }
 [data-scrolled="true"] .site-header {
   background: var(--header-bg-scrolled);
