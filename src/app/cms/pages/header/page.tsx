@@ -11,11 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { saveSettingsAction } from '@/app/actions';
 import { Slider } from '@/components/ui/slider';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import { ConflictDialog } from '@/components/admin/ConflictDialog';
-import { getGeneralSettings } from '@/services/settings';
+import { type HeaderAppearanceInput } from '@/lib/validators/headerAppearance.zod';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -88,12 +87,39 @@ function HslColorPicker({
     )
 }
 
-function GeneralHeaderSettings({ settings, setSettings }: { settings: Partial<GeneralSettings>, setSettings: (s: Partial<GeneralSettings>) => void }) {
+function HeaderAppearanceForm() {
+  const [settings, setSettings] = useState<Partial<HeaderAppearanceInput>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, startSaving] = useTransition();
+  const [conflict, setConflict] = useState<any>(null);
+  const { toast } = useToast();
+
+  const fetchAppearance = useCallback(async () => {
+    setIsLoading(true);
+    try {
+        const res = await fetch('/api/pages/header/appearance');
+        const json = await res.json();
+        if (json.ok) {
+            setSettings(json.data);
+        } else {
+            throw new Error(json.error || 'Failed to fetch appearance');
+        }
+    } catch (e) {
+        console.error(e);
+        toast({ title: 'Error', description: 'Could not load header appearance.', variant: 'destructive' });
+    } finally {
+        setIsLoading(false);
+    }
+  }, [toast]);
   
-  const handleInputChange = (field: keyof GeneralSettings, value: any) => {
-    setSettings({ ...settings, [field]: value });
+  useEffect(() => {
+    fetchAppearance();
+  }, [fetchAppearance]);
+  
+  const handleInputChange = (field: keyof HeaderAppearanceInput, value: any) => {
+    setSettings(prev => ({ ...prev, [field]: value }));
   };
-  
+
   const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
     const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks)];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
@@ -110,44 +136,151 @@ function GeneralHeaderSettings({ settings, setSettings }: { settings: Partial<Ge
     handleInputChange('headerNavLinks', updatedLinks);
   };
 
+  const handleSaveChanges = async (force = false, useVersion?: number) => {
+    startSaving(async () => {
+        setConflict(null);
+        const payload: Partial<HeaderAppearanceInput> = { ...settings, version: useVersion ?? settings.version };
+        try {
+            const res = await fetch('/api/pages/header/appearance/save', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+
+            if (res.status === 409) {
+                setConflict({ server: json.current, serverVersion: json.currentVersion });
+                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
+                return;
+            }
+            if (!json.ok) throw new Error(json.error || 'Save failed');
+            
+            setSettings(json.data);
+            toast({ title: "Saved!", description: "Header appearance has been saved." });
+            window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
+
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message, variant: 'destructive' });
+        }
+    });
+  };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-48"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  }
+
   return (
-      <AccordionItem value="general" className="border rounded-lg shadow-sm">
-        <AccordionTrigger className="px-6 py-4"><h3 className="font-semibold text-lg">General Header Settings</h3></AccordionTrigger>
+    <AccordionItem value="appearance" className="border rounded-lg shadow-sm">
+         <ConflictDialog
+            isOpen={!!conflict}
+            onOpenChange={() => setConflict(null)}
+            onReload={(serverData, serverVersion) => {
+                setSettings({ ...settings, ...serverData, version: serverVersion });
+                setConflict(null);
+            }}
+            onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
+            serverData={conflict?.server}
+            serverVersion={conflict?.serverVersion}
+        />
+        <AccordionTrigger className="px-6 py-4 flex justify-between items-center w-full">
+            <h3 className="font-semibold text-lg text-left">Header Appearance</h3>
+        </AccordionTrigger>
         <AccordionContent className="p-6 border-t">
+            <div className="flex justify-end mb-6">
+                <Button onClick={() => handleSaveChanges()} disabled={isSaving}>
+                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Appearance Settings
+                </Button>
+            </div>
             <div className="space-y-6">
-                <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                       <Label>Logo Width</Label>
-                       <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 96}px</span>
-                   </div>
-                   <Slider 
-                       value={[settings.headerLogoWidth || 96]} 
-                       onValueChange={([v]) => handleInputChange('headerLogoWidth', v)}
-                       min={50}
-                       max={250}
-                       step={1}
-                   />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                           <Label>Header Height</Label>
+                           <span className="text-sm text-muted-foreground">{settings.headerHeight || 72}px</span>
+                       </div>
+                       <Slider 
+                           value={[settings.headerHeight || 72]} 
+                           onValueChange={([v]) => handleInputChange('headerHeight', v)}
+                           min={50} max={120} step={1}
+                       />
+                    </div>
+                     <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                           <Label>Logo Width</Label>
+                           <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 120}px</span>
+                       </div>
+                       <Slider 
+                           value={[settings.headerLogoWidth || 120]} 
+                           onValueChange={([v]) => handleInputChange('headerLogoWidth', v)}
+                           min={60} max={320} step={1}
+                       />
+                    </div>
                 </div>
-                 <div className="space-y-2">
-                     <div className="flex justify-between items-center">
-                       <Label>Header Height</Label>
-                       <span className="text-sm text-muted-foreground">{settings.headerHeight || 64}px</span>
-                   </div>
-                   <Slider 
-                       value={[settings.headerHeight || 64]} 
-                       onValueChange={([v]) => handleInputChange('headerHeight', v)}
-                       min={50}
-                       max={120}
-                       step={1}
-                   />
+
+                 <div className="p-4 border rounded-lg space-y-4">
+                    <h4 className='font-semibold'>Top Border</h4>
+                     <div className="flex items-center justify-between">
+                        <Label htmlFor='border-enabled'>Enable Top Border</Label>
+                        <Switch id="border-enabled" checked={settings.headerTopBorderEnabled} onCheckedChange={v => handleInputChange('headerTopBorderEnabled', v)} />
+                     </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                           <Label>Border Thickness</Label>
+                           <span className="text-sm text-muted-foreground">{settings.headerTopBorderHeight || 0}px</span>
+                       </div>
+                       <Slider 
+                           value={[settings.headerTopBorderHeight || 0]} 
+                           onValueChange={([v]) => handleInputChange('headerTopBorderHeight', v)}
+                           min={0} max={8} step={1}
+                       />
+                    </div>
+                     <HslColorPicker
+                        label="Border Color"
+                        color={settings.headerTopBorderColor || { h: 0, s: 0, l: 85 }}
+                        onChange={(hsl) => handleInputChange('headerTopBorderColor', hsl)}
+                    />
                 </div>
-                <div className="space-y-2">
-                   <HslColorPicker
+
+                <div className="p-4 border rounded-lg space-y-4">
+                    <h4 className='font-semibold'>Normal Background</h4>
+                     <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                           <Label>Opacity</Label>
+                           <span className="text-sm text-muted-foreground">{settings.headerInitialBackgroundOpacity || 0}%</span>
+                       </div>
+                       <Slider 
+                           value={[settings.headerInitialBackgroundOpacity || 0]} 
+                           onValueChange={([v]) => handleInputChange('headerInitialBackgroundOpacity', v)}
+                           min={0} max={100} step={1}
+                       />
+                    </div>
+                     <HslColorPicker
+                        label="Background Color"
+                        color={settings.headerInitialBackgroundColor || { h: 0, s: 0, l: 100 }}
+                        onChange={(hsl) => handleInputChange('headerInitialBackgroundColor', hsl)}
+                    />
+                </div>
+                 <div className="p-4 border rounded-lg space-y-4">
+                    <h4 className='font-semibold'>Scrolled Background</h4>
+                     <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                           <Label>Opacity</Label>
+                           <span className="text-sm text-muted-foreground">{settings.headerScrolledBackgroundOpacity || 100}%</span>
+                       </div>
+                       <Slider 
+                           value={[settings.headerScrolledBackgroundOpacity || 100]} 
+                           onValueChange={([v]) => handleInputChange('headerScrolledBackgroundOpacity', v)}
+                           min={0} max={100} step={1}
+                       />
+                    </div>
+                     <HslColorPicker
                         label="Scrolled Background Color"
                         color={settings.headerScrolledBackgroundColor || { h: 0, s: 0, l: 100 }}
                         onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
                     />
                 </div>
+
                  <div className="space-y-4">
                     <Label>Navigation Links</Label>
                     {(settings.headerNavLinks || defaultNavLinks).map((link, index) => (
@@ -166,8 +299,7 @@ function GeneralHeaderSettings({ settings, setSettings }: { settings: Partial<Ge
 }
 
 function CtaSettingsForm() {
-    const { settings: initialSettings, isLoading, refresh, setSettings } = useHeaderSettings();
-    const ctaSettings = initialSettings;
+    const { settings: ctaSettings, isLoading, setSettings } = useHeaderSettings();
     const [isSaving, startSaving] = useTransition();
     const [conflict, setConflict] = useState<any>(null);
     const { toast } = useToast();
@@ -224,18 +356,9 @@ function CtaSettingsForm() {
                  return;
             }
             
-            // Write-through verification (DF230)
-            const verifyRes = await fetch('/api/pages/header');
-            const verifyJson = await verifyRes.json();
-            if (JSON.stringify(verifyJson.data) !== JSON.stringify(json.data)) {
-                console.error('persist_mismatch', { sent: json.data, got: verifyJson.data });
-                toast({ title: "Save Failed (Verification Error)", description: "Server did not persist the changes correctly.", variant: "destructive" });
-            } else {
-                toast({ title: "Saved!", description: "CTA settings have been saved." });
-            }
-
-            setSettings(verifyJson.data); // Always use the verified data as the source of truth
-            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: verifyJson.data }));
+            setSettings(json.data);
+            toast({ title: "Saved!", description: "CTA settings have been saved." });
+            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: json.data }));
         });
     }
 
@@ -368,62 +491,15 @@ function CtaSettingsForm() {
     );
 }
 
-
 export default function HeaderPage(){
-  const [settings, setSettings] = useState<Partial<GeneralSettings>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, startSaving] = useTransition();
-  const { toast } = useToast();
-  
-  useEffect(() => {
-    async function loadSettings() {
-      setIsLoading(true);
-      const loadedSettings = await getGeneralSettings();
-      if (loadedSettings) {
-        setSettings(loadedSettings);
-      }
-      setIsLoading(false);
-    }
-    loadSettings();
-  }, []);
-
-  async function onSaveGeneral(){
-    startSaving(async () => {
-        // We only save the general settings here, CTA is separate
-        const { headerCtaSettings, ...generalSettings } = settings;
-        const result = await saveSettingsAction(generalSettings);
-        toast({
-            title: result.success ? "Saved!" : "Error!",
-            description: result.message,
-        });
-        if (result.success) {
-            window.dispatchEvent(new CustomEvent('design:updated', { detail: settings }));
-        }
-    });
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-        <div className="flex items-center justify-between">
-             <div>
-                <h1 className="text-2xl font-bold">Header Settings</h1>
-                <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
-            </div>
-            <Button onClick={onSaveGeneral} disabled={isSaving}>
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save General Header Settings
-            </Button>
+        <div>
+            <h1 className="text-2xl font-bold">Header Settings</h1>
+            <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
         </div>
-      <Accordion type="multiple" defaultValue={['general', 'cta']} className="w-full space-y-4">
-        <GeneralHeaderSettings settings={settings} setSettings={setSettings} />
+      <Accordion type="multiple" defaultValue={['appearance', 'cta']} className="w-full space-y-4">
+        <HeaderAppearanceForm />
         <CtaSettingsForm />
       </Accordion>
     </div>
