@@ -1,21 +1,30 @@
 
 'use server';
 import { adminDb } from '@/lib/server/firebaseAdmin';
-import type { GeneralSettings } from '@/types/settings';
-import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
+import type { GeneralSettings, HeaderSettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
 
 const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
-const headerDefaults: HeaderCTASettings = {
-  enabled: false,
-  label: 'Kom i gang',
-  linkType: 'internal',
-  href: '#hero',
-  variant: 'default',
-  size: 'default',
-  mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
+const headerDefaults: HeaderSettings = {
+    height: 72,
+    logo: { maxWidth: 140 },
+    border: { enabled: false, width: 1, color: {h: 220, s: 13, l: 91} },
+    bg: {
+      initial: { h: 255, s: 255, l: 255, opacity: 1 },
+      scrolled: { h: 255, s: 255, l: 255, opacity: 1 },
+    },
+    navLinks: [],
+    cta: {
+        enabled: false,
+        label: 'Kom i gang',
+        linkType: 'internal',
+        href: '#hero',
+        variant: 'default',
+        size: 'default',
+        mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
+    }
 };
 
 export const getGeneralSettings = unstable_cache(
@@ -28,16 +37,19 @@ export const getGeneralSettings = unstable_cache(
                 const data = docSnap.data() as GeneralSettings;
                 
                 // Ensure headerCtaSettings has defaults
-                const headerCtaSettings = { ...headerDefaults, ...data.headerCtaSettings };
-                data.headerCtaSettings = headerCtaSettings;
-
-                // Backwards compatibility for old header settings
-                if (data && 'headerBackgroundColor' in data && !data.headerScrolledBackgroundColor) {
-                    data.headerScrolledBackgroundColor = (data as any).headerBackgroundColor;
-                }
-                if (data && 'headerBackgroundOpacity' in data && !data.headerScrolledBackgroundOpacity) {
-                    data.headerScrolledBackgroundOpacity = (data as any).headerBackgroundOpacity;
-                }
+                data.header = {
+                    ...headerDefaults,
+                    ...(data.header ?? {}),
+                    logo: { ...headerDefaults.logo, ...data.header?.logo },
+                    border: { ...headerDefaults.border, ...data.header?.border },
+                    bg: { ...headerDefaults.bg, ...data.header?.bg,
+                        initial: { ...headerDefaults.bg.initial, ...data.header?.bg?.initial },
+                        scrolled: { ...headerDefaults.bg.scrolled, ...data.header?.bg?.scrolled },
+                    },
+                    cta: { ...headerDefaults.cta, ...data.header?.cta,
+                        mobileFloating: { ...headerDefaults.cta!.mobileFloating, ...data.header?.cta?.mobileFloating }
+                    },
+                };
                 
                 return data;
             }
@@ -45,7 +57,7 @@ export const getGeneralSettings = unstable_cache(
             // If doc doesn't exist, create it with a lock to prevent backfill races (DF231)
             console.log("Settings document not found, creating with defaults and lock.");
             const defaultData: Partial<GeneralSettings> = { 
-                headerCtaSettings: headerDefaults,
+                header: headerDefaults,
                 locked: true, // Anti-backfill lock
             };
             await settingsDocRef.set(defaultData);
@@ -55,7 +67,7 @@ export const getGeneralSettings = unstable_cache(
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
             // On error, return a minimal default object to allow build/app to continue
             const minimalDefaults: Partial<GeneralSettings> = {
-                headerCtaSettings: headerDefaults
+                header: headerDefaults
             };
             return minimalDefaults as GeneralSettings;
         }

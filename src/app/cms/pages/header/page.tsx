@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import type { GeneralSettings, HeaderCTASettings, NavLink, HSLColor } from '@/types/settings';
+import type { HeaderSettings, NavLink, HSLColor } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,12 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Slider } from '@/components/ui/slider';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import { ConflictDialog } from '@/components/admin/ConflictDialog';
 import { type HeaderAppearanceInput } from '@/lib/validators/headerAppearance.zod';
+import { type HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -31,15 +31,16 @@ function HslColorPicker({
   onChange,
 }: {
   label: string;
-  color: HSLColor;
-  onChange: (hsl: HSLColor) => void;
+  color: Partial<HSLColor>;
+  onChange: (hsl: Partial<HSLColor>) => void;
 }) {
-    function hslToHex(h: number, s: number, l: number) {
-      l /= 100;
-      const a = (s * Math.min(l, 1 - l)) / 100;
+    function hslToHex(h?: number, s?: number, l?: number) {
+      if(h === undefined || s === undefined || l === undefined) return '';
+      const lNorm = l / 100;
+      const a = (s * Math.min(lNorm, 1 - lNorm)) / 100;
       const f = (n: number) => {
         const k = (n + h / 30) % 12;
-        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        const color = lNorm - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
         return Math.round(255 * color).toString(16).padStart(2, "0");
       };
       return `#${f(0)}${f(8)}${f(4)}`;
@@ -71,24 +72,28 @@ function HslColorPicker({
         if(newHsl) { onChange(newHsl); } else { setHexInputValue(hslToHex(color.h, color.s, color.l)); }
     }
     const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { handleHexBlur(); (e.target as HTMLInputElement).blur(); } }
+    
+    const bgColor = (color.h !== undefined && color.s !== undefined && color.l !== undefined) ? `hsl(${color.h}, ${color.s}%, ${color.l}%)` : 'transparent';
+    const textColor = (color.l ?? 100) > 50 ? '#000' : '#FFF';
+
     return (
-        <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)` }}>
+        <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: bgColor }}>
              <div className="flex justify-between items-center">
-                 <h3 className="font-semibold text-lg" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>{label}</h3>
+                 <h3 className="font-semibold text-lg" style={{ color: textColor }}>{label}</h3>
                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm uppercase" style={{ color: color.l > 50 ? '#000' : '#FFF' }}>HEX</span>
-                    <Input value={hexInputValue} onChange={handleHexChange} onBlur={handleHexBlur} onKeyDown={handleHexKeyPress} className="w-24 font-mono" style={{ backgroundColor: 'hsla(0, 0%, 100%, 0.2)', color: color.l > 50 ? '#000' : '#FFF', borderColor: 'hsla(0, 0%, 100%, 0.3)' }}/>
+                    <span className="font-mono text-sm uppercase" style={{ color: textColor }}>HEX</span>
+                    <Input value={hexInputValue} onChange={handleHexChange} onBlur={handleHexBlur} onKeyDown={handleHexKeyPress} className="w-24 font-mono" style={{ backgroundColor: 'hsla(0, 0%, 100%, 0.2)', color: textColor, borderColor: 'hsla(0, 0%, 100%, 0.3)' }}/>
                 </div>
             </div>
-            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Hue ({color.h})</Label> <Slider value={[color.h]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} /> </div>
-            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Saturation ({color.s}%)</Label> <Slider value={[color.s]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} /> </div>
-            <div className="space-y-2"> <Label style={{ color: color.l > 50 ? '#000' : '#FFF' }}>Lightness ({color.l}%)</Label> <Slider value={[color.l]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} /> </div>
+            <div className="space-y-2"> <Label style={{ color: textColor }}>Hue ({color.h ?? 0})</Label> <Slider value={[color.h ?? 0]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} /> </div>
+            <div className="space-y-2"> <Label style={{ color: textColor }}>Saturation ({color.s ?? 0}%)</Label> <Slider value={[color.s ?? 0]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} /> </div>
+            <div className="space-y-2"> <Label style={{ color: textColor }}>Lightness ({color.l ?? 100}%)</Label> <Slider value={[color.l ?? 100]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} /> </div>
         </div>
     )
 }
 
 function HeaderAppearanceForm() {
-  const [settings, setSettings] = useState<Partial<HeaderAppearanceInput>>({});
+  const [settings, setSettings] = useState<Partial<HeaderSettings>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, startSaving] = useTransition();
   const [conflict, setConflict] = useState<any>(null);
@@ -116,24 +121,32 @@ function HeaderAppearanceForm() {
     fetchAppearance();
   }, [fetchAppearance]);
   
-  const handleInputChange = (field: keyof HeaderAppearanceInput, value: any) => {
+  const handleInputChange = (field: keyof HeaderSettings, value: any) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
+  
+  const handleNestedChange = (part: 'logo' | 'border' | 'bg', field: string, value: any) => {
+      setSettings(prev => ({ ...prev, [part]: { ...prev[part], [field]: value } }));
+  }
+
+  const handleBackgroundChange = (type: 'initial' | 'scrolled', value: any) => {
+      setSettings(prev => ({ ...prev, bg: { ...prev.bg, [type]: value }}));
+  }
 
   const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
-    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks)];
+    const updatedLinks = [...(settings.navLinks || defaultNavLinks)];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    handleInputChange('headerNavLinks', updatedLinks);
+    handleInputChange('navLinks', updatedLinks);
   };
 
   const addNavLink = () => {
-    const updatedLinks = [...(settings.headerNavLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
-    handleInputChange('headerNavLinks', updatedLinks);
+    const updatedLinks = [...(settings.navLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
+    handleInputChange('navLinks', updatedLinks);
   };
 
   const removeNavLink = (index: number) => {
-    const updatedLinks = (settings.headerNavLinks || defaultNavLinks).filter((_, i) => i !== index);
-    handleInputChange('headerNavLinks', updatedLinks);
+    const updatedLinks = (settings.navLinks || defaultNavLinks).filter((_, i) => i !== index);
+    handleInputChange('navLinks', updatedLinks);
   };
 
   const handleSaveChanges = async (force = false, useVersion?: number) => {
@@ -197,22 +210,22 @@ function HeaderAppearanceForm() {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Header Height</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerHeight || 72}px</span>
+                           <span className="text-sm text-muted-foreground">{settings.height || 72}px</span>
                        </div>
                        <Slider 
-                           value={[settings.headerHeight || 72]} 
-                           onValueChange={([v]) => handleInputChange('headerHeight', v)}
+                           value={[settings.height || 72]} 
+                           onValueChange={([v]) => handleInputChange('height', v)}
                            min={50} max={120} step={1}
                        />
                     </div>
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                           <Label>Logo Width</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerLogoWidth || 120}px</span>
+                           <Label>Logo Max Width</Label>
+                           <span className="text-sm text-muted-foreground">{settings.logo?.maxWidth || 120}px</span>
                        </div>
                        <Slider 
-                           value={[settings.headerLogoWidth || 120]} 
-                           onValueChange={([v]) => handleInputChange('headerLogoWidth', v)}
+                           value={[settings.logo?.maxWidth || 120]} 
+                           onValueChange={([v]) => handleNestedChange('logo', 'maxWidth', v)}
                            min={60} max={320} step={1}
                        />
                     </div>
@@ -222,23 +235,23 @@ function HeaderAppearanceForm() {
                     <h4 className='font-semibold'>Top Border</h4>
                      <div className="flex items-center justify-between">
                         <Label htmlFor='border-enabled'>Enable Top Border</Label>
-                        <Switch id="border-enabled" checked={settings.headerTopBorderEnabled} onCheckedChange={v => handleInputChange('headerTopBorderEnabled', v)} />
+                        <Switch id="border-enabled" checked={settings.border?.enabled} onCheckedChange={v => handleNestedChange('border', 'enabled', v)} />
                      </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Border Thickness</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerTopBorderHeight || 0}px</span>
+                           <span className="text-sm text-muted-foreground">{settings.border?.width || 0}px</span>
                        </div>
                        <Slider 
-                           value={[settings.headerTopBorderHeight || 0]} 
-                           onValueChange={([v]) => handleInputChange('headerTopBorderHeight', v)}
+                           value={[settings.border?.width || 0]} 
+                           onValueChange={([v]) => handleNestedChange('border', 'width', v)}
                            min={0} max={8} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Border Color"
-                        color={settings.headerTopBorderColor || { h: 0, s: 0, l: 85 }}
-                        onChange={(hsl) => handleInputChange('headerTopBorderColor', hsl)}
+                        color={settings.border?.color || {}}
+                        onChange={(hsl) => handleNestedChange('border', 'color', hsl)}
                     />
                 </div>
 
@@ -247,18 +260,18 @@ function HeaderAppearanceForm() {
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Opacity</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerInitialBackgroundOpacity || 0}%</span>
+                           <span className="text-sm text-muted-foreground">{Math.round((settings.bg?.initial?.opacity ?? 1) * 100)}%</span>
                        </div>
                        <Slider 
-                           value={[settings.headerInitialBackgroundOpacity || 0]} 
-                           onValueChange={([v]) => handleInputChange('headerInitialBackgroundOpacity', v)}
+                           value={[Math.round((settings.bg?.initial?.opacity ?? 1) * 100)]} 
+                           onValueChange={([v]) => handleBackgroundChange('initial', { ...settings.bg?.initial, opacity: v / 100 })}
                            min={0} max={100} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Background Color"
-                        color={settings.headerInitialBackgroundColor || { h: 0, s: 0, l: 100 }}
-                        onChange={(hsl) => handleInputChange('headerInitialBackgroundColor', hsl)}
+                        color={settings.bg?.initial || {}}
+                        onChange={(hsl) => handleBackgroundChange('initial', { ...settings.bg?.initial, ...hsl })}
                     />
                 </div>
                  <div className="p-4 border rounded-lg space-y-4">
@@ -266,24 +279,24 @@ function HeaderAppearanceForm() {
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Opacity</Label>
-                           <span className="text-sm text-muted-foreground">{settings.headerScrolledBackgroundOpacity || 100}%</span>
+                            <span className="text-sm text-muted-foreground">{Math.round((settings.bg?.scrolled?.opacity ?? 1) * 100)}%</span>
                        </div>
                        <Slider 
-                           value={[settings.headerScrolledBackgroundOpacity || 100]} 
-                           onValueChange={([v]) => handleInputChange('headerScrolledBackgroundOpacity', v)}
+                           value={[Math.round((settings.bg?.scrolled?.opacity ?? 1) * 100)]} 
+                           onValueChange={([v]) => handleBackgroundChange('scrolled', { ...settings.bg?.scrolled, opacity: v / 100 })}
                            min={0} max={100} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Scrolled Background Color"
-                        color={settings.headerScrolledBackgroundColor || { h: 0, s: 0, l: 100 }}
-                        onChange={(hsl) => handleInputChange('headerScrolledBackgroundColor', hsl)}
+                        color={settings.bg?.scrolled || {}}
+                        onChange={(hsl) => handleBackgroundChange('scrolled', { ...settings.bg?.scrolled, ...hsl })}
                     />
                 </div>
 
                  <div className="space-y-4">
                     <Label>Navigation Links</Label>
-                    {(settings.headerNavLinks || defaultNavLinks).map((link, index) => (
+                    {(settings.navLinks || defaultNavLinks).map((link, index) => (
                         <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
                             <Input value={link.label} onChange={(e) => handleNavLinkChange(index, 'label', e.target.value)} placeholder="Label" />
                             <Input value={link.href} onChange={(e) => handleNavLinkChange(index, 'href', e.target.value)} placeholder="Href (#section or /path)" />
@@ -299,29 +312,29 @@ function HeaderAppearanceForm() {
 }
 
 function CtaSettingsForm() {
-    const { settings: ctaSettings, isLoading, setSettings } = useHeaderSettings();
+    const { settings: headerSettings, setSettings: setHeaderSettings } = useHeaderSettings();
+    const ctaSettings = headerSettings?.cta;
     const [isSaving, startSaving] = useTransition();
     const [conflict, setConflict] = useState<any>(null);
     const { toast } = useToast();
 
-    if (isLoading || !ctaSettings) {
-        return (
-          <div className="flex justify-center items-center h-48">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        );
+    if (!headerSettings) {
+        return <div className="flex justify-center items-center h-48"><Loader2 className="h-8 w-8 animate-spin" /></div>
     }
   
     const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
-        setSettings(prev => prev ? ({ ...prev, [field]: value }) : undefined);
+        setHeaderSettings(prev => prev ? ({ ...prev, cta: { ...(prev.cta as any), [field]: value } }) : undefined);
     }
 
     const handleMobileCtaChange = (field: keyof HeaderCTASettings['mobileFloating'], value: any) => {
-        setSettings(prev => prev ? ({
+        setHeaderSettings(prev => prev ? ({
             ...prev,
-            mobileFloating: {
-                ...(prev.mobileFloating ?? { enabled: false, position: 'br' }),
-                [field]: value,
+            cta: {
+                ...(prev.cta as any),
+                mobileFloating: {
+                    ...(prev.cta?.mobileFloating ?? { enabled: false, position: 'br' }),
+                    [field]: value,
+                }
             }
         }) : undefined)
     }
@@ -333,7 +346,7 @@ function CtaSettingsForm() {
             setConflict(null);
             const payload = {
                 ...ctaSettings,
-                version: useVersion ?? (ctaSettings as any).version,
+                version: useVersion ?? (headerSettings as any).version,
             };
 
             const res = await fetch('/api/pages/header/save', {
@@ -356,7 +369,7 @@ function CtaSettingsForm() {
                  return;
             }
             
-            setSettings(json.data);
+            setHeaderSettings(prev => prev ? ({ ...prev, cta: json.data, version: json.data.version }) : undefined);
             toast({ title: "Saved!", description: "CTA settings have been saved." });
             window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: json.data }));
         });
@@ -368,7 +381,7 @@ function CtaSettingsForm() {
                 isOpen={!!conflict}
                 onOpenChange={() => setConflict(null)}
                 onReload={(serverData, serverVersion) => {
-                    setSettings({ ...serverData, version: serverVersion } as HeaderCTASettings);
+                    setHeaderSettings(prev => prev ? ({ ...prev, cta: serverData, version: serverVersion }) : undefined);
                     setConflict(null);
                 }}
                 onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
@@ -393,12 +406,12 @@ function CtaSettingsForm() {
                         </div>
                         <Switch
                             id="cta-enabled"
-                            checked={ctaSettings.enabled}
+                            checked={ctaSettings?.enabled}
                             onCheckedChange={checked => handleCtaChange('enabled', checked)}
                         />
                     </div>
 
-                  {ctaSettings.enabled && (
+                  {ctaSettings?.enabled && (
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">

@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import React from 'react';
 import Logo from '@/components/logo';
@@ -24,7 +25,7 @@ export default function Header({ logoUrl, logoAlt, links = [] }: Props) {
   const isMobile = useIsMobile();
   const { isScrolled } = useScrollState();
 
-  const headerHeight = settings?.headerHeight ?? 72;
+  const headerHeight = settings?.height ?? 72;
   
   React.useEffect(() => {
     document.documentElement.style.setProperty('--header-h', `${headerHeight}px`);

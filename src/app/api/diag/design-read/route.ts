@@ -8,8 +8,7 @@ const PATH = 'settings/general';
 
 export async function GET() {
   try {
-    const db = adminDb;
-    const snap = await db.doc(PATH).get();
+    const snap = await adminDb.doc(PATH).get();
     return NextResponse.json({
       ok: true,
       path: PATH,

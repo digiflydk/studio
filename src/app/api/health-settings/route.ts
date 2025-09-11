@@ -38,7 +38,7 @@ export async function GET() {
 
   const okGeneral = !!g;
   const okButtons = !!g?.buttonSettings?.colors?.primary || !!(ds.exists && (ds.data() as any)?.buttons);
-  const okHeader = !!g?.headerCtaSettings || ph.exists;
+  const okHeader = !!g?.header?.cta || ph.exists;
 
   const okVersioning = typeof g?.version === 'number' || typeof (ds.data() as any)?.version === 'number';
 

@@ -17,7 +17,6 @@ export const headerSettingsSchema = z.object({
     offsetX: z.number().int().min(0).optional(),
     offsetY: z.number().int().min(0).optional(),
   }),
-  version: z.number().optional(),
 });
 
 export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;

@@ -5,7 +5,8 @@ import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import { ArrowRight } from 'lucide-react';
 
 export default function HeaderCTA(){
-  const { settings: s } = useHeaderSettings();
+  const { settings: headerSettings } = useHeaderSettings();
+  const s = headerSettings?.cta;
 
   if(!s?.enabled) return null;
 

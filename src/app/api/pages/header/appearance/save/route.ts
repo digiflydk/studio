@@ -25,7 +25,10 @@ export async function POST(req: Request) {
 
     const next = {
       ...current,
-      ...parsed, // flatten: vi skriver direkte på general-dokumentet
+      header: {
+          ...(current.header ?? {}),
+          ...parsed
+      },
       version: serverVersion + 1,
       updatedAt: now,
       updatedBy: "cms-user",
@@ -39,16 +42,7 @@ export async function POST(req: Request) {
 
   const g = result.data as any;
   const payload = {
-    headerHeight: g.headerHeight,
-    headerLogoWidth: g.headerLogoWidth,
-    headerNavLinks: g.headerNavLinks,
-    headerTopBorderEnabled: g.headerTopBorderEnabled,
-    headerTopBorderHeight: g.headerTopBorderHeight,
-    headerTopBorderColor: g.headerTopBorderColor,
-    headerInitialBackgroundColor: g.headerInitialBackgroundColor,
-    headerInitialBackgroundOpacity: g.headerInitialBackgroundOpacity,
-    headerScrolledBackgroundColor: g.headerScrolledBackgroundColor,
-    headerScrolledBackgroundOpacity: g.headerScrolledBackgroundOpacity,
+    ...(g.header ?? {}),
     version: g.version ?? 0,
   };
 

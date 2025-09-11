@@ -1,7 +1,9 @@
 
+import type { z } from 'zod';
+import type { headerSettingsSchema } from "@/lib/validators/headerSettings.zod";
+import { headerAppearanceSchema } from '@/lib/validators/headerAppearance.zod';
 
-import type { HeaderCTASettings } from "@/lib/validators/headerSettings.zod";
-type HSLColor = { h: number; s: number; l: number };
+export type HSLColor = { h: number; s: number; l: number };
 
 export interface Service {
     title: string;
@@ -143,6 +145,10 @@ export interface ButtonSettings {
   defaultSize: ButtonSizeOption;
 }
 
+export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;
+
+export type HeaderSettings = z.infer<typeof headerAppearanceSchema>;
+
 export interface GeneralSettings {
     locked?: boolean;
     websiteTitle?: string;
@@ -199,22 +205,7 @@ export interface GeneralSettings {
     buttonSettings?: ButtonSettings;
     
     // Header Settings
-    headerNavLinks?: NavLink[];
-    headerLogoWidth?: number;
-    headerHeight?: number;
-    headerInitialBackgroundColor?: HSLColor;
-    headerInitialBackgroundOpacity?: number;
-    headerScrolledBackgroundColor?: HSLColor;
-    headerScrolledBackgroundOpacity?: number;
-    headerIsSticky?: boolean;
-    headerMenuIconColor?: string;
-    headerLinkColor?: string;
-    headerLinkHoverColor?: string;
-    headerLinkSize?: number;
-    headerTopBorderEnabled?: boolean;
-    headerTopBorderColor?: HSLColor;
-    headerTopBorderHeight?: number;
-    headerCtaSettings?: HeaderCTASettings;
+    header?: HeaderSettings;
 
     // Footer Settings
     footerTagline?: string;
@@ -268,7 +259,6 @@ export interface GeneralSettings {
     featureSectionHeading?: string;
     featureSectionHeadingColor?: string;
     featureSectionHeadingSize?: number;
-    featureSectionHeadingSizeMobile?: number;
     featureSectionBody?: string;
     featureSectionBodyColor?: string;
     featureSectionBodySize?: number;
@@ -311,7 +301,7 @@ export interface GeneralSettings {
     aiProjectSectionTitleColor?: string;
     aiProjectSectionTitleSize?: number;
     aiProjectSectionDescription?: string;
-    aiProjectSectionDescriptionColor?: string;
+aiProjectSectionDescriptionColor?: string;
     aiProjectSectionDescriptionSize?: number;
     aiProjectSectionBackgroundColor?: HSLColor;
     aiProjectSectionAlignment?: Alignment;

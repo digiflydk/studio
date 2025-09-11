@@ -1,34 +1,39 @@
 
 import { z } from "zod";
+import { headerSettingsSchema as ctaSchema } from "./headerSettings.zod";
 
-const hsl = z.object({
+const hslSchema = z.object({
   h: z.number().min(0).max(360),
   s: z.number().min(0).max(100),
   l: z.number().min(0).max(100),
 });
 
+const backgroundSchema = z.object({
+    h: z.number().min(0).max(360),
+    s: z.number().min(0).max(100),
+    l: z.number().min(0).max(100),
+    opacity: z.number().min(0).max(1),
+}).partial();
+
 export const headerAppearanceSchema = z.object({
-  headerHeight: z.number().int().min(40).max(160).optional(),
-  headerLogoWidth: z.number().int().min(60).max(320).optional(),
-
-  // Border (bundlinje – vi bruger eksisterende felter)
-  headerTopBorderEnabled: z.boolean().optional(),
-  headerTopBorderHeight: z.number().int().min(0).max(8).optional(),
-  headerTopBorderColor: hsl.optional(),
-
-  // Normal (initial) background
-  headerInitialBackgroundColor: hsl.optional(),
-  headerInitialBackgroundOpacity: z.number().min(0).max(100).optional(),
-
-  // Scrolled background (beholdes også her)
-  headerScrolledBackgroundColor: hsl.optional(),
-  headerScrolledBackgroundOpacity: z.number().min(0).max(100).optional(),
-  
-  headerNavLinks: z.array(z.object({
+  height: z.number().int().min(40).max(160).optional(),
+  logo: z.object({
+      maxWidth: z.number().int().min(60).max(320).optional(),
+  }).optional(),
+  border: z.object({
+      enabled: z.boolean().optional(),
+      width: z.number().int().min(0).max(8).optional(),
+      color: hslSchema.optional(),
+  }).optional(),
+  bg: z.object({
+    initial: backgroundSchema.optional(),
+    scrolled: backgroundSchema.optional(),
+  }).optional(),
+  navLinks: z.array(z.object({
     label: z.string(),
     href: z.string(),
   })).optional(),
-
+  cta: ctaSchema.optional(),
   version: z.number().optional(),
 });
 export type HeaderAppearanceInput = z.infer<typeof headerAppearanceSchema>;

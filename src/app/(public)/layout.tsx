@@ -10,7 +10,7 @@ export default async function PublicLayout({
   children: ReactNode;
 }) {
   const settings = await getGeneralSettings();
-  const links = settings?.headerNavLinks ?? [];
+  const links = settings?.header?.navLinks ?? [];
   const logoUrl = settings?.logoUrl;
   const logoAlt = settings?.logoAlt;
 

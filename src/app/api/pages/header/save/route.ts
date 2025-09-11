@@ -8,7 +8,7 @@ export const dynamic='force-dynamic';
 
 export async function POST(req: Request) {
   const db = adminDb;
-  const body = await req.json();   // { version?: number, ...headerFields }
+  const body = await req.json();   // { version?: number, ...headerCtaFields }
   const clientVersion = Number(body?.version ?? 0);
   const parsed = headerSettingsSchema.parse(body);
 
@@ -25,19 +25,22 @@ export async function POST(req: Request) {
 
     const next = {
       ...current,
-      headerCtaSettings: { ...(current?.headerCtaSettings ?? {}), ...parsed },
+      header: {
+          ...(current.header ?? {}),
+          cta: parsed
+      },
       version: serverVersion + 1,
       updatedAt: now,
       updatedBy: 'cms-user',
     };
 
-    tx.set(ref, next, { merge:false });
+    tx.set(ref, next, { merge: false });
     return { ok:true as const, data: next };
   });
 
   if (!result.ok) return NextResponse.json(result, { status: result.status ?? 400 });
 
   const g = result.data as any;
-  const payload = { version: g.version ?? 0, ...(g.headerCtaSettings ?? {}) };
+  const payload = { version: g.version ?? 0, ...(g.header?.cta ?? {}) };
   return NextResponse.json({ ok:true, data: payload }, { headers:{'cache-control':'no-store'}});
 }

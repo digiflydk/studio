@@ -1,18 +1,18 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
+import type { HeaderSettings } from '@/types/settings';
 
-let cache: HeaderCTASettings | undefined;
+let cache: HeaderSettings | undefined;
 
-export function useHeaderSettings(initial?: HeaderCTASettings) {
-  const [settings, setSettings] = useState<HeaderCTASettings | undefined>(initial ?? cache);
+export function useHeaderSettings(initial?: HeaderSettings) {
+  const [settings, setSettings] = useState<HeaderSettings | undefined>(initial ?? cache);
   const [isLoading, setLoading] = useState(!settings);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchNow = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/pages/header', { cache: 'no-store' });
+      const res = await fetch('/api/pages/header/appearance', { cache: 'no-store' });
       const json = await res.json();
       if(json.ok) {
         cache = json.data; // Update cache
@@ -32,18 +32,18 @@ export function useHeaderSettings(initial?: HeaderCTASettings) {
         fetchNow();
     }
     const onUpdate = (e: Event) => {
-        const customEvent = e as CustomEvent<HeaderCTASettings>;
+        const customEvent = e as CustomEvent<HeaderSettings>;
         if (customEvent.detail) {
           cache = customEvent.detail; // Update cache
           setSettings(customEvent.detail);
         }
     };
     
-    window.addEventListener('pages:header:updated', onUpdate);
-    return () => window.removeEventListener('pages:header:updated', onUpdate);
+    window.addEventListener('design:updated', onUpdate as EventListener);
+    return () => window.removeEventListener('design:updated', onUpdate as EventListener);
   }, [settings, fetchNow]);
 
-  const updateSettings = useCallback((newSettings: HeaderCTASettings | undefined) => {
+  const updateSettings = useCallback((newSettings: HeaderSettings | undefined) => {
       setSettings(newSettings);
       if(newSettings) {
         cache = newSettings;
