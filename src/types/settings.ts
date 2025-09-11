@@ -1,4 +1,3 @@
-
 import type { z } from 'zod';
 import type { headerSettingsSchema } from "@/lib/validators/headerSettings.zod";
 import { headerAppearanceSchema } from '@/lib/validators/headerAppearance.zod';
@@ -140,16 +139,60 @@ export interface ButtonSettings {
     primary: string;
     secondary: string;
     hover: string;
+    text?: string;
   };
+  radius?: number;
+  textSize?: 'sm'|'md'|'lg';
   defaultVariant: ButtonVariantOption;
   defaultSize: ButtonSizeOption;
 }
 
 export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;
 
-export type HeaderSettings = z.infer<typeof headerAppearanceSchema>;
+export type HeaderSettings = {
+  enabled?: boolean;
+  height?: number;
+  bg?: string;
+  bgOpacity?: number;
+  scrolledBg?: string;
+  scrolledOpacity?: number;
+  sticky?: boolean;
+  logo?: {
+    maxHeight?: number;
+    width?: number;
+    aspect?: 'contain' | 'cover';
+  };
+  border?: {
+    enabled?: boolean;
+    width?: number;
+    color?: any;
+  };
+  cta?: {
+    enabled?: boolean;
+    label?: string;
+    linkType?: 'internal' | 'external' | 'tel' | 'mailto';
+    href?: string;
+    variant?: 'primary' | 'secondary' | 'outline' | 'destructive' | 'default';
+    size?: 'sm' | 'md' | 'lg';
+  };
+  ctaFloating?: {
+    enabled?: boolean;
+    position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
+    offsetX?: number;
+    offsetY?: number;
+  };
+  navLinks?: NavLink[];
+};
+
 
 export interface GeneralSettings {
+    brandPrimary?: string;
+    brandSecondary?: string;
+    textColor?: string;
+    linkColor?: string;
+    fontFamily?: string;
+    fontScale?: number;
+    spacingBase?: number;
     locked?: boolean;
     websiteTitle?: string;
     logoUrl?: string;
@@ -203,11 +246,18 @@ export interface GeneralSettings {
     };
     typography?: TypographySettings;
     buttonSettings?: ButtonSettings;
+    buttons?: any; // legacy
     
     // Header Settings
     header?: HeaderSettings;
 
     // Footer Settings
+    footer?: {
+        enabled?: boolean;
+        bg?: string;
+        textColor?: string;
+        border?: { enabled?: boolean; width?: number; color?: string };
+    };
     footerTagline?: string;
     footerDescription?: string;
     footerDescriptionColor?: string;
@@ -226,6 +276,14 @@ export interface GeneralSettings {
     // Home Page Content
     homePageSectionOrder?: string[];
 
+    hero?: {
+        offsetMode?: 'auto'|'fixed';
+        fixedOffset?: number;
+        bg?: string;
+        title?: string;
+        subtitle?: string;
+        cta?: { text?: string; variant?: 'primary'|'secondary'|'outline'|'destructive' };
+    };
     heroLayout?: 'fullWidthImage' | 'textWithImageGrid';
     heroImageUrl?: string;
     heroGridImage1Url?: string;
