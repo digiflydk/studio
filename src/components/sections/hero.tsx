@@ -113,7 +113,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     
     const imageGrid = (
         <div className={cn(
-            "grid grid-cols-2 grid-rows-2 gap-4 md:scale-80 md:ml-auto"
+            "grid grid-cols-2 grid-rows-2 gap-4 md:scale-80"
         )}>
             {[1, 2, 3, 4].map(i => (
                 <div key={i} className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
@@ -136,13 +136,17 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                      <div className="grid md:grid-cols-2 gap-12 items-center">
                          {horizontalAlign === 'right' ? (
                             <>
-                                {imageGrid}
+                                <div className="flex md:justify-end">
+                                  {imageGrid}
+                                </div>
                                 {heroContent}
                             </>
                          ) : (
                             <>
                                 {heroContent}
-                                {imageGrid}
+                                <div className="flex">
+                                  {imageGrid}
+                                </div>
                             </>
                          )}
                      </div>
