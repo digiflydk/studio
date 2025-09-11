@@ -1,0 +1,38 @@
+/* styles/design.css */
+:root {
+  --brand-primary:#6B46C1;
+  --brand-secondary:#111827;
+  --text-color:#111827;
+  --link-color:#2563EB;
+  --font-family:system-ui;
+  --font-scale:1;
+  --spacing-base:8px;
+
+  --header-height:80px;
+  --header-bg:#FFFFFF;
+  --header-border-width:0px;
+  --header-border-color:#E5E7EB;
+  --logo-max-height:32px;
+
+  --footer-bg:#111827;
+  --footer-text:#D1D5DB;
+  --footer-border-width:0px;
+  --footer-border-color:#1F2937;
+
+  --hero-offset-mode:auto;
+  --hero-fixed-offset:0px;
+  --hero-top-offset:80px;
+  --hero-bg:#F9FAFB;
+
+  --btn-shape:default;
+  --btn-radius:8px;
+  --btn-text-size:md;
+  --btn-primary-bg:var(--brand-primary);
+  --btn-primary-text:#FFFFFF;
+}
+
+/* Minimal brug */
+body { color: var(--text-color); font-family: var(--font-family), system-ui, -apple-system, Segoe UI, Roboto; }
+.header { background: var(--header-bg); border-bottom: var(--header-border-width) solid var(--header-border-color); }
+.hero   { background: var(--hero-bg); padding-top: var(--hero-top-offset); }
+button.btn-primary { background: var(--btn-primary-bg); color: var(--btn-primary-text); border-radius: var(--btn-radius); }
