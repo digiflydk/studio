@@ -11,10 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Slider } from '@/components/ui/slider';
-import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import { ConflictDialog } from '@/components/admin/ConflictDialog';
-import { type HeaderAppearanceInput } from '@/lib/validators/headerAppearance.zod';
-import { type HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
+import type { HeaderAppearanceInput } from '@/lib/validators/headerAppearance.zod';
+import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
+import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 
 const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
 const sizes = ['default', 'sm', 'lg', 'icon'] as const;
@@ -93,66 +93,53 @@ function HslColorPicker({
 }
 
 function HeaderAppearanceForm() {
-  const [settings, setSettings] = useState<Partial<HeaderSettings>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const { settings, setSettings, isLoading, refresh } = useHeaderSettings();
   const [isSaving, startSaving] = useTransition();
   const [conflict, setConflict] = useState<any>(null);
   const { toast } = useToast();
 
-  const fetchAppearance = useCallback(async () => {
-    setIsLoading(true);
-    try {
-        const res = await fetch('/api/pages/header/appearance');
-        const json = await res.json();
-        if (json.ok) {
-            setSettings(json.data);
-        } else {
-            throw new Error(json.error || 'Failed to fetch appearance');
-        }
-    } catch (e) {
-        console.error(e);
-        toast({ title: 'Error', description: 'Could not load header appearance.', variant: 'destructive' });
-    } finally {
-        setIsLoading(false);
-    }
-  }, [toast]);
-  
   useEffect(() => {
-    fetchAppearance();
-  }, [fetchAppearance]);
+    refresh();
+  }, [refresh]);
   
   const handleInputChange = (field: keyof HeaderSettings, value: any) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
   
   const handleNestedChange = (part: 'logo' | 'border' | 'bg', field: string, value: any) => {
-      setSettings(prev => ({ ...prev, [part]: { ...prev[part], [field]: value } }));
+      setSettings(prev => ({ ...prev, [part]: { ...(prev as any)[part], [field]: value } }));
   }
 
   const handleBackgroundChange = (type: 'initial' | 'scrolled', value: any) => {
-      setSettings(prev => ({ ...prev, bg: { ...prev.bg, [type]: value }}));
+      setSettings(prev => ({ ...prev, bg: { ...(prev as any).bg, [type]: value }}));
   }
 
   const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
-    const updatedLinks = [...(settings.navLinks || defaultNavLinks)];
+    const updatedLinks = [...(settings?.navLinks || defaultNavLinks)];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
     handleInputChange('navLinks', updatedLinks);
   };
 
   const addNavLink = () => {
-    const updatedLinks = [...(settings.navLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
+    const updatedLinks = [...(settings?.navLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
     handleInputChange('navLinks', updatedLinks);
   };
 
   const removeNavLink = (index: number) => {
-    const updatedLinks = (settings.navLinks || defaultNavLinks).filter((_, i) => i !== index);
+    const updatedLinks = (settings?.navLinks || defaultNavLinks).filter((_, i) => i !== index);
     handleInputChange('navLinks', updatedLinks);
   };
 
   const handleSaveChanges = async (force = false, useVersion?: number) => {
     startSaving(async () => {
         setConflict(null);
-        const payload: Partial<HeaderAppearanceInput> = { ...settings, version: useVersion ?? settings.version };
+        if(!settings) return;
+
+        const payload: HeaderAppearanceInput = { 
+          ...settings, 
+          version: useVersion ?? (settings as any).version 
+        };
+
         try {
             const res = await fetch('/api/pages/header/appearance/save', {
                 method: 'POST',
@@ -162,7 +149,7 @@ function HeaderAppearanceForm() {
             const json = await res.json();
 
             if (res.status === 409) {
-                setConflict({ server: json.current, serverVersion: json.currentVersion });
+                setConflict({ server: json.current.header, serverVersion: json.currentVersion });
                 toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
                 return;
             }
@@ -170,7 +157,7 @@ function HeaderAppearanceForm() {
             
             setSettings(json.data);
             toast({ title: "Saved!", description: "Header appearance has been saved." });
-            window.dispatchEvent(new CustomEvent('design:updated', { detail: json.data }));
+            window.dispatchEvent(new CustomEvent('design:updated', { detail: { header: json.data } }));
 
         } catch (e: any) {
             toast({ title: 'Error', description: e.message, variant: 'destructive' });
@@ -210,10 +197,10 @@ function HeaderAppearanceForm() {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Header Height</Label>
-                           <span className="text-sm text-muted-foreground">{settings.height || 72}px</span>
+                           <span className="text-sm text-muted-foreground">{settings?.height || 72}px</span>
                        </div>
                        <Slider 
-                           value={[settings.height || 72]} 
+                           value={[settings?.height || 72]} 
                            onValueChange={([v]) => handleInputChange('height', v)}
                            min={50} max={120} step={1}
                        />
@@ -221,10 +208,10 @@ function HeaderAppearanceForm() {
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Logo Max Width</Label>
-                           <span className="text-sm text-muted-foreground">{settings.logo?.maxWidth || 120}px</span>
+                           <span className="text-sm text-muted-foreground">{settings?.logo?.maxWidth || 120}px</span>
                        </div>
                        <Slider 
-                           value={[settings.logo?.maxWidth || 120]} 
+                           value={[settings?.logo?.maxWidth || 120]} 
                            onValueChange={([v]) => handleNestedChange('logo', 'maxWidth', v)}
                            min={60} max={320} step={1}
                        />
@@ -235,22 +222,22 @@ function HeaderAppearanceForm() {
                     <h4 className='font-semibold'>Top Border</h4>
                      <div className="flex items-center justify-between">
                         <Label htmlFor='border-enabled'>Enable Top Border</Label>
-                        <Switch id="border-enabled" checked={settings.border?.enabled} onCheckedChange={v => handleNestedChange('border', 'enabled', v)} />
+                        <Switch id="border-enabled" checked={settings?.border?.enabled} onCheckedChange={v => handleNestedChange('border', 'enabled', v)} />
                      </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Border Thickness</Label>
-                           <span className="text-sm text-muted-foreground">{settings.border?.width || 0}px</span>
+                           <span className="text-sm text-muted-foreground">{settings?.border?.width || 0}px</span>
                        </div>
                        <Slider 
-                           value={[settings.border?.width || 0]} 
+                           value={[settings?.border?.width || 0]} 
                            onValueChange={([v]) => handleNestedChange('border', 'width', v)}
                            min={0} max={8} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Border Color"
-                        color={settings.border?.color || {}}
+                        color={settings?.border?.color || {}}
                         onChange={(hsl) => handleNestedChange('border', 'color', hsl)}
                     />
                 </div>
@@ -260,18 +247,18 @@ function HeaderAppearanceForm() {
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Opacity</Label>
-                           <span className="text-sm text-muted-foreground">{Math.round((settings.bg?.initial?.opacity ?? 1) * 100)}%</span>
+                           <span className="text-sm text-muted-foreground">{Math.round((settings?.bg?.initial?.opacity ?? 1) * 100)}%</span>
                        </div>
                        <Slider 
-                           value={[Math.round((settings.bg?.initial?.opacity ?? 1) * 100)]} 
-                           onValueChange={([v]) => handleBackgroundChange('initial', { ...settings.bg?.initial, opacity: v / 100 })}
+                           value={[Math.round((settings?.bg?.initial?.opacity ?? 1) * 100)]} 
+                           onValueChange={([v]) => handleBackgroundChange('initial', { ...settings?.bg?.initial, opacity: v / 100 })}
                            min={0} max={100} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Background Color"
-                        color={settings.bg?.initial || {}}
-                        onChange={(hsl) => handleBackgroundChange('initial', { ...settings.bg?.initial, ...hsl })}
+                        color={settings?.bg?.initial || {}}
+                        onChange={(hsl) => handleBackgroundChange('initial', { ...settings?.bg?.initial, ...hsl })}
                     />
                 </div>
                  <div className="p-4 border rounded-lg space-y-4">
@@ -279,24 +266,24 @@ function HeaderAppearanceForm() {
                      <div className="space-y-2">
                         <div className="flex justify-between items-center">
                            <Label>Opacity</Label>
-                            <span className="text-sm text-muted-foreground">{Math.round((settings.bg?.scrolled?.opacity ?? 1) * 100)}%</span>
+                            <span className="text-sm text-muted-foreground">{Math.round((settings?.bg?.scrolled?.opacity ?? 1) * 100)}%</span>
                        </div>
                        <Slider 
-                           value={[Math.round((settings.bg?.scrolled?.opacity ?? 1) * 100)]} 
-                           onValueChange={([v]) => handleBackgroundChange('scrolled', { ...settings.bg?.scrolled, opacity: v / 100 })}
+                           value={[Math.round((settings?.bg?.scrolled?.opacity ?? 1) * 100)]} 
+                           onValueChange={([v]) => handleBackgroundChange('scrolled', { ...settings?.bg?.scrolled, opacity: v / 100 })}
                            min={0} max={100} step={1}
                        />
                     </div>
                      <HslColorPicker
                         label="Scrolled Background Color"
-                        color={settings.bg?.scrolled || {}}
-                        onChange={(hsl) => handleBackgroundChange('scrolled', { ...settings.bg?.scrolled, ...hsl })}
+                        color={settings?.bg?.scrolled || {}}
+                        onChange={(hsl) => handleBackgroundChange('scrolled', { ...settings?.bg?.scrolled, ...hsl })}
                     />
                 </div>
 
                  <div className="space-y-4">
                     <Label>Navigation Links</Label>
-                    {(settings.navLinks || defaultNavLinks).map((link, index) => (
+                    {(settings?.navLinks || defaultNavLinks).map((link, index) => (
                         <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
                             <Input value={link.label} onChange={(e) => handleNavLinkChange(index, 'label', e.target.value)} placeholder="Label" />
                             <Input value={link.href} onChange={(e) => handleNavLinkChange(index, 'href', e.target.value)} placeholder="Href (#section or /path)" />
@@ -371,7 +358,7 @@ function CtaSettingsForm() {
             
             setHeaderSettings(prev => prev ? ({ ...prev, cta: json.data, version: json.data.version }) : undefined);
             toast({ title: "Saved!", description: "CTA settings have been saved." });
-            window.dispatchEvent(new CustomEvent('pages:header:updated', { detail: json.data }));
+            window.dispatchEvent(new CustomEvent('design:updated', { detail: { header: { cta: json.data } } }));
         });
     }
 

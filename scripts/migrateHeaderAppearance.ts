@@ -18,7 +18,7 @@ export async function migrateHeaderAppearance() {
       'headerTopBorderEnabled' in cur || 'headerInitialBackgroundOpacity' in cur ||
       'headerCtaSettings' in cur;
 
-    if (!hasFlat) return { ok:true, changed:false, reason: 'no_flat_keys' };
+    if (!hasFlat && cur.header) return { ok:true, changed:false, reason: 'already_migrated' };
 
     const next = { ...cur, header: { ...(cur.header ?? {}) } };
     

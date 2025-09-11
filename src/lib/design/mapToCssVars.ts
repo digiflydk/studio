@@ -1,5 +1,6 @@
+
 // lib/design/mapToCssVars.ts
-import type { GeneralSettings } from '@/types/settings';
+import type { GeneralSettings, HSLColor } from '@/types/settings';
 
 function hexToRgba(hex: string, opacity: number) {
   if(!hex) return `rgba(255,255,255,${opacity})`;
@@ -11,7 +12,7 @@ function hexToRgba(hex: string, opacity: number) {
   return `rgba(${r}, ${g}, ${b}, ${o})`;
 }
 
-const d: GeneralSettings = {
+const d: Partial<GeneralSettings> = {
   themeColors: {
     primary: {h: 211, s: 100, l: 50 },
     background: {h: 210, s: 100, l: 95 },
@@ -26,9 +27,6 @@ const d: GeneralSettings = {
       scrolled: { h:255, s:255, l:255, opacity: 1 },
     },
     navLinks: [],
-    bgOpacity: 1,
-    scrolledBg: '#FFFFFF',
-    scrolledOpacity: 1,
   },
   footer: { bg: '#111827', textColor: '#D1D5DB', border: { enabled: false, width: 1, color: '#1F2937' } },
   hero: { offsetMode: 'auto', fixedOffset: 0, bg: '#F9FAFB' },
@@ -42,7 +40,8 @@ const d: GeneralSettings = {
   }
 };
 
-function hToHex(h: {h:number,s:number,l:number}){
+function hToHex(h: HSLColor){
+    if (!h) return '#000000';
     const {h:hue,s,l} = h;
     const lFix = l/100;
     const a = s * Math.min(lFix, 1 - lFix) / 100;
@@ -51,12 +50,14 @@ function hToHex(h: {h:number,s:number,l:number}){
         const color = lFix - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
         return Math.round(255 * color).toString(16).padStart(2, '0');
     };
-    return `#${f(0)}${f(8)}${f(4)}`;
+    return `#${f(0)}$f(8)}$f(4)}`;
 }
 
 export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
     const safeSettings = s || {};
-    const S: GeneralSettings = {
+    
+    // Deep merge with defaults
+    const S: Partial<GeneralSettings> = {
         ...d,
         ...safeSettings,
         themeColors: { ...d.themeColors!, ...safeSettings.themeColors },
@@ -67,6 +68,9 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
                 initial: { ...d.header!.bg.initial, ...safeSettings.header?.bg?.initial },
                 scrolled: { ...d.header!.bg.scrolled, ...safeSettings.header?.bg?.scrolled },
             },
+            cta: { ...d.header!.cta, ...safeSettings.header?.cta, 
+                mobileFloating: { ...d.header!.cta?.mobileFloating, ...safeSettings.header?.cta?.mobileFloating}
+            }
         },
         footer: { ...d.footer!, ...safeSettings.footer,
           border: { ...d.footer!.border, ...safeSettings.footer?.border }
@@ -75,15 +79,14 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
         buttonSettings: { ...d.buttonSettings!, ...safeSettings.buttonSettings },
     };
 
-  const initialBg = S.header!.bg?.initial?.h ? hToHex(S.header!.bg.initial as any) : S.header!.bg || '#FFFFFF';
-  const initialOpacity = S.header!.bg?.initial?.opacity ?? S.header!.bgOpacity ?? 1;
+  const initialBg = S.header!.bg?.initial?.h ? hToHex(S.header!.bg.initial) : '#FFFFFF';
+  const initialOpacity = S.header!.bg?.initial?.opacity ?? 1;
 
-  const scrolledBgFromSettings = S.header!.bg?.scrolled?.h ? hToHex(S.header!.bg.scrolled as any) : S.header!.scrolledBg;
+  const scrolledBgFromSettings = S.header!.bg?.scrolled?.h ? hToHex(S.header!.bg.scrolled) : undefined;
   const scrolledBg = scrolledBgFromSettings ?? initialBg;
-  const scrolledOpacity = S.header!.bg?.scrolled?.opacity ?? S.header!.scrolledOpacity ?? 1;
+  const scrolledOpacity = S.header!.bg?.scrolled?.opacity ?? 1;
 
   const btnPrimaryBg = S.buttonSettings!.colors.primary || S.brandPrimary;
-
 
   const vars: Record<string, string> = {
     '--brand-primary': S.brandPrimary!,
@@ -94,7 +97,6 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
     '--font-scale': String(S.fontScale),
     '--spacing-base': `${S.spacingBase}px`,
 
-    /* Header core */
     '--header-height': `${S.header!.height}px`,
     '--header-bg': hexToRgba(initialBg, initialOpacity),
     '--header-bg-raw': initialBg,
@@ -108,13 +110,11 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
     '--logo-max-height': `${S.header!.logo!.maxHeight}px`,
     '--logo-width': `${S.header!.logo!.width}px`,
 
-    /* Footer */
     '--footer-bg': S.footer!.bg!,
     '--footer-text': S.footer!.textColor!,
     '--footer-border-width': S.footer!.border!.enabled ? `${S.footer!.border!.width}px` : '0px',
     '--footer-border-color': S.footer!.border!.color!,
 
-    /* Hero / Buttons */
     '--hero-offset-mode': S.hero!.offsetMode!,
     '--hero-fixed-offset': `${S.hero!.fixedOffset}px`,
     '--hero-bg': S.hero!.bg!,
@@ -128,10 +128,8 @@ export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
   vars['--hero-top-offset'] =
     S.hero!.offsetMode === 'auto' ? `${S.header!.height}px` : `${S.hero!.fixedOffset}px`;
     
-  // Floating CTA vars (defaults)
-  vars['--cta-float-pos'] = S.header!.ctaFloating?.position ?? 'bottom-right';
-  vars['--cta-float-offset-x'] = `${S.header!.ctaFloating?.offsetX ?? 16}px`;
-  vars['--cta-float-offset-y'] = `${S.header!.ctaFloating?.offsetY ?? 16}px`;
+  vars['--cta-float-offset-x'] = `${S.header!.cta?.mobileFloating?.offsetX ?? 16}px`;
+  vars['--cta-float-offset-y'] = `${S.header!.cta?.mobileFloating?.offsetY ?? 16}px`;
 
   return vars;
 }

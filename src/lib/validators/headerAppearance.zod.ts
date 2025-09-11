@@ -1,6 +1,5 @@
 
 import { z } from "zod";
-import { headerSettingsSchema as ctaSchema } from "./headerSettings.zod";
 
 const hslSchema = z.object({
   h: z.number().min(0).max(360),
@@ -9,10 +8,10 @@ const hslSchema = z.object({
 });
 
 const backgroundSchema = z.object({
-    h: z.number().min(0).max(360),
-    s: z.number().min(0).max(100),
-    l: z.number().min(0).max(100),
-    opacity: z.number().min(0).max(1),
+    h: z.number().min(0).max(360).optional(),
+    s: z.number().min(0).max(100).optional(),
+    l: z.number().min(0).max(100).optional(),
+    opacity: z.number().min(0).max(1).optional(),
 }).partial();
 
 export const headerAppearanceSchema = z.object({
@@ -33,7 +32,7 @@ export const headerAppearanceSchema = z.object({
     label: z.string(),
     href: z.string(),
   })).optional(),
-  cta: ctaSchema.optional(),
   version: z.number().optional(),
 });
+
 export type HeaderAppearanceInput = z.infer<typeof headerAppearanceSchema>;

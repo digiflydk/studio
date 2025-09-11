@@ -1,3 +1,4 @@
+
 import type { z } from 'zod';
 import type { headerSettingsSchema } from "@/lib/validators/headerSettings.zod";
 import { headerAppearanceSchema } from '@/lib/validators/headerAppearance.zod';
@@ -149,39 +150,8 @@ export interface ButtonSettings {
 
 export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;
 
-export type HeaderSettings = {
-  enabled?: boolean;
-  height?: number;
-  bg?: string;
-  bgOpacity?: number;
-  scrolledBg?: string;
-  scrolledOpacity?: number;
-  sticky?: boolean;
-  logo?: {
-    maxHeight?: number;
-    width?: number;
-    aspect?: 'contain' | 'cover';
-  };
-  border?: {
-    enabled?: boolean;
-    width?: number;
-    color?: any;
-  };
-  cta?: {
-    enabled?: boolean;
-    label?: string;
-    linkType?: 'internal' | 'external' | 'tel' | 'mailto';
-    href?: string;
-    variant?: 'primary' | 'secondary' | 'outline' | 'destructive' | 'default';
-    size?: 'sm' | 'md' | 'lg';
-  };
-  ctaFloating?: {
-    enabled?: boolean;
-    position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
-    offsetX?: number;
-    offsetY?: number;
-  };
-  navLinks?: NavLink[];
+export type HeaderSettings = z.infer<typeof headerAppearanceSchema> & {
+    cta?: HeaderCTASettings
 };
 
 
@@ -218,7 +188,6 @@ export interface GeneralSettings {
     twitterUrl?: string;
     tiktokUrl?: string;
     
-    // Tracking settings
     enableGtm?: boolean;
     gtmId?: string;
     enableGoogleAnalytics?: boolean;
@@ -228,17 +197,14 @@ export interface GeneralSettings {
     enableGoogleAds?: boolean;
     googleAdsId?: string;
 
-    // Cookie Settings
     cookies?: CookieSettings;
 
-    // AI Settings
     aiProvider?: 'googleai' | 'openai';
     aiModel?: string;
     aiGreetingMessage?: string;
-    aiSystemPrompt?: string; // Used for Google AI
-    aiSystemPromptOpenAI?: string; // Used for OpenAI
+    aiSystemPrompt?: string; 
+    aiSystemPromptOpenAI?: string;
 
-    // Design Settings
     themeColors?: {
         primary: HSLColor;
         background: HSLColor;
@@ -248,10 +214,8 @@ export interface GeneralSettings {
     buttonSettings?: ButtonSettings;
     buttons?: any; // legacy
     
-    // Header Settings
     header?: HeaderSettings;
 
-    // Footer Settings
     footer?: {
         enabled?: boolean;
         bg?: string;
@@ -273,7 +237,6 @@ export interface GeneralSettings {
     footerContactColor?: string;
     footerContactSize?: number;
 
-    // Home Page Content
     homePageSectionOrder?: string[];
 
     hero?: {
@@ -359,7 +322,7 @@ export interface GeneralSettings {
     aiProjectSectionTitleColor?: string;
     aiProjectSectionTitleSize?: number;
     aiProjectSectionDescription?: string;
-aiProjectSectionDescriptionColor?: string;
+    aiProjectSectionDescriptionColor?: string;
     aiProjectSectionDescriptionSize?: number;
     aiProjectSectionBackgroundColor?: HSLColor;
     aiProjectSectionAlignment?: Alignment;
@@ -405,17 +368,12 @@ aiProjectSectionDescriptionColor?: string;
     tabbedContentItems?: TabbedContentItem[];
     tabbedContentSectionBackgroundColor?: HSLColor;
 
-
-    // Spacing
     sectionPadding?: Partial<Record<keyof SectionVisibility, SectionPadding>>;
     
-    // Section Visibility
     sectionVisibility?: SectionVisibility;
 
-    // Customers
     customers?: Customer[];
 }
 
-// Keep ButtonVariant and ButtonSize here as they are used in sections
 export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
 export type ButtonSize = 'default' | 'sm' | 'lg';
