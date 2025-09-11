@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import { type GeneralSettings } from '@/types/settings';
@@ -113,7 +114,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     
     const imageGrid = (
         <div className={cn(
-            "grid grid-cols-2 grid-rows-2 gap-4 md:scale-60",
+            "grid grid-cols-2 grid-rows-2 gap-4 md:w-3/5",
             {
                 'md:ml-auto': horizontalAlign === 'right',
             }
@@ -161,9 +162,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         return (
             <section id="hero" style={sectionStyle} className="py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]">
                  <div className="container mx-auto max-w-7xl px-4 md:px-6">
-                     <div className={cn("grid md:grid-cols-2 gap-12 items-center", {
-                         'md:justify-items-end': horizontalAlign === 'right'
-                     })}>
+                     <div className={cn("grid md:grid-cols-2 gap-12 items-center")}>
                          {horizontalAlign === 'right' ? (
                             <>
                                 {imageGrid}
@@ -210,3 +209,5 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         </section>
     );
 }
+
+    
