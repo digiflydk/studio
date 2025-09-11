@@ -1,13 +1,13 @@
 
 import { NextResponse } from "next/server";
-import { getAdminDb } from "@/lib/server/firebaseAdmin";
+import { adminDb } from "@/lib/server/firebaseAdmin";
 import { headerAppearanceSchema } from "@/lib/validators/headerAppearance.zod";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  const db = getAdminDb();
+  const db = adminDb;
   const body = await req.json();
   const clientVersion = Number(body?.version ?? 0);
   const parsed = headerAppearanceSchema.parse(body);
@@ -54,4 +54,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, data: payload }, { headers: { "cache-control": "no-store" } });
 }
-

@@ -1,13 +1,13 @@
 
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 import { buttonSettingsSchema } from '@/lib/validators/buttonSettings.zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-  const db = getAdminDb();
+  const db = adminDb;
   const body = await req.json(); // forventer { version?: number, ...buttonSettings }
   const clientVersion = Number(body?.version ?? 0);
   const parsed = buttonSettingsSchema.parse(body);

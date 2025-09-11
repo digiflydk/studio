@@ -1,12 +1,12 @@
 
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const db = getAdminDb();
+  const db = adminDb;
   // Kanonisk doc
   const refGen = db.doc('settings/general');
   const snapGen = await refGen.get();

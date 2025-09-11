@@ -3,12 +3,12 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 const PATH = 'settings/general';
 
 export async function POST() {
   try {
-    const db = getAdminDb();
+    const db = adminDb;
     const now = new Date().toISOString();
     await db.doc(PATH).set({ _diag: { lastWrite: now } }, { merge: true });
     const snap = await db.doc(PATH).get();

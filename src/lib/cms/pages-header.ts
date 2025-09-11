@@ -1,5 +1,5 @@
 
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
 import { unstable_cache } from 'next/cache';
 
@@ -7,7 +7,7 @@ const PATH = 'pages/header';
 
 export const getHeaderSettings = unstable_cache(
     async (): Promise<HeaderCTASettings> => {
-        const db = getAdminDb();
+        const db = adminDb;
         const headerDefaults: HeaderCTASettings = {
           enabled: false,
           label: 'Kom i gang',

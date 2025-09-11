@@ -1,12 +1,12 @@
 
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const db = getAdminDb();
+  const db = adminDb;
   const ref = db.doc('settings/general');
   const snap = await ref.get();
   if (!snap.exists) return NextResponse.json({ ok:false, error:'not_found' }, { status: 404 });

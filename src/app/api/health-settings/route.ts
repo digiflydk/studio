@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,7 @@ function toPlainObject(obj: any) {
 
 
 export async function GET() {
-  const db = getAdminDb();
+  const db = adminDb;
 
   // primær: settings/general
   const gen = await db.doc('settings/general').get();

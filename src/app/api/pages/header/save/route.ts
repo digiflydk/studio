@@ -1,13 +1,13 @@
 
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 import { headerSettingsSchema } from '@/lib/validators/headerSettings.zod';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 
 export async function POST(req: Request) {
-  const db = getAdminDb();
+  const db = adminDb;
   const body = await req.json();   // { version?: number, ...headerFields }
   const clientVersion = Number(body?.version ?? 0);
   const parsed = headerSettingsSchema.parse(body);

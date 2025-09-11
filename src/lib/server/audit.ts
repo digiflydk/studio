@@ -1,5 +1,5 @@
 
-import { getAdminDb } from '@/lib/server/firebaseAdmin';
+import { adminDb } from '@/lib/server/firebaseAdmin';
 import type { AuditRecord } from '@/types/audit';
 
 function shallowDiff(a: any = {}, b: any = {}) {
@@ -17,7 +17,7 @@ function shallowDiff(a: any = {}, b: any = {}) {
 
 export async function logAudit<T>(record: AuditRecord<T>) {
   try {
-    const db = getAdminDb();
+    const db = adminDb;
     // cap payload size (50KB) ved at nøjes med diff
     const afterStr = JSON.stringify(record.after ?? {});
     const size = Buffer.byteLength(afterStr, 'utf8');
