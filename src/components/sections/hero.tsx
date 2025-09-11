@@ -112,7 +112,10 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     );
     
     const imageGrid = (
-        <div className="grid grid-cols-2 grid-rows-2 gap-4 md:scale-90">
+        <div className={cn(
+            "grid grid-cols-2 grid-rows-2 gap-4 md:scale-90",
+            horizontalAlign === 'right' && 'md:ml-auto'
+        )}>
             {[1, 2, 3, 4].map(i => (
                 <div key={i} className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
                     <Image 
@@ -131,10 +134,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         return (
             <section id="hero" style={sectionStyle} className="py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]">
                  <div className="container mx-auto max-w-7xl px-4 md:px-6">
-                     <div className={cn("grid md:grid-cols-2 gap-12 items-center", {
-                         'md:justify-items-end': horizontalAlign === 'left',
-                         'md:justify-items-start': horizontalAlign === 'right',
-                     })}>
+                     <div className="grid md:grid-cols-2 gap-12 items-center">
                          {horizontalAlign === 'right' ? (
                             <>
                                 {imageGrid}
