@@ -115,17 +115,42 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         <div className={cn(
             "grid grid-cols-2 grid-rows-2 gap-4 md:scale-80"
         )}>
-            {[1, 2, 3, 4].map(i => (
-                <div key={i} className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
-                    <Image 
-                        src={settings?.[`heroGridImage${i}Url` as keyof typeof settings] as string || `https://picsum.photos/400/300?random=${10+i}`}
-                        alt={`Hero image ${i}`}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={settings?.[`heroGridImage${i}AiHint` as keyof typeof settings] as string || ''}
-                    />
-                </div>
-            ))}
+            <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
+                <Image 
+                    src={settings?.heroGridImage1Url || `https://picsum.photos/400/300?random=11`}
+                    alt="Hero image 1"
+                    fill
+                    className="object-cover"
+                    data-ai-hint={settings?.heroGridImage1AiHint || ''}
+                />
+            </div>
+             <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
+                <Image 
+                    src={settings?.heroGridImage2Url || `https://picsum.photos/400/300?random=12`}
+                    alt="Hero image 2"
+                    fill
+                    className="object-cover"
+                    data-ai-hint={settings?.heroGridImage2AiHint || ''}
+                />
+            </div>
+             <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
+                <Image 
+                    src={settings?.heroGridImage3Url || `https://picsum.photos/400/300?random=13`}
+                    alt="Hero image 3"
+                    fill
+                    className="object-cover"
+                    data-ai-hint={settings?.heroGridImage3AiHint || ''}
+                />
+            </div>
+             <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
+                <Image 
+                    src={settings?.heroGridImage4Url || `https://picsum.photos/400/300?random=14`}
+                    alt="Hero image 4"
+                    fill
+                    className="object-cover"
+                    data-ai-hint={settings?.heroGridImage4AiHint || ''}
+                />
+            </div>
         </div>
     );
 
