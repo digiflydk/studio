@@ -403,12 +403,12 @@ function CtaSettingsForm() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                             <Label>Label</Label>
-                            <Input value={ctaSettings.label} onChange={e=>handleCtaChange('label',e.target.value)}/>
+                            <Input value={ctaSettings.label || ''} onChange={e=>handleCtaChange('label',e.target.value)}/>
                             </div>
 
                             <div className="space-y-2">
                             <Label>Link Type</Label>
-                            <Select value={ctaSettings.linkType} onValueChange={(v: 'internal' | 'external') => handleCtaChange('linkType', v)}>
+                            <Select value={ctaSettings.linkType || 'internal'} onValueChange={(v: 'internal' | 'external') => handleCtaChange('linkType', v)}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="internal">Internal (#section)</SelectItem>
@@ -420,12 +420,12 @@ function CtaSettingsForm() {
                             <div className="md:col-span-2 space-y-2">
                             <Label>Href</Label>
                             <Input placeholder={ctaSettings.linkType==='internal'?'#section-id':'https://domain.com'}
-                                    value={ctaSettings.href} onChange={e=>handleCtaChange('href',e.target.value)}/>
+                                    value={ctaSettings.href || ''} onChange={e=>handleCtaChange('href',e.target.value)}/>
                             </div>
 
                             <div className="space-y-2">
                             <Label>Variant</Label>
-                            <Select value={ctaSettings.variant} onValueChange={(v: any) => handleCtaChange('variant', v)}>
+                            <Select value={ctaSettings.variant || 'default'} onValueChange={(v: any) => handleCtaChange('variant', v)}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
                                     {variants.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
@@ -435,7 +435,7 @@ function CtaSettingsForm() {
 
                             <div className="space-y-2">
                             <Label>Size</Label>
-                            <Select value={ctaSettings.size} onValueChange={(v: any) => handleCtaChange('size', v)}>
+                            <Select value={ctaSettings.size || 'default'} onValueChange={(v: any) => handleCtaChange('size', v)}>
                                 <SelectTrigger><SelectValue/></SelectTrigger>
                                 <SelectContent>
                                      {sizes.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
@@ -462,7 +462,7 @@ function CtaSettingsForm() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                 <Label>Position</Label>
-                                 <Select value={ctaSettings.mobileFloating?.position} onValueChange={(v: any) => handleMobileCtaChange('position', v)}>
+                                 <Select value={ctaSettings.mobileFloating?.position || 'br'} onValueChange={(v: any) => handleMobileCtaChange('position', v)}>
                                     <SelectTrigger><SelectValue/></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="br">Bottom Right</SelectItem>
