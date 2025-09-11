@@ -1,6 +1,6 @@
 // components/providers/DesignVarsProvider.tsx
 'use client';
-import * as React from 'react';
+import { useEffect } from 'react';
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
 import { mapToCssVars } from '@/lib/design/mapToCssVars';
@@ -12,7 +12,7 @@ const firebaseConfig = {
 };
 
 export default function DesignVarsProvider() {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!getApps().length) initializeApp(firebaseConfig);
     const db = getFirestore();
     const ref = doc(db, 'settings/general');
