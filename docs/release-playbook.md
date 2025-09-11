@@ -24,7 +24,7 @@ Formål: En standardiseret og sikker proces for at implementere design- og indho
 - **Hvordan**:
     1.  **Tag screenshots**: Tag før/efter billeder jf. `qa-checklist.md` og gem dem i `/qa/baseline/DF-XXX/`.
     2.  **Commit**: Lav et commit med en klar besked, der refererer til opgavenummeret (f.eks. "DF-245: Add release playbook docs").
-    3.  **Footer-version**: Inkludér den nye version (f.eks. `1.0.197 • DF-246`) i commit-beskeden.
+    3.  **Footer-version**: Inkludér den nye version (f.eks. `1.0.199 • DF-249`) i commit-beskeden.
     4.  **Changelog**: Tilføj en kort note til den interne changelog, der beskriver ændringen.
 - **Effekt**: Ændringen er nu en del af main-branchen og klar til deployment.
 
@@ -32,7 +32,7 @@ Formål: En standardiseret og sikker proces for at implementere design- og indho
 
 ### Versionering
 
-- **Format**: `Major.Minor.Patch • Opgave-ID` (f.eks. `1.0.197 • DF-246`).
+- **Format**: `Major.Minor.Patch • Opgave-ID` (f.eks. `1.0.199 • DF-249`).
 - **Major**: Store, breaking changes i applikationskoden.
 - **Minor**: Nye features eller større ændringer i UI/CMS.
 - **Patch**: Små rettelser, justeringer og dokumentation.

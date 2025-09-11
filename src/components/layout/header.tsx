@@ -7,6 +7,7 @@ import Logo from '@/components/logo';
 import HeaderCTA from '@/components/common/HeaderCTA';
 import type { NavLink } from '@/types/settings';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
+import MobileFloatingCTA from './MobileFloatingCTA';
 
 export default function Header({
   logoUrl,
@@ -17,26 +18,29 @@ export default function Header({
   logoAlt?: string | null;
   links?: NavLink[];
 }) {
-    const { settings: headerSettings } = useHeaderSettings();
+  const { settings: headerSettings } = useHeaderSettings();
 
   return (
-    <header className="site-header" data-testid="site-header">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/">
-            <Logo logoUrl={logoUrl ?? undefined} logoAlt={logoAlt ?? undefined} width={headerSettings?.logo?.maxWidth} />
-          </Link>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-6">
-          {links.map((n) => (
-            <Link key={n.href} href={n.href} className="text-sm hover:opacity-80">
-              {n.label}
+    <>
+      <header className="site-header" data-testid="site-header">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Logo logoUrl={logoUrl ?? undefined} logoAlt={logoAlt ?? undefined} width={headerSettings?.logo?.maxWidth} />
             </Link>
-          ))}
-          <HeaderCTA />
-        </nav>
-      </div>
-    </header>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-6">
+            {links.map((n) => (
+              <Link key={n.href} href={n.href} className="text-sm hover:opacity-80">
+                {n.label}
+              </Link>
+            ))}
+            <HeaderCTA />
+          </nav>
+        </div>
+      </header>
+      <MobileFloatingCTA />
+    </>
   );
 }

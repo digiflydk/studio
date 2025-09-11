@@ -12,11 +12,12 @@ export async function POST(req: Request) {
   const clientVersion = Number(body?.version ?? 0);
   
   const { version, ...ctaData } = body;
-  const parsed = headerSettingsSchema.parse(ctaData);
-
-  const ref = db.doc('settings/general');
-
+  
   try {
+    const parsed = headerSettingsSchema.parse(ctaData);
+
+    const ref = db.doc('settings/general');
+    
     const result = await db.runTransaction(async tx => {
       const snap = await tx.get(ref);
       const now = new Date().toISOString();
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
     const g = result.data as any;
     const payload = { version: g.version ?? 0, ...(g.header?.cta ?? {}) };
     return NextResponse.json({ ok:true, data: payload }, { headers:{'cache-control':'no-store'}});
+
   } catch (error: any) {
     console.error("CTA settings save failed:", error);
     if (error.name === 'ZodError') {

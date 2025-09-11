@@ -14,11 +14,12 @@ export async function POST(req: Request) {
   
   // Fjerner version før validering for at undgå at Zod brokker sig
   const { version, ...dataToParse } = body;
-  const parsed = headerAppearanceSchema.parse(dataToParse);
-
-  const ref = db.doc("settings/general");
   
   try {
+    const parsed = headerAppearanceSchema.parse(dataToParse);
+
+    const ref = db.doc("settings/general");
+    
     const result = await db.runTransaction(async (tx) => {
       const snap = await tx.get(ref);
       const now = new Date().toISOString();
