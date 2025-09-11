@@ -1,0 +1,279 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-padding-top: var(--header-h, 72px);
+}
+
+body {
+  font-family: var(--font-primary), Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Typografi – mobil defaults */
+    --header-offset: 64px;
+
+    /* Colors */
+    --background: 210 100% 95%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 210 100% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 210 100% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 60% 98%;
+    --secondary-foreground: 224 71.4% 4.1%;
+    --muted: 210 20% 92.2%;
+    --muted-foreground: 224 10% 45.1%;
+    --accent: 211 100% 40%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 20% 89.8%;
+    --input: 210 20% 89.8%;
+    --ring: 211 100% 50%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+
+    /* Fonts */
+    --font-primary: "Inter", ui-sans-serif, system-ui, -apple-system;
+    --font-secondary: var(--font-primary);
+
+    /* Sizes (px) – Mobile defaults overskrives ved runtime fra CMS */
+    --h1-size-mobile: 32;
+    --h2-size-mobile: 26;
+    --h3-size-mobile: 22;
+    --h4-size-mobile: 18;
+
+    --h1-size-desktop: 48;
+    --h2-size-desktop: 36;
+    --h3-size-desktop: 28;
+    --h4-size-desktop: 22;
+
+    --body-size: 16;
+
+    /* Weights */
+    --h1-weight: 700; --h2-weight: 700; --h3-weight: 700; --h4-weight: 700;
+    --body-weight: 400;
+
+    /* Line-heights */
+    --h1-lh: 1.2; --h2-lh: 1.25; --h3-lh: 1.3; --h4-lh: 1.35;
+    --body-lh: 1.6;
+
+     /* CTA – defaults fra CMS */
+    --btn-radius: 10px;            /* overskrives ved 'pill' */
+    --btn-font-family: Inter, ui-sans-serif, system-ui;
+    --btn-font-weight: 600;
+    --btn-color-primary: hsl(var(--primary));
+    --btn-color-secondary: hsl(var(--secondary));
+    --btn-color-hover: hsl(var(--primary));
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 211 100% 40%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 211 100% 50%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  h1 { font-family: var(--font-primary); font-size: calc(var(--h1-size-mobile) * 1px); font-weight: var(--h1-weight); line-height: var(--h1-lh); }
+  h2 { font-family: var(--font-primary); font-size: calc(var(--h2-size-mobile) * 1px); font-weight: var(--h2-weight); line-height: var(--h2-lh); }
+  h3 { font-family: var(--font-primary); font-size: calc(var(--h3-size-mobile) * 1px); font-weight: var(--h3-weight); line-height: var(--h3-lh); }
+  h4 { font-family: var(--font-primary); font-size: calc(var(--h4-size-mobile) * 1px); font-weight: var(--h4-weight); line-height: var(--h4-lh); }
+  p  { font-family: var(--font-primary); font-size: calc(var(--body-size) * 1px); font-weight: var(--body-weight); line-height: var(--body-lh); }
+
+  @media (min-width: 768px) {
+    h1 { font-size: calc(var(--h1-size-desktop) * 1px); }
+    h2 { font-size: calc(var(--h2-size-desktop) * 1px); }
+    h3 { font-size: calc(var(--h3-size-desktop) * 1px); }
+    h4 { font-size: calc(var(--h4-size-desktop) * 1px); }
+  }
+
+  /* Sikr at base-headings følger CMS line-height, selv hvis utils bruges andre steder */
+  h1 { line-height: var(--h1-lh) !important; }
+  h2 { line-height: var(--h2-lh) !important; }
+  h3 { line-height: var(--h3-lh) !important; }
+  h4 { line-height: var(--h4-lh) !important; }
+  p  { line-height: var(--body-lh) !important; }
+
+  /* Hvis @tailwindcss/typography bruges (prose), tving samme variabler igennem */
+  .prose h1 { line-height: var(--h1-lh) !important; }
+  .prose h2 { line-height: var(--h2-lh) !important; }
+  .prose h3 { line-height: var(--h3-lh) !important; }
+  .prose h4 { line-height: var(--h4-lh) !important; }
+  .prose p  { line-height: var(--body-lh) !important; }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .section {
+    padding-top: var(--section-pt-mobile, 64px);
+    padding-bottom: var(--section-pb-mobile, 96px);
+  }
+  @media (min-width: 768px) {
+    .section {
+      padding-top: var(--section-pt, 96px);
+      padding-bottom: var(--section-pb, 128px);
+    }
+  }
+
+  /* Knapper */
+  .btn { 
+    font-family: var(--btn-font-family); 
+    font-weight: var(--btn-font-weight); 
+    border-radius: var(--btn-radius); 
+  }
+  .btn--primary { 
+    background: var(--btn-color-primary); 
+    color: hsl(var(--primary-foreground)); 
+  }
+  .btn--primary:hover { 
+    background: var(--btn-color-hover); 
+  }
+  .btn--secondary { 
+    background: var(--btn-color-secondary); 
+    color: hsl(var(--primary-foreground)); 
+  }
+  .btn--secondary:hover { 
+    filter: brightness(0.95); 
+  }
+  .btn--outline { 
+    border: 1px solid var(--btn-color-primary); 
+    color: var(--btn-color-primary); 
+    background: transparent; 
+  }
+  .btn--outline:hover { 
+    background: color-mix(in srgb, var(--btn-color-primary) 10%, transparent); 
+  }
+  .btn--destructive { 
+    background: hsl(var(--destructive)); 
+    color: hsl(var(--destructive-foreground)); 
+  }
+  .btn--destructive:hover { 
+    background: hsl(var(--destructive));
+    filter: brightness(0.9);
+  }
+
+  .btn--sm { padding:.5rem .875rem; }
+  .btn--md { padding:.625rem 1rem; }
+  .btn--lg { padding:.75rem 1.25rem; }
+}
+
+
+/* ---- Header/Hero offset guard ---- */
+
+/* Dræb eventuelle legacy spacers/sentinels direkte efter header */
+[data-role="site-header"] + .header-sentinel,
+[data-role="site-header"] + .scroll-sentinel,
+[data-role="site-header"] + .debug-spacer {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Nulstil altid top-afstand på første content-element under header */
+main > :first-child {
+  margin-top: 0 !important;
+}
+main > section:first-of-type,
+main > div:first-of-type {
+  padding-top: 0 !important;
+}
+
+/* Sørg for at headeren selv ikke skaber afstand */
+[data-role="site-header"] {
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Anker-navigation: undgå overlap, men påvirk ikke layout-højde */
+[id] {
+  scroll-margin-top: calc(var(--header-h, 72px) + var(--header-border-h, 1px));
+}
+
+/* Header Appearance bindings */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-height);
+  background: var(--header-bg);
+  backdrop-filter: saturate(1);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+[data-scrolled="true"] .site-header {
+  background: var(--header-bg-scrolled);
+}
+
+html { scroll-padding-top: var(--hero-top-offset); } /* for ankerlinks */
+
+
+/* Button base (binder til vars fra DF-246) */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--btn-radius);
+  font-size: 0.875rem; line-height: 1.25rem; /* sm default */
+  padding: 0.5rem 0.875rem;
+  transition: opacity .15s ease, transform .05s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn--md { font-size: 1rem; padding: 0.625rem 1rem; }
+.btn--lg { font-size: 1.125rem; padding: 0.75rem 1.25rem; }
+
+.btn--primary   { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+.btn--secondary { background: var(--brand-secondary); color: #fff; }
+.btn--outline   { background: transparent; color: var(--brand-secondary); border: 1px solid var(--brand-secondary); }
+.btn--destructive { background: #ef4444; color:#fff; }
+.btn--default   { background: #e5e7eb; color:#111827; }
+
+/* Floating CTA (kun mobil) */
+@media (max-width: 640px) {
+  .cta-float {
+    position: fixed; z-index: 60;
+    left: auto; right: auto; bottom: auto;
+    transform: translate(-50%, 0);
+  }
+  /* positions */
+  .cta-pos--bottom-right { right: var(--cta-float-offset-x); bottom: var(--cta-float-offset-y); transform: none; }
+  .cta-pos--bottom-left  { left: var(--cta-float-offset-x); bottom: var(--cta-float-offset-y); transform: none; }
+  .cta-pos--bottom-center{ left: 50%; bottom: var(--cta-float-offset-y); }
+}

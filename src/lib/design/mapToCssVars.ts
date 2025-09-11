@@ -15,8 +15,8 @@ function hexToRgba(hex: string, opacity: number) {
 }
 
 
-function hToHex(h?: HSLColor){
-    if (!h || typeof h.h !== 'number') return '#FFFFFF';
+function hToHex(h?: Partial<HSLColor>){
+    if (!h || typeof h.h !== 'number' || typeof h.s !== 'number' || typeof h.l !== 'number') return '#FFFFFF';
     const {h:hue,s,l} = h;
     const lFix = l/100;
     const a = s * Math.min(lFix, 1 - lFix) / 100;

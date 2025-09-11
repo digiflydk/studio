@@ -8,6 +8,7 @@ import HeaderCTA from '@/components/common/HeaderCTA';
 import type { NavLink } from '@/types/settings';
 import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
 import MobileFloatingCTA from './MobileFloatingCTA';
+import { cn } from '@/lib/utils';
 
 export default function Header({
   logoUrl,
@@ -19,6 +20,8 @@ export default function Header({
   links?: NavLink[];
 }) {
   const { settings: headerSettings } = useHeaderSettings();
+
+  const showBorder = headerSettings?.border?.enabled === true;
 
   return (
     <>
@@ -39,6 +42,15 @@ export default function Header({
             <HeaderCTA />
           </nav>
         </div>
+        {showBorder && (
+          <div
+            className="absolute bottom-0 left-0 right-0"
+            style={{
+              height: 'var(--header-border-width)',
+              backgroundColor: 'var(--header-border-color)',
+            }}
+          />
+        )}
       </header>
       <MobileFloatingCTA />
     </>
