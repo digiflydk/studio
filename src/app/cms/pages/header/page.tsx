@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import type { GeneralSettings, HeaderCTASettings, NavLink, HSLColor } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
