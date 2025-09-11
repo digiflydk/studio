@@ -113,7 +113,10 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     
     const imageGrid = (
         <div className={cn(
-            "grid grid-cols-2 grid-rows-2 gap-4"
+            "grid grid-cols-2 grid-rows-2 gap-4 md:scale-60",
+            {
+                'md:ml-auto': horizontalAlign === 'right',
+            }
         )}>
             <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
                 <Image 
