@@ -244,11 +244,4 @@ main > div:first-of-type {
   background: var(--header-bg-scrolled);
 }
 
-.site-header .logo {
-  max-height: var(--logo-max-height);
-  width: var(--logo-width);
-  object-fit: contain;
-  display: block;
-}
-
 html { scroll-padding-top: var(--hero-top-offset); } /* for ankerlinks */

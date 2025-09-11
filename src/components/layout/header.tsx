@@ -1,38 +1,62 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import Logo from '@/components/logo';
+import HeaderCTA from '@/components/common/HeaderCTA';
+import MobileMenu from './MobileMenu';
+import { Menu, X } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useScrollState } from '@/hooks/useScrollState';
 
 type NavLink = { label: string; href: string };
 
 type Props = {
-  logoUrl?: string;
-  siteTitle?: string;
-  nav?: NavLink[]; // udfyldes i DF-249 (Navigation)
+  logoUrl?: string | null;
+  logoAlt?: string | null;
+  links?: NavLink[];
 };
 
-export default function Header({ logoUrl, siteTitle, nav = [] }: Props) {
-  return (
-    <header className="site-header" data-role="site-header">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={siteTitle || 'Logo'} className="logo" />
-          ) : (
-            <span className="text-lg font-semibold">{siteTitle || 'Digifly'}</span>
-          )}
-        </div>
+export default function Header({ logoUrl, logoAlt, links = [] }: Props) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { settings } = useHeaderSettings();
+  const isMobile = useIsMobile();
+  const { isScrolled } = useScrollState();
 
-        {/* Nav/CTA kommer i DF-249/DF-250 */}
-        <nav className="hidden md:flex items-center gap-6">
-          {nav.map((n) => (
-            <Link key={n.href} href={n.href} className="text-sm hover:opacity-80">
-              {n.label}
+  const headerHeight = settings?.headerHeight ?? 72;
+  
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--header-h', `${headerHeight}px`);
+  }, [headerHeight]);
+
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const closeMenu = () => setMenuOpen(false);
+
+  return (
+    <header data-testid="site-header" className="site-header" data-scrolled={isScrolled}>
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" onClick={closeMenu}>
+          <Logo logoUrl={logoUrl ?? undefined} logoAlt={logoAlt ?? undefined} />
+        </Link>
+
+        <nav className="hidden items-center gap-6 md:flex">
+          {links?.map((l) => (
+            <Link key={l.href + l.label} href={l.href} className="text-sm hover:opacity-80">
+              {l.label}
             </Link>
           ))}
+          <HeaderCTA />
         </nav>
+
+        <div className="md:hidden">
+          <Button size="icon" variant="ghost" onClick={toggleMenu} aria-label="Toggle menu">
+            {menuOpen ? <X /> : <Menu />}
+          </Button>
+        </div>
       </div>
+
+      {isMobile && <MobileMenu open={menuOpen} onClose={closeMenu} links={links} />}
     </header>
   );
 }
