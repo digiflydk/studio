@@ -1,9 +1,9 @@
+
 import './globals.css';
 import '@/styles/design.css';
 import { ReactNode } from 'react';
 import { getGeneralSettings } from '@/lib/firestore/settings';
 import { mapToCssVars } from '@/lib/design/mapToCssVars';
-import DesignVarsProvider from '@/components/providers/DesignVarsProvider';
 import { AdminToolbar } from '@/components/admin/AdminToolbar';
 import { ThemeProvider } from '@/context/ThemeContext';
 
@@ -21,7 +21,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <style id="design-vars">{`:root{${css}}`}</style>
       </head>
       <body>
-        <DesignVarsProvider />
         {children}
       </body>
     </html>
