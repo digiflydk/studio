@@ -194,3 +194,37 @@ body {
   .btn--md { padding:.625rem 1rem; }
   .btn--lg { padding:.75rem 1.25rem; }
 }
+
+
+/* ---- Header/Hero offset guard ---- */
+
+/* Dræb eventuelle legacy spacers/sentinels direkte efter header */
+[data-role="site-header"] + .header-sentinel,
+[data-role="site-header"] + .scroll-sentinel,
+[data-role="site-header"] + .debug-spacer {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Nulstil altid top-afstand på første content-element under header */
+main > :first-child {
+  margin-top: 0 !important;
+}
+main > section:first-of-type,
+main > div:first-of-type {
+  padding-top: 0 !important;
+}
+
+/* Sørg for at headeren selv ikke skaber afstand */
+[data-role="site-header"] {
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Anker-navigation: undgå overlap, men påvirk ikke layout-højde */
+[id] {
+  scroll-margin-top: calc(var(--header-h, 72px) + var(--header-border-h, 1px));
+}

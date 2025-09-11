@@ -100,16 +100,6 @@ const Header = forwardRef<HTMLElement, HeaderProps>(
           </button>
         </div>
         
-        {/* Valgfri top-border (fra CMS) */}
-        <div
-          aria-hidden
-          style={{
-            display: 'var(--header-border-enabled)' as any ? 'block' : 'none',
-            height: 0,
-            borderTop: 'var(--header-border-h) solid var(--header-border-color)',
-          }}
-        />
-
         {/* Mobile menu – separat, så vi ikke dobbelt-renderer på desktop */}
         <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={links} />
       </header>

@@ -27,7 +27,7 @@ export default function Template({ children, settings }: { children: ReactNode, 
     return (
         <>
             <AnnouncementBanner />
-            <main style={{ marginTop: 'calc(var(--header-h, 72px) * -1)' }}>
+            <main>
                 {children}
             </main>
             <Suspense fallback={null}>
