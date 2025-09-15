@@ -20,8 +20,4 @@ export const HeaderAppearanceSchema = z.object({
 
 export type HeaderAppearanceInput = z.infer<typeof HeaderAppearanceSchema>;
 
-// Navngivet export i lille bogstav for bagudkompatibilitet
-export const headerAppearanceSchema = HeaderAppearanceSchema;
-
-// Default export for standard-import
 export default HeaderAppearanceSchema;
