@@ -151,8 +151,27 @@ export interface ButtonSettings {
 export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;
 
 export type HeaderSettings = z.infer<typeof headerAppearanceSchema> & {
-    cta?: HeaderCTASettings
+    cta?: HeaderCTASettings;
+    sticky?: boolean;
 };
+
+export interface Brand {
+    id: string;
+    name: string;
+    slug: string;
+    logoUrl?: string | null;
+    companyName?: string;
+    ownerId: string;
+    status: 'active' | 'inactive' | 'draft';
+    street?: string;
+    zipCode?: string;
+    city?: string;
+    country?: string;
+    currency: string;
+    companyRegNo?: string;
+    foodCategories: string[];
+    locationsCount: number;
+}
 
 
 export interface GeneralSettings {
@@ -215,11 +234,25 @@ export interface GeneralSettings {
     buttons?: any; // legacy
     
     header?: HeaderSettings;
+    headerIsSticky?: boolean;
+    headerHeight?: number;
+    headerLogoWidth?: number;
+    headerInitialBackgroundColor?: HSLColor;
+    headerInitialBackgroundOpacity?: number;
+    headerScrolledBackgroundColor?: HSLColor;
+    headerScrolledBackgroundOpacity?: number;
+    headerLinkColor?: string;
+    headerNavLinks?: NavLink[];
+
 
     footer?: {
         enabled?: boolean;
         bg?: string;
+        bgColor?: string;
         textColor?: string;
+        linkColor?: string;
+        linkHoverColor?: string;
+        isVisible?: boolean;
         border?: { enabled?: boolean; width?: number; color?: string };
     };
     footerTagline?: string;
@@ -280,6 +313,7 @@ export interface GeneralSettings {
     featureSectionHeading?: string;
     featureSectionHeadingColor?: string;
     featureSectionHeadingSize?: number;
+    featureSectionHeadingSizeMobile?: number;
     featureSectionBody?: string;
     featureSectionBodyColor?: string;
     featureSectionBodySize?: number;

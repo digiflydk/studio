@@ -1,47 +1,59 @@
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import type { Brand, GeneralSettings, NavLink } from "@/types/settings";
+import { cn } from "@/lib/utils";
 
-'use client';
-
-import Link from 'next/link';
-import React from 'react';
-import Logo from '@/components/logo';
-import HeaderCTA from '@/components/common/HeaderCTA';
-import type { NavLink } from '@/types/settings';
-import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
-import MobileFloatingCTA from './MobileFloatingCTA';
-import { cn } from '@/lib/utils';
-
-export default function Header({
+export function Header({
+  brand,
   logoUrl,
   logoAlt,
-  links = [],
+  settings,
+  navLinks,
+  linkClass,
+  heightPx,
+  logoWidthPx,
+  sticky,
 }: {
+  brand?: Brand;
   logoUrl?: string | null;
-  logoAlt?: string | null;
-  links?: NavLink[];
+  logoAlt?: string;
+  settings: GeneralSettings | null;
+  navLinks: NavLink[];
+  linkClass?: string;
+  heightPx?: number;
+  logoWidthPx?: number;
+  sticky?: boolean;
 }) {
-  const { settings: headerSettings } = useHeaderSettings();
+  const h = Math.max(56, heightPx ?? 80);
+  const w = Math.max(80, logoWidthPx ?? 120);
+  const finalLinkClass = linkClass || "text-white hover:text-primary";
 
   return (
-    <>
-      <header className="site-header" data-testid="site-header">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/">
-              <Logo logoUrl={logoUrl ?? undefined} logoAlt={logoAlt ?? undefined} width={headerSettings?.logo?.maxWidth} />
+    <header
+      data-header
+      className={cn("w-full border-b border-transparent", sticky && "backdrop-blur")}
+      style={{ height: h }}
+    >
+      <div className="mx-auto flex h-full max-w-[1140px] items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src={logoUrl || brand?.logoUrl || "/digifly-logo-dark.svg"}
+            alt={logoAlt || brand?.name || "Digifly"}
+            width={w}
+            height={Math.round(w / 3)}
+            priority
+            className="object-contain"
+          />
+        </Link>
+        <nav className="hidden gap-6 md:flex">
+          {navLinks.map((l) => (
+            <Link key={l.href} href={l.href} className={cn("text-sm font-medium transition-colors", finalLinkClass)}>
+              {l.label}
             </Link>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-6">
-            {links.map((n) => (
-              <Link key={n.href} href={n.href} className="text-sm hover:opacity-80">
-                {n.label}
-              </Link>
-            ))}
-            <HeaderCTA />
-          </nav>
-        </div>
-      </header>
-      <MobileFloatingCTA />
-    </>
+          ))}
+        </nav>
+      </div>
+    </header>
   );
 }
