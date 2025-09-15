@@ -1,4 +1,5 @@
 "use server";
+
 import { unstable_noStore as noStore } from "next/cache";
 import type { WebsiteHeaderConfig } from "@/types/website";
 import { getGeneralSettings } from "./settings";
@@ -25,24 +26,25 @@ function resolveLinkClass(input?: string): string {
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   noStore();
   const data = await getGeneralSettings();
-  const header = data?.header || {};
+  const h = data?.header;
+
   return {
-    isOverlay: true,
-    sticky: header.sticky ?? true,
-    heightPx: header.height ?? 80,
-    logoWidthPx: header.logo?.maxWidth ?? 120,
+    isOverlay: h?.overlay ?? true,
+    sticky: h?.sticky ?? true,
+    heightPx: h?.height ?? 80,
+    logoWidthPx: h?.logo?.maxWidth ?? 120,
     topBg: {
-      h: header.bg?.initial?.h ?? 0,
-      s: header.bg?.initial?.s ?? 0,
-      l: header.bg?.initial?.l ?? 100,
-      opacity: header.bg?.initial?.opacity !== undefined ? header.bg.initial.opacity * 100 : 0,
+      h: h?.bg?.initial?.h ?? 0,
+      s: h?.bg?.initial?.s ?? 0,
+      l: h?.bg?.initial?.l ?? 100,
+      opacity: Math.round(((h?.bg?.initial?.opacity ?? 1) * 100)),
     },
     scrolledBg: {
-      h: header.bg?.scrolled?.h ?? 210,
-      s: header.bg?.scrolled?.s ?? 100,
-      l: header.bg?.scrolled?.l ?? 95,
-      opacity: header.bg?.scrolled?.opacity !== undefined ? header.bg.scrolled.opacity * 100 : 98,
+      h: h?.bg?.scrolled?.h ?? 210,
+      s: h?.bg?.scrolled?.s ?? 100,
+      l: h?.bg?.scrolled?.l ?? 95,
+      opacity: Math.round(((h?.bg?.scrolled?.opacity ?? 0.98) * 100)),
     },
-    linkClass: resolveLinkClass(data?.headerLinkColor),
+    linkClass: resolveLinkClass(h?.linkColor),
   };
 }

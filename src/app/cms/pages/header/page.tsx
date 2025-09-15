@@ -1,507 +1,243 @@
-
 'use client';
+
 import { useState, useEffect, useTransition, useCallback } from 'react';
-import type { HeaderSettings, NavLink, HSLColor } from '@/types/settings';
+import type { HeaderSettings, NavLink } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, Trash2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Slider } from '@/components/ui/slider';
-import { ConflictDialog } from '@/components/admin/ConflictDialog';
-import type { HeaderAppearanceInput } from '@/lib/validators/headerAppearance.zod';
-import type { HeaderCTASettings } from '@/lib/validators/headerSettings.zod';
-import { useHeaderSettings } from '@/lib/hooks/useHeaderSettings';
+import OpacitySlider from '@/components/cms/OpacitySlider';
 
-const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'pill'] as const;
-const sizes = ['default', 'sm', 'lg', 'icon'] as const;
-const defaultNavLinks: NavLink[] = [
-  { href: '#services', label: 'Services' },
-  { href: '#cases', label: 'Cases' },
-  { href: '#om-os', label: 'Om os' },
-  { href: '#kontakt', label: 'Kontakt' },
+const defaultLinks: NavLink[] = [
+  { label: 'Online ordre', href: '/#online-orders' },
+  { label: 'Priser', href: '/#pricing' },
+  { label: 'Kunder', href: '/#customers' },
+  { label: 'Kontakt', href: '/#contact' },
 ];
 
-function HslColorPicker({
-  label,
-  color,
-  onChange,
-}: {
-  label: string;
-  color: Partial<HSLColor>;
-  onChange: (hsl: Partial<HSLColor>) => void;
-}) {
-    function hslToHex(h?: number, s?: number, l?: number) {
-      if(h === undefined || s === undefined || l === undefined) return '';
-      const lNorm = l / 100;
-      const a = (s * Math.min(lNorm, 1 - lNorm)) / 100;
-      const f = (n: number) => {
-        const k = (n + h / 30) % 12;
-        const color = lNorm - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color).toString(16).padStart(2, "0");
-      };
-      return `#${f(0)}${f(8)}${f(4)}`;
-    }
-    function hexToHsl(hex: string): { h: number, s: number, l: number } | null {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        if (!result) return null;
-        let r = parseInt(result[1], 16) / 255, g = parseInt(result[2], 16) / 255, b = parseInt(result[3], 16) / 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h = 0, s = 0, l = (max + min) / 2;
-        if (max === min) { h = s = 0; } else {
-            var d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
-            }
-            h /= 6;
-        }
-        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-    }
-    const [hexInputValue, setHexInputValue] = useState(hslToHex(color.h, color.s, color.l));
-    useEffect(() => { setHexInputValue(hslToHex(color.h, color.s, color.l)); }, [color]);
-    const handleColorChange = (part: 'h' | 's' | 'l', value: number) => { onChange({ ...color, [part]: value }); };
-    const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => { setHexInputValue(e.target.value); }
-    const handleHexBlur = () => {
-        const newHsl = hexToHsl(hexInputValue);
-        if(newHsl) { onChange(newHsl); } else { setHexInputValue(hslToHex(color.h, color.s, color.l)); }
-    }
-    const handleHexKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { handleHexBlur(); (e.target as HTMLInputElement).blur(); } }
-    
-    const bgColor = (color.h !== undefined && color.s !== undefined && color.l !== undefined) ? `hsl(${color.h}, ${color.s}%, ${color.l}%)` : 'transparent';
-    const textColor = (color.l ?? 100) > 50 ? '#000' : '#FFF';
-
-    return (
-        <div className="space-y-4 p-4 border rounded-lg" style={{ backgroundColor: bgColor }}>
-             <div className="flex justify-between items-center">
-                 <h3 className="font-semibold text-lg" style={{ color: textColor }}>{label}</h3>
-                 <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm uppercase" style={{ color: textColor }}>HEX</span>
-                    <Input value={hexInputValue} onChange={handleHexChange} onBlur={handleHexBlur} onKeyDown={handleHexKeyPress} className="w-24 font-mono" style={{ backgroundColor: 'hsla(0, 0%, 100%, 0.2)', color: textColor, borderColor: 'hsla(0, 0%, 100%, 0.3)' }}/>
-                </div>
-            </div>
-            <div className="space-y-2"> <Label style={{ color: textColor }}>Hue ({color.h ?? 0})</Label> <Slider value={[color.h ?? 0]} onValueChange={([v]) => handleColorChange('h', v)} max={360} step={1} /> </div>
-            <div className="space-y-2"> <Label style={{ color: textColor }}>Saturation ({color.s ?? 0}%)</Label> <Slider value={[color.s ?? 0]} onValueChange={([v]) => handleColorChange('s', v)} max={100} step={1} /> </div>
-            <div className="space-y-2"> <Label style={{ color: textColor }}>Lightness ({color.l ?? 100}%)</Label> <Slider value={[color.l ?? 100]} onValueChange={([v]) => handleColorChange('l', v)} max={100} step={1} /> </div>
-        </div>
-    )
+async function fetchSettings(): Promise<HeaderSettings | undefined> {
+  const res = await fetch('/api/pages/header/appearance', { cache: 'no-store' });
+  const json = await res.json();
+  if (json?.success && json?.data?.header) return json.data.header as HeaderSettings;
+  return undefined;
 }
 
-function HeaderAppearanceForm() {
-  const { settings, setSettings, isLoading, refresh } = useHeaderSettings();
-  const [isSaving, startSaving] = useTransition();
-  const [conflict, setConflict] = useState<any>(null);
-  const { toast } = useToast();
+async function saveSettings(payload: Partial<HeaderSettings>): Promise<boolean> {
+  const res = await fetch('/api/pages/header/appearance/save', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ header: payload }),
+  });
+  const json = await res.json();
+  return Boolean(json?.success);
+}
+
+export default function HeaderPage() {
+  const [settings, setSettings] = useState<HeaderSettings | undefined>(undefined);
+  const [isPending, startTransition] = useTransition();
+
+  const load = useCallback(async () => {
+    const s = await fetchSettings();
+    setSettings(s);
+  }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
-  
-  const handleInputChange = (field: keyof HeaderSettings, value: any) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    load();
+  }, [load]);
+
+  const s = settings;
+
+  const setHeader = (patch: Partial<HeaderSettings>) => {
+    setSettings((prev) => ({ ...prev, ...patch } as HeaderSettings));
   };
-  
-  const handleNestedChange = (part: 'logo' | 'border' | 'bg', field: string, value: any) => {
-      setSettings(prev => ({ ...prev, [part]: { ...(prev as any)[part], [field]: value } }));
-  }
 
-  const handleBackgroundChange = (type: 'initial' | 'scrolled', value: any) => {
-      setSettings(prev => ({ ...prev, bg: { ...(prev as any).bg, [type]: value }}));
-  }
+  const setBgInitial = (patch: Partial<HeaderSettings['bg']['initial']>) => {
+    setSettings((prev) =>
+      prev
+        ? { ...prev, bg: { ...prev.bg, initial: { ...prev.bg.initial, ...patch } } }
+        : prev
+    );
+  };
 
-  const handleNavLinkChange = (index: number, field: keyof NavLink, value: string) => {
-    const updatedLinks = [...(settings?.navLinks || defaultNavLinks)];
-    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    handleInputChange('navLinks', updatedLinks);
+  const setBgScrolled = (patch: Partial<HeaderSettings['bg']['scrolled']>) => {
+    setSettings((prev) =>
+      prev
+        ? { ...prev, bg: { ...prev.bg, scrolled: { ...prev.bg.scrolled, ...patch } } }
+        : prev
+    );
+  };
+
+  const setBorder = (patch: any) => {
+    setSettings((prev) =>
+      prev
+        ? { ...prev, border: { ...prev.border, ...patch } }
+        : prev
+    );
+  };
+
+  const setLogo = (patch: any) => {
+    setSettings((prev) =>
+      prev
+        ? { ...prev, logo: { ...prev.logo, ...patch } }
+        : prev
+    );
+  };
+
+  const setNavLink = (idx: number, field: keyof NavLink, value: string) => {
+    const arr = [...(s?.navLinks ?? defaultLinks)];
+    arr[idx] = { ...arr[idx], [field]: value };
+    setHeader({ navLinks: arr });
   };
 
   const addNavLink = () => {
-    const updatedLinks = [...(settings?.navLinks || defaultNavLinks), { label: 'New Link', href: '#' }];
-    handleInputChange('navLinks', updatedLinks);
+    setHeader({ navLinks: [...(s?.navLinks ?? defaultLinks), { label: 'New Link', href: '#' }] });
   };
 
-  const removeNavLink = (index: number) => {
-    const updatedLinks = (settings?.navLinks || defaultNavLinks).filter((_, i) => i !== index);
-    handleInputChange('navLinks', updatedLinks);
+  const removeNavLink = (idx: number) => {
+    setHeader({ navLinks: (s?.navLinks ?? defaultLinks).filter((_, i) => i !== idx) });
   };
 
-  const handleSaveChanges = async (force = false, useVersion?: number) => {
-    startSaving(async () => {
-        setConflict(null);
-        if(!settings) return;
-
-        const payload: HeaderAppearanceInput = { 
-          ...settings, 
-          version: useVersion ?? (settings as any).version 
-        };
-
-        try {
-            const res = await fetch('/api/pages/header/appearance/save', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            const json = await res.json();
-
-            if (res.status === 409) {
-                setConflict({ server: json.current.header, serverVersion: json.currentVersion });
-                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
-                return;
-            }
-            if (!json.ok) throw new Error(json.error || 'Save failed');
-            
-            setSettings(json.data);
-            toast({ title: "Saved!", description: "Header appearance has been saved." });
-            window.dispatchEvent(new CustomEvent('design:updated', { detail: { header: json.data } }));
-
-        } catch (e: any) {
-            toast({ title: 'Error', description: e.message, variant: 'destructive' });
-        }
+  const onSave = () => {
+    if (!settings) return;
+    startTransition(async () => {
+      const ok = await saveSettings(settings);
+      if (ok) {
+        window.dispatchEvent(new CustomEvent('design:updated'));
+        await load();
+      }
     });
   };
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-48"><Loader2 className="h-8 w-8 animate-spin" /></div>
-  }
-
-  return (
-    <AccordionItem value="appearance" className="border rounded-lg shadow-sm">
-         <ConflictDialog
-            isOpen={!!conflict}
-            onOpenChange={() => setConflict(null)}
-            onReload={(serverData, serverVersion) => {
-                setSettings({ ...settings, ...serverData, version: serverVersion });
-                setConflict(null);
-            }}
-            onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
-            serverData={conflict?.server}
-            serverVersion={conflict?.serverVersion}
-        />
-        <AccordionTrigger className="px-6 py-4 flex justify-between items-center w-full">
-            <h3 className="font-semibold text-lg text-left">Header Appearance</h3>
-        </AccordionTrigger>
-        <AccordionContent className="p-6 border-t">
-            <div className="flex justify-end mb-6">
-                <Button onClick={() => handleSaveChanges()} disabled={isSaving}>
-                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Save Appearance Settings
-                </Button>
-            </div>
-            <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Header Height</Label>
-                           <span className="text-sm text-muted-foreground">{settings?.height || 72}px</span>
-                       </div>
-                       <Slider 
-                           value={[settings?.height || 72]} 
-                           onValueChange={([v]) => handleInputChange('height', v)}
-                           min={50} max={120} step={1}
-                       />
-                    </div>
-                     <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Logo Max Width</Label>
-                           <span className="text-sm text-muted-foreground">{settings?.logo?.maxWidth || 120}px</span>
-                       </div>
-                       <Slider 
-                           value={[settings?.logo?.maxWidth || 120]} 
-                           onValueChange={([v]) => handleNestedChange('logo', 'maxWidth', v)}
-                           min={60} max={320} step={1}
-                       />
-                    </div>
-                </div>
-
-                 <div className="p-4 border rounded-lg space-y-4">
-                    <h4 className='font-semibold'>Top Border</h4>
-                     <div className="flex items-center justify-between">
-                        <Label htmlFor='border-enabled'>Enable Top Border</Label>
-                        <Switch id="border-enabled" checked={settings?.border?.enabled} onCheckedChange={v => handleNestedChange('border', 'enabled', v)} />
-                     </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Border Thickness</Label>
-                           <span className="text-sm text-muted-foreground">{settings?.border?.width || 0}px</span>
-                       </div>
-                       <Slider 
-                           value={[settings?.border?.width || 0]} 
-                           onValueChange={([v]) => handleNestedChange('border', 'width', v)}
-                           min={0} max={8} step={1}
-                       />
-                    </div>
-                     <HslColorPicker
-                        label="Border Color"
-                        color={settings?.border?.color || {}}
-                        onChange={(hsl) => handleNestedChange('border', 'color', hsl)}
-                    />
-                </div>
-
-                <div className="p-4 border rounded-lg space-y-4">
-                    <h4 className='font-semibold'>Normal Background</h4>
-                     <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Opacity</Label>
-                           <span className="text-sm text-muted-foreground">{Math.round((settings?.bg?.initial?.opacity ?? 1) * 100)}%</span>
-                       </div>
-                       <Slider 
-                           value={[Math.round((settings?.bg?.initial?.opacity ?? 1) * 100)]} 
-                           onValueChange={([v]) => handleBackgroundChange('initial', { ...settings?.bg?.initial, opacity: v / 100 })}
-                           min={0} max={100} step={1}
-                       />
-                    </div>
-                     <HslColorPicker
-                        label="Background Color"
-                        color={settings?.bg?.initial || {}}
-                        onChange={(hsl) => handleBackgroundChange('initial', { ...settings?.bg?.initial, ...hsl })}
-                    />
-                </div>
-                 <div className="p-4 border rounded-lg space-y-4">
-                    <h4 className='font-semibold'>Scrolled Background</h4>
-                     <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                           <Label>Opacity</Label>
-                            <span className="text-sm text-muted-foreground">{Math.round((settings?.bg?.scrolled?.opacity ?? 1) * 100)}%</span>
-                       </div>
-                       <Slider 
-                           value={[Math.round((settings?.bg?.scrolled?.opacity ?? 1) * 100)]} 
-                           onValueChange={([v]) => handleBackgroundChange('scrolled', { ...settings?.bg?.scrolled, opacity: v / 100 })}
-                           min={0} max={100} step={1}
-                       />
-                    </div>
-                     <HslColorPicker
-                        label="Scrolled Background Color"
-                        color={settings?.bg?.scrolled || {}}
-                        onChange={(hsl) => handleBackgroundChange('scrolled', { ...settings?.bg?.scrolled, ...hsl })}
-                    />
-                </div>
-
-                 <div className="space-y-4">
-                    <Label>Navigation Links</Label>
-                    {(settings?.navLinks || defaultNavLinks).map((link, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
-                            <Input value={link.label} onChange={(e) => handleNavLinkChange(index, 'label', e.target.value)} placeholder="Label" />
-                            <Input value={link.href} onChange={(e) => handleNavLinkChange(index, 'href', e.target.value)} placeholder="Href (#section or /path)" />
-                            <Button variant="ghost" size="icon" onClick={() => removeNavLink(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                        </div>
-                    ))}
-                    <Button variant="outline" onClick={addNavLink}>Add Link</Button>
-                </div>
-            </div>
-        </AccordionContent>
-    </AccordionItem>
-  )
-}
-
-function CtaSettingsForm() {
-    const { settings: headerSettings, setSettings: setHeaderSettings } = useHeaderSettings();
-    const ctaSettings = headerSettings?.cta;
-    const [isSaving, startSaving] = useTransition();
-    const [conflict, setConflict] = useState<any>(null);
-    const { toast } = useToast();
-
-    if (!headerSettings) {
-        return <div className="flex justify-center items-center h-48"><Loader2 className="h-8 w-8 animate-spin" /></div>
-    }
-  
-    const handleCtaChange = (field: keyof HeaderCTASettings, value: any) => {
-        setHeaderSettings(prev => prev ? ({ ...prev, cta: { ...(prev.cta as any), [field]: value } }) : undefined);
-    }
-
-    const handleMobileCtaChange = (field: keyof HeaderCTASettings['mobileFloating'], value: any) => {
-        setHeaderSettings(prev => prev ? ({
-            ...prev,
-            cta: {
-                ...(prev.cta as any),
-                mobileFloating: {
-                    ...(prev.cta?.mobileFloating ?? { enabled: false, position: 'br' }),
-                    [field]: value,
-                }
-            }
-        }) : undefined)
-    }
-
-    const handleSaveChanges = async (force = false, useVersion?: number) => {
-        if (!ctaSettings) return;
-
-        startSaving(async () => {
-            setConflict(null);
-            const payload = {
-                ...ctaSettings,
-                version: useVersion ?? (headerSettings as any).version,
-            };
-
-            const res = await fetch('/api/pages/header/save', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
-                body: JSON.stringify(payload),
-                cache: 'no-store',
-            });
-
-            const json = await res.json();
-
-            if (res.status === 409) {
-                setConflict({ server: json.data, serverVersion: json.version });
-                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
-                return;
-            }
-
-            if (!json.ok) {
-                 toast({ title: "Error!", description: json.error || 'Save failed', variant: 'destructive' });
-                 return;
-            }
-            
-            setHeaderSettings(prev => prev ? ({ ...prev, cta: json.data, version: json.data.version }) : undefined);
-            toast({ title: "Saved!", description: "CTA settings have been saved." });
-            window.dispatchEvent(new CustomEvent('design:updated', { detail: { header: { cta: json.data } } }));
-        });
-    }
-
-    return (
-        <AccordionItem value="cta" className="border rounded-lg shadow-sm">
-             <ConflictDialog
-                isOpen={!!conflict}
-                onOpenChange={() => setConflict(null)}
-                onReload={(serverData, serverVersion) => {
-                    setHeaderSettings(prev => prev ? ({ ...prev, cta: serverData, version: serverVersion }) : undefined);
-                    setConflict(null);
-                }}
-                onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
-                serverData={conflict?.server}
-                serverVersion={conflict?.serverVersion}
-            />
-            <AccordionTrigger className="px-6 py-4 flex justify-between items-center w-full">
-                <h3 className="font-semibold text-lg text-left">Header CTA Settings</h3>
-            </AccordionTrigger>
-            <AccordionContent className="p-6 border-t">
-                 <div className="flex justify-end mb-6">
-                    <Button onClick={() => handleSaveChanges()} disabled={isSaving}>
-                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Save CTA Settings
-                    </Button>
-                </div>
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <Label htmlFor="cta-enabled" className="text-base">Enable Header CTA</Label>
-                             <p className="text-sm text-muted-foreground">Show a Call-to-Action button in the header.</p>
-                        </div>
-                        <Switch
-                            id="cta-enabled"
-                            checked={ctaSettings?.enabled}
-                            onCheckedChange={checked => handleCtaChange('enabled', checked)}
-                        />
-                    </div>
-
-                  {ctaSettings?.enabled && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                            <Label>Label</Label>
-                            <Input value={ctaSettings.label || ''} onChange={e=>handleCtaChange('label',e.target.value)}/>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Link Type</Label>
-                            <Select value={ctaSettings.linkType || 'internal'} onValueChange={(v: 'internal' | 'external') => handleCtaChange('linkType', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="internal">Internal (#section)</SelectItem>
-                                    <SelectItem value="external">External (URL)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            </div>
-
-                            <div className="md:col-span-2 space-y-2">
-                            <Label>Href</Label>
-                            <Input placeholder={ctaSettings.linkType==='internal'?'#section-id':'https://domain.com'}
-                                    value={ctaSettings.href || ''} onChange={e=>handleCtaChange('href',e.target.value)}/>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Variant</Label>
-                            <Select value={ctaSettings.variant || 'default'} onValueChange={(v: any) => handleCtaChange('variant', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    {variants.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                            <Label>Size</Label>
-                            <Select value={ctaSettings.size || 'default'} onValueChange={(v: any) => handleCtaChange('size', v)}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                     {sizes.map(v=> <SelectItem key={v} value={v}>{v}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            </div>
-                        </div>
-
-                        <fieldset className="border rounded-lg p-4 space-y-4">
-                            <legend className="px-1 text-sm font-medium -ml-1">Mobile: Floating CTA</legend>
-                             <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label htmlFor="mobile-cta-enabled" className="text-base">Enable Mobile Floating</Label>
-                                    <p className="text-sm text-muted-foreground">Show a fixed button at the bottom on mobile screens.</p>
-                                </div>
-                                 <Switch
-                                    id="mobile-cta-enabled"
-                                    checked={ctaSettings.mobileFloating?.enabled}
-                                    onCheckedChange={checked => handleMobileCtaChange('enabled', checked)}
-                                />
-                            </div>
-
-                            {ctaSettings.mobileFloating?.enabled && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                <Label>Position</Label>
-                                 <Select value={ctaSettings.mobileFloating?.position || 'br'} onValueChange={(v: any) => handleMobileCtaChange('position', v)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="br">Bottom Right</SelectItem>
-                                        <SelectItem value="bl">Bottom Left</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Offset X (px)</Label>
-                                    <Input type="number" min={0} value={ctaSettings.mobileFloating?.offsetX ?? 16}
-                                            onChange={e=>handleMobileCtaChange('offsetX', Number(e.target.value))}/>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Offset Y (px)</Label>
-                                    <Input type="number" min={0} value={ctaSettings.mobileFloating?.offsetY ?? 16}
-                                            onChange={e=>handleMobileCtaChange('offsetY', Number(e.target.value))}/>
-                                </div>
-                            </div>
-                            )}
-                        </fieldset>
-                    </div>
-                  )}
-                </div>
-            </AccordionContent>
-        </AccordionItem>
-    );
-}
-
-export default function HeaderPage(){
   return (
     <div className="space-y-6">
-        <div>
-            <h1 className="text-2xl font-bold">Header Settings</h1>
-            <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
-        </div>
-      <Accordion type="multiple" defaultValue={['appearance', 'cta']} className="w-full space-y-4">
-        <HeaderAppearanceForm />
-        <CtaSettingsForm />
+      <div>
+        <h1 className="text-2xl font-bold">Header Settings</h1>
+        <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
+      </div>
+
+      <Accordion type="multiple" defaultValue={['appearance', 'bg', 'border', 'nav', 'brand']}>
+        <AccordionItem value="appearance">
+          <AccordionTrigger>Appearance</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="flex items-center justify-between rounded border p-3">
+                <Label>Overlay</Label>
+                <Switch checked={Boolean(s?.overlay)} onCheckedChange={(v) => setHeader({ overlay: v })} />
+              </div>
+              <div className="flex items-center justify-between rounded border p-3">
+                <Label>Sticky</Label>
+                <Switch checked={Boolean(s?.sticky)} onCheckedChange={(v) => setHeader({ sticky: v })} />
+              </div>
+              <div className="rounded border p-3">
+                <Label>Height (px)</Label>
+                <Input
+                  type="number"
+                  value={s?.height ?? 72}
+                  onChange={(e) => setHeader({ height: Number(e.target.value) })}
+                />
+              </div>
+              <div className="rounded border p-3">
+                <Label>Logo max width (px)</Label>
+                <Input
+                  type="number"
+                  value={s?.logo?.maxWidth ?? 140}
+                  onChange={(e) => setLogo({ maxWidth: Number(e.target.value) })}
+                />
+              </div>
+              <div className="rounded border p-3">
+                <Label>Link color</Label>
+                <Select value={s?.linkColor ?? 'white'} onValueChange={(v) => setHeader({ linkColor: v as any })}>
+                  <SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="white">White</SelectItem>
+                    <SelectItem value="black">Black</SelectItem>
+                    <SelectItem value="primary">Primary</SelectItem>
+                    <SelectItem value="secondary">Secondary</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="bg">
+          <AccordionTrigger>Backgrounds</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded border p-3 space-y-3">
+                <div className="font-medium">Normal</div>
+                <Label>H</Label>
+                <Input type="number" value={s?.bg?.initial?.h ?? 0} onChange={(e) => setBgInitial({ h: Number(e.target.value) })} />
+                <Label>S</Label>
+                <Input type="number" value={s?.bg?.initial?.s ?? 0} onChange={(e) => setBgInitial({ s: Number(e.target.value) })} />
+                <Label>L</Label>
+                <Input type="number" value={s?.bg?.initial?.l ?? 100} onChange={(e) => setBgInitial({ l: Number(e.target.value) })} />
+                <OpacitySlider label="Opacity" value01={s?.bg?.initial?.opacity ?? 1} onChange01={(v) => setBgInitial({ opacity: v })} />
+              </div>
+
+              <div className="rounded border p-3 space-y-3">
+                <div className="font-medium">Scrolled</div>
+                <Label>H</Label>
+                <Input type="number" value={s?.bg?.scrolled?.h ?? 210} onChange={(e) => setBgScrolled({ h: Number(e.target.value) })} />
+                <Label>S</Label>
+                <Input type="number" value={s?.bg?.scrolled?.s ?? 100} onChange={(e) => setBgScrolled({ s: Number(e.target.value) })} />
+                <Label>L</Label>
+                <Input type="number" value={s?.bg?.scrolled?.l ?? 95} onChange={(e) => setBgScrolled({ l: Number(e.target.value) })} />
+                <OpacitySlider label="Opacity" value01={s?.bg?.scrolled?.opacity ?? 0.98} onChange01={(v) => setBgScrolled({ opacity: v })} />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="border">
+          <AccordionTrigger>Border</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="flex items-center justify-between rounded border p-3">
+                <Label>Enabled</Label>
+                <Switch checked={Boolean(s?.border?.enabled)} onCheckedChange={(v) => setBorder({ enabled: v })} />
+              </div>
+              <div className="rounded border p-3">
+                <Label>Width (px)</Label>
+                <Input type="number" value={s?.border?.width ?? 1} onChange={(e) => setBorder({ width: Number(e.target.value) })} />
+              </div>
+              <div className="rounded border p-3">
+                <Label>Color H</Label>
+                <Input type="number" value={s?.border?.color?.h ?? 220} onChange={(e) => setBorder({ color: { ...(s?.border?.color ?? {}), h: Number(e.target.value) } })} />
+                <Label>Color S</Label>
+                <Input type="number" value={s?.border?.color?.s ?? 13} onChange={(e) => setBorder({ color: { ...(s?.border?.color ?? {}), s: Number(e.target.value) } })} />
+                <Label>Color L</Label>
+                <Input type="number" value={s?.border?.color?.l ?? 91} onChange={(e) => setBorder({ color: { ...(s?.border?.color ?? {}), l: Number(e.target.value) } })} />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="nav">
+          <AccordionTrigger>Navigation links</AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-3">
+              {(s?.navLinks ?? defaultLinks).map((lnk, i) => (
+                <div key={i} className="grid grid-cols-1 gap-2 md:grid-cols-3 items-center rounded border p-3">
+                  <Input value={lnk.label} onChange={(e) => setNavLink(i, 'label', e.target.value)} placeholder="Label" />
+                  <Input value={lnk.href} onChange={(e) => setNavLink(i, 'href', e.target.value)} placeholder="Href" />
+                  <div className="flex gap-2">
+                    <Button variant="secondary" onClick={() => removeNavLink(i)}>Remove</Button>
+                  </div>
+                </div>
+              ))}
+              <Button onClick={addNavLink}>Add link</Button>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
+
+      <div className="flex gap-3">
+        <Button onClick={onSave} disabled={isPending}>{isPending ? 'Saving…' : 'Save changes'}</Button>
+        <Button variant="secondary" onClick={load} disabled={isPending}>Reload</Button>
+      </div>
     </div>
   );
 }
