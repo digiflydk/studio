@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/firebaseAdmin";
-import HeaderAppearanceSchema, { headerAppearanceSchema } from "@/lib/validators/headerAppearance.zod";
+import HeaderAppearanceSchema from "@/lib/validators/headerAppearance.zod";
 import { logAudit } from "@/lib/server/audit";
 
 export const runtime = "nodejs";
@@ -10,9 +10,7 @@ type HeaderAppearanceInput = ReturnType<typeof HeaderAppearanceSchema["parse"]>;
 export async function POST(req: Request) {
   try {
     const json = await req.json();
-
-    // Accepter begge exports (default eller navngivet)
-    const data: HeaderAppearanceInput = (headerAppearanceSchema ?? HeaderAppearanceSchema).parse(json);
+    const data: HeaderAppearanceInput = HeaderAppearanceSchema.parse(json);
 
     await adminDb
       .collection("cms")
