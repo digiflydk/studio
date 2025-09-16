@@ -1,84 +1,70 @@
 import { z } from "zod";
 
-export const hslSchema = z.object({
-  h: z.number().min(0).max(360),
-  s: z.number().min(0).max(100),
-  l: z.number().min(0).max(100),
-  opacity: z.number().min(0).max(100).optional().default(100),
+// Helper: coerce number (accept både string og number)
+const zNum = z.coerce.number();
+
+// Border: acceptér både enabled/visible og widthPx/width
+const BorderSchema = z.object({
+  enabled: z.boolean().optional(),
+  visible: z.boolean().optional(),         // legacy
+  widthPx: zNum.optional(),
+  width: zNum.optional(),                  // legacy
+  color: z.object({
+    h: zNum.default(220),
+    s: zNum.default(13),
+    l: zNum.default(91),
+  }).default({ h: 220, s: 13, l: 91 }),
+}).transform((b) => ({
+  enabled: typeof b.enabled === "boolean" ? b.enabled : !!b.visible,
+  widthPx: typeof b.widthPx === "number" ? b.widthPx : (typeof b.width === "number" ? b.width : 1),
+  color: b.color,
+}));
+
+const BgPart = z.object({
+  h: zNum.default(0),
+  s: zNum.default(0),
+  l: zNum.default(100),
+  opacity: zNum.default(0),
 });
 
-export const borderSchema = z.object({
-  enabled: z.boolean().default(false),
-  widthPx: z.number().min(0).max(16).default(1),
-  color: hslSchema.partial().default({}).transform((c) => ({
-    h: c.h ?? 0,
-    s: c.s ?? 0,
-    l: c.l ?? 0,
-    opacity: c.opacity ?? 100,
-  })),
-  hex: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).optional().or(z.literal("")).default(""),
+export const HeaderAppearanceSchema = z.object({
+  // Nye felter
+  isOverlay: z.boolean().optional(),
+  headerIsSticky: z.boolean().optional(),
+  headerHeight: zNum.optional(),
+  headerLogoWidth: zNum.optional(),
+  headerLinkColor: z.string().default("white"),
+  link: z.object({ color: z.string().optional(), hex: z.string().optional() }).partial().optional(),
+
+  border: BorderSchema.optional(),
+
+  // Legacy aliaser
+  overlay: z.boolean().optional(),
+  sticky: z.boolean().optional(),
+  height: zNum.optional(),
+  logo: z.object({ maxWidth: zNum.optional() }).partial().optional(),
+
+  topBg: BgPart.default({ h: 0, s: 0, l: 100, opacity: 0 }),
+  scrolledBg: BgPart.default({ h: 210, s: 100, l: 95, opacity: 98 }),
+
+  navLinks: z.array(z.any()).default([]),
+}).transform((a) => {
+  const linkColor = a.headerLinkColor ?? a.link?.color ?? a.link?.hex ?? "white";
+  return {
+    isOverlay: typeof a.isOverlay === "boolean" ? a.isOverlay : !!a.overlay,
+    headerIsSticky: typeof a.headerIsSticky === "boolean" ? a.headerIsSticky : !!a.sticky,
+    headerHeight: typeof a.headerHeight === "number" ? a.headerHeight : (typeof a.height === "number" ? a.height : 72),
+    headerLogoWidth: typeof a.headerLogoWidth === "number" ? a.headerLogoWidth : (a.logo?.maxWidth ?? 140),
+    headerLinkColor: linkColor,
+    border: a.border ?? { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91 } },
+    topBg: a.topBg,
+    scrolledBg: a.scrolledBg,
+    navLinks: Array.isArray(a.navLinks) ? a.navLinks : [],
+  };
 });
 
-export const linkSchema = z.object({
-  color: z.string().default("white"),
-  hover: z.string().optional().default(""),
-  size: z.number().min(10).max(48).optional().default(15),
-  hex: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).optional().or(z.literal("")).default(""),
-  hoverHex: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).optional().or(z.literal("")).default(""),
-  menuIconColor: z.string().optional().default(""),
-});
-
-export const logoSchema = z.object({
-  url: z.string().url().optional().default(""),
-  alt: z.string().optional().default(""),
-  maxWidth: z.number().min(40).max(400).default(120),
-});
-
-export const ctaSchema = z.object({
-  enabled: z.boolean().default(false),
-  label: z.string().optional().default(""),
-  href: z.string().optional().default(""),
-  linkType: z.enum(["internal", "external", "anchor"]).optional().default("external"),
-  variant: z.string().optional().default("default"),
-  size: z.string().optional().default("md"),
-});
-
-export const mobileFloatingSchema = z.object({
-  enabled: z.boolean().default(false),
-  position: z.enum(["br", "bl", "tr", "tl"]).optional().default("br"),
-  size: z.string().optional().default("lg"),
-  variant: z.string().optional().default("pill"),
-  height: z.number().min(32).max(200).optional().default(110),
-});
-
-export const navLinkSchema = z.object({
-  label: z.string(),
-  href: z.string(),
-});
-
-export const appearanceSchema = z.object({
-  isOverlay: z.boolean().optional().default(true),
-  headerIsSticky: z.boolean().optional().default(true),
-  headerHeight: z.number().min(56).max(200).optional().default(80),
-  headerLogoWidth: z.number().min(60).max(400).optional().default(120),
-  logo: logoSchema.optional().default({} as any),
-  link: linkSchema.optional().default({} as any),
-  topBg: hslSchema.optional().default({ h: 0, s: 0, l: 100, opacity: 0 }),
-  scrolledBg: hslSchema.optional().default({ h: 210, s: 100, l: 95, opacity: 98 }),
-  border: borderSchema.optional().default({} as any),
-  cta: ctaSchema.optional().default({} as any),
-  mobileFloating: mobileFloatingSchema.optional().default({} as any),
-  navLinks: z.array(navLinkSchema).optional().default([]),
-});
-
-export const headerDocumentSchema = z.object({
-  appearance: appearanceSchema,
-  version: z.number().optional().default(1),
-  updatedAt: z.string().optional(),
-  updatedBy: z.string().optional(),
-});
-
-export type HeaderAppearance = z.infer<typeof appearanceSchema>;
-export type HeaderDocument = z.infer<typeof headerDocumentSchema>;
-export const headerAppearanceSchema = appearanceSchema;
-export const HeaderAppearanceSchema = appearanceSchema;
+// Top-level: acceptér { appearance: {...} } ELLER fladt objekt {...}
+export const SavePayloadSchema = z.union([
+  z.object({ appearance: HeaderAppearanceSchema }),
+  HeaderAppearanceSchema.transform((appearance) => ({ appearance })),
+]);

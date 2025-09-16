@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, useCallback } from 'react';
+import React, { useMemo, useState, useTransition, useCallback, useEffect } from 'react';
 import type { HeaderSettings, NavLink } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,16 @@ const D_HEADER: HeaderSettings = {
   bg: { initial: D_INITIAL, scrolled: D_SCROLLED },
   navLinks: D_LINKS,
 };
+
+function AlertBanner({ type = "error", title, message }: { type?: "error" | "success"; title: string; message?: string }) {
+  const tone = type === "error" ? "bg-red-50 text-red-800 border-red-200" : "bg-green-50 text-green-800 border-green-200";
+  return (
+    <div className={`mb-4 border rounded-lg p-3 ${tone}`}>
+      <div className="font-medium">{title}</div>
+      {message ? <div className="text-sm mt-1">{message}</div> : null}
+    </div>
+  );
+}
 
 function apiToHeaderSettings(api: any) {
   const a = api?.appearance ?? api ?? {};
@@ -111,10 +121,8 @@ async function fetchSettings(): Promise<HeaderSettings> {
   return safe;
 }
 
-async function saveSettings(payload: Partial<HeaderSettings>): Promise<boolean> {
-  // 1) Normaliser til vores lokale HeaderSettings-form
+async function saveSettings(payload: Partial<HeaderSettings>): Promise<{ ok: boolean; error?: string; details?: any }> {
   const normalized = normalizeHeader(payload);
-  // 2) Map til API’ets appearance-form
   const appearance = headerSettingsToAppearance(normalized);
 
   const res = await fetch('/api/pages/header/appearance/save', {
@@ -124,7 +132,11 @@ async function saveSettings(payload: Partial<HeaderSettings>): Promise<boolean> 
   });
 
   const json = await res.json();
-  return Boolean(json?.ok);
+  if (!json?.ok) {
+    // Returnér fejl til UI
+    return { ok: false, error: json?.error || 'Save failed', details: json?.details || json?.message };
+  }
+  return { ok: true };
 }
 
 function to01(v: unknown, fb = 1): number {
@@ -168,38 +180,77 @@ function normalizeHeader(h: any): HeaderSettings {
 }
 
 export default function HeaderPage() {
-  const [settings, setSettings] = useState<HeaderSettings>(D_HEADER);
-  const [isPending, startTransition] = useTransition();
+  const [form, setForm] = useState<HeaderSettings | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const s = await fetchSettings();
-    setSettings(s);
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      const data = await fetchSettings();
+      setForm(data);
+    } catch (e: any) {
+      setErrorMsg('Kunne ikke indlæse header-data.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const s = settings;
+  async function handleSave() {
+    if (!form) return;
+    setSaving(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    const res = await saveSettings(form);
+    setSaving(false);
+    if (!res.ok) {
+      // Viser både kort fejl og tekstdetaljer hvis tilgængelig
+      const details = typeof res.details === 'string'
+        ? res.details
+        : res.details?.formErrors?.join(', ') || JSON.stringify(res.details, null, 2);
+      setErrorMsg(`${res.error}${details ? ` — ${details}` : ''}`);
+      return;
+    }
+    setSuccessMsg('Gemt! Dine ændringer er nu lagret.');
+    // Reload data så UI matcher Firestore
+    try {
+      const fresh = await fetchSettings();
+      setForm(fresh);
+    } catch { /* ignore */ }
+    // Skjul success-besked efter et par sekunder
+    setTimeout(() => setSuccessMsg(null), 2000);
+  }
+
+  if (loading) return <div className="p-4">Indlæser…</div>;
+  if (!form) return <div className="p-4">Ingen data.</div>;
+  
+  const s = form;
 
   const setHeader = (patch: Partial<HeaderSettings>) => {
-    setSettings((prev) => normalizeHeader({ ...prev, ...patch }));
+    setForm((prev) => prev ? normalizeHeader({ ...prev, ...patch }) : null);
   };
 
   const setBgInitial = (patch: Partial<HSLA>) => {
-    setSettings((prev) => normalizeHeader({ ...prev, bg: { ...prev.bg, initial: { ...prev.bg.initial, ...patch } } }));
+    setForm((prev) => prev ? normalizeHeader({ ...prev, bg: { ...prev.bg, initial: { ...prev.bg.initial, ...patch } } }) : null);
   };
 
   const setBgScrolled = (patch: Partial<HSLA>) => {
-    setSettings((prev) => normalizeHeader({ ...prev, bg: { ...prev.bg, scrolled: { ...prev.bg.scrolled, ...patch } } }));
+    setForm((prev) => prev ? normalizeHeader({ ...prev, bg: { ...prev.bg, scrolled: { ...prev.bg.scrolled, ...patch } } }) : null);
   };
 
   const setBorder = (patch: Partial<{ enabled: boolean; width: number; color: HSL }>) => {
-    setSettings((prev) => normalizeHeader({ ...prev, border: { ...prev.border, ...patch, color: { ...prev.border.color, ...(patch.color ?? {}) } } }));
+    setForm((prev) => prev ? normalizeHeader({ ...prev, border: { ...prev.border, ...patch, color: { ...prev.border.color, ...(patch.color ?? {}) } } }) : null);
   };
 
   const setLogo = (patch: Partial<{ maxWidth: number }>) => {
-    setSettings((prev) => normalizeHeader({ ...prev, logo: { ...prev.logo, ...patch } }));
+    setForm((prev) => prev ? normalizeHeader({ ...prev, logo: { ...prev.logo, ...patch } }) : null);
   };
 
   const setNavLink = (idx: number, field: keyof NavLink, value: string) => {
@@ -219,18 +270,10 @@ export default function HeaderPage() {
     setHeader({ navLinks: base.filter((_, i) => i !== idx) });
   };
 
-  const onSave = () => {
-    startTransition(async () => {
-      const ok = await saveSettings(settings);
-      if (ok) {
-        window.dispatchEvent(new CustomEvent('design:updated'));
-        await load();
-      }
-    });
-  };
-
   return (
     <div className="space-y-6">
+      {errorMsg ? <AlertBanner type="error" title="Gem fejlede" message={errorMsg} /> : null}
+      {successMsg ? <AlertBanner type="success" title="Gemt" message={successMsg} /> : null}
       <div>
         <h1 className="text-2xl font-bold">Header Settings</h1>
         <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
@@ -346,8 +389,8 @@ export default function HeaderPage() {
       </Accordion>
 
       <div className="flex gap-3">
-        <Button onClick={onSave} disabled={isPending}>{isPending ? 'Saving…' : 'Save changes'}</Button>
-        <Button variant="secondary" onClick={load} disabled={isPending}>Reload</Button>
+        <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</Button>
+        <Button variant="secondary" onClick={load} disabled={saving}>Reload</Button>
       </div>
     </div>
   );
