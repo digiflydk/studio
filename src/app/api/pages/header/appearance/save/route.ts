@@ -7,6 +7,28 @@ export const runtime = "nodejs";
 // Firestore-doc: cms/pages/header/header
 const PATH = { collection: "cms/pages/header", id: "header" };
 
+function stripUndefinedDeep<T>(input: T): T {
+  if (Array.isArray(input)) {
+    return input.map((v) => stripUndefinedDeep(v)) as unknown as T;
+  }
+  if (input && typeof input === "object") {
+    const out: any = {};
+    for (const [k, v] of Object.entries(input as any)) {
+      if (typeof v === "undefined") continue; // drop undefined
+      const cleaned = stripUndefinedDeep(v as any);
+      // drop tomme objekter der kun opstår pga. undefined
+      if (cleaned && typeof cleaned === "object" && !Array.isArray(cleaned) && Object.keys(cleaned).length === 0) {
+        // behold tomme objekter hvis de giver mening? Vi skipper dem for at være sikre
+        continue;
+      }
+      out[k] = cleaned;
+    }
+    return out;
+  }
+  return input;
+}
+
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -26,12 +48,15 @@ export async function POST(req: Request) {
 
     const { appearance } = parsed.data;
 
+    // Rens for undefined, så Firestore accepterer dokumentet
+    const cleanedAppearance = stripUndefinedDeep(appearance);
+
     // --- ADMIN SDK WRITE (bypasser Security Rules) ---
     const ref = adminDb.collection(PATH.collection).doc(PATH.id);
     const snap = await ref.get();
 
     const base = {
-      appearance,
+      appearance: cleanedAppearance,
       updatedAt: new Date(), // brug serverTimestamp hvis du har det wired i admin initialisering
     };
 
