@@ -48,7 +48,6 @@ export const HeaderAppearanceSchema = z.object({
 
   border: BorderSchema.optional(),
 
-  // Legacy aliaser
   overlay: z.boolean().optional(),
   sticky: z.boolean().optional(),
   height: zNum.optional(),
@@ -91,12 +90,3 @@ export const SavePayloadSchema = z.union([
   z.object({ appearance: HeaderAppearanceSchema }),
   HeaderAppearanceSchema.transform((appearance) => ({ appearance })),
 ]);
-
-// For at undgå breaking changes i andre filer
-export const headerDocumentSchema = z.object({
-  appearance: HeaderAppearanceSchema,
-  version: z.number().optional(),
-  updatedAt: z.string().optional(),
-  updatedBy: z.string().optional(),
-});
-export type HeaderDocument = z.infer<typeof headerDocumentSchema>;
