@@ -35,22 +35,96 @@ const D_HEADER: HeaderSettings = {
   navLinks: D_LINKS,
 };
 
+function apiToHeaderSettings(api: any) {
+  const a = api?.appearance ?? api ?? {};
+  return {
+    overlay: !!a.isOverlay,
+    sticky: !!a.headerIsSticky,
+    height: Number(a.headerHeight ?? 72),
+    logo: { maxWidth: Number(a.headerLogoWidth ?? a?.logo?.maxWidth ?? 140) },
+    linkColor: a.headerLinkColor ?? a?.link?.hex ?? a?.link?.color ?? 'white',
+    border: {
+      enabled: !!(a?.border?.enabled ?? a?.border?.visible),
+      width: Number(a?.border?.width ?? a?.border?.widthPx ?? 1),
+      color: {
+        h: Number(a?.border?.color?.h ?? 220),
+        s: Number(a?.border?.color?.s ?? 13),
+        l: Number(a?.border?.color?.l ?? 91),
+      },
+    },
+    bg: {
+      initial: {
+        h: Number(a?.topBg?.h ?? 0),
+        s: Number(a?.topBg?.s ?? 0),
+        l: Number(a?.topBg?.l ?? 100),
+        opacity: Number(a?.topBg?.opacity ?? 0),
+      },
+      scrolled: {
+        h: Number(a?.scrolledBg?.h ?? 210),
+        s: Number(a?.scrolledBg?.s ?? 100),
+        l: Number(a?.scrolledBg?.l ?? 95),
+        opacity: Number(a?.scrolledBg?.opacity ?? 98),
+      },
+    },
+    navLinks: Array.isArray(a?.navLinks) ? a.navLinks : [],
+  };
+}
+
+function headerSettingsToAppearance(h: any) {
+  return {
+    isOverlay: !!h?.overlay,
+    headerIsSticky: !!h?.sticky,
+    headerHeight: Number(h?.height ?? 72),
+    headerLogoWidth: Number(h?.logo?.maxWidth ?? 140),
+    headerLinkColor: h?.linkColor ?? 'white',
+    border: {
+      enabled: !!h?.border?.enabled,
+      widthPx: Number(h?.border?.width ?? 1),
+      color: {
+        h: Number(h?.border?.color?.h ?? 220),
+        s: Number(h?.border?.color?.s ?? 13),
+        l: Number(h?.border?.color?.l ?? 91),
+      },
+    },
+    topBg: {
+      h: Number(h?.bg?.initial?.h ?? 0),
+      s: Number(h?.bg?.initial?.s ?? 0),
+      l: Number(h?.bg?.initial?.l ?? 100),
+      opacity: Number(h?.bg?.initial?.opacity ?? 0),
+    },
+    scrolledBg: {
+      h: Number(h?.bg?.scrolled?.h ?? 210),
+      s: Number(h?.bg?.scrolled?.s ?? 100),
+      l: Number(h?.bg?.scrolled?.l ?? 95),
+      opacity: Number(h?.bg?.scrolled?.opacity ?? 98),
+    },
+    navLinks: Array.isArray(h?.navLinks) ? h.navLinks : [],
+  };
+}
+
 async function fetchSettings(): Promise<HeaderSettings> {
   const res = await fetch('/api/pages/header/appearance', { cache: 'no-store' });
   const json = await res.json();
-  const raw = (json?.success && json?.data?.header) ? json.data.header as HeaderSettings : {};
-  const safe = normalizeHeader(raw);
+  const raw = (json?.ok && json?.data) ? json.data : {};
+  const mapped = apiToHeaderSettings(raw);
+  const safe = normalizeHeader(mapped);
   return safe;
 }
 
 async function saveSettings(payload: Partial<HeaderSettings>): Promise<boolean> {
+  // 1) Normaliser til vores lokale HeaderSettings-form
+  const normalized = normalizeHeader(payload);
+  // 2) Map til API’ets appearance-form
+  const appearance = headerSettingsToAppearance(normalized);
+
   const res = await fetch('/api/pages/header/appearance/save', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ header: normalizeHeader(payload) }),
+    body: JSON.stringify({ appearance }),
   });
+
   const json = await res.json();
-  return Boolean(json?.success);
+  return Boolean(json?.ok);
 }
 
 function to01(v: unknown, fb = 1): number {
