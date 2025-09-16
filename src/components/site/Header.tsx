@@ -54,43 +54,43 @@ export default function SiteHeader() {
   // 4) Render logik
   return (
     <header id="site-header" style={styles.root}>
-        <div
-          className="
-            mx-auto w-full
-            max-w-screen-xl        /* matcher typisk sitebredde (kan hæves til -2xl hvis I bruger det i sektioner) */
-            px-4 md:px-6 lg:px-8  /* matcher side-padding i øvrige sektioner */
-          "
-        >
-          <div className="flex h-full items-center justify-between gap-6">
-            {/* Venstre: Logo */}
-            <a href="/" className="shrink-0 inline-flex items-center" aria-label={styles.logoAlt}>
-              <img
-                src={activeLogoSrc}
-                alt={styles.logoAlt}
-                style={{ maxWidth: styles.logoMaxWidth, height: "auto", display: "block" }} /* display:block fjerner inline-img whitespace */
-                className="object-contain"
-                onError={() => { setLogoOk(false); setActiveLogoSrc(FALLBACK_LOGO); }}
-              />
-            </a>
+      <div
+        className="
+          container mx-auto           /* bruger projektets globale container (samme som resten af siden) */
+          px-4 sm:px-6 lg:px-8        /* nøjagtig samme side-padding som øvrige sektioner */
+          w-full h-full
+        "
+      >
+        <div className="flex h-full items-center justify-between gap-6">
+          {/* Logo (venstre) */}
+          <a href="/" className="block shrink-0" aria-label={styles.logoAlt}>
+            <img
+              src={activeLogoSrc}
+              alt={styles.logoAlt}
+              className="block object-contain"
+              style={{ maxWidth: styles.logoMaxWidth, height: "auto" }}
+              onError={() => { setLogoOk(false); setActiveLogoSrc(FALLBACK_LOGO); }}
+            />
+          </a>
 
-            {/* Højre: Nav */}
-            <nav className="ml-auto">
-              <ul className="flex items-center gap-8">
-                {links?.map((l) => (
-                  <li key={`${l.href}-${l.label}`}>
-                    <a
-                      href={l.href}
-                      className="inline-flex items-center font-medium"
-                      style={{ color: styles.linkColor }}
-                    >
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
+          {/* Navigation (højre) */}
+          <nav className="ml-0">
+            <ul className="flex items-center gap-8">
+              {links?.map((l) => (
+                <li key={`${l.href}-${l.label}`}>
+                  <a
+                    href={l.href}
+                    className="inline-flex items-center font-medium"
+                    style={{ color: styles.linkColor }}
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
+      </div>
     </header>
   );
 }
