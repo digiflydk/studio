@@ -14,6 +14,45 @@ import OpacitySlider from '@/components/cms/OpacitySlider';
 type HSLA = { h: number; s: number; l: number; opacity: number; hex?: string };
 type HSL = { h: number; s: number; l: number; hex?: string };
 
+function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
+function pct(n: number) { return Math.max(0, Math.min(100, Math.round(n))); }
+
+/** H, S, L i procent → HEX (uden alpha) */
+function hslToHex(h: number, s: number, l: number): string {
+  // h: 0–360, s/l: 0–100
+  const _s = clamp01(s / 100);
+  const _l = clamp01(l / 100);
+  const c = (1 - Math.abs(2 * _l - 1)) * _s;
+  const hp = (h % 360) / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r = 0, g = 0, b = 0;
+  if (0 <= hp && hp < 1) { r = c; g = x; b = 0; }
+  else if (1 <= hp && hp < 2) { r = x; g = c; b = 0; }
+  else if (2 <= hp && hp < 3) { r = 0; g = c; b = x; }
+  else if (3 <= hp && hp < 4) { r = 0; g = x; b = c; }
+  else if (4 <= hp && hp < 5) { r = x; g = 0; b = c; }
+  else if (5 <= hp && hp < 6) { r = c; g = 0; b = x; }
+  const m = _l - c / 2;
+  const R = Math.round((r + m) * 255);
+  const G = Math.round((g + m) * 255);
+  const B = Math.round((b + m) * 255);
+  const toHex = (v: number) => v.toString(16).padStart(2, "0");
+  return `#${toHex(R)}${toHex(G)}${toHex(B)}`;
+}
+
+function effectiveColorHex(opt: {
+  hex?: string | null;
+  h?: number; s?: number; l?: number;
+  opacity?: number;
+}): string | null {
+  const hex = opt.hex?.trim();
+  if (hex) return hex; // HEX har prioritet
+  if (typeof opt.h === "number" && typeof opt.s === "number" && typeof opt.l === "number") {
+    return hslToHex(opt.h, opt.s, opt.l);
+  }
+  return null;
+}
+
 function Toast({ text }: { text: string }) {
   const [open, setOpen] = React.useState(true);
   React.useEffect(() => {
@@ -444,6 +483,13 @@ export default function HeaderPage() {
                     value={form?.linkColorHex ?? ""}
                     onChange={(e) => setForm((f: any) => ({ ...f, linkColorHex: e.target.value }))}
                     className="w-full rounded-md border px-3 py-2"
+                    onBlur={(e) => {
+                      const v = e.target.value.trim();
+                      if (v && !v.startsWith("#")) {
+                        e.target.value = `#${v}`;
+                        e.target.dispatchEvent(new Event("input", { bubbles: true }));
+                      }
+                    }}
                   />
                 </div>
             </div>
@@ -467,7 +513,49 @@ export default function HeaderPage() {
                         bg: { ...(f.bg ?? {}), initial: { ...(f.bg?.initial ?? {}), hex: e.target.value } } 
                       }))}
                       className="w-full rounded-md border px-3 py-2"
+                      onBlur={(e) => {
+                          const v = e.target.value.trim();
+                          if (v && !v.startsWith("#")) {
+                            e.target.value = `#${v}`;
+                            e.target.dispatchEvent(new Event("input", { bubbles: true }));
+                          }
+                      }}
                     />
+                    {(() => {
+                      const eff = effectiveColorHex({
+                        hex: form?.bg?.initial?.hex,
+                        h: form?.bg?.initial?.h,
+                        s: form?.bg?.initial?.s,
+                        l: form?.bg?.initial?.l,
+                        opacity: form?.bg?.initial?.opacity
+                      });
+                      const label = form?.bg?.initial?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
+                      return (
+                        <div className="flex items-center gap-3 mt-2">
+                          <div className="w-8 h-5 rounded border" style={{ background: eff ?? "transparent" }} />
+                          <div className="text-sm text-muted-foreground">
+                            Effektiv farve: <span className="font-medium">{eff ?? "—"}</span> <span>({label})</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = eff ?? "#FFFFFF";
+                              setForm((f: any) => ({
+                                ...f,
+                                bg: {
+                                  ...(f.bg ?? {}),
+                                  initial: { ...(f.bg?.initial ?? {}), hex: next }
+                                }
+                              }));
+                            }}
+                            className="ml-auto rounded-md border px-2 py-1 text-sm"
+                            title="Kopier effektiv farve til HEX-feltet"
+                          >
+                            Brug denne farve som HEX
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 <Label>H</Label>
                 <Input type="number" value={s.bg.initial.h} onChange={(e) => setBgInitial({ h: Number(e.target.value) })} />
@@ -491,7 +579,49 @@ export default function HeaderPage() {
                         bg: { ...(f.bg ?? {}), scrolled: { ...(f.bg?.scrolled ?? {}), hex: e.target.value } } 
                       }))}
                       className="w-full rounded-md border px-3 py-2"
+                       onBlur={(e) => {
+                          const v = e.target.value.trim();
+                          if (v && !v.startsWith("#")) {
+                            e.target.value = `#${v}`;
+                            e.target.dispatchEvent(new Event("input", { bubbles: true }));
+                          }
+                       }}
                     />
+                     {(() => {
+                      const eff = effectiveColorHex({
+                        hex: form?.bg?.scrolled?.hex,
+                        h: form?.bg?.scrolled?.h,
+                        s: form?.bg?.scrolled?.s,
+                        l: form?.bg?.scrolled?.l,
+                        opacity: form?.bg?.scrolled?.opacity
+                      });
+                      const label = form?.bg?.scrolled?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
+                      return (
+                        <div className="flex items-center gap-3 mt-2">
+                          <div className="w-8 h-5 rounded border" style={{ background: eff ?? "transparent" }} />
+                          <div className="text-sm text-muted-foreground">
+                            Effektiv farve: <span className="font-medium">{eff ?? "—"}</span> <span>({label})</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = eff ?? "#FFFFFF";
+                              setForm((f: any) => ({
+                                ...f,
+                                bg: {
+                                  ...(f.bg ?? {}),
+                                  scrolled: { ...(f.bg?.scrolled ?? {}), hex: next }
+                                }
+                              }));
+                            }}
+                            className="ml-auto rounded-md border px-2 py-1 text-sm"
+                            title="Kopier effektiv farve til HEX-feltet"
+                          >
+                            Brug denne farve som HEX
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 <Label>H</Label>
                 <Input type="number" value={s.bg.scrolled.h} onChange={(e) => setBgScrolled({ h: Number(e.target.value) })} />
@@ -529,6 +659,13 @@ export default function HeaderPage() {
                       border: { ...(f.border ?? {}), colorHex: e.target.value } 
                     }))}
                     className="w-full rounded-md border px-3 py-2"
+                     onBlur={(e) => {
+                        const v = e.target.value.trim();
+                        if (v && !v.startsWith("#")) {
+                          e.target.value = `#${v}`;
+                          e.target.dispatchEvent(new Event("input", { bubbles: true }));
+                        }
+                     }}
                   />
                 </div>
                 <Label>Color H</Label>

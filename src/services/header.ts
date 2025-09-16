@@ -86,20 +86,20 @@ export async function fetchHeaderAppearance(): Promise<Appearance> {
 }
 
 export function computeHeaderStyles(a: Appearance) {
-  // vælg baggrund: HEX har prioritet; ellers HSL/HSLA
-  const topHex = a.topBg.hex;
-  const scrHex = a.scrolledBg.hex;
+  // Normaliser opacity, især hvis HEX er sat
+  const topOpacity = Math.max(0, Math.min(100, a.topBg?.opacity ?? 100));
+  const scrOpacity = Math.max(0, Math.min(100, a.scrolledBg?.opacity ?? 100));
 
-  // Solid hvis opacity = 100
-  const topBgCss =
-    topHex ?? (a.topBg.opacity >= 100
-      ? `hsl(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}%)`
-      : `hsla(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}% / ${a.topBg.opacity / 100})`);
+  // Hvis der er HEX, ignorér "0%" gennemsigtighed (vi vil være solid ved HEX)
+  const topHex = a.topBg?.hex;
+  const scrHex = a.scrolledBg?.hex;
+  const topCss = topHex ?? (topOpacity >= 100
+    ? `hsl(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}%)`
+    : `hsla(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}% / ${topOpacity / 100})`);
+  const scrCss = scrHex ?? (scrOpacity >= 100
+    ? `hsl(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}%)`
+    : `hsla(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}% / ${scrOpacity / 100})`);
 
-  const scrBgCss =
-    scrHex ?? (a.scrolledBg.opacity >= 100
-      ? `hsl(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}%)`
-      : `hsla(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}% / ${a.scrolledBg.opacity / 100})`);
 
   const linkColorCss = a.headerLinkColorHex ?? a.headerLinkColor ?? "white";
   const borderColorCss =
@@ -114,12 +114,12 @@ export function computeHeaderStyles(a: Appearance) {
       top: 0,
       zIndex: 2000,                               // altid over indhold
       height: `${a.headerHeight}px`,
-      background: topBgCss,                       // sæt begge for sikkerhed
-      backgroundColor: topBgCss,
+      background: topCss,
+      backgroundColor: topCss,
       borderBottom: a.border.enabled ? `${a.border.widthPx}px solid ${borderColorCss}` : "none",
       willChange: "transform",
     },
-    scrolledBg: scrBgCss,
+    scrolledBg: scrCss,
     linkColor: linkColorCss,
     logoMaxWidth: `${a.headerLogoWidth}px`,
     logoSrc: a.logo?.src ?? null,                 // kan være null → fallback i komponent
