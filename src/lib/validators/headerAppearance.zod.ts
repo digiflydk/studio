@@ -1,46 +1,37 @@
 import { z } from "zod";
 
-const HexColor = z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/);
-
-const ColorHex = z.object({
-  hex: HexColor,
-  opacity: z.number().min(0).max(100).optional(),
-});
-
-const ColorHsl = z.object({
+const hslo = z.object({
   h: z.number().min(0).max(360),
   s: z.number().min(0).max(100),
   l: z.number().min(0).max(100),
   opacity: z.number().min(0).max(100).optional(),
 });
 
-// Tolerér "a" (0..1) fra visse color pickers
-const ColorAny = z.union([ColorHex, ColorHsl, z.object({
-  h: z.number(),
-  s: z.number(),
-  l: z.number(),
-  a: z.number().min(0).max(1),
-})]);
-
-const Border = z.object({
-  visible: z.boolean().optional(),
-  widthPx: z.number().int().min(0).max(8).optional(),
-  color: ColorAny.optional(),
+const borderSchema = z.object({
+  enabled: z.boolean().default(false),
+  widthPx: z.number().min(0).max(8).default(0),
+  color: hslo.partial({ opacity: true }).extend({ opacity: z.number().min(0).max(100).default(100) }),
 });
 
-const NavLink = z.object({ label: z.string(), href: z.string() });
-
-export const HeaderAppearanceSchema = z.object({
-  isOverlay: z.boolean().optional(),
-  headerIsSticky: z.boolean().optional(),
-  headerHeight: z.number().int().min(40).max(160).optional(),
-  headerLogoWidth: z.number().int().min(40).max(480).optional(),
-  headerLinkColor: z.string().optional(),
-  topBg: ColorAny.optional(),
-  scrolledBg: ColorAny.optional(),
-  border: Border.optional(),
-  navLinks: z.array(NavLink).optional(),
+const bgSchema = z.object({
+  topBg: hslo,
+  scrolledBg: hslo,
 });
 
-export type HeaderAppearanceInput = z.infer<typeof HeaderAppearanceSchema>;
-export default HeaderAppearanceSchema;
+const navLink = z.object({
+  label: z.string().min(1),
+  href: z.string().min(1),
+});
+
+export const headerAppearanceSchema = z.object({
+  isOverlay: z.boolean().default(true),
+  headerIsSticky: z.boolean().default(true),
+  headerHeight: z.number().min(48).max(160).default(80),
+  headerLogoWidth: z.number().min(60).max(320).default(120),
+  headerLinkColor: z.string().min(1), // accepterer “white/black/…/hex”
+  border: borderSchema.optional(),
+  ...bgSchema.shape,
+  navLinks: z.array(navLink).optional().default([]),
+});
+
+export type HeaderAppearanceInput = z.infer<typeof headerAppearanceSchema>;
