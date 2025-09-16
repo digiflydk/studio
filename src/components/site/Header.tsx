@@ -1,5 +1,3 @@
-
-// src/components/site/Header.tsx
 "use client";
 
 import * as React from "react";
@@ -8,7 +6,6 @@ import { fetchHeaderAppearance, computeHeaderStyles } from "@/services/header";
 export default function SiteHeader() {
   const [styles, setStyles] = React.useState<ReturnType<typeof computeHeaderStyles> | null>(null);
   const [links, setLinks] = React.useState<{label:string; href:string}[]>([]);
-  const [logoMaxWidth, setLogoMaxWidth] = React.useState<string>("140px");
 
   React.useEffect(() => {
     let mounted = true;
@@ -17,13 +14,11 @@ export default function SiteHeader() {
       if (!mounted) return;
       const s = computeHeaderStyles(a);
       setStyles(s);
-      setLinks(Array.isArray(a.navLinks) ? a.navLinks : []);
-      setLogoMaxWidth(s.logoMaxWidth);
+      setLinks(Array.isArray((a as any).navLinks) ? (a as any).navLinks : []);
     })();
     return () => { mounted = false; };
   }, []);
 
-  // Simple scroll effect: når man scroller, skift bg til scrolledBg
   React.useEffect(() => {
     if (!styles) return;
     const el = document.getElementById("site-header");
@@ -37,21 +32,50 @@ export default function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [styles]);
 
-  if (!styles) {
-    return <div id="site-header" style={{ height: 72 }} />;
-  }
+  if (!styles) return <div id="site-header" style={{ height: 72 }} />;
+
+  // Container-bredde (matcher typisk site container)
+  const containerStyle: React.CSSProperties = {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "0 16px",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+  };
+
+  // Logo-styles: bevar aspect ratio; begræns bredde
+  const logoStyle: React.CSSProperties = {
+    maxWidth: styles.logoMaxWidth,
+    height: "auto",
+    display: "block",
+  };
+
+  // robust: fallback hvis logo-src fejler
+  const [logoOk, setLogoOk] = React.useState(true);
 
   return (
     <header id="site-header" style={styles.root}>
-      <div style={{ display:"flex", alignItems:"center", height:"100%", padding:"0 16px", gap:16 }}>
-        <img
-          src="/logo.svg"
-          alt="Logo"
-          style={{ maxWidth: logoMaxWidth, height: "auto" }}
-        />
-        <nav style={{ marginLeft: "auto", display: "flex", gap: 16 }}>
+      <div style={containerStyle}>
+        {logoOk ? (
+          <img
+            src={styles.logoSrc}
+            alt={styles.logoAlt}
+            style={logoStyle}
+            onError={() => setLogoOk(false)}
+          />
+        ) : (
+          <div style={{ fontWeight: 700 }}>Logo</div>
+        )}
+
+        <nav style={{ marginLeft: "auto", display: "flex", gap: 24 }}>
           {links.map((l, i) => (
-            <a key={i} href={l.href} style={{ color: styles.linkColor, textDecoration: "none" }}>
+            <a
+              key={i}
+              href={l.href}
+              style={{ color: styles.linkColor, textDecoration: "none", fontWeight: 500 }}
+            >
               {l.label}
             </a>
           ))}

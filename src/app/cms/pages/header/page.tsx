@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
@@ -17,27 +16,40 @@ type HSL = { h: number; s: number; l: number };
 function Toast({ text }: { text: string }) {
   const [open, setOpen] = React.useState(true);
   React.useEffect(() => {
-    const t = setTimeout(() => setOpen(false), 1000); // auto close efter 1s
+    const t = setTimeout(() => setOpen(false), 1000); // auto close 1s
     return () => clearTimeout(t);
   }, []);
   if (!open) return null;
   return (
     <div
+      role="status"
+      aria-live="polite"
       style={{
         position: "fixed",
-        top: 12,
-        right: 12,
+        top: 16,
+        right: 16,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
         padding: "10px 12px",
-        borderRadius: 8,
-        border: "1px solid rgba(0,0,0,0.08)",
-        background: "#F0FFF4",
+        borderRadius: 10,
+        border: "1px solid rgba(16,185,129,0.35)",
+        background: "#ECFDF5",
         color: "#065F46",
-        boxShadow: "0 6px 30px rgba(0,0,0,0.08)",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
         zIndex: 9999,
         fontSize: 14,
+        transform: "translateY(0)",
+        animation: "toast-in .18s ease-out",
       }}
     >
-      {text}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm-1 14-4-4 1.414-1.414L11 12.172l5.586-5.586L18 8l-7 8Z" />
+      </svg>
+      <span>{text}</span>
+      <style>{`
+        @keyframes toast-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 }
