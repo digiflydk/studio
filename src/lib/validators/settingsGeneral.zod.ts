@@ -4,6 +4,8 @@ import { z } from "zod";
 const zNum = z.coerce.number();
 const zBool = z.coerce.boolean();
 const zUrl = z.string().url();
+const zHex = z.string().regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/);
+
 
 // Brand / kontakt / SEO er eksempler på typiske felter.
 // Skema er *tolerant*: alt ukendt fanges i `extra`.
@@ -40,19 +42,44 @@ export const SettingsGeneralSchema = z.object({
   // Feature flags
   flags: z.record(z.string(), zBool).optional(),
 
+  // NYT: extra logo til scroll
+  logoScrolledUrl: z.string().url().optional(),
+
+  // NYT: header HEX felter
+  headerInitialBackgroundHex: zHex.optional(),
+  headerScrolledBackgroundHex: zHex.optional(),
+  headerBorderColorHex: zHex.optional(),
+
+  // Opacity kan eksistere i 0–1 eller 0–100 i legacy
+  headerInitialBackgroundOpacity: z.union([z.number(), z.string()]).optional(),
+  headerScrolledBackgroundOpacity: z.union([z.number(), z.string()]).optional(),
+
+
   // Alt andet vi ikke kender endnu
   extra: z.record(z.any()).optional(),
 })
 .transform((v) => {
   // Flyt ukendte top-level keys ind i extra (tolerant “pass-through”)
-  const known = ["brand", "contact", "seo", "flags", "extra"];
+  const known = ["brand", "contact", "seo", "flags", "extra", "logoScrolledUrl", "headerInitialBackgroundHex", "headerScrolledBackgroundHex", "headerBorderColorHex", "headerInitialBackgroundOpacity", "headerScrolledBackgroundOpacity"];
   const extra: Record<string, any> = { ...(v.extra ?? {}) };
   for (const [k, val] of Object.entries(v as any)) {
     if (!known.includes(k) && typeof val !== "undefined") {
       extra[k] = val;
     }
   }
-  return { ...v, extra };
+
+  const toNum = (x: any, def: number) => {
+    const n = Number(x ?? def);
+    if (n > 0 && n <= 1) return Math.round(n * 100); // normaliser 0–1 → %
+    return n;
+  };
+
+  return {
+    ...v,
+    extra,
+    headerInitialBackgroundOpacity: toNum(v.headerInitialBackgroundOpacity, 100),
+    headerScrolledBackgroundOpacity: toNum(v.headerScrolledBackgroundOpacity, 100),
+  };
 });
 
 export type SettingsGeneral = z.infer<typeof SettingsGeneralSchema>;
