@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
@@ -384,6 +385,29 @@ export default function HeaderPage() {
           <AccordionTrigger>Appearance</AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+               <section className="grid grid-cols-1 md:grid-cols-2 gap-4 col-span-full">
+                  <div className="space-y-2">
+                    <label className="font-medium">Logo URL (normal)</label>
+                    <input
+                      type="url"
+                      placeholder="https://…/logo.png"
+                      value={form?.logo?.src ?? ""}
+                      onChange={(e) => setForm((f: any) => ({ ...f, logo: { ...(f.logo ?? {}), src: e.target.value } }))}
+                      className="w-full rounded-md border px-3 py-2"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-medium">Logo URL (scrolled)</label>
+                    <input
+                      type="url"
+                      placeholder="https://…/logo-scrolled.png"
+                      value={form?.logo?.scrolledSrc ?? ""}
+                      onChange={(e) => setForm((f: any) => ({ ...f, logo: { ...(f.logo ?? {}), scrolledSrc: e.target.value } }))}
+                      className="w-full rounded-md border px-3 py-2"
+                    />
+                  </div>
+                </section>
               <div className="flex items-center justify-between rounded border p-3">
                 <Label>Overlay</Label>
                 <Switch checked={Boolean(s.overlay)} onCheckedChange={(v) => setHeader({ overlay: v })} />
@@ -412,6 +436,16 @@ export default function HeaderPage() {
                   </SelectContent>
                 </Select>
               </div>
+               <div className="space-y-2 rounded border p-3">
+                  <label className="font-medium">Link color (HEX)</label>
+                  <input
+                    type="text"
+                    placeholder="#111827"
+                    value={form?.linkColorHex ?? ""}
+                    onChange={(e) => setForm((f: any) => ({ ...f, linkColorHex: e.target.value }))}
+                    className="w-full rounded-md border px-3 py-2"
+                  />
+                </div>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -422,6 +456,19 @@ export default function HeaderPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="rounded border p-3 space-y-3">
                 <div className="font-medium">Normal</div>
+                 <div className="space-y-2">
+                    <label className="font-medium">Normal Background (HEX)</label>
+                    <input
+                      type="text"
+                      placeholder="#FFFFFF"
+                      value={form?.bg?.initial?.hex ?? ""}
+                      onChange={(e) => setForm((f: any) => ({ 
+                        ...f, 
+                        bg: { ...(f.bg ?? {}), initial: { ...(f.bg?.initial ?? {}), hex: e.target.value } } 
+                      }))}
+                      className="w-full rounded-md border px-3 py-2"
+                    />
+                  </div>
                 <Label>H</Label>
                 <Input type="number" value={s.bg.initial.h} onChange={(e) => setBgInitial({ h: Number(e.target.value) })} />
                 <Label>S</Label>
@@ -433,6 +480,19 @@ export default function HeaderPage() {
 
               <div className="rounded border p-3 space-y-3">
                 <div className="font-medium">Scrolled</div>
+                <div className="space-y-2">
+                    <label className="font-medium">Scrolled Background (HEX)</label>
+                    <input
+                      type="text"
+                      placeholder="#FFFFFF"
+                      value={form?.bg?.scrolled?.hex ?? ""}
+                      onChange={(e) => setForm((f: any) => ({ 
+                        ...f, 
+                        bg: { ...(f.bg ?? {}), scrolled: { ...(f.bg?.scrolled ?? {}), hex: e.target.value } } 
+                      }))}
+                      className="w-full rounded-md border px-3 py-2"
+                    />
+                  </div>
                 <Label>H</Label>
                 <Input type="number" value={s.bg.scrolled.h} onChange={(e) => setBgScrolled({ h: Number(e.target.value) })} />
                 <Label>S</Label>
@@ -457,7 +517,20 @@ export default function HeaderPage() {
                 <Label>Width (px)</Label>
                 <Input type="number" value={s.border.width} onChange={(e) => setBorder({ width: Number(e.target.value) })} />
               </div>
-              <div className="rounded border p-3">
+              <div className="rounded border p-3 space-y-3">
+                 <div className="space-y-2">
+                  <label className="font-medium">Border color (HEX)</label>
+                  <input
+                    type="text"
+                    placeholder="#000000"
+                    value={form?.border?.colorHex ?? ""}
+                    onChange={(e) => setForm((f: any) => ({ 
+                      ...f, 
+                      border: { ...(f.border ?? {}), colorHex: e.target.value } 
+                    }))}
+                    className="w-full rounded-md border px-3 py-2"
+                  />
+                </div>
                 <Label>Color H</Label>
                 <Input type="number" value={s.border.color.h} onChange={(e) => setBorder({ color: { ...s.border.color, h: Number(e.target.value) } })} />
                 <Label>Color S</Label>

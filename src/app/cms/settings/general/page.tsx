@@ -147,16 +147,17 @@ export default function GeneralSettingsPage() {
                 <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels. PNG med transparent baggrund foretrækkes.</p>
              </div>
 
+            {/* Scrolled logo URL (NYT) */}
             <div className="space-y-2">
               <label className="font-medium">Scrolled logo URL</label>
               <input
                 type="url"
                 placeholder="https://…/logo-scrolled.png"
-                value={(form as any).logoScrolledUrl ?? ""}
+                value={form?.logoScrolledUrl ?? ""}
                 onChange={(e) => setForm((f: any) => ({ ...f, logoScrolledUrl: e.target.value }))}
                 className="w-full rounded-md border px-3 py-2"
               />
-              <p className="text-xs text-muted-foreground">Bruges når headeren er scrollet.</p>
+              <p className="text-xs text-muted-foreground">Bruges når headeren er scrollet (fallback hvis CMS Header ikke sætter sit eget).</p>
             </div>
 
              <div className="space-y-2">
@@ -235,14 +236,14 @@ export default function GeneralSettingsPage() {
                     <input
                         type="text"
                         placeholder="#FFFFFF"
-                        value={(form as any).headerInitialBackgroundHex ?? ""}
+                        value={form.headerInitialBackgroundHex ?? ""}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerInitialBackgroundHex: e.target.value }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
                     <label className="text-sm">Opacity (%)</label>
                     <input
                         type="number" min={0} max={100}
-                        value={(form as any).headerInitialBackgroundOpacity ?? 100}
+                        value={form.headerInitialBackgroundOpacity ?? 100}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerInitialBackgroundOpacity: Number(e.target.value) }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
@@ -254,14 +255,14 @@ export default function GeneralSettingsPage() {
                     <input
                         type="text"
                         placeholder="#FFFFFF"
-                        value={(form as any).headerScrolledBackgroundHex ?? ""}
+                        value={form.headerScrolledBackgroundHex ?? ""}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerScrolledBackgroundHex: e.target.value }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
                     <label className="text-sm">Opacity (%)</label>
                     <input
                         type="number" min={0} max={100}
-                        value={(form as any).headerScrolledBackgroundOpacity ?? 100}
+                        value={form.headerScrolledBackgroundOpacity ?? 100}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerScrolledBackgroundOpacity: Number(e.target.value) }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
@@ -273,14 +274,14 @@ export default function GeneralSettingsPage() {
                     <input
                         type="text"
                         placeholder="#000000"
-                        value={(form as any).headerBorderColorHex ?? ""}
+                        value={form.headerBorderColorHex ?? ""}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerBorderColorHex: e.target.value }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
                     <label className="text-sm">Border height (px)</label>
                     <input
                         type="number" min={0}
-                        value={(form as any).headerTopBorderHeight ?? 1}
+                        value={form.headerTopBorderHeight ?? 1}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerTopBorderHeight: Number(e.target.value) }))}
                         className="w-full rounded-md border px-3 py-2"
                     />
@@ -288,7 +289,7 @@ export default function GeneralSettingsPage() {
                         <input
                         id="headerTopBorderEnabled"
                         type="checkbox"
-                        checked={!!(form as any).headerTopBorderEnabled}
+                        checked={!!form.headerTopBorderEnabled}
                         onChange={(e) => setForm((f: any) => ({ ...f, headerTopBorderEnabled: e.target.checked }))}
                         />
                         <label htmlFor="headerTopBorderEnabled">Border enabled</label>
