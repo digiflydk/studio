@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import OpacitySlider from '@/components/cms/OpacitySlider';
 
-type HSLA = { h: number; s: number; l: number; opacity: number };
-type HSL = { h: number; s: number; l: number };
+type HSLA = { h: number; s: number; l: number; opacity: number; hex?: string };
+type HSL = { h: number; s: number; l: number; hex?: string };
 
 function Toast({ text }: { text: string }) {
   const [open, setOpen] = React.useState(true);
@@ -94,16 +94,23 @@ function apiToHeaderSettings(api: any) {
     overlay: !!a.isOverlay,
     sticky: !!a.headerIsSticky,
     height: Number(a.headerHeight ?? 72),
-    logo: { maxWidth: Number(a.headerLogoWidth ?? a?.logo?.maxWidth ?? 140) },
+    logo: {
+      maxWidth: Number(a.headerLogoWidth ?? a?.logo?.maxWidth ?? 140),
+      src: a?.logo?.src,
+      scrolledSrc: a?.logo?.scrolledSrc,
+      alt: a?.logo?.alt ?? "Logo",
+    },
     linkColor: a.headerLinkColor ?? a?.link?.hex ?? a?.link?.color ?? 'white',
+    linkColorHex: a.headerLinkColorHex ?? a?.link?.hex,                 // NYT
     border: {
       enabled: !!(a?.border?.enabled ?? a?.border?.visible),
-      width: Number(a?.border?.width ?? a?.border?.widthPx ?? 1),
+      width: Number(a?.border?.widthPx ?? a?.border?.width ?? 1),
       color: {
         h: Number(a?.border?.color?.h ?? 220),
         s: Number(a?.border?.color?.s ?? 13),
         l: Number(a?.border?.color?.l ?? 91),
       },
+      colorHex: a?.border?.colorHex,                                   // NYT
     },
     bg: {
       initial: {
@@ -111,12 +118,14 @@ function apiToHeaderSettings(api: any) {
         s: Number(a?.topBg?.s ?? 0),
         l: Number(a?.topBg?.l ?? 100),
         opacity: Number(a?.topBg?.opacity ?? 0),
+        hex: a?.topBg?.hex,                                            // NYT
       },
       scrolled: {
         h: Number(a?.scrolledBg?.h ?? 210),
         s: Number(a?.scrolledBg?.s ?? 100),
         l: Number(a?.scrolledBg?.l ?? 95),
         opacity: Number(a?.scrolledBg?.opacity ?? 98),
+        hex: a?.scrolledBg?.hex,                                       // NYT
       },
     },
     navLinks: Array.isArray(a?.navLinks) ? a.navLinks : [],
@@ -130,6 +139,13 @@ function headerSettingsToAppearance(h: any) {
     headerHeight: Number(h?.height ?? 72),
     headerLogoWidth: Number(h?.logo?.maxWidth ?? 140),
     headerLinkColor: h?.linkColor ?? 'white',
+    headerLinkColorHex: h?.linkColorHex,                 // NYT
+    logo: {
+      src: h?.logo?.src,                                 // NYT
+      scrolledSrc: h?.logo?.scrolledSrc,                 // NYT
+      alt: h?.logo?.alt ?? 'Logo',
+      maxWidth: Number(h?.logo?.maxWidth ?? 140),
+    },
     border: {
       enabled: !!h?.border?.enabled,
       widthPx: Number(h?.border?.width ?? 1),
@@ -138,18 +154,21 @@ function headerSettingsToAppearance(h: any) {
         s: Number(h?.border?.color?.s ?? 13),
         l: Number(h?.border?.color?.l ?? 91),
       },
+      colorHex: h?.border?.colorHex,                     // NYT
     },
     topBg: {
       h: Number(h?.bg?.initial?.h ?? 0),
       s: Number(h?.bg?.initial?.s ?? 0),
       l: Number(h?.bg?.initial?.l ?? 100),
       opacity: Number(h?.bg?.initial?.opacity ?? 0),
+      hex: h?.bg?.initial?.hex,                          // NYT
     },
     scrolledBg: {
       h: Number(h?.bg?.scrolled?.h ?? 210),
       s: Number(h?.bg?.scrolled?.s ?? 100),
       l: Number(h?.bg?.scrolled?.l ?? 95),
       opacity: Number(h?.bg?.scrolled?.opacity ?? 98),
+      hex: h?.bg?.scrolled?.hex,                         // NYT
     },
     navLinks: Array.isArray(h?.navLinks) ? h.navLinks : [],
   };
@@ -207,19 +226,26 @@ function normalizeHeader(h: any): HeaderSettings {
   const overlay = h?.overlay ?? D_HEADER.overlay;
   const sticky = h?.sticky ?? D_HEADER.sticky;
   const height = typeof h?.height === 'number' ? h.height : D_HEADER.height;
-  const logo = { maxWidth: typeof h?.logo?.maxWidth === 'number' ? h.logo.maxWidth : D_HEADER.logo.maxWidth };
+  const logo = { 
+    maxWidth: typeof h?.logo?.maxWidth === 'number' ? h.logo.maxWidth : D_HEADER.logo.maxWidth,
+    src: h?.logo?.src,
+    scrolledSrc: h?.logo?.scrolledSrc,
+    alt: h?.logo?.alt,
+  };
   const linkColor = h?.linkColor ?? D_HEADER.linkColor;
+  const linkColorHex = h?.linkColorHex;
   const border = {
     enabled: h?.border?.enabled ?? D_HEADER.border.enabled,
     width: typeof h?.border?.width === 'number' ? h.border.width : D_HEADER.border.width,
     color: normHsl(h?.border?.color, D_HEADER.border.color),
+    colorHex: h?.border?.colorHex
   };
   const bg = {
     initial: normHsla(h?.bg?.initial, D_INITIAL),
     scrolled: normHsla(h?.bg?.scrolled, D_SCROLLED),
   };
   const navLinks = Array.isArray(h?.navLinks) && h.navLinks.length ? h.navLinks : D_LINKS;
-  return { overlay, sticky, height, logo, linkColor, border, bg, navLinks };
+  return { overlay, sticky, height, logo, linkColor, linkColorHex, border, bg, navLinks };
 }
 
 export default function HeaderPage() {

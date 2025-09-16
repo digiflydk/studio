@@ -86,43 +86,44 @@ export async function fetchHeaderAppearance(): Promise<Appearance> {
 }
 
 export function computeHeaderStyles(a: Appearance) {
+  // vælg baggrund: HEX har prioritet; ellers HSL/HSLA
+  const topHex = a.topBg.hex;
+  const scrHex = a.scrolledBg.hex;
+
+  // Solid hvis opacity = 100
   const topBgCss =
-    (a.topBg.hex ? a.topBg.hex : undefined) ??
-    // hsl fallback
-    `hsla(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}% / ${a.topBg.opacity / 100})`;
+    topHex ?? (a.topBg.opacity >= 100
+      ? `hsl(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}%)`
+      : `hsla(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}% / ${a.topBg.opacity / 100})`);
 
   const scrBgCss =
-    (a.scrolledBg.hex ? a.scrolledBg.hex : undefined) ??
-    `hsla(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}% / ${a.scrolledBg.opacity / 100})`;
+    scrHex ?? (a.scrolledBg.opacity >= 100
+      ? `hsl(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}%)`
+      : `hsla(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}% / ${a.scrolledBg.opacity / 100})`);
 
   const linkColorCss = a.headerLinkColorHex ?? a.headerLinkColor ?? "white";
   const borderColorCss =
     a.border.colorHex ??
     (a.border.color
       ? `hsl(${a.border.color.h} ${a.border.color.s}% ${a.border.color.l}%)`
-      : undefined);
+      : "transparent");
 
   return {
     root: {
       position: a.headerIsSticky ? ("sticky" as const) : ("relative" as const),
       top: 0,
-      // VIGTIGT: sørg for at headeren altid ligger over indhold
-      zIndex: 1000,
-      // Skab ny stacking context på headeren
-      // (z-index virker kun på positionerede elementer; sticky er OK)
-      background: topBgCss,
+      zIndex: 2000,                               // altid over indhold
       height: `${a.headerHeight}px`,
-      borderBottom: a.border.enabled
-        ? `${a.border.widthPx}px solid ${borderColorCss ?? "transparent"}`
-        : "none",
-      // (valgfrit men ufarligt) GPU-hint hjælper mod repaint-glitches ved scroll
+      background: topBgCss,                       // sæt begge for sikkerhed
+      backgroundColor: topBgCss,
+      borderBottom: a.border.enabled ? `${a.border.widthPx}px solid ${borderColorCss}` : "none",
       willChange: "transform",
     },
     scrolledBg: scrBgCss,
     linkColor: linkColorCss,
     logoMaxWidth: `${a.headerLogoWidth}px`,
-    logoSrc: a.logo?.src ?? "/logo.svg",
-    logoScrolledSrc: a.logo?.scrolledSrc ?? a.logo?.src ?? "/logo.svg",
+    logoSrc: a.logo?.src ?? null,                 // kan være null → fallback i komponent
+    logoScrolledSrc: a.logo?.scrolledSrc ?? a.logo?.src ?? null,
     logoAlt: a.logo?.alt ?? "Logo",
   };
 }
