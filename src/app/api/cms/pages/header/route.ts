@@ -11,8 +11,9 @@ export async function GET() {
   const snap = await ref.get();
   if (!snap.exists) {
     const seed = headerDocumentSchema.parse({ appearance: {} });
-    await ref.set({ ...seed, updatedAt: new Date().toISOString(), updatedBy: "system" }, { merge: true });
-    return NextResponse.json({ ok: true, data: seed, created: true });
+    const payload = { ...seed, updatedAt: new Date().toISOString(), updatedBy: "system" };
+    await ref.set(payload, { merge: true });
+    return NextResponse.json({ ok: true, data: payload, created: true });
   }
   return NextResponse.json({ ok: true, data: snap.data() || null });
 }

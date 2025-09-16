@@ -1,33 +1,12 @@
 "use server";
 import { unstable_noStore as noStore } from "next/cache";
 import type { WebsiteHeaderConfig } from "@/types/website";
-import { getGeneralSettings } from "./settings";
-import { getCmsHeader } from "./cmsHeader";
-
-function resolveLinkClass(input?: string): string {
-  const v = (input || "").toLowerCase().trim();
-  switch (v) {
-    case "black":
-    case "text-black":
-    case "sort":
-      return "text-black hover:text-black/70";
-    case "white":
-    case "text-white":
-    case "hvid":
-      return "text-white hover:text-white/80";
-    case "primary":
-    case "brand":
-      return "text-primary hover:text-primary/80";
-    case "secondary":
-      return "text-secondary hover:text-secondary/80";
-    default:
-      return "text-white hover:text-white/80";
-  }
-}
+import { getGeneralSettings } from "@/services/settings";
+import { getCmsHeader } from "@/services/cmsHeader";
+import { linkClassFromInput } from "@/lib/colors";
 
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   noStore();
-
   const [cms, fallback] = await Promise.all([getCmsHeader(), getGeneralSettings()]);
   const a = cms?.appearance;
 
@@ -49,7 +28,7 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
         l: a.scrolledBg?.l ?? 95,
         opacity: a.scrolledBg?.opacity ?? 98,
       },
-      linkClass: resolveLinkClass(a.link?.hex ? "custom" : a.link?.color),
+      linkClass: linkClassFromInput(a.link?.hex ? a.link?.hex : a.link?.color, a.link?.hex),
     };
   }
 
@@ -70,6 +49,6 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
       l: fallback?.headerScrolledBackgroundColor?.l ?? 95,
       opacity: fallback?.headerScrolledBackgroundOpacity ?? 98,
     },
-    linkClass: resolveLinkClass(fallback?.headerLinkColor),
+    linkClass: linkClassFromInput(fallback?.headerLinkColor),
   };
 }

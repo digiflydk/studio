@@ -1,19 +1,19 @@
 const HEX3 = /^#([0-9a-fA-F]{3})$/;
 const HEX6 = /^#([0-9a-fA-F]{6})$/;
 
-export function normalizeLinkColor(input?: string): { raw: string; canonical: "black" | "white" | "primary" | "secondary" | "hex"; } {
+export function normalizeLinkColor(input?: string): { canonical: "black" | "white" | "primary" | "secondary" | "hex"; raw: string } {
   const v = (input || "").trim().toLowerCase();
-
-  if (v === "black" || v === "text-black") return { raw: "black", canonical: "black" };
-  if (v === "white" || v === "text-white") return { raw: "white", canonical: "white" };
-  if (v === "primary" || v === "brand") return { raw: "primary", canonical: "primary" };
-  if (v === "secondary") return { raw: "secondary", canonical: "secondary" };
-  if (HEX3.test(v) || HEX6.test(v)) return { raw: v, canonical: "hex" };
-  return { raw: "white", canonical: "white" };
+  if (v === "black" || v === "text-black" || v === "sort") return { canonical: "black", raw: "black" };
+  if (v === "white" || v === "text-white" || v === "hvid") return { canonical: "white", raw: "white" };
+  if (v === "primary" || v === "brand") return { canonical: "primary", raw: "primary" };
+  if (v === "secondary") return { canonical: "secondary", raw: "secondary" };
+  if (HEX3.test(v) || HEX6.test(v)) return { canonical: "hex", raw: v };
+  return { canonical: "white", raw: "white" };
 }
 
-export function linkClassFromInput(input?: string): string {
+export function linkClassFromInput(input?: string, hex?: string): string {
   const { canonical, raw } = normalizeLinkColor(input);
+  if (canonical === "hex" || hex) return `text-[${hex || raw}] hover:opacity-80`;
   switch (canonical) {
     case "black":
       return "text-black hover:text-black/70";
@@ -23,8 +23,6 @@ export function linkClassFromInput(input?: string): string {
       return "text-primary hover:text-primary/80";
     case "secondary":
       return "text-secondary hover:text-secondary/80";
-    case "hex":
-      return `text-[${raw}] hover:opacity-80`;
     default:
       return "text-white hover:text-white/80";
   }

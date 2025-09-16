@@ -20,9 +20,9 @@ export const borderSchema = z.object({
 });
 
 export const linkSchema = z.object({
-  color: z.string().default("white"),       // "white" | "black" | "primary" | "secondary" | "custom"
+  color: z.string().default("white"),
   hover: z.string().optional().default(""),
-  size: z.number().min(10).max(24).optional().default(15),
+  size: z.number().min(10).max(48).optional().default(15),
   hex: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).optional().or(z.literal("")).default(""),
   hoverHex: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).optional().or(z.literal("")).default(""),
   menuIconColor: z.string().optional().default(""),
@@ -59,17 +59,13 @@ export const navLinkSchema = z.object({
 export const appearanceSchema = z.object({
   isOverlay: z.boolean().optional().default(true),
   headerIsSticky: z.boolean().optional().default(true),
-  headerHeight: z.number().min(56).max(160).optional().default(80),
+  headerHeight: z.number().min(56).max(200).optional().default(80),
   headerLogoWidth: z.number().min(60).max(400).optional().default(120),
-
   logo: logoSchema.optional().default({} as any),
   link: linkSchema.optional().default({} as any),
-
   topBg: hslSchema.optional().default({ h: 0, s: 0, l: 100, opacity: 0 }),
   scrolledBg: hslSchema.optional().default({ h: 210, s: 100, l: 95, opacity: 98 }),
-
   border: borderSchema.optional().default({} as any),
-
   cta: ctaSchema.optional().default({} as any),
   mobileFloating: mobileFloatingSchema.optional().default({} as any),
   navLinks: z.array(navLinkSchema).optional().default([]),
@@ -84,7 +80,5 @@ export const headerDocumentSchema = z.object({
 
 export type HeaderAppearance = z.infer<typeof appearanceSchema>;
 export type HeaderDocument = z.infer<typeof headerDocumentSchema>;
-
-// Bevar begge navne så eksisterende imports ikke fejler
 export const headerAppearanceSchema = appearanceSchema;
 export const HeaderAppearanceSchema = appearanceSchema;
