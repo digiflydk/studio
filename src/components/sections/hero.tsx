@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import SiteContainer from "@/components/ui/SiteContainer";
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
@@ -168,8 +169,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
     if (settings?.heroLayout === 'textWithImageGrid') {
         return (
-            <section id="hero" style={sectionStyle} className="py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]">
-                 <div className="container mx-auto max-w-7xl px-4 md:px-6">
+            <section id="hero" style={sectionStyle} className="pt-[var(--hero-padding-top-mobile)] md:pt-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]">
+                 <SiteContainer>
                      <div className={cn("grid md:grid-cols-2 gap-12 items-center")}>
                          {horizontalAlign === 'right' ? (
                             <>
@@ -183,7 +184,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                             </>
                          )}
                      </div>
-                 </div>
+                 </SiteContainer>
             </section>
         )
     }
@@ -209,8 +210,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                 "relative flex min-h-[calc(100vh_-_var(--header-h,72px))]",
                  alignmentClasses.container[verticalAlign]
             )}>
-                 <div className={cn(
-                    "container mx-auto max-w-7xl px-4 md:px-6 w-full flex",
+                 <SiteContainer className={cn(
+                    "flex",
                     "py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]",
                     {
                         'justify-start': horizontalAlign === 'left',
@@ -219,7 +220,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     }
                  )}>
                     {heroContent}
-                </div>
+                </SiteContainer>
             </div>
         </section>
     );

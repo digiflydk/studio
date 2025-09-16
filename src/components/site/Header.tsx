@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { fetchHeaderAppearance, computeHeaderStyles } from "@/services/header";
+import SiteContainer from "@/components/ui/SiteContainer";
 
 export default function SiteHeader() {
   const FALLBACK_LOGO = `data:image/svg+xml;utf8,` +
@@ -53,16 +54,15 @@ export default function SiteHeader() {
 
   // 4) Render logik
   return (
-    <header id="site-header" style={styles.root}>
-      <div
-        className="
-          container mx-auto           /* bruger projektets globale container (samme som resten af siden) */
-          px-4 sm:px-6 lg:px-8        /* nøjagtig samme side-padding som øvrige sektioner */
-          w-full h-full
-        "
-      >
+    <header
+      id="site-header"
+      // VIGTIGT: ingen px-* her — padding styres af SiteContainer
+      className="sticky top-0 z-50 border-b"
+      style={styles.root}
+    >
+      <SiteContainer>
         <div className="flex h-full items-center justify-between gap-6">
-          {/* Logo (venstre) */}
+          {/* VENSTRE: LOGO */}
           <a href="/" className="block shrink-0" aria-label={styles.logoAlt}>
             <img
               src={activeLogoSrc}
@@ -73,10 +73,10 @@ export default function SiteHeader() {
             />
           </a>
 
-          {/* Navigation (højre) */}
+          {/* HØJRE: NAV */}
           <nav className="ml-0">
             <ul className="flex items-center gap-8">
-              {links?.map((l) => (
+              {links?.map((l: any) => (
                 <li key={`${l.href}-${l.label}`}>
                   <a
                     href={l.href}
@@ -90,7 +90,7 @@ export default function SiteHeader() {
             </ul>
           </nav>
         </div>
-      </div>
+      </SiteContainer>
     </header>
   );
 }
