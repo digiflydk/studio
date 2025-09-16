@@ -14,13 +14,21 @@ const ColorHsl = z.object({
   opacity: z.number().min(0).max(100).optional(),
 });
 
-const AnyColor = z.union([ColorHex, ColorHsl]);
+// Tolerér "a" (0..1) fra visse color pickers
+const ColorAny = z.union([ColorHex, ColorHsl, z.object({
+  h: z.number(),
+  s: z.number(),
+  l: z.number(),
+  a: z.number().min(0).max(1),
+})]);
 
 const Border = z.object({
-  enabled: z.boolean().optional(),
-  width: z.number().int().min(0).max(8).optional(),
-  color: AnyColor.optional(),
+  visible: z.boolean().optional(),
+  widthPx: z.number().int().min(0).max(8).optional(),
+  color: ColorAny.optional(),
 });
+
+const NavLink = z.object({ label: z.string(), href: z.string() });
 
 export const HeaderAppearanceSchema = z.object({
   isOverlay: z.boolean().optional(),
@@ -28,12 +36,11 @@ export const HeaderAppearanceSchema = z.object({
   headerHeight: z.number().int().min(40).max(160).optional(),
   headerLogoWidth: z.number().int().min(40).max(480).optional(),
   headerLinkColor: z.string().optional(),
-  topBg: AnyColor.optional(),
-  scrolledBg: AnyColor.optional(),
+  topBg: ColorAny.optional(),
+  scrolledBg: ColorAny.optional(),
   border: Border.optional(),
-  navLinks: z.array(z.object({ label: z.string(), href: z.string() })).optional(),
+  navLinks: z.array(NavLink).optional(),
 });
 
 export type HeaderAppearanceInput = z.infer<typeof HeaderAppearanceSchema>;
-
 export default HeaderAppearanceSchema;
