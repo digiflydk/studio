@@ -1,42 +1,75 @@
 "use server";
 import { unstable_noStore as noStore } from "next/cache";
 import type { WebsiteHeaderConfig } from "@/types/website";
-import { getGeneralSettings } from "@/services/settings";
-import { getCmsHeaderPage } from "@/services/cms";
-import { linkClassFromInput } from "@/lib/colors";
+import { getGeneralSettings } from "./settings";
+import { getCmsHeader } from "./cmsHeader";
+
+function resolveLinkClass(input?: string): string {
+  const v = (input || "").toLowerCase().trim();
+  switch (v) {
+    case "black":
+    case "text-black":
+    case "sort":
+      return "text-black hover:text-black/70";
+    case "white":
+    case "text-white":
+    case "hvid":
+      return "text-white hover:text-white/80";
+    case "primary":
+    case "brand":
+      return "text-primary hover:text-primary/80";
+    case "secondary":
+      return "text-secondary hover:text-secondary/80";
+    default:
+      return "text-white hover:text-white/80";
+  }
+}
 
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   noStore();
-  const [settings, header] = await Promise.all([getGeneralSettings(), getCmsHeaderPage()]);
 
-  const h = header ?? {
-    isOverlay: true,
-    headerIsSticky: true,
-    headerHeight: 80,
-    headerLogoWidth: 120,
-    headerLinkColor: "white",
-    topBg: { h: 0, s: 0, l: 100, opacity: 0 },
-    scrolledBg: { h: 210, s: 100, l: 95, opacity: 98 },
-    navLinks: settings?.headerNavLinks ?? [],
-  };
+  const [cms, fallback] = await Promise.all([getCmsHeader(), getGeneralSettings()]);
+  const a = cms?.appearance;
+
+  if (a) {
+    return {
+      isOverlay: !!a.isOverlay,
+      sticky: !!a.headerIsSticky,
+      heightPx: a.headerHeight ?? 80,
+      logoWidthPx: a.headerLogoWidth ?? a.logo?.maxWidth ?? 120,
+      topBg: {
+        h: a.topBg?.h ?? 0,
+        s: a.topBg?.s ?? 0,
+        l: a.topBg?.l ?? 100,
+        opacity: a.topBg?.opacity ?? 0,
+      },
+      scrolledBg: {
+        h: a.scrolledBg?.h ?? 210,
+        s: a.scrolledBg?.s ?? 100,
+        l: a.scrolledBg?.l ?? 95,
+        opacity: a.scrolledBg?.opacity ?? 98,
+      },
+      linkClass: resolveLinkClass(a.link?.hex ? "custom" : a.link?.color),
+    };
+  }
 
   return {
-    isOverlay: !!h.isOverlay,
-    sticky: !!h.headerIsSticky,
-    heightPx: h.headerHeight ?? 80,
-    logoWidthPx: h.headerLogoWidth ?? 120,
+    isOverlay: true,
+    sticky: fallback?.headerIsSticky ?? true,
+    heightPx: fallback?.headerHeight ?? 80,
+    logoWidthPx: fallback?.headerLogoWidth ?? 120,
     topBg: {
-      h: h.topBg?.h ?? 0,
-      s: h.topBg?.s ?? 0,
-      l: h.topBg?.l ?? 100,
-      opacity: h.topBg?.opacity ?? 0,
+      h: fallback?.headerInitialBackgroundColor?.h ?? 0,
+      s: fallback?.headerInitialBackgroundColor?.s ?? 0,
+      l: fallback?.headerInitialBackgroundColor?.l ?? 100,
+      opacity: fallback?.headerInitialBackgroundOpacity ?? 0,
     },
     scrolledBg: {
-      h: h.scrolledBg?.h ?? 210,
-      s: h.scrolledBg?.s ?? 100,
-      l: h.scrolledBg?.l ?? 95,
-      opacity: h.scrolledBg?.opacity ?? 98,
+      h: fallback?.headerScrolledBackgroundColor?.h ?? 210,
+      s: fallback?.headerScrolledBackgroundColor?.s ?? 100,
+      l: fallback?.headerScrolledBackgroundColor?.l ?? 95,
+      opacity: fallback?.headerScrolledBackgroundOpacity ?? 98,
     },
-    linkClass: linkClassFromInput(h.headerLinkColor),
+    linkClass: resolveLinkClass(fallback?.headerLinkColor),
   };
 }
