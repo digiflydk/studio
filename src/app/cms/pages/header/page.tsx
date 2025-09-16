@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
@@ -12,6 +13,35 @@ import OpacitySlider from '@/components/cms/OpacitySlider';
 
 type HSLA = { h: number; s: number; l: number; opacity: number };
 type HSL = { h: number; s: number; l: number };
+
+function Toast({ text }: { text: string }) {
+  const [open, setOpen] = React.useState(true);
+  React.useEffect(() => {
+    const t = setTimeout(() => setOpen(false), 1000); // auto close efter 1s
+    return () => clearTimeout(t);
+  }, []);
+  if (!open) return null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 12,
+        right: 12,
+        padding: "10px 12px",
+        borderRadius: 8,
+        border: "1px solid rgba(0,0,0,0.08)",
+        background: "#F0FFF4",
+        color: "#065F46",
+        boxShadow: "0 6px 30px rgba(0,0,0,0.08)",
+        zIndex: 9999,
+        fontSize: 14,
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
 
 const D_LINKS: NavLink[] = [
   { label: 'Online ordre', href: '/#online-orders' },
@@ -140,7 +170,6 @@ async function saveSettings(payload: Partial<HeaderSettings>): Promise<{ ok: boo
   return { ok: true };
 }
 
-
 function to01(v: unknown, fb = 1): number {
   if (typeof v === 'number') {
     if (v >= 0 && v <= 1) return v;
@@ -187,6 +216,8 @@ export default function HeaderPage() {
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [showToast, setShowToast] = React.useState(false);
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -220,14 +251,14 @@ export default function HeaderPage() {
       setErrorMsg(`${res.error}${details ? ` — ${details}` : ''}`);
       return;
     }
-    setSuccessMsg('Gemt! Dine ændringer er nu lagret.');
-    // Reload data så UI matcher Firestore
+    setSuccessMsg("Gemt! Dine ændringer er nu lagret.");
+    setShowToast(true);
+    // reload settings + auto-hide banner (hvis du bruger banneret også)
     try {
       const fresh = await fetchSettings();
       setForm(fresh);
-    } catch { /* ignore */ }
-    // Skjul success-besked efter et par sekunder
-    setTimeout(() => setSuccessMsg(null), 2000);
+    } catch {}
+    setTimeout(() => setShowToast(false), 1100);
   }
 
   if (loading) return <div className="p-4">Indlæser…</div>;
@@ -274,8 +305,37 @@ export default function HeaderPage() {
 
   return (
     <div className="space-y-6">
+       <div style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        background: "white",
+        borderBottom: "1px solid rgba(0,0,0,0.08)",
+        padding: "10px 12px",
+        display: "flex",
+        alignItems: "center",
+        gap: 8
+      }}>
+        <div style={{ fontWeight: 600 }}>Header indstillinger</div>
+        <div style={{ marginLeft: "auto" }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              border: "1px solid rgba(0,0,0,0.1)",
+              borderRadius: 8,
+              padding: "8px 12px",
+              fontSize: 14,
+              background: saving ? "#F3F4F6" : "white",
+              cursor: saving ? "not-allowed" : "pointer",
+            }}
+          >
+            {saving ? "Gemmer…" : "Gem"}
+          </button>
+        </div>
+      </div>
       {errorMsg ? <AlertBanner type="error" title="Gem fejlede" message={errorMsg} /> : null}
-      {successMsg ? <AlertBanner type="success" title="Gemt" message={successMsg} /> : null}
+      
       <div>
         <h1 className="text-2xl font-bold">Header Settings</h1>
         <p className="text-muted-foreground">Manage the content and appearance of the site header.</p>
@@ -389,11 +449,7 @@ export default function HeaderPage() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-
-      <div className="flex gap-3">
-        <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</Button>
-        <Button variant="secondary" onClick={load} disabled={saving}>Reload</Button>
-      </div>
+      {showToast ? <Toast text="Gemt ✔" /> : null}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { Header } from "./header";
@@ -66,12 +67,12 @@ export default function HeaderClient({
   }, [config]);
 
   return (
-    <div key={configKey} style={vars} data-scrolled={scrolled ? "true" : "false"}>
+    <div key={configKey} style={vars}>
       {isStickyActive && <div aria-hidden style={{ height: `var(--header-height)` }} />}
       <div
         data-header-wrap
         className={isStickyActive ? "fixed top-0 left-0 right-0 z-[60]" : ""}
-        style={isStickyActive ? { background: "var(--bg-scrolled)" } : undefined}
+        style={isStickyActive ? { background: "var(--bg-scrolled)" } : { background: 'var(--bg-top)' }}
       >
         <Header
           brand={brand}
@@ -86,16 +87,7 @@ export default function HeaderClient({
         />
       </div>
 
-      <style>{`
-        [data-scrolled="true"] [data-header] {
-          background: var(--bg-scrolled);
-          border-bottom: 1px solid hsl(var(--border));
-        }
-        [data-header-wrap]:not([class*="fixed"]) [data-header] {
-          background: var(--bg-top);
-          border-bottom-color: transparent;
-        }
-      `}</style>
     </div>
   );
 }
+
