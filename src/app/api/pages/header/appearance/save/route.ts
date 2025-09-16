@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { SavePayloadSchema } from "@/lib/validators/headerAppearance.zod";
-import { db } from "@/lib/client/firebase";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { adminDb } from "@/lib/server/firebaseAdmin";
 
-const TARGET = { col: "cms/pages/header", id: "header" };
+export const runtime = "nodejs";
+
+// Firestore-doc: cms/pages/header/header
+const PATH = { collection: "cms/pages/header", id: "header" };
 
 export async function POST(req: Request) {
   try {
@@ -17,19 +19,6 @@ export async function POST(req: Request) {
           error: "VALIDATION_ERROR",
           details: parsed.error.flatten(),
           hint: "Send { appearance: {...} } eller et fladt objekt – begge accepteres.",
-          example: {
-            appearance: {
-              isOverlay: true,
-              headerIsSticky: true,
-              headerHeight: 80,
-              headerLogoWidth: 120,
-              headerLinkColor: "white",
-              border: { enabled: true, widthPx: 1, color: { h: 210, s: 16, l: 87 } },
-              topBg: { h: 0, s: 0, l: 100, opacity: 0 },
-              scrolledBg: { h: 210, s: 100, l: 95, opacity: 98 },
-              navLinks: [],
-            },
-          },
         },
         { status: 400 }
       );
@@ -37,26 +26,31 @@ export async function POST(req: Request) {
 
     const { appearance } = parsed.data;
 
-    const ref = doc(db, TARGET.col, TARGET.id);
-    const snap = await getDoc(ref);
+    // --- ADMIN SDK WRITE (bypasser Security Rules) ---
+    const ref = adminDb.collection(PATH.collection).doc(PATH.id);
+    const snap = await ref.get();
 
     const base = {
       appearance,
-      updatedAt: serverTimestamp(),
+      updatedAt: new Date(), // brug serverTimestamp hvis du har det wired i admin initialisering
     };
 
-    if (!snap.exists()) {
-      await setDoc(ref, { ...base, version: 1 });
+    if (!snap.exists) {
+      await ref.set({ ...base, version: 1 }, { merge: false });
     } else {
       const current = snap.data() as any;
       const nextVersion = typeof current?.version === "number" ? current.version + 1 : 1;
-      await updateDoc(ref, { ...base, version: nextVersion });
+      await ref.set({ ...base, version: nextVersion }, { merge: true });
     }
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     return NextResponse.json(
-      { ok: false, error: "UNEXPECTED_ERROR", message: err?.message ?? "Unknown error" },
+      {
+        ok: false,
+        error: "UNEXPECTED_ERROR",
+        message: err?.message ?? "Unknown error",
+      },
       { status: 500 }
     );
   }
