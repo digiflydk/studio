@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useTransition, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import type { HeaderSettings, NavLink } from '@/types/settings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,7 @@ function AlertBanner({ type = "error", title, message }: { type?: "error" | "suc
     </div>
   );
 }
+
 
 function apiToHeaderSettings(api: any) {
   const a = api?.appearance ?? api ?? {};
@@ -138,6 +139,7 @@ async function saveSettings(payload: Partial<HeaderSettings>): Promise<{ ok: boo
   }
   return { ok: true };
 }
+
 
 function to01(v: unknown, fb = 1): number {
   if (typeof v === 'number') {
