@@ -1,4 +1,5 @@
 
+
 'use client';
 import { Button } from '@/components/ui/button';
 import { type GeneralSettings } from '@/types/settings';
@@ -20,15 +21,22 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         color: settings?.heroDescriptionColor ? `var(--${settings.heroDescriptionColor.replace('text-', '')})` : undefined,
     };
     
+    const pad = settings?.sectionPadding?.hero ?? {};
+    const pt = 'top' in pad && typeof pad.top === 'number' ? pad.top : 192;
+    const pb = 'bottom' in pad && typeof pad.bottom === 'number' ? pad.bottom : 192;
+    const ptM = 'topMobile' in pad && typeof pad.topMobile === 'number' ? pad.topMobile : 128;
+    const pbM = 'bottomMobile' in pad && typeof pad.bottomMobile === 'number' ? pad.bottomMobile : 128;
+
+
     const sectionStyle: React.CSSProperties & { [key: string]: string } = {
         '--hero-headline-size-mobile': settings?.heroHeadlineSizeMobile ? `${settings.heroHeadlineSizeMobile}px` : '40px',
         '--hero-headline-size': settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : '64px',
         '--hero-description-size-mobile': settings?.heroDescriptionSizeMobile ? `${settings.heroDescriptionSizeMobile}px` : '16px',
         '--hero-description-size': settings?.heroDescriptionSize ? `${settings.heroDescriptionSize}px` : '18px',
-        '--hero-padding-top-mobile': settings?.sectionPadding?.hero?.topMobile ? `${settings.sectionPadding.hero.topMobile}px` : '128px',
-        '--hero-padding-bottom-mobile': settings?.sectionPadding?.hero?.bottomMobile ? `${settings.sectionPadding.hero.bottomMobile}px` : '128px',
-        '--hero-padding-top': settings?.sectionPadding?.hero?.top ? `${settings.sectionPadding.hero.top}px` : '192px',
-        '--hero-padding-bottom': settings?.sectionPadding?.hero?.bottom ? `${settings.sectionPadding.hero.bottom}px` : '192px',
+        '--hero-padding-top-mobile': `${ptM}px`,
+        '--hero-padding-bottom-mobile': `${pbM}px`,
+        '--hero-padding-top': `${pt}px`,
+        '--hero-padding-bottom': `${pb}px`,
     };
 
     if (settings?.heroLayout === 'textWithImageGrid' && settings?.heroSectionBackgroundColor) {
@@ -197,12 +205,19 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                 />
                 <div className="absolute inset-0 bg-black/50" />
             </div>
-            <div className={cn("relative container mx-auto max-w-7xl px-4 md:px-6 flex min-h-[calc(100vh_-_var(--header-h,72px))] py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]", alignmentClasses.container[verticalAlign])}>
-                <div className={cn("w-full flex", {
-                    'justify-start': horizontalAlign === 'left',
-                    'justify-center': horizontalAlign === 'center',
-                    'justify-end': horizontalAlign === 'right',
-                })}>
+            <div className={cn(
+                "relative flex min-h-[calc(100vh_-_var(--header-h,72px))]",
+                 alignmentClasses.container[verticalAlign]
+            )}>
+                 <div className={cn(
+                    "container mx-auto max-w-7xl px-4 md:px-6 w-full flex",
+                    "py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]",
+                    {
+                        'justify-start': horizontalAlign === 'left',
+                        'justify-center': horizontalAlign === 'center',
+                        'justify-end': horizontalAlign === 'right',
+                    }
+                 )}>
                     {heroContent}
                 </div>
             </div>
