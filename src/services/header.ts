@@ -86,19 +86,37 @@ export async function fetchHeaderAppearance(): Promise<Appearance> {
 }
 
 export function computeHeaderStyles(a: Appearance) {
-  // vælg baggrund: HEX > HSL
-  const topBgCss = hex(a.topBg.hex, a.topBg.opacity) ?? hsl(a.topBg.h, a.topBg.s, a.topBg.l, a.topBg.opacity);
-  const scrBgCss = hex(a.scrolledBg.hex, a.scrolledBg.opacity) ?? hsl(a.scrolledBg.h, a.scrolledBg.s, a.scrolledBg.l, a.scrolledBg.opacity);
+  const topBgCss =
+    (a.topBg.hex ? a.topBg.hex : undefined) ??
+    // hsl fallback
+    `hsla(${a.topBg.h} ${a.topBg.s}% ${a.topBg.l}% / ${a.topBg.opacity / 100})`;
+
+  const scrBgCss =
+    (a.scrolledBg.hex ? a.scrolledBg.hex : undefined) ??
+    `hsla(${a.scrolledBg.h} ${a.scrolledBg.s}% ${a.scrolledBg.l}% / ${a.scrolledBg.opacity / 100})`;
+
   const linkColorCss = a.headerLinkColorHex ?? a.headerLinkColor ?? "white";
-  const borderColorCss = a.border.colorHex ?? (a.border.color ? hsl(a.border.color.h, a.border.color.s, a.border.color.l) : undefined);
+  const borderColorCss =
+    a.border.colorHex ??
+    (a.border.color
+      ? `hsl(${a.border.color.h} ${a.border.color.s}% ${a.border.color.l}%)`
+      : undefined);
 
   return {
     root: {
       position: a.headerIsSticky ? ("sticky" as const) : ("relative" as const),
       top: 0,
-      height: `${a.headerHeight}px`,
+      // VIGTIGT: sørg for at headeren altid ligger over indhold
+      zIndex: 1000,
+      // Skab ny stacking context på headeren
+      // (z-index virker kun på positionerede elementer; sticky er OK)
       background: topBgCss,
-      borderBottom: a.border.enabled ? `${a.border.widthPx}px solid ${borderColorCss ?? "transparent"}` : "none",
+      height: `${a.headerHeight}px`,
+      borderBottom: a.border.enabled
+        ? `${a.border.widthPx}px solid ${borderColorCss ?? "transparent"}`
+        : "none",
+      // (valgfrit men ufarligt) GPU-hint hjælper mod repaint-glitches ved scroll
+      willChange: "transform",
     },
     scrolledBg: scrBgCss,
     linkColor: linkColorCss,
