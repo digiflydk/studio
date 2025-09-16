@@ -7,7 +7,8 @@ export default function SiteHeader() {
   // 1) Hooks først — altid samme rækkefølge
   const [styles, setStyles] = React.useState<ReturnType<typeof computeHeaderStyles> | null>(null);
   const [links, setLinks] = React.useState<{label:string; href:string}[]>([]);
-  const [logoOk, setLogoOk] = React.useState(true); // ← FLYTTET HEROP
+  const [logoOk, setLogoOk] = React.useState(true);
+  const [activeLogoSrc, setActiveLogoSrc] = React.useState<string | null>(null);
 
   // 2) Effects
   React.useEffect(() => {
@@ -18,6 +19,7 @@ export default function SiteHeader() {
       const s = computeHeaderStyles(a);
       setStyles(s);
       setLinks(Array.isArray((a as any).navLinks) ? (a as any).navLinks : []);
+      setActiveLogoSrc(s.logoSrc);
     })();
     return () => { mounted = false; };
   }, []);
@@ -29,6 +31,12 @@ export default function SiteHeader() {
     const onScroll = () => {
       const y = window.scrollY || 0;
       el.style.background = y > 10 ? styles.scrolledBg : (styles.root.background as string);
+      // byt logo baseret på scroll
+      if (y > 10) {
+        setActiveLogoSrc(styles.logoScrolledSrc);
+      } else {
+        setActiveLogoSrc(styles.logoSrc);
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -60,7 +68,7 @@ export default function SiteHeader() {
       <div style={containerStyle}>
         {logoOk ? (
           <img
-            src={styles.logoSrc}
+            src={activeLogoSrc ?? styles.logoSrc}
             alt={styles.logoAlt}
             style={logoStyle}
             onError={() => setLogoOk(false)}

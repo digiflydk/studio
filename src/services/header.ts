@@ -6,7 +6,7 @@ export type Appearance = {
   headerLogoWidth: number;
   headerLinkColor?: string;
   headerLinkColorHex?: string;
-  logo?: { src?: string; alt?: string; maxWidth?: number };
+  logo?: { src?: string; scrolledSrc?: string; alt?: string; maxWidth?: number };
   border: {
     enabled: boolean;
     widthPx: number;
@@ -50,7 +50,7 @@ export function toAppearance(raw: any): Appearance {
     headerLogoWidth: Number(a.headerLogoWidth ?? a?.logo?.maxWidth ?? 140),
     headerLinkColor: a.headerLinkColor,
     headerLinkColorHex: a.headerLinkColorHex ?? a.link?.hex,
-    logo: { src: a.logo?.src, alt: a.logo?.alt, maxWidth: a.logo?.maxWidth },
+    logo: { src: a.logo?.src, scrolledSrc: a.logo?.scrolledSrc, alt: a.logo?.alt, maxWidth: a.logo?.maxWidth },
     border: {
       enabled: !!(border.enabled ?? border.visible),
       widthPx: Number(border.widthPx ?? border.width ?? 1),
@@ -104,6 +104,7 @@ export function computeHeaderStyles(a: Appearance) {
     linkColor: linkColorCss,
     logoMaxWidth: `${a.headerLogoWidth}px`,
     logoSrc: a.logo?.src ?? "/logo.svg",
+    logoScrolledSrc: a.logo?.scrolledSrc ?? a.logo?.src ?? "/logo.svg",
     logoAlt: a.logo?.alt ?? "Logo",
   };
 }

@@ -48,13 +48,14 @@ export const HeaderAppearanceSchema = z.object({
 
   border: BorderSchema.optional(),
 
+  // Legacy aliaser
   overlay: z.boolean().optional(),
   sticky: z.boolean().optional(),
   height: zNum.optional(),
   logo: z.object({
     maxWidth: zNum.optional(),
-    // NYT: logoSrc (valgfri)
-    src: z.string().url().optional(),
+    src: z.string().url().optional(),           // NYT: normal logo
+    scrolledSrc: z.string().url().optional(),   // NYT: scrolled logo
     alt: z.string().optional(),
   }).partial().optional(),
 
@@ -77,7 +78,7 @@ export const HeaderAppearanceSchema = z.object({
     headerLogoWidth: typeof a.headerLogoWidth === "number" ? a.headerLogoWidth : (a.logo?.maxWidth ?? 140),
     headerLinkColor: linkColor,
     headerLinkColorHex: a.headerLinkColorHex ?? a.link?.hex, // bevar hex hvis sat
-    logo: { src: a.logo?.src, alt: a.logo?.alt, maxWidth: a.logo?.maxWidth },
+    logo: { src: a.logo?.src, scrolledSrc: a.logo?.scrolledSrc, alt: a.logo?.alt, maxWidth: a.logo?.maxWidth },
     border: a.border ?? { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91 } },
     topBg: a.topBg,
     scrolledBg: a.scrolledBg,
@@ -90,3 +91,12 @@ export const SavePayloadSchema = z.union([
   z.object({ appearance: HeaderAppearanceSchema }),
   HeaderAppearanceSchema.transform((appearance) => ({ appearance })),
 ]);
+
+// For at undgå breaking changes i andre filer
+export const headerDocumentSchema = z.object({
+  appearance: HeaderAppearanceSchema,
+  version: z.number().optional(),
+  updatedAt: z.string().optional(),
+  updatedBy: z.string().optional(),
+});
+export type HeaderDocument = z.infer<typeof headerDocumentSchema>;
