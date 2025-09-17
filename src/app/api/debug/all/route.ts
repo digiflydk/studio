@@ -36,13 +36,12 @@ export async function GET() {
     const cmsHomeRef           = adminDb.collection("cms").doc("pages").collection("home").doc("home");
     const cmsFooterRef         = adminDb.collection("cms").doc("pages").collection("footer").doc("footer");
 
-    // ---------- CMS DATA (flade dokumenter: cms/{bucket}/{doc})
-    // Brug: collection("cms") -> doc("{bucket}") -> doc("{doc}")
-    const cmsTeamRef           = adminDb.collection("cms").doc("team");               // cms/team/team
-    const cmsCustomersRef      = adminDb.collection("cms").doc("customers");     // cms/customers/customers
-    const cmsCasesRef          = adminDb.collection("cms").doc("cases");             // cms/cases/cases
-    const cmsServicesRef       = adminDb.collection("cms").doc("services");       // cms/services/services
-    const cmsBlogRef           = adminDb.collection("cms").doc("blog");               // cms/blog/blog
+    // ---------- CMS DATA (flade dokumenter: cms/{bucket})
+    const cmsTeamRef           = adminDb.collection("cms").doc("team");
+    const cmsCustomersRef      = adminDb.collection("cms").doc("customers");
+    const cmsCasesRef          = adminDb.collection("cms").doc("cases");
+    const cmsServicesRef       = adminDb.collection("cms").doc("services");
+    const cmsBlogRef           = adminDb.collection("cms").doc("blog");
 
     const [
       settingsGeneral,
