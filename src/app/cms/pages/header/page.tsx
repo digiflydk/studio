@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import OpacitySlider from '@/components/cms/OpacitySlider';
 import type { NavLink } from '@/types/settings';
-import { toast } from "sonner";
+import { notifySuccess, notifyError } from "@/lib/ui/notify";
 
 // Helper functions (previously inside the component)
 async function loadHeaderAppearance() {
@@ -74,8 +74,8 @@ export default function HeaderCmsPage() {
       try {
         const data = await loadHeaderAppearance();
         setForm(data);
-      } catch (e) {
-        toast.error("Kunne ikke hente header-data");
+      } catch (e: any) {
+        notifyError("Kunne ikke hente header-data: " + (e?.message ?? "Ukendt fejl"));
       } finally {
         setLoading(false);
       }
@@ -88,9 +88,9 @@ export default function HeaderCmsPage() {
     startSaving(async () => {
       try {
         await saveHeaderAppearance(form);
-        toast.success("Header gemt", { duration: 1000 }); // auto-hide ~1s
+        notifySuccess("Header gemt", 1000); // auto-hide ~1s
       } catch (e: any) {
-        toast.error("Fejl under gemning: " + (e?.message ?? "Ukendt fejl"));
+        notifyError("Fejl under gemning: " + (e?.message ?? "Ukendt fejl"));
       }
     });
   }, [form, isSaving]);
