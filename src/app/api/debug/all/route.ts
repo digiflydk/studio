@@ -5,10 +5,8 @@ import { adminDb } from "@/lib/server/firebaseAdmin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Standardiseret læsning af et dokument */
-async function readDoc(
-  ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
-) {
+/** Læs et dokument med ensartet struktur i svaret */
+async function readDoc(ref: FirebaseFirestore.DocumentReference) {
   try {
     const snap = await ref.get();
     if (!snap.exists) {
@@ -28,22 +26,23 @@ async function readDoc(
 
 export async function GET() {
   try {
-    // SETTINGS
-    const settingsGeneralRef = adminDb.collection("settings").doc("general");
-    const sectionPaddingRef = adminDb.collection("settings").doc("sectionPadding"); // hvis den findes
-    const aiAssistantRef = adminDb.collection("settings").doc("aiAssistant"); // hvis den findes
+    // ---------- SETTINGS (rodsamling 'settings')
+    const settingsGeneralRef   = adminDb.collection("settings").doc("general");
+    const sectionPaddingRef    = adminDb.collection("settings").doc("sectionPadding"); // hvis findes
+    const aiAssistantRef       = adminDb.collection("settings").doc("aiAssistant");    // hvis findes
 
-    // CMS PAGES
-    const cmsHeaderRef = adminDb.collection("cms").doc("pages").collection("header").doc("header");
-    const cmsHomeRef   = adminDb.collection("cms").doc("pages").collection("home").doc("home");
-    const cmsFooterRef = adminDb.collection("cms").doc("pages").collection("footer").doc("footer");
+    // ---------- CMS PAGES (hierarki: cms/pages/{page}/{doc})
+    const cmsHeaderRef         = adminDb.collection("cms").doc("pages").collection("header").doc("header");
+    const cmsHomeRef           = adminDb.collection("cms").doc("pages").collection("home").doc("home");
+    const cmsFooterRef         = adminDb.collection("cms").doc("pages").collection("footer").doc("footer");
 
-    // CMS DATA (VIGTIGT: brug collection() mellem doc() og doc())
-    const cmsTeamRef      = adminDb.collection("cms").collection("team").doc("team");
-    const cmsCustomersRef = adminDb.collection("cms").collection("customers").doc("customers");
-    const cmsCasesRef     = adminDb.collection("cms").collection("cases").doc("cases");
-    const cmsServicesRef  = adminDb.collection("cms").collection("services").doc("services");
-    const cmsBlogRef      = adminDb.collection("cms").collection("blog").doc("blog");
+    // ---------- CMS DATA (flade dokumenter: cms/{bucket}/{doc})
+    // Brug: collection("cms") -> doc("{bucket}") -> doc("{doc}")
+    const cmsTeamRef           = adminDb.collection("cms").doc("team");               // cms/team/team
+    const cmsCustomersRef      = adminDb.collection("cms").doc("customers");     // cms/customers/customers
+    const cmsCasesRef          = adminDb.collection("cms").doc("cases");             // cms/cases/cases
+    const cmsServicesRef       = adminDb.collection("cms").doc("services");       // cms/services/services
+    const cmsBlogRef           = adminDb.collection("cms").doc("blog");               // cms/blog/blog
 
     const [
       settingsGeneral,
@@ -71,10 +70,9 @@ export async function GET() {
       readDoc(cmsBlogRef),
     ]);
 
+    // ---------- Afledt overblik (valgfrit)
     const derived: Record<string, any> = {};
-
     if (settingsGeneral?.ok && settingsGeneral?.exists && settingsGeneral.raw) {
-      // Hvis sectionPadding ligger inde i general, eksponér også her
       if (settingsGeneral.raw.sectionPadding) {
         derived.sectionPaddingFromSettingsGeneral = {
           ok: true,
@@ -83,7 +81,6 @@ export async function GET() {
           raw: settingsGeneral.raw.sectionPadding,
         };
       }
-      // Hvis header-lomme findes i general
       if (settingsGeneral.raw.header) {
         derived.headerFromSettingsGeneral = {
           ok: true,
