@@ -17,9 +17,7 @@ type HSL = { h: number; s: number; l: number; hex?: string };
 function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
 function pct(n: number) { return Math.max(0, Math.min(100, Math.round(n))); }
 
-/** H, S, L i procent → HEX (uden alpha) */
 function hslToHex(h: number, s: number, l: number): string {
-  // h: 0–360, s/l: 0–100
   const _s = clamp01(s / 100);
   const _l = clamp01(l / 100);
   const c = (1 - Math.abs(2 * _l - 1)) * _s;
@@ -46,262 +44,43 @@ function effectiveColorHex(opt: {
   opacity?: number;
 }): string | null {
   const hex = opt.hex?.trim();
-  if (hex) return hex; // HEX har prioritet
+  if (hex) return hex;
   if (typeof opt.h === "number" && typeof opt.s === "number" && typeof opt.l === "number") {
     return hslToHex(opt.h, opt.s, opt.l);
   }
   return null;
 }
 
-function Toast({ text }: { text: string }) {
-  const [open, setOpen] = React.useState(true);
-  React.useEffect(() => {
-    const t = setTimeout(() => setOpen(false), 1000); // auto close 1s
-    return () => clearTimeout(t);
-  }, []);
-  if (!open) return null;
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      style={{
-        position: "fixed",
-        top: 16,
-        right: 16,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "10px 12px",
-        borderRadius: 10,
-        border: "1px solid rgba(16,185,129,0.35)",
-        background: "#ECFDF5",
-        color: "#065F46",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-        zIndex: 9999,
-        fontSize: 14,
-        transform: "translateY(0)",
-        animation: "toast-in .18s ease-out",
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm-1 14-4-4 1.414-1.414L11 12.172l5.586-5.586L18 8l-7 8Z" />
-      </svg>
-      <span>{text}</span>
-      <style>{`
-        @keyframes toast-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
-    </div>
-  );
+async function loadHeaderAppearance() {
+  const r = await fetch("/api/pages/header/appearance", { cache: "no-store" });
+  const j = await r.json();
+  if (!j?.ok) throw new Error(j?.message || "Load failed");
+  return j.data;
 }
 
-
-const D_LINKS: NavLink[] = [
-  { label: 'Online ordre', href: '/#online-orders' },
-  { label: 'Priser', href: '/#pricing' },
-  { label: 'Kunder', href: '/#customers' },
-  { label: 'Kontakt', href: '/#contact' },
-];
-
-const D_BORDER_COLOR: HSL = { h: 220, s: 13, l: 91 };
-const D_BORDER = { enabled: false, width: 1, color: D_BORDER_COLOR };
-const D_INITIAL: HSLA = { h: 0, s: 0, l: 100, opacity: 1 };
-const D_SCROLLED: HSLA = { h: 210, s: 100, l: 95, opacity: 0.98 };
-const D_HEADER: HeaderSettings = {
-  overlay: true,
-  sticky: true,
-  height: 72,
-  logo: { maxWidth: 140 },
-  linkColor: 'white',
-  border: D_BORDER,
-  bg: { initial: D_INITIAL, scrolled: D_SCROLLED },
-  navLinks: D_LINKS,
-};
-
-function AlertBanner({ type = "error", title, message }: { type?: "error" | "success"; title: string; message?: string }) {
-  const tone = type === "error" ? "bg-red-50 text-red-800 border-red-200" : "bg-green-50 text-green-800 border-green-200";
-  return (
-    <div className={`mb-4 border rounded-lg p-3 ${tone}`}>
-      <div className="font-medium">{title}</div>
-      {message ? <div className="text-sm mt-1">{message}</div> : null}
-    </div>
-  );
-}
-
-
-function apiToHeaderSettings(api: any) {
-  const a = api?.appearance ?? api ?? {};
-  return {
-    overlay: !!a.isOverlay,
-    sticky: !!a.headerIsSticky,
-    height: Number(a.headerHeight ?? 72),
-    logo: {
-      maxWidth: Number(a.headerLogoWidth ?? a?.logo?.maxWidth ?? 140),
-      src: a?.logo?.src,
-      scrolledSrc: a?.logo?.scrolledSrc,
-      alt: a?.logo?.alt ?? "Logo",
-    },
-    linkColor: a.headerLinkColor ?? a?.link?.hex ?? a?.link?.color ?? 'white',
-    linkColorHex: a.headerLinkColorHex ?? a?.link?.hex,                 // NYT
-    border: {
-      enabled: !!(a?.border?.enabled ?? a?.border?.visible),
-      width: Number(a?.border?.widthPx ?? a?.border?.width ?? 1),
-      color: {
-        h: Number(a?.border?.color?.h ?? 220),
-        s: Number(a?.border?.color?.s ?? 13),
-        l: Number(a?.border?.color?.l ?? 91),
-      },
-      colorHex: a?.border?.colorHex,                                   // NYT
-    },
-    bg: {
-      initial: {
-        h: Number(a?.topBg?.h ?? 0),
-        s: Number(a?.topBg?.s ?? 0),
-        l: Number(a?.topBg?.l ?? 100),
-        opacity: Number(a?.topBg?.opacity ?? 0),
-        hex: a?.topBg?.hex,                                            // NYT
-      },
-      scrolled: {
-        h: Number(a?.scrolledBg?.h ?? 210),
-        s: Number(a?.scrolledBg?.s ?? 100),
-        l: Number(a?.scrolledBg?.l ?? 95),
-        opacity: Number(a?.scrolledBg?.opacity ?? 98),
-        hex: a?.scrolledBg?.hex,                                       // NYT
-      },
-    },
-    navLinks: Array.isArray(a?.navLinks) ? a.navLinks : [],
-  };
-}
-
-function headerSettingsToAppearance(h: any) {
-  return {
-    isOverlay: !!h?.overlay,
-    headerIsSticky: !!h?.sticky,
-    headerHeight: Number(h?.height ?? 72),
-    headerLogoWidth: Number(h?.logo?.maxWidth ?? 140),
-    headerLinkColor: h?.linkColor ?? 'white',
-    headerLinkColorHex: h?.linkColorHex,                 // NYT
-    logo: {
-      src: h?.logo?.src,                                 // NYT
-      scrolledSrc: h?.logo?.scrolledSrc,                 // NYT
-      alt: h?.logo?.alt ?? 'Logo',
-      maxWidth: Number(h?.logo?.maxWidth ?? 140),
-    },
-    border: {
-      enabled: !!h?.border?.enabled,
-      widthPx: Number(h?.border?.width ?? 1),
-      color: {
-        h: Number(h?.border?.color?.h ?? 220),
-        s: Number(h?.border?.color?.s ?? 13),
-        l: Number(h?.border?.color?.l ?? 91),
-      },
-      colorHex: h?.border?.colorHex,                     // NYT
-    },
-    topBg: {
-      h: Number(h?.bg?.initial?.h ?? 0),
-      s: Number(h?.bg?.initial?.s ?? 0),
-      l: Number(h?.bg?.initial?.l ?? 100),
-      opacity: Number(h?.bg?.initial?.opacity ?? 0),
-      hex: h?.bg?.initial?.hex,                          // NYT
-    },
-    scrolledBg: {
-      h: Number(h?.bg?.scrolled?.h ?? 210),
-      s: Number(h?.bg?.scrolled?.s ?? 100),
-      l: Number(h?.bg?.scrolled?.l ?? 95),
-      opacity: Number(h?.bg?.scrolled?.opacity ?? 98),
-      hex: h?.bg?.scrolled?.hex,                         // NYT
-    },
-    navLinks: Array.isArray(h?.navLinks) ? h.navLinks : [],
-  };
-}
-
-async function fetchSettings(): Promise<HeaderSettings> {
-  const res = await fetch('/api/pages/header/appearance', { cache: 'no-store' });
-  const json = await res.json();
-  const raw = (json?.ok && json?.data) ? json.data : {};
-  const mapped = apiToHeaderSettings(raw);
-  const safe = normalizeHeader(mapped);
-  return safe;
-}
-
-async function saveSettings(payload: Partial<HeaderSettings>): Promise<{ ok: boolean; error?: string; details?: any }> {
-  const normalized = normalizeHeader(payload);
-  const appearance = headerSettingsToAppearance(normalized);
-
-  const res = await fetch('/api/pages/header/appearance/save', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ appearance }),
+async function saveHeaderAppearance(payload: any) {
+  const r = await fetch("/api/pages/header/appearance/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(payload),
   });
-
-  const json = await res.json();
-  if (!json?.ok) {
-    // Returnér fejl til UI
-    return { ok: false, error: json?.error || 'Save failed', details: json?.details || json?.message };
-  }
-  return { ok: true };
-}
-
-function to01(v: unknown, fb = 1): number {
-  if (typeof v === 'number') {
-    if (v >= 0 && v <= 1) return v;
-    if (v > 1 && v <= 100) return Math.max(0, Math.min(1, v / 100));
-  }
-  return fb;
-}
-
-function normHsl(input: any, fb: HSL): HSL {
-  const h = typeof input?.h === 'number' ? input.h : fb.h;
-  const s = typeof input?.s === 'number' ? input.s : fb.s;
-  const l = typeof input?.l === 'number' ? input.l : fb.l;
-  return { h, s, l };
-}
-
-function normHsla(input: any, fb: HSLA): HSLA {
-  const base = normHsl(input, fb);
-  const opacity = to01(input?.opacity, fb.opacity);
-  return { ...base, opacity };
-}
-
-function normalizeHeader(h: any): HeaderSettings {
-  const overlay = h?.overlay ?? D_HEADER.overlay;
-  const sticky = h?.sticky ?? D_HEADER.sticky;
-  const height = typeof h?.height === 'number' ? h.height : D_HEADER.height;
-  const logo = { 
-    maxWidth: typeof h?.logo?.maxWidth === 'number' ? h.logo.maxWidth : D_HEADER.logo.maxWidth,
-    src: h?.logo?.src,
-    scrolledSrc: h?.logo?.scrolledSrc,
-    alt: h?.logo?.alt,
-  };
-  const linkColor = h?.linkColor ?? D_HEADER.linkColor;
-  const linkColorHex = h?.linkColorHex;
-  const border = {
-    enabled: h?.border?.enabled ?? D_HEADER.border.enabled,
-    width: typeof h?.border?.width === 'number' ? h.border.width : D_HEADER.border.width,
-    color: normHsl(h?.border?.color, D_HEADER.border.color),
-    colorHex: h?.border?.colorHex
-  };
-  const bg = {
-    initial: normHsla(h?.bg?.initial, D_INITIAL),
-    scrolled: normHsla(h?.bg?.scrolled, D_SCROLLED),
-  };
-  const navLinks = Array.isArray(h?.navLinks) && h.navLinks.length ? h.navLinks : D_LINKS;
-  return { overlay, sticky, height, logo, linkColor, linkColorHex, border, bg, navLinks };
+  const j = await r.json();
+  if (!j?.ok) throw new Error(j?.message || "Save failed");
+  return true;
 }
 
 export default function HeaderPage() {
-  const [form, setForm] = useState<HeaderSettings | null>(null);
+  const [form, setForm] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [showToast, setShowToast] = React.useState(false);
-
 
   const load = useCallback(async () => {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const data = await fetchSettings();
+      const data = await loadHeaderAppearance();
       setForm(data);
     } catch (e: any) {
       setErrorMsg('Kunne ikke indlæse header-data.');
@@ -319,65 +98,61 @@ export default function HeaderPage() {
     setSaving(true);
     setErrorMsg(null);
     setSuccessMsg(null);
-    const res = await saveSettings(form);
-    setSaving(false);
-    if (!res.ok) {
-      // Viser både kort fejl og tekstdetaljer hvis tilgængelig
-      const details = typeof res.details === 'string'
-        ? res.details
-        : res.details?.formErrors?.join(', ') || JSON.stringify(res.details, null, 2);
-      setErrorMsg(`${res.error}${details ? ` — ${details}` : ''}`);
-      return;
-    }
-    setSuccessMsg("Gemt! Dine ændringer er nu lagret.");
-    setShowToast(true);
-    // reload settings + auto-hide banner (hvis du bruger banneret også)
     try {
-      const fresh = await fetchSettings();
-      setForm(fresh);
-    } catch {}
-    setTimeout(() => setShowToast(false), 1100);
+        await saveHeaderAppearance(form);
+        setSuccessMsg("Gemt! Dine ændringer er nu lagret.");
+        setTimeout(() => setSuccessMsg(null), 2000);
+    } catch (e: any) {
+        setErrorMsg(e.message || "Fejl under gemning");
+    } finally {
+        setSaving(false);
+    }
   }
+
+  // Global save hook for CMS shell
+  (globalThis as any).__HEADER_SAVE__ = async () => {
+    await handleSave();
+    return true;
+  };
 
   if (loading) return <div className="p-4">Indlæser…</div>;
   if (!form) return <div className="p-4">Ingen data.</div>;
   
   const s = form;
 
-  const setHeader = (patch: Partial<HeaderSettings>) => {
-    setForm((prev) => prev ? normalizeHeader({ ...prev, ...patch }) : null);
+  const setHeader = (patch: Partial<any>) => {
+    setForm((prev: any) => ({ ...prev, ...patch }));
   };
 
   const setBgInitial = (patch: Partial<HSLA>) => {
-    setForm((prev) => prev ? normalizeHeader({ ...prev, bg: { ...prev.bg, initial: { ...prev.bg.initial, ...patch } } }) : null);
+    setForm((prev: any) => ({ ...prev, topBg: { ...(prev.topBg ?? {}), ...patch } }));
   };
 
   const setBgScrolled = (patch: Partial<HSLA>) => {
-    setForm((prev) => prev ? normalizeHeader({ ...prev, bg: { ...prev.bg, scrolled: { ...prev.bg.scrolled, ...patch } } }) : null);
+    setForm((prev: any) => ({ ...prev, scrolledBg: { ...(prev.scrolledBg ?? {}), ...patch } }));
   };
 
-  const setBorder = (patch: Partial<{ enabled: boolean; width: number; color: HSL }>) => {
-    setForm((prev) => prev ? normalizeHeader({ ...prev, border: { ...prev.border, ...patch, color: { ...prev.border.color, ...(patch.color ?? {}) } } }) : null);
+  const setBorder = (patch: Partial<any>) => {
+    setForm((prev: any) => ({ ...prev, border: { ...(prev.border ?? {}), ...patch }}));
   };
 
-  const setLogo = (patch: Partial<{ maxWidth: number }>) => {
-    setForm((prev) => prev ? normalizeHeader({ ...prev, logo: { ...prev.logo, ...patch } }) : null);
+  const setLogo = (patch: Partial<any>) => {
+    setForm((prev: any) => ({ ...prev, logo: { ...(prev.logo ?? {}), ...patch } }));
   };
 
   const setNavLink = (idx: number, field: keyof NavLink, value: string) => {
-    const base = Array.isArray(s.navLinks) ? s.navLinks : D_LINKS;
-    const arr = [...base];
+    const arr = [...(s.navLinks ?? [])];
     arr[idx] = { ...arr[idx], [field]: value };
     setHeader({ navLinks: arr });
   };
 
   const addNavLink = () => {
-    const base = Array.isArray(s.navLinks) ? s.navLinks : D_LINKS;
+    const base = [...(s.navLinks ?? [])];
     setHeader({ navLinks: [...base, { label: 'New Link', href: '#' }] });
   };
 
   const removeNavLink = (idx: number) => {
-    const base = Array.isArray(s.navLinks) ? s.navLinks : D_LINKS;
+    const base = [...(s.navLinks ?? [])];
     setHeader({ navLinks: base.filter((_, i) => i !== idx) });
   };
 
@@ -412,7 +187,8 @@ export default function HeaderPage() {
           </button>
         </div>
       </div>
-      {errorMsg ? <AlertBanner type="error" title="Gem fejlede" message={errorMsg} /> : null}
+      {errorMsg && <div className="p-4 bg-red-100 text-red-800 rounded">{errorMsg}</div>}
+      {successMsg && <div className="p-4 bg-green-100 text-green-800 rounded">{successMsg}</div>}
       
       <div>
         <h1 className="text-2xl font-bold">Header Settings</h1>
@@ -431,7 +207,7 @@ export default function HeaderPage() {
                       type="url"
                       placeholder="https://…/logo.png"
                       value={form?.logo?.src ?? ""}
-                      onChange={(e) => setForm((f: any) => ({ ...f, logo: { ...(f.logo ?? {}), src: e.target.value } }))}
+                      onChange={(e) => setLogo({ src: e.target.value })}
                       className="w-full rounded-md border px-3 py-2"
                     />
                   </div>
@@ -442,30 +218,30 @@ export default function HeaderPage() {
                       type="url"
                       placeholder="https://…/logo-scrolled.png"
                       value={form?.logo?.scrolledSrc ?? ""}
-                      onChange={(e) => setForm((f: any) => ({ ...f, logo: { ...(f.logo ?? {}), scrolledSrc: e.target.value } }))}
+                      onChange={(e) => setLogo({ scrolledSrc: e.target.value })}
                       className="w-full rounded-md border px-3 py-2"
                     />
                   </div>
                 </section>
               <div className="flex items-center justify-between rounded border p-3">
                 <Label>Overlay</Label>
-                <Switch checked={Boolean(s.overlay)} onCheckedChange={(v) => setHeader({ overlay: v })} />
+                <Switch checked={Boolean(s.isOverlay)} onCheckedChange={(v) => setHeader({ isOverlay: v })} />
               </div>
               <div className="flex items-center justify-between rounded border p-3">
                 <Label>Sticky</Label>
-                <Switch checked={Boolean(s.sticky)} onCheckedChange={(v) => setHeader({ sticky: v })} />
+                <Switch checked={Boolean(s.headerIsSticky)} onCheckedChange={(v) => setHeader({ headerIsSticky: v })} />
               </div>
               <div className="rounded border p-3">
                 <Label>Height (px)</Label>
-                <Input type="number" value={s.height ?? 72} onChange={(e) => setHeader({ height: Number(e.target.value) })} />
+                <Input type="number" value={s.headerHeight ?? 72} onChange={(e) => setHeader({ headerHeight: Number(e.target.value) })} />
               </div>
               <div className="rounded border p-3">
                 <Label>Logo max width (px)</Label>
-                <Input type="number" value={s.logo?.maxWidth ?? 140} onChange={(e) => setLogo({ maxWidth: Number(e.target.value) })} />
+                <Input type="number" value={s.headerLogoWidth ?? 140} onChange={(e) => setHeader({ headerLogoWidth: Number(e.target.value) })} />
               </div>
               <div className="rounded border p-3">
                 <Label>Link color</Label>
-                <Select value={s.linkColor ?? 'white'} onValueChange={(v) => setHeader({ linkColor: v as any })}>
+                <Select value={s.headerLinkColor ?? 'white'} onValueChange={(v) => setHeader({ headerLinkColor: v as any })}>
                   <SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="white">White</SelectItem>
@@ -480,8 +256,8 @@ export default function HeaderPage() {
                   <input
                     type="text"
                     placeholder="#111827"
-                    value={form?.linkColorHex ?? ""}
-                    onChange={(e) => setForm((f: any) => ({ ...f, linkColorHex: e.target.value }))}
+                    value={form?.headerLinkColorHex ?? ""}
+                    onChange={(e) => setHeader({ headerLinkColorHex: e.target.value })}
                     className="w-full rounded-md border px-3 py-2"
                     onBlur={(e) => {
                       const v = e.target.value.trim();
@@ -507,11 +283,8 @@ export default function HeaderPage() {
                     <input
                       type="text"
                       placeholder="#FFFFFF"
-                      value={form?.bg?.initial?.hex ?? ""}
-                      onChange={(e) => setForm((f: any) => ({ 
-                        ...f, 
-                        bg: { ...(f.bg ?? {}), initial: { ...(f.bg?.initial ?? {}), hex: e.target.value } } 
-                      }))}
+                      value={form?.topBg?.hex ?? ""}
+                      onChange={(e) => setBgInitial({ hex: e.target.value })}
                       className="w-full rounded-md border px-3 py-2"
                       onBlur={(e) => {
                           const v = e.target.value.trim();
@@ -523,13 +296,13 @@ export default function HeaderPage() {
                     />
                     {(() => {
                       const eff = effectiveColorHex({
-                        hex: form?.bg?.initial?.hex,
-                        h: form?.bg?.initial?.h,
-                        s: form?.bg?.initial?.s,
-                        l: form?.bg?.initial?.l,
-                        opacity: form?.bg?.initial?.opacity
+                        hex: form?.topBg?.hex,
+                        h: form?.topBg?.h,
+                        s: form?.topBg?.s,
+                        l: form?.topBg?.l,
+                        opacity: form?.topBg?.opacity
                       });
-                      const label = form?.bg?.initial?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
+                      const label = form?.topBg?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
                       return (
                         <div className="flex items-center gap-3 mt-2">
                           <div className="w-8 h-5 rounded border" style={{ background: eff ?? "transparent" }} />
@@ -540,13 +313,7 @@ export default function HeaderPage() {
                             type="button"
                             onClick={() => {
                               const next = eff ?? "#FFFFFF";
-                              setForm((f: any) => ({
-                                ...f,
-                                bg: {
-                                  ...(f.bg ?? {}),
-                                  initial: { ...(f.bg?.initial ?? {}), hex: next }
-                                }
-                              }));
+                              setBgInitial({ hex: next });
                             }}
                             className="ml-auto rounded-md border px-2 py-1 text-sm"
                             title="Kopier effektiv farve til HEX-feltet"
@@ -558,12 +325,12 @@ export default function HeaderPage() {
                     })()}
                   </div>
                 <Label>H</Label>
-                <Input type="number" value={s.bg.initial.h} onChange={(e) => setBgInitial({ h: Number(e.target.value) })} />
+                <Input type="number" value={s.topBg.h} onChange={(e) => setBgInitial({ h: Number(e.target.value) })} />
                 <Label>S</Label>
-                <Input type="number" value={s.bg.initial.s} onChange={(e) => setBgInitial({ s: Number(e.target.value) })} />
+                <Input type="number" value={s.topBg.s} onChange={(e) => setBgInitial({ s: Number(e.target.value) })} />
                 <Label>L</Label>
-                <Input type="number" value={s.bg.initial.l} onChange={(e) => setBgInitial({ l: Number(e.target.value) })} />
-                <OpacitySlider label="Opacity" value01={s.bg.initial.opacity} onChange01={(v) => setBgInitial({ opacity: v })} />
+                <Input type="number" value={s.topBg.l} onChange={(e) => setBgInitial({ l: Number(e.target.value) })} />
+                <OpacitySlider label="Opacity" value01={(s.topBg.opacity ?? 0) / 100} onChange01={(v) => setBgInitial({ opacity: v * 100 })} />
               </div>
 
               <div className="rounded border p-3 space-y-3">
@@ -573,11 +340,8 @@ export default function HeaderPage() {
                     <input
                       type="text"
                       placeholder="#FFFFFF"
-                      value={form?.bg?.scrolled?.hex ?? ""}
-                      onChange={(e) => setForm((f: any) => ({ 
-                        ...f, 
-                        bg: { ...(f.bg ?? {}), scrolled: { ...(f.bg?.scrolled ?? {}), hex: e.target.value } } 
-                      }))}
+                      value={form?.scrolledBg?.hex ?? ""}
+                      onChange={(e) => setBgScrolled({ hex: e.target.value })}
                       className="w-full rounded-md border px-3 py-2"
                        onBlur={(e) => {
                           const v = e.target.value.trim();
@@ -589,13 +353,13 @@ export default function HeaderPage() {
                     />
                      {(() => {
                       const eff = effectiveColorHex({
-                        hex: form?.bg?.scrolled?.hex,
-                        h: form?.bg?.scrolled?.h,
-                        s: form?.bg?.scrolled?.s,
-                        l: form?.bg?.scrolled?.l,
-                        opacity: form?.bg?.scrolled?.opacity
+                        hex: form?.scrolledBg?.hex,
+                        h: form?.scrolledBg?.h,
+                        s: form?.scrolledBg?.s,
+                        l: form?.scrolledBg?.l,
+                        opacity: form?.scrolledBg?.opacity
                       });
-                      const label = form?.bg?.scrolled?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
+                      const label = form?.scrolledBg?.hex ? "Kilde: HEX" : "Kilde: HSL (fallback)";
                       return (
                         <div className="flex items-center gap-3 mt-2">
                           <div className="w-8 h-5 rounded border" style={{ background: eff ?? "transparent" }} />
@@ -606,13 +370,7 @@ export default function HeaderPage() {
                             type="button"
                             onClick={() => {
                               const next = eff ?? "#FFFFFF";
-                              setForm((f: any) => ({
-                                ...f,
-                                bg: {
-                                  ...(f.bg ?? {}),
-                                  scrolled: { ...(f.bg?.scrolled ?? {}), hex: next }
-                                }
-                              }));
+                              setBgScrolled({ hex: next });
                             }}
                             className="ml-auto rounded-md border px-2 py-1 text-sm"
                             title="Kopier effektiv farve til HEX-feltet"
@@ -624,12 +382,12 @@ export default function HeaderPage() {
                     })()}
                   </div>
                 <Label>H</Label>
-                <Input type="number" value={s.bg.scrolled.h} onChange={(e) => setBgScrolled({ h: Number(e.target.value) })} />
+                <Input type="number" value={s.scrolledBg.h} onChange={(e) => setBgScrolled({ h: Number(e.target.value) })} />
                 <Label>S</Label>
-                <Input type="number" value={s.bg.scrolled.s} onChange={(e) => setBgScrolled({ s: Number(e.target.value) })} />
+                <Input type="number" value={s.scrolledBg.s} onChange={(e) => setBgScrolled({ s: Number(e.target.value) })} />
                 <Label>L</Label>
-                <Input type="number" value={s.bg.scrolled.l} onChange={(e) => setBgScrolled({ l: Number(e.target.value) })} />
-                <OpacitySlider label="Opacity" value01={s.bg.scrolled.opacity} onChange01={(v) => setBgScrolled({ opacity: v })} />
+                <Input type="number" value={s.scrolledBg.l} onChange={(e) => setBgScrolled({ l: Number(e.target.value) })} />
+                <OpacitySlider label="Opacity" value01={(s.scrolledBg.opacity ?? 0) / 100} onChange01={(v) => setBgScrolled({ opacity: v * 100 })} />
               </div>
             </div>
           </AccordionContent>
@@ -645,7 +403,7 @@ export default function HeaderPage() {
               </div>
               <div className="rounded border p-3">
                 <Label>Width (px)</Label>
-                <Input type="number" value={s.border.width} onChange={(e) => setBorder({ width: Number(e.target.value) })} />
+                <Input type="number" value={s.border.widthPx} onChange={(e) => setBorder({ widthPx: Number(e.target.value) })} />
               </div>
               <div className="rounded border p-3 space-y-3">
                  <div className="space-y-2">
@@ -654,10 +412,7 @@ export default function HeaderPage() {
                     type="text"
                     placeholder="#000000"
                     value={form?.border?.colorHex ?? ""}
-                    onChange={(e) => setForm((f: any) => ({ 
-                      ...f, 
-                      border: { ...(f.border ?? {}), colorHex: e.target.value } 
-                    }))}
+                    onChange={(e) => setBorder({ colorHex: e.target.value })}
                     className="w-full rounded-md border px-3 py-2"
                      onBlur={(e) => {
                         const v = e.target.value.trim();
@@ -683,7 +438,7 @@ export default function HeaderPage() {
           <AccordionTrigger>Navigation links</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
-              {(s.navLinks ?? D_LINKS).map((lnk, i) => (
+              {(s.navLinks ?? []).map((lnk: NavLink, i: number) => (
                 <div key={i} className="grid grid-cols-1 gap-2 md:grid-cols-3 items-center rounded border p-3">
                   <Input value={lnk.label} onChange={(e) => setNavLink(i, 'label', e.target.value)} placeholder="Label" />
                   <Input value={lnk.href} onChange={(e) => setNavLink(i, 'href', e.target.value)} placeholder="Href" />
@@ -697,7 +452,6 @@ export default function HeaderPage() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-      {showToast ? <Toast text="Gemt ✔" /> : null}
     </div>
   );
 }

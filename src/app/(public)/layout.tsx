@@ -8,13 +8,17 @@ import { getGeneralSettings } from "@/services/settings";
 import type { Brand } from "@/types/settings";
 import FooterClient from "@/components/layout/FooterClient";
 import Template from "./template";
-import SiteHeader from "@/components/site/Header";
+import SiteHeader from "@/components/site/SiteHeader";
+import { getHeaderAppearance } from "@/lib/server/header";
 
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
   noStore();
 
-  const settings = await getGeneralSettings();
+  const [settings, headerAppearance] = await Promise.all([
+    getGeneralSettings(),
+    getHeaderAppearance()
+  ]);
 
   const publicBrand: Brand = {
     id: "public-page-brand",
@@ -43,7 +47,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
         <Template settings={settings}>
-            <SiteHeader />
+            <SiteHeader appearance={headerAppearance} />
             <main className="flex-1">{children}</main>
             {(footerTheme.enabled ?? true) && (
                 <Suspense fallback={<footer></footer>}>
