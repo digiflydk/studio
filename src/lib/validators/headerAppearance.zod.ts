@@ -59,6 +59,12 @@ export const HeaderAppearanceSchema = z.object({
 
   topBg: BgPart.default({ h: 0, s: 0, l: 100, opacity: 0 }),
   scrolledBg: BgPart.default({ h: 210, s: 100, l: 95, opacity: 98 }),
+  
+  bg: z.object({
+    initial: BgPart.optional(),
+    scrolled: BgPart.optional()
+  }).optional(),
+
 
   navLinks: z.array(z.any()).default([]),
 }).transform((a) => {

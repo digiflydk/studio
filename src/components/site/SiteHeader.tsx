@@ -1,3 +1,4 @@
+
 // src/components/site/Header.tsx
 "use client";
 
@@ -7,6 +8,7 @@ import SiteContainer from "@/components/ui/SiteContainer";
 import { resolveBgColor } from "@/lib/colors/resolveColor";
 import type { GeneralSettings } from "@/types/settings";
 import MobileDrawer from "@/components/site/MobileDrawer";
+import { pickBgCss } from "@/lib/color/hex";
 
 export default function SiteHeader({ appearance }: { appearance: any }) {
   const FALLBACK_LOGO = `data:image/svg+xml;utf8,` +
@@ -38,19 +40,34 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
       []
     );
   }, [appearance, settings]);
-
-  const bgConf = scrolled ? appearance?.scrolledBg : appearance?.topBg;
-  const bgColor = resolveBgColor({
-    hex: bgConf?.hex,
-    hsl: { h: bgConf?.h, s: bgConf?.s, l: bgConf?.l },
-    opacity: bgConf?.opacity != null ? bgConf.opacity / 100 : 1,
+  
+  const topBgCss = pickBgCss({
+    hex: appearance?.topBg?.hex,
+    h: appearance?.topBg?.h,
+    s: appearance?.topBg?.s,
+    l: appearance?.topBg?.l,
+    opacity: (appearance?.topBg?.opacity ?? 100) / 100,
   });
 
-  const borderColor = resolveBgColor({
+  const scrolledBgCss = pickBgCss({
+    hex: appearance?.scrolledBg?.hex,
+    h: appearance?.scrolledBg?.h,
+    s: appearance?.scrolledBg?.s,
+    l: appearance?.scrolledBg?.l,
+    opacity: (appearance?.scrolledBg?.opacity ?? 100) / 100,
+  });
+
+  const borderCss = pickBgCss({
     hex: appearance?.border?.colorHex,
-    hsl: appearance?.border?.color,
-    opacity: 1,
+    h: appearance?.border?.color?.h,
+    s: appearance?.border?.color?.s,
+    l: appearance?.border?.color?.l,
+    opacity: (appearance?.border?.color?.opacity ?? 100) / 100,
   });
+
+
+  const bgColor = scrolled ? scrolledBgCss : topBgCss;
+
   const borderEnabled = !!appearance?.border?.enabled;
   const borderWidth = appearance?.border?.widthPx ?? 1;
 
@@ -70,8 +87,8 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
       className="sticky top-0 z-[100] w-full border-b"
        style={{
         height: appearance?.headerHeight ?? 80,
-        background: bgColor ?? "transparent",
-        borderBottom: borderEnabled ? `${borderWidth}px solid ${borderColor ?? "transparent"}` : "none",
+        background: bgColor,
+        borderBottom: borderEnabled ? `${borderWidth}px solid ${borderCss}` : "none",
       }}
     >
       <SiteContainer>

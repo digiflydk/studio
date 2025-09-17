@@ -251,14 +251,11 @@ export default function HeaderCmsPage() {
                             type="text"
                             placeholder="#ffffff"
                             className="w-full rounded border bg-background px-3 py-2 text-sm"
-                            value={form?.bg?.initial?.hex ?? ""}
+                            value={form?.topBg?.hex ?? ""}
                             onChange={(e) =>
                               setForm((f: any) => ({
                                 ...f,
-                                bg: { 
-                                  ...(f.bg ?? {}), 
-                                  initial: { ...(f.bg?.initial ?? {}), hex: e.target.value } 
-                                },
+                                topBg: { ...(f.topBg ?? {}), hex: e.target.value }
                               }))
                             }
                           />
@@ -312,14 +309,11 @@ export default function HeaderCmsPage() {
                             type="text"
                             placeholder="#ffffff"
                             className="w-full rounded border bg-background px-3 py-2 text-sm"
-                            value={form?.bg?.scrolled?.hex ?? ""}
+                            value={form?.scrolledBg?.hex ?? ""}
                             onChange={(e) =>
                               setForm((f: any) => ({
                                 ...f,
-                                bg: { 
-                                  ...(f.bg ?? {}), 
-                                  scrolled: { ...(f.bg?.scrolled ?? {}), hex: e.target.value } 
-                                },
+                                scrolledBg: { ...(f.scrolledBg ?? {}), hex: e.target.value } 
                               }))
                             }
                           />
