@@ -3,16 +3,16 @@ import { z } from "zod";
 // Helper: coerce number (accept både string og number)
 const zNum = z.coerce.number();
 
-// Acceptér simple hex-strenge som "#RRGGBB" eller "#RRGGBBAA"
-const zHex = z.string().regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, { message: "Invalid hex color" });
+// Acceptér simple hex-strenge som "#RRGGBB" eller "#RRGGBBAA" eller "#RGB"
+const zHex = z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, { message: "Invalid hex color" }).optional();
+
 
 const BorderSchema = z.object({
   enabled: z.boolean().optional(),
   visible: z.boolean().optional(),
   widthPx: zNum.optional(),
   width: zNum.optional(),
-  // NYT: valgfri hex-farve
-  colorHex: zHex.optional(),
+  colorHex: zHex,
   color: z.object({
     h: zNum.default(220),
     s: zNum.default(13),
@@ -30,8 +30,7 @@ const BgPart = z.object({
   s: zNum.default(0),
   l: zNum.default(100),
   opacity: zNum.default(0),
-  // NYT: valgfri hex-farve
-  hex: zHex.optional(),
+  hex: zHex,
 });
 
 export const HeaderAppearanceSchema = z.object({
@@ -42,7 +41,7 @@ export const HeaderAppearanceSchema = z.object({
 
   // Link color – både tekst og hex
   headerLinkColor: z.string().default("white"),
-  headerLinkColorHex: zHex.optional(), // NYT
+  headerLinkColorHex: zHex, // NYT
 
   link: z.object({ color: z.string().optional(), hex: z.string().optional() }).partial().optional(),
 

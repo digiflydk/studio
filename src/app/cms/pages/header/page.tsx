@@ -245,21 +245,25 @@ export default function HeaderCmsPage() {
                   <div className="rounded border p-3 space-y-3">
                     <div className="font-medium">Normal</div>
                      <div className="space-y-2">
-                        <label className="font-medium">Normal Background (HEX)</label>
-                        <input
-                          type="text"
-                          placeholder="#FFFFFF"
-                          value={form?.topBg?.hex ?? ""}
-                          onChange={(e) => setBgInitial({ hex: e.target.value })}
-                          className="w-full rounded-md border px-3 py-2"
-                          onBlur={(e) => {
-                              const v = e.target.value.trim();
-                              if (v && !v.startsWith("#")) {
-                                e.target.value = `#${v}`;
-                                e.target.dispatchEvent(new Event("input", { bubbles: true }));
-                              }
-                          }}
-                        />
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium">Baggrund (normal) – HEX</label>
+                          <input
+                            type="text"
+                            placeholder="#ffffff"
+                            className="w-full rounded border bg-background px-3 py-2 text-sm"
+                            value={form?.bg?.initial?.hex ?? ""}
+                            onChange={(e) =>
+                              setForm((f: any) => ({
+                                ...f,
+                                bg: { 
+                                  ...(f.bg ?? {}), 
+                                  initial: { ...(f.bg?.initial ?? {}), hex: e.target.value } 
+                                },
+                              }))
+                            }
+                          />
+                          <p className="text-xs text-muted-foreground">Brug HEX. Hvis udfyldt, har den højere prioritet end HSL.</p>
+                        </div>
                         {(() => {
                           const eff = effectiveColorHex({
                             hex: form?.topBg?.hex,
@@ -302,21 +306,24 @@ export default function HeaderCmsPage() {
                   <div className="rounded border p-3 space-y-3">
                     <div className="font-medium">Scrolled</div>
                     <div className="space-y-2">
-                        <label className="font-medium">Scrolled Background (HEX)</label>
-                        <input
-                          type="text"
-                          placeholder="#FFFFFF"
-                          value={form?.scrolledBg?.hex ?? ""}
-                          onChange={(e) => setBgScrolled({ hex: e.target.value })}
-                          className="w-full rounded-md border px-3 py-2"
-                           onBlur={(e) => {
-                              const v = e.target.value.trim();
-                              if (v && !v.startsWith("#")) {
-                                e.target.value = `#${v}`;
-                                e.target.dispatchEvent(new Event("input", { bubbles: true }));
-                              }
-                           }}
-                        />
+                        <div className="space-y-1">
+                          <label className="block text-sm font-medium">Baggrund (scrolled) – HEX</label>
+                          <input
+                            type="text"
+                            placeholder="#ffffff"
+                            className="w-full rounded border bg-background px-3 py-2 text-sm"
+                            value={form?.bg?.scrolled?.hex ?? ""}
+                            onChange={(e) =>
+                              setForm((f: any) => ({
+                                ...f,
+                                bg: { 
+                                  ...(f.bg ?? {}), 
+                                  scrolled: { ...(f.bg?.scrolled ?? {}), hex: e.target.value } 
+                                },
+                              }))
+                            }
+                          />
+                        </div>
                          {(() => {
                           const eff = effectiveColorHex({
                             hex: form?.scrolledBg?.hex,
@@ -372,22 +379,21 @@ export default function HeaderCmsPage() {
                     <Input type="number" value={s.border.widthPx} onChange={(e) => setBorder({ widthPx: Number(e.target.value) })} />
                   </div>
                   <div className="rounded border p-3 space-y-3">
-                     <div className="space-y-2">
-                      <label className="font-medium">Border color (HEX)</label>
+                     <div className="space-y-1">
+                      <label className="block text-sm font-medium">Border – HEX</label>
                       <input
                         type="text"
                         placeholder="#000000"
+                        className="w-full rounded border bg-background px-3 py-2 text-sm"
                         value={form?.border?.colorHex ?? ""}
-                        onChange={(e) => setBorder({ colorHex: e.target.value })}
-                        className="w-full rounded-md border px-3 py-2"
-                         onBlur={(e) => {
-                            const v = e.target.value.trim();
-                            if (v && !v.startsWith("#")) {
-                              e.target.value = `#${v}`;
-                              e.target.dispatchEvent(new Event("input", { bubbles: true }));
-                            }
-                         }}
+                        onChange={(e) =>
+                          setForm((f: any) => ({
+                            ...f,
+                            border: { ...(f.border ?? {}), colorHex: e.target.value },
+                          }))
+                        }
                       />
+                      <p className="text-xs text-muted-foreground">Bruges hvis sat; ellers falder vi tilbage til HSL-farven.</p>
                     </div>
                     <Label>Color H</Label>
                     <Input type="number" value={s.border.color.h} onChange={(e) => setBorder({ color: { ...s.border.color, h: Number(e.target.value) } })} />
@@ -422,4 +428,3 @@ export default function HeaderCmsPage() {
     </div>
   );
 }
-

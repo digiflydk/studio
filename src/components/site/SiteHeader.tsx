@@ -1,10 +1,11 @@
-
 // src/components/site/Header.tsx
 "use client";
 
 import * as React from "react";
-import { computeHeaderStyles } from "@/services/header";
+import { getGeneralSettings } from "@/services/settings";
 import SiteContainer from "@/components/ui/SiteContainer";
+import { resolveBgColor } from "@/lib/colors/resolveColor";
+import type { GeneralSettings } from "@/types/settings";
 
 export default function SiteHeader({ appearance }: { appearance: any }) {
   const FALLBACK_LOGO = `data:image/svg+xml;utf8,` +
@@ -14,6 +15,42 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
 </svg>`);
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [settings, setSettings] = React.useState<GeneralSettings | null>(null);
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    getGeneralSettings().then(setSettings);
+
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const bgConf = scrolled ? appearance?.scrolledBg : appearance?.topBg;
+  const bgColor = resolveBgColor({
+    hex: bgConf?.hex,
+    hsl: { h: bgConf?.h, s: bgConf?.s, l: bgConf?.l },
+    opacity: bgConf?.opacity != null ? bgConf.opacity / 100 : 1,
+  });
+
+  const borderColor = resolveBgColor({
+    hex: appearance?.border?.colorHex,
+    hsl: appearance?.border?.color,
+    opacity: 1,
+  });
+  const borderEnabled = !!appearance?.border?.enabled;
+  const borderWidth = appearance?.border?.widthPx ?? 1;
+
+  const logoNormal = settings?.logoUrl;
+  const logoScroll = (settings as any)?.headerLogoScrollUrl;
+  const logoSrc = scrolled && logoScroll ? logoScroll : logoNormal;
+  
+  const links = appearance?.navLinks ?? [];
+  const linkColor = appearance?.headerLinkColorHex ?? appearance?.headerLinkColor ?? "white";
+
 
   // Lås body scroll når mobilmenu er åben
   React.useEffect(() => {
@@ -31,53 +68,28 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const styles = React.useMemo(() => computeHeaderStyles(appearance), [appearance]);
-  const links = appearance?.navLinks ?? [];
   const headerCta = appearance?.cta;
-
-  const [activeLogoSrc, setActiveLogoSrc] = React.useState<string>(styles.logoSrc ?? FALLBACK_LOGO);
-  const [logoOk, setLogoOk] = React.useState(true); // Antager logo virker, indtil det modsatte er bevist
-
-  React.useEffect(() => {
-    const el = document.getElementById("site-header");
-    if (!el) return;
-
-    const onScroll = () => {
-      const y = window.scrollY || 0;
-      const isScrolled = y > 10;
-      const bg = isScrolled ? styles.scrolledBg : (styles.root.background as string);
-      el.style.background = bg;
-      el.style.backgroundColor = bg; // sikrer solid farve
-      setActiveLogoSrc(isScrolled ? (styles.logoScrolledSrc ?? styles.logoSrc ?? FALLBACK_LOGO) : (styles.logoSrc ?? FALLBACK_LOGO));
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [styles]);
 
   return (
     <>
     <header
       id="site-header"
       className="sticky top-0 z-[100] w-full border-b"
-      style={styles.root}
+       style={{
+        height: appearance?.headerHeight ?? 80,
+        background: bgColor ?? "transparent",
+        borderBottom: borderEnabled ? `${borderWidth}px solid ${borderColor ?? "transparent"}` : "none",
+      }}
     >
       <SiteContainer>
         <div className="flex h-full items-center justify-between gap-3">
           {/* Logo */}
-          <a href="/" className="block shrink-0" aria-label={styles.logoAlt}>
+          <a href="/" className="block shrink-0" aria-label={appearance?.logo?.alt ?? 'Logo'}>
             <img
-              src={activeLogoSrc}
-              alt={styles.logoAlt}
+              src={logoSrc || FALLBACK_LOGO}
+              alt={appearance?.logo?.alt ?? 'Logo'}
               className="block object-contain"
-              style={{ maxWidth: styles.logoMaxWidth, height: "auto" }}
-              onError={() => {
-                if (logoOk) { // Undgå uendeligt loop
-                  setLogoOk(false);
-                  setActiveLogoSrc(FALLBACK_LOGO);
-                }
-              }}
+              style={{ maxWidth: appearance?.headerLogoWidth ?? 140, height: "auto" }}
             />
           </a>
 
@@ -89,7 +101,7 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
                   <a
                     href={l.href}
                     className="inline-flex items-center font-medium"
-                    style={{ color: styles.linkColor }}
+                    style={{ color: linkColor }}
                   >
                     {l.label}
                   </a>

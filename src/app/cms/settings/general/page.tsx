@@ -147,17 +147,19 @@ export default function GeneralSettingsPage() {
                 <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels. PNG med transparent baggrund foretrækkes.</p>
              </div>
 
-            {/* Scrolled logo URL (NYT) */}
-            <div className="space-y-2">
-              <label className="font-medium">Scrolled logo URL</label>
+            {/* Header logo (scroll) URL */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium">Header logo (scroll) URL</label>
               <input
                 type="url"
-                placeholder="https://…/logo-scrolled.png"
-                value={form?.logoScrolledUrl ?? ""}
-                onChange={(e) => setForm((f: any) => ({ ...f, logoScrolledUrl: e.target.value }))}
-                className="w-full rounded-md border px-3 py-2"
+                placeholder="https://..."
+                className="w-full rounded border bg-background px-3 py-2 text-sm"
+                value={(form as any)?.headerLogoScrollUrl ?? ""}
+                onChange={(e) =>
+                  setForm((s: any) => ({ ...s, headerLogoScrollUrl: e.target.value }))
+                }
               />
-              <p className="text-xs text-muted-foreground">Bruges når headeren er scrollet (fallback hvis CMS Header ikke sætter sit eget).</p>
+              <p className="text-xs text-muted-foreground">Bruges når header er scrollet. Hvis tom, bruges standard-logo.</p>
             </div>
 
              <div className="space-y-2">
