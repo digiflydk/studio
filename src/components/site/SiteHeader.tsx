@@ -6,6 +6,7 @@ import { getGeneralSettings } from "@/services/settings";
 import SiteContainer from "@/components/ui/SiteContainer";
 import { resolveBgColor } from "@/lib/colors/resolveColor";
 import type { GeneralSettings } from "@/types/settings";
+import MobileDrawer from "@/components/site/MobileDrawer";
 
 export default function SiteHeader({ appearance }: { appearance: any }) {
   const FALLBACK_LOGO = `data:image/svg+xml;utf8,` +
@@ -29,6 +30,15 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const navLinks = React.useMemo(() => {
+    return (
+      appearance?.navLinks ??
+      settings?.headerNavLinks ??
+      (settings as any)?.general?.headerNavLinks ??
+      []
+    );
+  }, [appearance, settings]);
+
   const bgConf = scrolled ? appearance?.scrolledBg : appearance?.topBg;
   const bgColor = resolveBgColor({
     hex: bgConf?.hex,
@@ -48,25 +58,8 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
   const logoScroll = (settings as any)?.headerLogoScrollUrl;
   const logoSrc = scrolled && logoScroll ? logoScroll : logoNormal;
   
-  const links = appearance?.navLinks ?? [];
   const linkColor = appearance?.headerLinkColorHex ?? appearance?.headerLinkColor ?? "white";
 
-
-  // Lås body scroll når mobilmenu er åben
-  React.useEffect(() => {
-    if (mobileOpen) {
-      const orig = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = orig; };
-    }
-  }, [mobileOpen]);
-
-  // Luk med ESC
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   const headerCta = appearance?.cta;
 
@@ -93,96 +86,45 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
             />
           </a>
 
-          {/* Desktop-nav (skjules på mobil) */}
-          <nav className="ml-auto hidden md:block" aria-label="Hovedmenu">
-            <ul className="flex items-center gap-8">
-              {links?.map((l: any) => (
-                <li key={`${l.href}-${l.label}`}>
-                  <a
-                    href={l.href}
-                    className="inline-flex items-center font-medium"
-                    style={{ color: linkColor }}
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+           {/* HØJRE: CTA + NAV */}
+          <div className="flex items-center gap-4">
 
-          {/* Mobil: Hamburger (kun < md) */}
-          <button
-            type="button"
-            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border hover:bg-muted"
-            aria-label="Åbn menu"
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
+            {/* Desktop nav (skjules på mobil) */}
+            <nav className="hidden md:block">
+                <ul className="flex items-center gap-6">
+                {navLinks?.map((l: any, i: number) => (
+                    <li key={`${l.href}-${i}`}>
+                    <a href={l.href} className="text-sm hover:opacity-80" style={{ color: linkColor }}>
+                        {l.label}
+                    </a>
+                    </li>
+                ))}
+                </ul>
+            </nav>
+
+            {/* Mobil hamburger (vises på md- og nedefter) */}
+            <button
+                type="button"
+                className="md:hidden rounded p-2 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Åbn mobilmenu"
+                aria-expanded={mobileOpen}
+                onClick={() => setMobileOpen(true)}
+            >
+                <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style={{ color: linkColor }}>
+                <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+            </button>
+          </div>
         </div>
       </SiteContainer>
     </header>
 
-    {/* ==== MOBIL DRAWER (slide-in fra højre) ==== */}
-    <div
-      className={`fixed inset-0 z-[101] bg-black/40 transition-opacity duration-200 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      onClick={() => setMobileOpen(false)}
-      aria-hidden={!mobileOpen}
-    />
-
-    <aside
-      className={`fixed right-0 top-0 z-[102] h-dvh w-[80vw] max-w-[360px] bg-white shadow-xl transition-transform duration-300
-      ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Mobilmenu"
-    >
-      <div className="flex h-14 items-center justify-between border-b px-4">
-        <span className="text-sm font-semibold">Menu</span>
-        <button
-          type="button"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border hover:bg-muted"
-          onClick={() => setMobileOpen(false)}
-          aria-label="Luk menu"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
-      </div>
-
-      <nav className="px-4 py-3" aria-label="Mobil navigation">
-        <ul className="space-y-1">
-          {links?.map((l: any) => (
-            <li key={`m-${l.href}-${l.label}`}>
-              <a
-                href={l.href}
-                className="block rounded-md px-3 py-3 text-base font-medium hover:bg-muted"
-                onClick={() => setMobileOpen(false)}
-                style={{ color: "#111827" }} // Mobilmenu links er altid mørke
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {headerCta?.enabled && (
-        <div className="mt-auto px-4 pb-4 pt-2">
-          <a
-            href={headerCta?.href}
-            className="inline-flex w-full items-center justify-center rounded-md border px-4 py-3 text-base font-semibold hover:bg-muted"
-            onClick={() => setMobileOpen(false)}
-          >
-            {headerCta?.label ?? "Book et møde"}
-          </a>
-        </div>
-      )}
-    </aside>
+    <MobileDrawer
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        navLinks={navLinks}
+        title="Menu"
+      />
     </>
   );
 }
