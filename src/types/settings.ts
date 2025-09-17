@@ -186,6 +186,7 @@ export interface GeneralSettings {
     websiteTitle?: string;
     logoUrl?: string;
     logoAlt?: string;
+    logoScrolledUrl?: string;
     faviconUrl?: string;
     companyName?: string;
     streetAddress?: string;

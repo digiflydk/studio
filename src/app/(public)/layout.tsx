@@ -47,7 +47,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
         <Template settings={settings}>
-            <SiteHeader appearance={headerAppearance} />
+            <SiteHeader appearance={headerAppearance} settings={settings} />
             <main className="flex-1">{children}</main>
             {(footerTheme.enabled ?? true) && (
                 <Suspense fallback={<footer></footer>}>

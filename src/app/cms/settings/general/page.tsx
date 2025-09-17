@@ -26,6 +26,32 @@ const initialOpeningHours = weekDays.reduce((acc, day) => {
   return acc;
 }, {} as Record<string, OpeningTime>);
 
+function TextField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value?: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium mb-1">{label}</span>
+      <input
+        type="url"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-md border px-3 py-2"
+      />
+    </label>
+  );
+}
+
+
 export default function GeneralSettingsPage() {
     const [form, setForm] = useState<Partial<GeneralSettings>>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -134,33 +160,21 @@ export default function GeneralSettingsPage() {
           <div className="space-y-6">
              <div className="space-y-4">
                 <Label>Logo</Label>
-                {form.logoUrl && (
-                    <div className="relative w-48 h-12 bg-muted rounded-md p-2 flex items-center justify-center">
-                        <Image src={form.logoUrl} alt={form.logoAlt || 'Logo preview'} fill style={{objectFit: 'contain'}} />
-                         <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white" onClick={() => removeImage('logo')}>
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )}
-                <Input id="logo-url" placeholder="Indsæt URL til logo billede" value={form.logoUrl || ''} onChange={e => handleInputChange('logoUrl', e.target.value)} />
+                <TextField
+                  label="Logo (normal) – URL"
+                  value={form.logoUrl}
+                  onChange={(v) => setForm((s: any) => ({ ...s, logoUrl: v }))}
+                  placeholder="https://..."
+                />
+                <TextField
+                  label="Logo (scrolled) – URL"
+                  value={form.logoScrolledUrl}
+                  onChange={(v) => setForm((s: any) => ({ ...s, logoScrolledUrl: v }))}
+                  placeholder="https://..."
+                />
                 <Input id="logo-alt" placeholder="Alt text for logo" value={form.logoAlt || ''} onChange={e => handleInputChange('logoAlt', e.target.value)} />
                 <p className="text-sm text-muted-foreground">Anbefalet størrelse: 200x50 pixels. PNG med transparent baggrund foretrækkes.</p>
              </div>
-
-            {/* Header logo (scroll) URL */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium">Header logo (scroll) URL</label>
-              <input
-                type="url"
-                placeholder="https://..."
-                className="w-full rounded border bg-background px-3 py-2 text-sm"
-                value={(form as any)?.headerLogoScrollUrl ?? ""}
-                onChange={(e) =>
-                  setForm((s: any) => ({ ...s, headerLogoScrollUrl: e.target.value }))
-                }
-              />
-              <p className="text-xs text-muted-foreground">Bruges når header er scrollet. Hvis tom, bruges standard-logo.</p>
-            </div>
 
              <div className="space-y-2">
                 <Label>Favicon</Label>

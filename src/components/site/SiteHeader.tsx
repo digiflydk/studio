@@ -1,28 +1,47 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import MobileMenu from "@/components/site/MobileMenu";
 import IconButton from "@/components/ui/IconButton";
-import { cn } from "@/lib/utils";
+import { getGeneralSettings } from "@/services/settings";
+import { getHeaderAppearance } from "@/lib/server/header";
 
-export default function SiteHeader({ header }: { header: any }) {
-  const navLinks = header?.appearance?.navLinks ?? [];
-  const cta = header?.cta ?? header?.appearance?.cta ?? undefined; // støtter begge
-  const linkColor = header?.appearance?.headerLinkColor === "white" ? "text-white" : "text-black";
-
+export default function SiteHeader({ appearance, settings }: { appearance: any, settings: any }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 10);
-    }
+    const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // 1) Primært fra settings/general
+  const sgLogo = settings?.logoUrl as string | undefined;
+  const sgLogoScrolled = settings?.logoScrolledUrl as string | undefined;
+  const sgAlt = settings?.logoAlt ?? "Logo";
+
+  // 2) Fallback fra cms/pages/header
+  const cmsLogo = appearance?.logo?.src || appearance?.logoUrl;
+  const cmsAlt = appearance?.logo?.alt || settings?.logoAlt || "Logo";
+
+  const chosenLogo = scrolled
+    ? sgLogoScrolled || sgLogo || cmsLogo
+    : sgLogo || cmsLogo;
+  
+  const navLinks = appearance?.navLinks ?? [];
+  const cta = appearance?.cta ?? undefined;
+  const linkColor = appearance?.headerLinkColor === "white" ? "text-white" : "text-black";
+
+  const maxW =
+    appearance?.headerLogoWidth ??
+    settings?.headerLogoWidth ??
+    150;
+  
   return (
     <>
       <header
@@ -33,12 +52,11 @@ export default function SiteHeader({ header }: { header: any }) {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left: Logo */}
           <Link href="/" className="shrink-0 inline-flex items-center gap-2">
-            {/* Din eksisterende logo-rendering her */}
-            <img
-              src={header?.appearance?.logo?.src || header?.logoUrl}
-              alt={header?.appearance?.logo?.alt || "Logo"}
-              style={{ maxWidth: header?.appearance?.headerLogoWidth ?? 150, height: "auto" }}
-            />
+             {chosenLogo ? (
+                <img src={chosenLogo} alt={sgAlt || cmsAlt} style={{ maxWidth: maxW, height: "auto" }} />
+             ) : (
+                <span className="text-base font-semibold">Logo</span>
+             )}
           </Link>
 
           {/* Center: Desktop nav */}

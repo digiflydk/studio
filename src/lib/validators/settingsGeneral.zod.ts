@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Hjælpere
@@ -43,6 +44,8 @@ export const SettingsGeneralSchema = z.object({
   flags: z.record(z.string(), zBool).optional(),
 
   // NYT: extra logo til scroll
+  logoUrl: z.string().url().optional(),
+  logoAlt: z.string().optional(),
   logoScrolledUrl: z.string().url().optional(),
 
   // NYT: header HEX felter
@@ -60,7 +63,7 @@ export const SettingsGeneralSchema = z.object({
 })
 .transform((v) => {
   // Flyt ukendte top-level keys ind i extra (tolerant “pass-through”)
-  const known = ["brand", "contact", "seo", "flags", "extra", "logoScrolledUrl", "headerInitialBackgroundHex", "headerScrolledBackgroundHex", "headerBorderColorHex", "headerInitialBackgroundOpacity", "headerScrolledBackgroundOpacity"];
+  const known = ["brand", "contact", "seo", "flags", "extra", "logoUrl", "logoAlt", "logoScrolledUrl", "headerInitialBackgroundHex", "headerScrolledBackgroundHex", "headerBorderColorHex", "headerInitialBackgroundOpacity", "headerScrolledBackgroundOpacity"];
   const extra: Record<string, any> = { ...(v.extra ?? {}) };
   for (const [k, val] of Object.entries(v as any)) {
     if (!known.includes(k) && typeof val !== "undefined") {
