@@ -17,6 +17,7 @@ const BorderSchema = z.object({
     h: zNum.default(220),
     s: zNum.default(13),
     l: zNum.default(91),
+    opacity: zNum.optional(),
   }).default({ h: 220, s: 13, l: 91 }),
 }).transform((b) => ({
   enabled: typeof b.enabled === "boolean" ? b.enabled : !!b.visible,
@@ -41,7 +42,7 @@ export const HeaderAppearanceSchema = z.object({
 
   // Link color – både tekst og hex
   headerLinkColor: z.string().default("white"),
-  headerLinkColorHex: zHex, // NYT
+  headerLinkColorHex: zHex,
 
   link: z.object({ color: z.string().optional(), hex: z.string().optional() }).partial().optional(),
 
@@ -52,8 +53,8 @@ export const HeaderAppearanceSchema = z.object({
   height: zNum.optional(),
   logo: z.object({
     maxWidth: zNum.optional(),
-    src: z.string().url().optional(),           // NYT: normal logo
-    scrolledSrc: z.string().url().optional(),   // NYT: scrolled logo
+    src: z.string().url().optional(),
+    scrolledSrc: z.string().url().optional(),
     alt: z.string().optional(),
   }).partial().optional(),
 

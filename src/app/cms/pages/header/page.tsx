@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import OpacitySlider from '@/components/cms/OpacitySlider';
 import type { NavLink } from '@/types/settings';
 import { notifySuccess, notifyError } from "@/lib/ui/notify";
+import { effectiveColorHex } from '@/lib/color/utils';
 
 // Helper functions (previously inside the component)
 async function loadHeaderAppearance() {
@@ -30,38 +31,6 @@ async function saveHeaderAppearance(payload: any) {
   if (!j?.ok) throw new Error(j?.message || "Save failed");
   return true;
 }
-
-function effectiveColorHex(opt: {
-  hex?: string | null;
-  h?: number; s?: number; l?: number;
-  opacity?: number;
-}): string | null {
-  const hex = opt.hex?.trim();
-  if (hex) return hex;
-  if (typeof opt.h === "number" && typeof opt.s === "number" && typeof opt.l === "number") {
-    // Re-implementing a simple hslToHex for this scope
-    const _s = Math.max(0, Math.min(1, opt.s / 100));
-    const _l = Math.max(0, Math.min(1, opt.l / 100));
-    const c = (1 - Math.abs(2 * _l - 1)) * _s;
-    const hp = (opt.h % 360) / 60;
-    const x = c * (1 - Math.abs((hp % 2) - 1));
-    let r = 0, g = 0, b = 0;
-    if (0 <= hp && hp < 1) { r = c; g = x; b = 0; }
-    else if (1 <= hp && hp < 2) { r = x; g = c; b = 0; }
-    else if (2 <= hp && hp < 3) { r = 0; g = c; b = x; }
-    else if (3 <= hp && hp < 4) { r = 0; g = x; b = c; }
-    else if (4 <= hp && hp < 5) { r = x; g = 0; b = c; }
-    else if (5 <= hp && hp < 6) { r = c; g = 0; b = x; }
-    const m = _l - c / 2;
-    const R = Math.round((r + m) * 255);
-    const G = Math.round((g + m) * 255);
-    const B = Math.round((b + m) * 255);
-    const toHex = (v: number) => v.toString(16).padStart(2, "0");
-    return `#${toHex(R)}${toHex(G)}${toHex(B)}`;
-  }
-  return null;
-}
-
 
 export default function HeaderCmsPage() {
   const [form, setForm] = useState<any>(null);
@@ -276,17 +245,6 @@ export default function HeaderCmsPage() {
                               <div className="text-sm text-muted-foreground">
                                 Effektiv farve: <span className="font-medium">{eff ?? "—"}</span> <span>({label})</span>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const next = eff ?? "#FFFFFF";
-                                  setBgInitial({ hex: next });
-                                }}
-                                className="ml-auto rounded-md border px-2 py-1 text-sm"
-                                title="Kopier effektiv farve til HEX-feltet"
-                              >
-                                Brug denne farve som HEX
-                              </button>
                             </div>
                           );
                         })()}
@@ -333,17 +291,6 @@ export default function HeaderCmsPage() {
                               <div className="text-sm text-muted-foreground">
                                 Effektiv farve: <span className="font-medium">{eff ?? "—"}</span> <span>({label})</span>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const next = eff ?? "#FFFFFF";
-                                  setBgScrolled({ hex: next });
-                                }}
-                                className="ml-auto rounded-md border px-2 py-1 text-sm"
-                                title="Kopier effektiv farve til HEX-feltet"
-                              >
-                                Brug denne farve som HEX
-                              </button>
                             </div>
                           );
                         })()}
@@ -395,6 +342,7 @@ export default function HeaderCmsPage() {
                     <Input type="number" value={s.border.color.s} onChange={(e) => setBorder({ color: { ...s.border.color, s: Number(e.target.value) } })} />
                     <Label>Color L</Label>
                     <Input type="number" value={s.border.color.l} onChange={(e) => setBorder({ color: { ...s.border.color, l: Number(e.target.value) } })} />
+                    <OpacitySlider label="Opacity" value01={(s.border.color.opacity ?? 100) / 100} onChange01={(v) => setBorder({ color: { ...s.border.color, opacity: v*100 } })} />
                   </div>
                 </div>
               </AccordionContent>

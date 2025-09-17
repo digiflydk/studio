@@ -5,7 +5,6 @@
 import * as React from "react";
 import { getGeneralSettings } from "@/services/settings";
 import SiteContainer from "@/components/ui/SiteContainer";
-import { resolveBgColor } from "@/lib/colors/resolveColor";
 import type { GeneralSettings } from "@/types/settings";
 import MobileDrawer from "@/components/site/MobileDrawer";
 import { pickBgCss } from "@/lib/color/hex";
@@ -41,20 +40,13 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
     );
   }, [appearance, settings]);
   
-  const topBgCss = pickBgCss({
-    hex: appearance?.topBg?.hex,
-    h: appearance?.topBg?.h,
-    s: appearance?.topBg?.s,
-    l: appearance?.topBg?.l,
-    opacity: (appearance?.topBg?.opacity ?? 100) / 100,
-  });
-
-  const scrolledBgCss = pickBgCss({
-    hex: appearance?.scrolledBg?.hex,
-    h: appearance?.scrolledBg?.h,
-    s: appearance?.scrolledBg?.s,
-    l: appearance?.scrolledBg?.l,
-    opacity: (appearance?.scrolledBg?.opacity ?? 100) / 100,
+  const bgConf = scrolled ? appearance?.scrolledBg : appearance?.topBg;
+  const bgColor = pickBgCss({
+    hex: bgConf?.hex,
+    h: bgConf?.h,
+    s: bgConf?.s,
+    l: bgConf?.l,
+    opacity: (bgConf?.opacity ?? 100) / 100,
   });
 
   const borderCss = pickBgCss({
@@ -65,8 +57,6 @@ export default function SiteHeader({ appearance }: { appearance: any }) {
     opacity: (appearance?.border?.color?.opacity ?? 100) / 100,
   });
 
-
-  const bgColor = scrolled ? scrolledBgCss : topBgCss;
 
   const borderEnabled = !!appearance?.border?.enabled;
   const borderWidth = appearance?.border?.widthPx ?? 1;
