@@ -1,6 +1,6 @@
 
 // lib/design/mapToCssVars.ts
-import type { GeneralSettings, HSLColor } from '@/types/settings';
+import type { GeneralSettings, HSLColor, ButtonSettings } from '@/types/settings';
 
 function hexToRgba(hex: string, opacity: number) {
   if(!hex || !/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.test(hex.trim())) {
@@ -30,7 +30,6 @@ function hToHex(h?: Partial<HSLColor>){
 
 export function mapToCssVars(s: Partial<GeneralSettings> | null = {}) {
     const settings = s || {};
-
     const header = settings.header || {};
     const logo = header.logo || {};
     const border = header.border || {};

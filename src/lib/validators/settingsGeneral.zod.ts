@@ -61,6 +61,7 @@ export const SettingsGeneralSchema = z.object({
   // Alt andet vi ikke kender endnu
   extra: z.record(z.any()).optional(),
 })
+.partial() // Make all fields optional for partial updates
 .transform((v) => {
   // Flyt ukendte top-level keys ind i extra (tolerant “pass-through”)
   const known = ["brand", "contact", "seo", "flags", "extra", "logoUrl", "logoAlt", "logoScrolledUrl", "headerInitialBackgroundHex", "headerScrolledBackgroundHex", "headerBorderColorHex", "headerInitialBackgroundOpacity", "headerScrolledBackgroundOpacity"];
@@ -77,11 +78,18 @@ export const SettingsGeneralSchema = z.object({
     return n;
   };
 
+  const transformed = { ...v };
+
+  if (v.headerInitialBackgroundOpacity !== undefined) {
+    transformed.headerInitialBackgroundOpacity = toNum(v.headerInitialBackgroundOpacity, 100);
+  }
+  if (v.headerScrolledBackgroundOpacity !== undefined) {
+    transformed.headerScrolledBackgroundOpacity = toNum(v.headerScrolledBackgroundOpacity, 100);
+  }
+
   return {
-    ...v,
+    ...transformed,
     extra,
-    headerInitialBackgroundOpacity: toNum(v.headerInitialBackgroundOpacity, 100),
-    headerScrolledBackgroundOpacity: toNum(v.headerScrolledBackgroundOpacity, 100),
   };
 });
 

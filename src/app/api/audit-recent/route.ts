@@ -5,7 +5,7 @@ import { adminDb } from '@/lib/server/firebaseAdmin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function toPlainObject(obj: any) {
+function toPlainObject(obj: any): any {
     if (obj === null || typeof obj !== 'object') {
         return obj;
     }

@@ -39,7 +39,7 @@ type ErrorResponse = {
     currentVersion: number;
 };
 
-export async function txSaveVersioned<T>({ path, schema, data, author='studio', mergeDeep=true }: Opts<T>): Promise<SuccessResponse<T> | ErrorResponse> {
+export async function txSaveVersioned<T extends Partial<any>>({ path, schema, data, author='studio', mergeDeep=true }: Opts<T>): Promise<SuccessResponse<T> | ErrorResponse> {
   const db = adminDb;
   const ref = db.doc(path);
   const clean = stripUndefined(data);

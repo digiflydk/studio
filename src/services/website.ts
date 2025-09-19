@@ -1,14 +1,28 @@
 "use server";
 import { unstable_noStore as noStore } from "next/cache";
-import type { WebsiteHeaderConfig } from "@/types/website";
 import { getGeneralSettings } from "@/services/settings";
 import { getCmsHeader } from "@/services/cmsHeader";
 import { linkClassFromInput } from "@/lib/colors";
+import type { NavLink } from '@/types/settings';
+
+export type HSL = { h: number, s: number, l: number, opacity: number };
+
+export interface WebsiteHeaderConfig {
+  isOverlay: boolean;
+  sticky: boolean;
+  heightPx: number;
+  logoWidthPx: number;
+  topBg: HSL;
+  scrolledBg: HSL;
+  linkClass: string;
+  logoUrl?: string;
+  navLinks: NavLink[];
+}
 
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   noStore();
   const [cms, fallback] = await Promise.all([getCmsHeader(), getGeneralSettings()]);
-  const a = cms?.appearance;
+  const a = cms;
 
   if (a) {
     return {
@@ -28,7 +42,9 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
         l: a.scrolledBg?.l ?? 95,
         opacity: a.scrolledBg?.opacity ?? 98,
       },
-      linkClass: linkClassFromInput(a.link?.hex ? a.link?.hex : a.link?.color, a.link?.hex),
+      linkClass: linkClassFromInput(a.headerLinkColorHex ?? a.headerLinkColor, a.headerLinkColorHex),
+      logoUrl: a.logo?.src,
+      navLinks: a.navLinks || [],
     };
   }
 
@@ -50,5 +66,7 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
       opacity: fallback?.headerScrolledBackgroundOpacity ?? 98,
     },
     linkClass: linkClassFromInput(fallback?.headerLinkColor),
+    logoUrl: fallback?.logoUrl,
+    navLinks: fallback?.headerNavLinks || [],
   };
 }

@@ -2,9 +2,9 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { Header } from "./header";
-import type { WebsiteHeaderConfig } from "@/services/website";
 import type { GeneralSettings, Brand, NavLink } from "@/types/settings";
 import { usePathname } from "next/navigation";
+import type { WebsiteHeaderConfig } from "@/services/website";
 
 function toHsla(h: number, s: number, l: number, opacity: number) {
   const a = Math.max(0, Math.min(1, opacity / 100));
@@ -90,4 +90,3 @@ export default function HeaderClient({
     </div>
   );
 }
-

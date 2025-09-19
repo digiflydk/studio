@@ -18,8 +18,8 @@ function ensureStyleEl(id = 'theme-vars') {
 }
 
 // --- uddrag i src/lib/ui/applyDesignVars.ts ---
-function px(n?: number, fallback: number) {
-  return `${typeof n === 'number' && !Number.isNaN(n) ? n : fallback}px`;
+function px(n: number | undefined, fallback: number) {
+  return typeof n === "number" ? `${n}px` : `${fallback}px`;
 }
 function hslObjToCss(c?: { h: number; s: number; l: number }, fallback = 'rgba(0,0,0,.08)') {
   if (!c || typeof c.h !== 'number') return fallback;

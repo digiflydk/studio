@@ -1,7 +1,7 @@
 
 import type { z } from 'zod';
 import type { headerSettingsSchema } from "@/lib/validators/headerSettings.zod";
-import { headerAppearanceSchema } from '@/lib/validators/headerAppearance.zod';
+import { HeaderAppearanceSchema } from '@/lib/validators/headerAppearance.zod';
 
 export type HSLColor = { h: number; s: number; l: number };
 
@@ -128,9 +128,9 @@ export interface CookieSettings {
 }
 
 export type ButtonDesignType = 'default' | 'pill';
-export type ButtonVariantOption = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill';
+export type ButtonVariantOption = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'pill' | 'primary';
 export type ButtonFontOption = 'Inter' | 'Manrope' | 'System';
-export type ButtonSizeOption = 'default' | 'sm' | 'lg' | 'icon';
+export type ButtonSizeOption = 'default' | 'sm' | 'lg' | 'icon' | 'md';
 
 export interface ButtonSettings {
   designType: ButtonDesignType;
@@ -150,7 +150,7 @@ export interface ButtonSettings {
 
 export type HeaderCTASettings = z.infer<typeof headerSettingsSchema>;
 
-export type HeaderSettings = z.infer<typeof headerAppearanceSchema> & {
+export type HeaderSettings = z.infer<typeof HeaderAppearanceSchema> & {
     cta?: HeaderCTASettings;
     sticky?: boolean;
 };
@@ -244,6 +244,11 @@ export interface GeneralSettings {
     headerScrolledBackgroundOpacity?: number;
     headerLinkColor?: string;
     headerNavLinks?: NavLink[];
+    headerInitialBackgroundHex?: string;
+    headerScrolledBackgroundHex?: string;
+    headerBorderColorHex?: string;
+    headerTopBorderHeight?: number;
+    headerTopBorderEnabled?: boolean;
 
 
     footer?: {

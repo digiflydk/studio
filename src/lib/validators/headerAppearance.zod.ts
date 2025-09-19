@@ -68,6 +68,9 @@ export const HeaderAppearanceSchema = z.object({
 
 
   navLinks: z.array(z.any()).default([]),
+  version: z.number().optional(),
+  updatedAt: z.string().optional(),
+  updatedBy: z.string().optional(),
 }).transform((a) => {
   const linkColor =
     a.headerLinkColorHex ??
@@ -88,8 +91,13 @@ export const HeaderAppearanceSchema = z.object({
     topBg: a.topBg,
     scrolledBg: a.scrolledBg,
     navLinks: Array.isArray(a.navLinks) ? a.navLinks : [],
+    version: a.version,
+    updatedAt: a.updatedAt,
+    updatedBy: a.updatedBy,
   };
 });
+
+export type HeaderAppearance = z.infer<typeof HeaderAppearanceSchema>;
 
 // Wrapper som før
 export const SavePayloadSchema = z.union([

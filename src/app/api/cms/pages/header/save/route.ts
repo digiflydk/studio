@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/firebaseAdmin";
-import { headerDocumentSchema } from "@/lib/validators/headerAppearance.zod";
+import { HeaderAppearanceSchema } from "@/lib/validators/headerAppearance.zod";
 
 export const runtime = "nodejs";
 
@@ -9,7 +9,7 @@ const DOC_PATH = ["cms", "pages", "header", "header"];
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const parsed = headerDocumentSchema.parse(body);
+    const parsed = HeaderAppearanceSchema.parse(body);
     const ref = adminDb.doc(DOC_PATH.join("/"));
     const current = await ref.get();
     const currentVersion = (current.exists && typeof current.data()?.version === "number") ? current.data()!.version : 0;
