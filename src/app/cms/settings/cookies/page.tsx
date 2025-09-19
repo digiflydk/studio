@@ -81,7 +81,8 @@ export default function CmsCookieSettingsPage() {
 
   const handleSaveChanges = () => {
     startSaving(async () => {
-      const result = await saveSettingsAction({ cookies: settings });
+      const fullCookies: CookieSettings = { ...defaultCookieSettings, ...settings };
+      const result = await saveSettingsAction({ cookies: fullCookies });
       toast({
         title: result.success ? 'Gemt!' : 'Fejl!',
         description: result.message,

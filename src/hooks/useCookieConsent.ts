@@ -6,7 +6,7 @@ import { getConsent, saveConsent } from '@/lib/cookie-consent';
 import type { ConsentCategories, GeneralSettings } from '@/types/settings';
 
 const NECESSARY_ONLY_CONSENT: ConsentCategories = {
-  necessary: true,
+  necessary: true as const,
   preferences: false,
   analytics: false,
   marketing: false,
@@ -62,7 +62,7 @@ export function useCookieConsent(settings: GeneralSettings | null) {
   }, [handleSaveConsent]);
 
   // Fallback for initial state before hydration
-  const initialConsentState = {
+  const initialConsentState: ConsentCategories = {
     necessary: true,
     ...settings?.cookies?.defaults ?? {
         preferences: false,

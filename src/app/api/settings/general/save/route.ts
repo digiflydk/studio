@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/firebaseAdmin";
 import { SettingsGeneralSchema } from "@/lib/validators/settingsGeneral.zod";
