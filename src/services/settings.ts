@@ -30,27 +30,23 @@ const headerDefaults: HeaderSettings = {
         color: { h: 0, s: 0, l: 0, opacity: 100 },
     },
 
-    topBg: { h: 0, s: 0, l: 100, opacity: 100 },
-    scrolledBg: { h: 0, s: 0, l: 100, opacity: 100 },
+    bg: {
+        initial: { h: 0, s: 0, l: 100, opacity: 100 },
+        scrolled: { h: 0, s: 0, l: 100, opacity: 100 },
+    },
 
     navLinks: [],
+    cta: {
+        enabled: true,
+        label: 'Book et møde',
+        linkType: 'external',
+        href: 'https://calendly.com/okh-digifly/30min',
+        variant: 'pill',
+        size: 'lg',
+        mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
+    },
     updatedAt: new Date().toISOString(),
     updatedBy: 'system',
-    version: 0,
-    cta: {
-        enabled: false,
-        label: "Book et møde",
-        linkType: "external",
-        href: "#",
-        variant: "default",
-        size: "lg",
-        mobileFloating: {
-            enabled: false,
-            position: 'br',
-            offsetX: 16,
-            offsetY: 16
-        }
-    }
 };
 
 export const getGeneralSettings = unstable_cache(
@@ -70,23 +66,23 @@ export const getGeneralSettings = unstable_cache(
             h: h?.border?.color?.h ?? headerDefaults.border.color.h,
             s: h?.border?.color?.s ?? headerDefaults.border.color.s,
             l: h?.border?.color?.l ?? headerDefaults.border.color.l,
-            opacity: h?.border?.color?.opacity ?? headerDefaults.border.color.opacity,
+            opacity: (h?.border?.color as any)?.opacity ?? headerDefaults.border.color.opacity,
             },
             colorHex: (h?.border as any)?.colorHex,
         };
 
         const bg = {
             initial: {
-                h: (h?.topBg as any)?.h ?? headerDefaults.topBg.h,
-                s: (h?.topBg as any)?.s ?? headerDefaults.topBg.s,
-                l: (h?.topBg as any)?.l ?? headerDefaults.topBg.l,
-                opacity: (h?.topBg as any)?.opacity ?? headerDefaults.topBg.opacity,
+                h: (h?.topBg as any)?.h ?? headerDefaults.bg.initial.h,
+                s: (h?.topBg as any)?.s ?? headerDefaults.bg.initial.s,
+                l: (h?.topBg as any)?.l ?? headerDefaults.bg.initial.l,
+                opacity: (h?.topBg as any)?.opacity ?? headerDefaults.bg.initial.opacity,
             },
             scrolled: {
-                h: (h?.scrolledBg as any)?.h ?? headerDefaults.scrolledBg.h,
-                s: (h?.scrolledBg as any)?.s ?? headerDefaults.scrolledBg.s,
-                l: (h?.scrolledBg as any)?.l ?? headerDefaults.scrolledBg.l,
-                opacity: (h?.scrolledBg as any)?.opacity ?? headerDefaults.scrolledBg.opacity,
+                h: (h?.scrolledBg as any)?.h ?? headerDefaults.bg.scrolled.h,
+                s: (h?.scrolledBg as any)?.s ?? headerDefaults.bg.scrolled.s,
+                l: (h?.scrolledBg as any)?.l ?? headerDefaults.bg.scrolled.l,
+                opacity: (h?.scrolledBg as any)?.opacity ?? headerDefaults.bg.scrolled.opacity,
             },
         };
         

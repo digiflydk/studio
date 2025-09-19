@@ -1,13 +1,14 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-import PublicHomePage from "./(public)/page";
-import PublicLayout from "./(public)/layout";
+import PublicLayout from './(public)/layout';
+import { getGeneralSettings } from '@/services/settings';
+import Home from './(public)/page';
 
-export default function Root() {
+export default async function Page() {
+  const settings = await getGeneralSettings();
+
   return (
-    <PublicLayout>
-      <PublicHomePage />
+    <PublicLayout settings={settings}>
+      <Home />
     </PublicLayout>
   );
 }

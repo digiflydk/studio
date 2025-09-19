@@ -29,8 +29,8 @@ export function mapToCssVars(
   const ctaFloat = (h?.cta?.mobileFloating ?? {}) as any;
   const border = (h?.border ?? {}) as any;
   const logo = (h?.logo ?? {}) as any;
-  const bgInit = (h?.bg?.initial ?? {}) as any;
-  const bgScroll = (h?.bg?.scrolled ?? {}) as any;
+  const bgInit = (h?.bg?.initial ?? h?.topBg ?? {}) as any;
+  const bgScroll = (h?.bg?.scrolled ?? h?.scrolledBg ?? {}) as any;
   const btnColors = (btn?.colors ?? {}) as any;
 
   const vars: Record<string, string> = {

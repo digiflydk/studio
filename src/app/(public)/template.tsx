@@ -40,10 +40,10 @@ export default function Template({ children, settings }: { children: ReactNode, 
         const ref = doc(db, 'settings/general');
         const unsub = onSnapshot(ref, (snap) => {
           const data = (snap.data() || {}) as any;
-          const vars = mapToCssVars(data);
+          const vars = mapToCssVars(data.header, data.buttonSettings, data.themeColors);
           const root = document.documentElement;
           for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, String(v));
-          window.dispatchEvent(new CustomEvent('design:updated', { detail: { source: 'cms' } }));
+          window.dispatchEvent(new CustomEvent('design:updated', { detail: data }));
         });
 
         const openCookieSettingsHandler = () => setShowCookieSettings(true);
