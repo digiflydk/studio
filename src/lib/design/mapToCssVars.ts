@@ -25,21 +25,18 @@ export function mapToCssVars(settings: Partial<GeneralSettings> = {}) {
   const logo = header.logo ?? {};
   const border = header.border ?? {};
   const bg = header.bg ?? {};
-  const initialBg = bg.initial || {};
-  const scrolledBg = bg.scrolled || {};
+  const initialBg = (bg.initial || {}) as Partial<Hsla>;
+  const scrolledBg = (bg.scrolled || {}) as Partial<Hsla>;
   const ctaFloating = header.cta?.mobileFloating ?? {};
   const buttonColors = buttonSettings.colors ?? {};
-
-  const initialBgHex = hToHex(initialBg as HSLColor);
-  const scrolledBgHex = hToHex(scrolledBg as HSLColor);
 
   return {
     "--header-height": `${header.height ?? 72}px`,
     '--logo-max-width': `${logo.maxWidth || 140}px`,
-    "--header-border-width": (border.enabled ? `${border.width || 1}px` : '0px'),
+    "--header-border-width": (border.enabled ? `${(border as any).widthPx || 1}px` : '0px'),
     "--header-border-color": border.enabled ? hToHex(border.color) : 'transparent',
-    "--header-bg": `hsla(${(initialBg as Hsla).h ?? 0} ${(initialBg as Hsla).s ?? 0}% ${(initialBg as Hsla).l ?? 100}% / ${(initialBg as Hsla).opacity ?? 1})`,
-    "--header-bg-scrolled": `hsla(${(scrolledBg as Hsla).h ?? 0} ${(scrolledBg as Hsla).s ?? 0}% ${(scrolledBg as Hsla).l ?? 100}% / ${(scrolledBg as Hsla).opacity ?? 1})`,
+    "--header-bg": `hsla(${initialBg.h ?? 0} ${initialBg.s ?? 0}% ${initialBg.l ?? 100}% / ${initialBg.opacity ?? 1})`,
+    "--header-bg-scrolled": `hsla(${scrolledBg.h ?? 0} ${scrolledBg.s ?? 0}% ${scrolledBg.l ?? 100}% / ${scrolledBg.opacity ?? 1})`,
 
     '--cta-float-offset-x': `${ctaFloating.offsetX ?? 16}px`,
     '--cta-float-offset-y': `${ctaFloating.offsetY ?? 16}px`,

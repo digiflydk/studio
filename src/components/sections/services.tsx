@@ -8,17 +8,7 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-
-const mapVariant = (v?: ButtonVariantOption):
-  "link" | "default" | "pill" | "destructive" | "outline" | "secondary" | "ghost" => {
-  if (!v) return "default";
-  return v === "primary" ? "default" : (v as any);
-};
-
-const mapSize = (s?: "sm" | "md" | "lg"): "default" | "sm" | "lg" | "icon" => {
-  if (!s) return "lg";
-  return s === "md" ? "default" : (s as any);
-};
+import { mapVariant, mapSize } from '@/lib/ui/mapButtonProps';
 
 const defaultServices: Service[] = [
   {

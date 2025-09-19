@@ -15,7 +15,7 @@ export const headerDefaults: HeaderSettings = {
     headerLogoWidth: 140,
     headerLinkColor: "text-black",
     logo: { src: undefined, scrolledSrc: undefined, alt: undefined, maxWidth: 140 },
-    border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91 } },
+    border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91, opacity: 100 } },
     topBg: { h: 0, s: 0, l: 100, opacity: 1 },
     scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
     navLinks: [],

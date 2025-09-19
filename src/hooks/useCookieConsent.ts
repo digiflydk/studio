@@ -23,8 +23,7 @@ const ALL_CONSENT: ConsentCategories = {
 export function useCookieConsent(settings: GeneralSettings | null) {
   const [consent, setConsent] = useState<ConsentCategories | null>(null);
   const [showBanner, setShowBanner] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-
+  
   useEffect(() => {
     const initialConsent = getConsent();
     if (initialConsent) {
@@ -50,7 +49,6 @@ export function useCookieConsent(settings: GeneralSettings | null) {
     saveConsent(newConsent, lifetime);
     setConsent(newConsent);
     setShowBanner(false);
-    setShowSettings(false);
   }, [settings]);
 
   const handleAcceptAll = useCallback(() => {
@@ -74,8 +72,6 @@ export function useCookieConsent(settings: GeneralSettings | null) {
   return {
     cookieConsent: consent ?? initialConsentState,
     showBanner,
-    showSettings,
-    setShowSettings,
     handleAcceptAll,
     handleAcceptNecessary,
     handleSaveConsent,

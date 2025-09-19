@@ -9,82 +9,64 @@ const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
 const headerDefaults: HeaderSettings = {
-  overlay: true,
-  sticky: true,
-  height: 72,
-  logo: { maxWidth: 140 },
-  linkColor: 'white',
-  border: { enabled: false, width: 1, color: { h: 220, s: 13, l: 91 } },
-  bg: {
-    initial: { h: 0, s: 0, l: 100, opacity: 1 },
-    scrolled: { h: 210, s: 100, l: 95, opacity: 0.98 },
-  },
-  navLinks: [
-    { label: 'Online ordre', href: '/#online-orders' },
-    { label: 'Priser', href: '/#pricing' },
-    { label: 'Kunder', href: '/#customers' },
-    { label: 'Kontakt', href: '/#contact' },
-  ],
+  isOverlay: false,
+  headerIsSticky: true,
+  headerHeight: 72,
+  headerLogoWidth: 140,
+  headerLinkColor: 'black',
+  logo: { src: '', scrolledSrc: '', alt: 'Logo', maxWidth: 140 },
+  border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91, opacity: 100 } },
+  topBg: { h: 0, s: 0, l: 100, opacity: 1 },
+  scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
+  navLinks: [],
+  version: 0,
+  updatedAt: '',
+  updatedBy: '',
 };
 
 export const getGeneralSettings = unstable_cache(
   async (): Promise<GeneralSettings | null> => {
-
     function normalizeHeader(h?: Partial<HeaderSettings>): HeaderSettings {
-      const overlay = typeof h?.isOverlay === "boolean" ? h.isOverlay : (headerDefaults as any).isOverlay;
-      const sticky = typeof h?.sticky === "boolean" ? h.sticky : headerDefaults.sticky;
-      const height = typeof h?.height === "number" ? h.height : headerDefaults.height;
-      const linkColor = h?.linkColor ?? headerDefaults.linkColor;
+        const overlay = typeof h?.isOverlay === "boolean" ? h.isOverlay : headerDefaults.isOverlay;
+        const sticky = typeof h?.headerIsSticky === "boolean" ? h.headerIsSticky : headerDefaults.headerIsSticky;
+        const height = typeof h?.headerHeight === "number" ? h.headerHeight : headerDefaults.headerHeight;
+        const linkColor = h?.headerLinkColor ?? headerDefaults.headerLinkColor;
 
-      const border = {
-        enabled: h?.border?.enabled ?? headerDefaults.border.enabled,
-        width: (h?.border as any)?.widthPx ?? headerDefaults.border.width,
-        color: {
-          h: h?.border?.color?.h ?? headerDefaults.border.color.h,
-          s: h?.border?.color?.s ?? headerDefaults.border.color.s,
-          l: h?.border?.color?.l ?? headerDefaults.border.color.l,
-        },
-        colorHex: (h?.border as any)?.colorHex,
-      };
+        const border = {
+            enabled: h?.border?.enabled ?? headerDefaults.border.enabled,
+            widthPx: (h?.border as any)?.widthPx ?? (headerDefaults.border as any).widthPx,
+            color: {
+            h: h?.border?.color?.h ?? headerDefaults.border.color.h,
+            s: h?.border?.color?.s ?? headerDefaults.border.color.s,
+            l: h?.border?.color?.l ?? headerDefaults.border.color.l,
+            opacity: h?.border?.color?.opacity ?? headerDefaults.border.color.opacity,
+            },
+            colorHex: (h?.border as any)?.colorHex,
+        };
 
-      const bg = {
-        initial: {
-          h: h?.bg?.initial?.h ?? headerDefaults.bg.initial.h,
-          s: h?.bg?.initial?.s ?? headerDefaults.bg.initial.s,
-          l: h?.bg?.initial?.l ?? headerDefaults.bg.initial.l,
-          opacity: h?.bg?.initial?.opacity ?? headerDefaults.bg.initial.opacity,
-        },
-        scrolled: {
-          h: h?.bg?.scrolled?.h ?? headerDefaults.bg.scrolled.h,
-          s: h?.bg?.scrolled?.s ?? headerDefaults.bg.scrolled.s,
-          l: h?.bg?.scrolled?.l ?? headerDefaults.bg.scrolled.l,
-          opacity: h?.bg?.scrolled?.opacity ?? headerDefaults.bg.scrolled.opacity,
-        },
-      };
+        const bg = {
+            initial: {
+            h: (h?.topBg as any)?.h ?? headerDefaults.topBg.h,
+            s: (h?.topBg as any)?.s ?? headerDefaults.topBg.s,
+            l: (h?.topBg as any)?.l ?? headerDefaults.topBg.l,
+            opacity: (h?.topBg as any)?.opacity ?? headerDefaults.topBg.opacity,
+            },
+            scrolled: {
+            h: (h?.scrolledBg as any)?.h ?? headerDefaults.scrolledBg.h,
+            s: (h?.scrolledBg as any)?.s ?? headerDefaults.scrolledBg.s,
+            l: (h?.scrolledBg as any)?.l ?? headerDefaults.scrolledBg.l,
+            opacity: (h?.scrolledBg as any)?.opacity ?? headerDefaults.scrolledBg.opacity,
+            },
+        };
+        
+        const logo = {
+            src: h?.logo?.src ?? headerDefaults.logo.src,
+            scrolledSrc: h?.logo?.scrolledSrc ?? headerDefaults.logo.scrolledSrc,
+            alt: h?.logo?.alt ?? headerDefaults.logo.alt,
+            maxWidth: h?.logo?.maxWidth ?? headerDefaults.logo.maxWidth,
+        };
 
-      const logo = {
-        src: h?.logo?.src ?? (headerDefaults.logo as any).src,
-        scrolledSrc: (h?.logo as any)?.scrolledSrc ?? (headerDefaults.logo as any).scrolledSrc,
-        alt: h?.logo?.alt ?? (headerDefaults.logo as any).alt,
-        maxWidth: h?.logo?.maxWidth ?? headerDefaults.logo.maxWidth,
-      };
-
-      const cta = {
-        enabled: h?.cta?.enabled ?? (headerDefaults as any).cta.enabled,
-        label: h?.cta?.label ?? (headerDefaults as any).cta.label,
-        linkType: h?.cta?.linkType ?? (headerDefaults as any).cta.linkType,
-        href: h?.cta?.href ?? (headerDefaults as any).cta.href,
-        variant: h?.cta?.variant ?? (headerDefaults as any).cta.variant,
-        size: h?.cta?.size ?? (headerDefaults as any).cta.size,
-        mobileFloating: {
-          enabled: h?.cta?.mobileFloating?.enabled ?? (headerDefaults as any).cta.mobileFloating.enabled,
-          position: h?.cta?.mobileFloating?.position ?? (headerDefaults as any).cta.mobileFloating.position,
-          offsetX: h?.cta?.mobileFloating?.offsetX ?? (headerDefaults as any).cta.mobileFloating.offsetX,
-          offsetY: h?.cta?.mobileFloating?.offsetY ?? (headerDefaults as any).cta.mobileFloating.offsetY,
-        },
-      };
-
-      return { isOverlay: overlay, sticky, height, logo, linkColor, border, bg, navLinks: h?.navLinks ?? [], cta } as any;
+      return { isOverlay: overlay, headerIsSticky: sticky, headerHeight: height, logo, headerLinkColor: linkColor, border, topBg: bg.initial, scrolledBg: bg.scrolled, navLinks: h?.navLinks ?? [] } as any;
     }
 
     try {
@@ -106,13 +88,6 @@ export async function saveGeneralSettings(settings: Partial<GeneralSettings>): P
   try {
     const ref = adminDb.collection(SETTINGS_COLLECTION_ID).doc(SETTINGS_DOC_ID);
     const patch: any = { ...settings };
-
-    // This function is no longer available here, and logic is handled inside getGeneralSettings
-    // if (patch.header) {
-    //   const normalized = normalizeHeader(patch.header);
-    //   patch.header = normalized;
-    // }
-
     await ref.set(patch, { merge: true });
     return { success: true, message: 'Settings saved.' };
   } catch (error) {

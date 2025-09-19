@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ReactNode, Suspense, useEffect } from 'react';
+import { ReactNode, Suspense, useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Analytics from '@/components/analytics';
 import { Toaster } from '@/components/ui/toaster';
@@ -27,12 +27,12 @@ export default function Template({ children, settings }: { children: ReactNode, 
     const {
         cookieConsent,
         showBanner,
-        showSettings,
         handleAcceptAll,
         handleAcceptNecessary,
         handleSaveConsent,
-        setShowSettings,
     } = useCookieConsent(settings);
+    
+    const [showCookieSettings, setShowCookieSettings] = useState(false);
     
     useEffect(() => {
         if (!getApps().length) initializeApp(firebaseConfig);
@@ -45,8 +45,19 @@ export default function Template({ children, settings }: { children: ReactNode, 
           for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, String(v));
           window.dispatchEvent(new CustomEvent('design:updated', { detail: { source: 'cms' } }));
         });
-        return () => unsub();
+
+        const openCookieSettingsHandler = () => setShowCookieSettings(true);
+        window.addEventListener('open-cookie-settings', openCookieSettingsHandler);
+
+        return () => {
+            unsub();
+            window.removeEventListener('open-cookie-settings', openCookieSettingsHandler);
+        };
     }, []);
+
+    const fixedConsent = cookieConsent
+      ? { ...cookieConsent, necessary: true as const }
+      : null;
 
     return (
         <>
@@ -55,10 +66,10 @@ export default function Template({ children, settings }: { children: ReactNode, 
                 {children}
             </main>
             <Suspense fallback={null}>
-                <MobileFloatingCTA />
+                <MobileFloatingCTA settings={settings} />
             </Suspense>
             <Suspense fallback={<footer></footer>}>
-                <Footer settings={settings} onOpenCookieSettings={() => setShowSettings(true)} />
+                <Footer settings={settings} onOpenCookieSettings={() => setShowCookieSettings(true)} />
             </Suspense>
 
             {showBanner && (
@@ -67,20 +78,20 @@ export default function Template({ children, settings }: { children: ReactNode, 
                     onAcceptAll={handleAcceptAll}
                     onAcceptNecessary={handleAcceptNecessary}
                     onCustomize={() => {
-                        setShowSettings(true);
+                        setShowCookieSettings(true);
                     }}
                 />
             )}
             
             <CookieSettingsModal
-                isOpen={showSettings}
-                onOpenChange={setShowSettings}
+                isOpen={showCookieSettings}
+                onOpenChange={setShowCookieSettings}
                 settings={settings?.cookies || null}
                 onSave={handleSaveConsent}
-                initialConsent={cookieConsent}
+                initialConsent={fixedConsent ?? { necessary: true, preferences: false, analytics: false, marketing: false }}
             />
             
-            <Analytics consent={cookieConsent} settings={settings} />
+            <Analytics consent={fixedConsent} settings={settings} />
             <Toaster />
         </>
     )
