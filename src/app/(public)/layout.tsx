@@ -1,24 +1,24 @@
+'use client';
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-import { unstable_noStore as noStore } from "next/cache";
-import { ReactNode, Suspense } from "react";
+import { useState, Suspense, ReactNode } from 'react';
 import { getGeneralSettings } from "@/services/settings";
-import type { Brand } from "@/types/settings";
+import type { Brand, GeneralSettings } from "@/types/settings";
 import FooterClient from "@/components/layout/FooterClient";
 import Template from "./template";
 import SiteHeader from "@/components/site/SiteHeader";
 import { getHeaderAppearance } from "@/lib/server/header";
+import Footer from '@/components/layout/footer';
+import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 
 
-export default async function PublicLayout({ children }: { children: ReactNode }) {
-  noStore();
-
-  const [settings, headerAppearance] = await Promise.all([
-    getGeneralSettings(),
-    getHeaderAppearance()
-  ]);
+export default function PublicLayout({
+  children,
+  settings,
+}: {
+  children: ReactNode;
+  settings: GeneralSettings | null;
+}) {
+  const [cookieOpen, setCookieOpen] = useState(false);
 
   const publicBrand: Brand = {
     id: "public-page-brand",
@@ -44,17 +44,25 @@ export default async function PublicLayout({ children }: { children: ReactNode }
     "--of-footer-text": footerTheme.textColor ?? "#e5e7eb",
   } as React.CSSProperties;
 
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
         <Template settings={settings}>
-            <SiteHeader appearance={headerAppearance} settings={settings} />
+            <SiteHeader appearance={null} settings={settings} />
             <main className="flex-1">{children}</main>
             {(footerTheme.enabled ?? true) && (
-                <Suspense fallback={<footer></footer>}>
-                    <FooterClient brand={publicBrand} theme={footerTheme} />
+                 <Suspense fallback={<footer></footer>}>
+                    <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
                 </Suspense>
             )}
         </Template>
+        <CookieSettingsModal
+            isOpen={cookieOpen}
+            onOpenChange={setCookieOpen}
+            settings={settings?.cookies || null}
+            onSave={() => {}}
+            initialConsent={{ necessary: true, preferences: false, analytics: false, marketing: false }}
+        />
     </div>
   );
 }
