@@ -2,12 +2,23 @@
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Service, GeneralSettings } from '@/types/settings';
+import type { Service, GeneralSettings, ButtonVariantOption, ButtonSizeOption } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+
+const mapVariant = (v?: ButtonVariantOption):
+  "link" | "default" | "pill" | "destructive" | "outline" | "secondary" | "ghost" => {
+  if (!v) return "default";
+  return v === "primary" ? "default" : (v as any);
+};
+
+const mapSize = (s?: "sm" | "md" | "lg"): "default" | "sm" | "lg" | "icon" => {
+  if (!s) return "lg";
+  return s === "md" ? "default" : (s as any);
+};
 
 const defaultServices: Service[] = [
   {
@@ -151,8 +162,8 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
             <div className="mt-12 text-center">
                 <Button
                     asChild
-                    size={settings.servicesCtaSize || 'lg'}
-                    variant={settings.servicesCtaVariant || 'default'}
+                    size={mapSize(settings.servicesCtaSize)}
+                    variant={mapVariant(settings.servicesCtaVariant)}
                     className="md:hidden"
                     style={ctaStyle}
                 >
@@ -163,8 +174,8 @@ export default function ServicesSection({ settings }: ServicesSectionProps) {
                 </Button>
                 <Button
                     asChild
-                    size={settings.servicesCtaSize || 'lg'}
-                    variant={settings.servicesCtaVariant || 'default'}
+                    size={mapSize(settings.servicesCtaSize)}
+                    variant={mapVariant(settings.servicesCtaVariant)}
                     className="hidden md:inline-flex"
                     style={ctaStyleDesktop}
                 >

@@ -1,3 +1,4 @@
+
 // src/lib/ui/applyDesignVars.ts
 // Robust variabel-apply der virker med både "settings/general" (buttonSettings)
 // og eventuelle legacy-felter ("buttons")

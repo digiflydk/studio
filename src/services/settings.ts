@@ -1,3 +1,4 @@
+
 'use server';
 
 import { adminDb } from '@/lib/server/firebaseAdmin';
@@ -26,48 +27,66 @@ const headerDefaults: HeaderSettings = {
   ],
 };
 
-function to01(v: unknown, fb = 1): number {
-  if (typeof v === 'number') {
-    if (v >= 0 && v <= 1) return v;
-    if (v > 1 && v <= 100) return Math.max(0, Math.min(1, v / 100));
-  }
-  return fb;
-}
-
-function normHsl(input: any, fb: { h: number; s: number; l: number }) {
-  const h = typeof input?.h === 'number' ? input.h : fb.h;
-  const s = typeof input?.s === 'number' ? input.s : fb.s;
-  const l = typeof input?.l === 'number' ? input.l : fb.l;
-  return { h, s, l };
-}
-
-function normHsla(input: any, fb: { h: number; s: number; l: number; opacity: number }) {
-  const base = normHsl(input, fb);
-  const opacity = to01(input?.opacity, fb.opacity);
-  return { ...base, opacity };
-}
-
-function normalizeHeader(h: any): HeaderSettings {
-  const overlay = h?.overlay ?? headerDefaults.overlay;
-  const sticky = h?.sticky ?? headerDefaults.sticky;
-  const height = typeof h?.height === 'number' ? h.height : headerDefaults.height;
-  const logo = { maxWidth: typeof h?.logo?.maxWidth === 'number' ? h.logo.maxWidth : headerDefaults.logo.maxWidth };
-  const linkColor = h?.linkColor ?? headerDefaults.linkColor;
-  const border = {
-    enabled: h?.border?.enabled ?? headerDefaults.border.enabled,
-    width: typeof h?.border?.width === 'number' ? h.border.width : headerDefaults.border.width,
-    color: normHsl(h?.border?.color, headerDefaults.border.color),
-  };
-  const bg = {
-    initial: normHsla(h?.bg?.initial, headerDefaults.bg.initial),
-    scrolled: normHsla(h?.bg?.scrolled, headerDefaults.bg.scrolled),
-  };
-  const navLinks = Array.isArray(h?.navLinks) ? h.navLinks : headerDefaults.navLinks;
-  return { overlay, sticky, height, logo, linkColor, border, bg, navLinks };
-}
-
 export const getGeneralSettings = unstable_cache(
   async (): Promise<GeneralSettings | null> => {
+
+    function normalizeHeader(h?: Partial<HeaderSettings>): HeaderSettings {
+      const overlay = typeof h?.isOverlay === "boolean" ? h.isOverlay : (headerDefaults as any).isOverlay;
+      const sticky = typeof h?.sticky === "boolean" ? h.sticky : headerDefaults.sticky;
+      const height = typeof h?.height === "number" ? h.height : headerDefaults.height;
+      const linkColor = h?.linkColor ?? headerDefaults.linkColor;
+
+      const border = {
+        enabled: h?.border?.enabled ?? headerDefaults.border.enabled,
+        width: (h?.border as any)?.widthPx ?? headerDefaults.border.width,
+        color: {
+          h: h?.border?.color?.h ?? headerDefaults.border.color.h,
+          s: h?.border?.color?.s ?? headerDefaults.border.color.s,
+          l: h?.border?.color?.l ?? headerDefaults.border.color.l,
+        },
+        colorHex: (h?.border as any)?.colorHex,
+      };
+
+      const bg = {
+        initial: {
+          h: h?.bg?.initial?.h ?? headerDefaults.bg.initial.h,
+          s: h?.bg?.initial?.s ?? headerDefaults.bg.initial.s,
+          l: h?.bg?.initial?.l ?? headerDefaults.bg.initial.l,
+          opacity: h?.bg?.initial?.opacity ?? headerDefaults.bg.initial.opacity,
+        },
+        scrolled: {
+          h: h?.bg?.scrolled?.h ?? headerDefaults.bg.scrolled.h,
+          s: h?.bg?.scrolled?.s ?? headerDefaults.bg.scrolled.s,
+          l: h?.bg?.scrolled?.l ?? headerDefaults.bg.scrolled.l,
+          opacity: h?.bg?.scrolled?.opacity ?? headerDefaults.bg.scrolled.opacity,
+        },
+      };
+
+      const logo = {
+        src: h?.logo?.src ?? (headerDefaults.logo as any).src,
+        scrolledSrc: (h?.logo as any)?.scrolledSrc ?? (headerDefaults.logo as any).scrolledSrc,
+        alt: h?.logo?.alt ?? (headerDefaults.logo as any).alt,
+        maxWidth: h?.logo?.maxWidth ?? headerDefaults.logo.maxWidth,
+      };
+
+      const cta = {
+        enabled: h?.cta?.enabled ?? (headerDefaults as any).cta.enabled,
+        label: h?.cta?.label ?? (headerDefaults as any).cta.label,
+        linkType: h?.cta?.linkType ?? (headerDefaults as any).cta.linkType,
+        href: h?.cta?.href ?? (headerDefaults as any).cta.href,
+        variant: h?.cta?.variant ?? (headerDefaults as any).cta.variant,
+        size: h?.cta?.size ?? (headerDefaults as any).cta.size,
+        mobileFloating: {
+          enabled: h?.cta?.mobileFloating?.enabled ?? (headerDefaults as any).cta.mobileFloating.enabled,
+          position: h?.cta?.mobileFloating?.position ?? (headerDefaults as any).cta.mobileFloating.position,
+          offsetX: h?.cta?.mobileFloating?.offsetX ?? (headerDefaults as any).cta.mobileFloating.offsetX,
+          offsetY: h?.cta?.mobileFloating?.offsetY ?? (headerDefaults as any).cta.mobileFloating.offsetY,
+        },
+      };
+
+      return { isOverlay: overlay, sticky, height, logo, linkColor, border, bg, navLinks: h?.navLinks ?? [], cta } as any;
+    }
+
     try {
       const ref = adminDb.collection(SETTINGS_COLLECTION_ID).doc(SETTINGS_DOC_ID);
       const snap = await ref.get();
@@ -88,10 +107,11 @@ export async function saveGeneralSettings(settings: Partial<GeneralSettings>): P
     const ref = adminDb.collection(SETTINGS_COLLECTION_ID).doc(SETTINGS_DOC_ID);
     const patch: any = { ...settings };
 
-    if (patch.header) {
-      const normalized = normalizeHeader(patch.header);
-      patch.header = normalized;
-    }
+    // This function is no longer available here, and logic is handled inside getGeneralSettings
+    // if (patch.header) {
+    //   const normalized = normalizeHeader(patch.header);
+    //   patch.header = normalized;
+    // }
 
     await ref.set(patch, { merge: true });
     return { success: true, message: 'Settings saved.' };

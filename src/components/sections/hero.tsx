@@ -1,14 +1,24 @@
 
-
 'use client';
 import { Button } from '@/components/ui/button';
-import { type GeneralSettings } from '@/types/settings';
+import { type GeneralSettings, type ButtonVariantOption, type ButtonSizeOption } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import SiteContainer from "@/components/ui/SiteContainer";
+
+const mapVariant = (v?: ButtonVariantOption):
+  "link" | "default" | "pill" | "destructive" | "outline" | "secondary" | "ghost" => {
+  if (!v) return "default";
+  return v === "primary" ? "default" : (v as any);
+};
+
+const mapSize = (s?: "sm" | "md" | "lg"): "default" | "sm" | "lg" | "icon" => {
+  if (!s) return "lg";
+  return s === "md" ? "default" : (s as any);
+};
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
@@ -94,8 +104,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                 <div className="mt-8">
                      <Button
                         asChild
-                        size={settings.heroCtaSize || 'lg'}
-                        variant={settings.heroCtaVariant || 'default'}
+                        size={mapSize(settings.heroCtaSize)}
+                        variant={mapVariant(settings.heroCtaVariant)}
                         className="md:hidden"
                         style={ctaStyle}
                     >
@@ -106,8 +116,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     </Button>
                      <Button
                         asChild
-                        size={settings.heroCtaSize || 'lg'}
-                        variant={settings.heroCtaVariant || 'default'}
+                        size={mapSize(settings.heroCtaSize)}
+                        variant={mapVariant(settings.heroCtaVariant)}
                         className="hidden md:inline-flex"
                         style={ctaStyleDesktop}
                     >
@@ -225,5 +235,3 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
         </section>
     );
 }
-
-    

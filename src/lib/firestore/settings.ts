@@ -1,30 +1,27 @@
 
 // lib/firestore/settings.ts
 import { adminDb } from '@/lib/server/firebaseAdmin';
-import type { GeneralSettings, HeaderSettings } from '@/types/settings';
+import type { GeneralSettings } from '@/types/settings';
+import type { HeaderSettings } from '@/lib/validators/headerAppearance.zod';
 import { unstable_cache } from 'next/cache';
 
 const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
-const headerDefaults: HeaderSettings = {
-    height: 72,
-    logo: { maxWidth: 140 },
-    border: { enabled: false, width: 1, color: {h: 220, s: 13, l: 91} },
-    bg: {
-      initial: { h: 255, s: 255, l: 255, opacity: 1 },
-      scrolled: { h: 255, s: 255, l: 255, opacity: 1 },
-    },
+export const headerDefaults: HeaderSettings = {
+    isOverlay: false,
+    headerIsSticky: true,
+    headerHeight: 72,
+    headerLogoWidth: 140,
+    headerLinkColor: "text-black",
+    logo: { src: undefined, scrolledSrc: undefined, alt: undefined, maxWidth: 140 },
+    border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91 } },
+    topBg: { h: 0, s: 0, l: 100, opacity: 1 },
+    scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
     navLinks: [],
-    cta: {
-        enabled: false,
-        label: 'Kom i gang',
-        linkType: 'internal',
-        href: '#hero',
-        variant: 'default',
-        size: 'default',
-        mobileFloating: { enabled: false, position: 'br', offsetX: 16, offsetY: 16 },
-    }
+    version: 0,
+    updatedAt: '',
+    updatedBy: '',
 };
 
 export const getGeneralSettings = unstable_cache(
@@ -35,27 +32,12 @@ export const getGeneralSettings = unstable_cache(
 
             if (docSnap.exists) {
                 const data = docSnap.data() as GeneralSettings;
-                
-                data.header = {
-                    ...headerDefaults,
-                    ...(data.header ?? {}),
-                    logo: { ...headerDefaults.logo, ...data.header?.logo },
-                    border: { ...headerDefaults.border, ...data.header?.border },
-                    bg: { ...headerDefaults.bg, ...data.header?.bg,
-                        initial: { ...headerDefaults.bg.initial, ...data.header?.bg?.initial },
-                        scrolled: { ...headerDefaults.bg.scrolled, ...data.header?.bg?.scrolled },
-                    },
-                    cta: { ...headerDefaults.cta, ...data.header?.cta,
-                        mobileFloating: { ...headerDefaults.cta!.mobileFloating, ...data.header?.cta?.mobileFloating }
-                    },
-                };
-                
                 return data;
             }
 
             console.log("Settings document not found, creating with defaults.");
             const defaultData: Partial<GeneralSettings> = { 
-                header: headerDefaults,
+                header: headerDefaults as any, // Cast to any to satisfy TS here
             };
             await settingsDocRef.set(defaultData);
             return defaultData as GeneralSettings;
@@ -63,7 +45,7 @@ export const getGeneralSettings = unstable_cache(
         } catch (error) {
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
             const minimalDefaults: Partial<GeneralSettings> = {
-                header: headerDefaults
+                header: headerDefaults as any, // Cast to any
             };
             return minimalDefaults as GeneralSettings;
         }

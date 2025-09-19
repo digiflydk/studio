@@ -1,7 +1,7 @@
 
 'use client';
 import Image from 'next/image';
-import { type GeneralSettings } from '@/types/settings';
+import { type GeneralSettings, type ButtonVariantOption, type ButtonSizeOption } from '@/types/settings';
 import { cn } from '@/lib/utils';
 import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
+const mapVariant = (v?: ButtonVariantOption):
+  "link" | "default" | "pill" | "destructive" | "outline" | "secondary" | "ghost" => {
+  if (!v) return "default";
+  return v === "primary" ? "default" : (v as any);
+};
+
+const mapSize = (s?: "sm" | "md" | "lg"): "default" | "sm" | "lg" | "icon" => {
+  if (!s) return "lg";
+  return s === "md" ? "default" : (s as any);
+};
 
 export default function FeatureSection({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
@@ -77,8 +87,8 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
                 <div className="pt-4">
                     <Button
                         asChild
-                        size={settings.featureSectionCtaSize || 'lg'}
-                        variant={settings.featureSectionCtaVariant || 'default'}
+                        size={mapSize(settings.featureSectionCtaSize)}
+                        variant={mapVariant(settings.featureSectionCtaVariant)}
                         className="md:hidden"
                         style={ctaStyle}
                     >
@@ -89,8 +99,8 @@ export default function FeatureSection({ settings }: { settings: GeneralSettings
                     </Button>
                      <Button
                         asChild
-                        size={settings.featureSectionCtaSize || 'lg'}
-                        variant={settings.featureSectionCtaVariant || 'default'}
+                        size={mapSize(settings.featureSectionCtaSize)}
+                        variant={mapVariant(settings.featureSectionCtaVariant)}
                         className="hidden md:inline-flex"
                         style={ctaStyleDesktop}
                     >
