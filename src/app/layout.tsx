@@ -11,7 +11,7 @@ export const metadata = { title: 'Digifly' };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const settings = await getGeneralSettings();
-  const vars = mapToCssVars(settings || {});
+  const vars = mapToCssVars(settings?.header, settings?.buttonSettings, settings?.themeColors);
   const css = Object.entries(vars).map(([k,v]) => `${k}:${v}`).join(';');
 
   return (
@@ -26,4 +26,3 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     </html>
   );
 }
-

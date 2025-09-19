@@ -9,27 +9,58 @@ const SETTINGS_COLLECTION_ID = 'settings';
 const SETTINGS_DOC_ID = 'general';
 
 const headerDefaults: HeaderSettings = {
-  isOverlay: false,
-  headerIsSticky: true,
-  headerHeight: 72,
-  headerLogoWidth: 140,
-  headerLinkColor: 'black',
-  logo: { src: '', scrolledSrc: '', alt: 'Logo', maxWidth: 140 },
-  border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91, opacity: 100 } },
-  topBg: { h: 0, s: 0, l: 100, opacity: 1 },
-  scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
-  navLinks: [],
-  version: 0,
-  updatedAt: '',
-  updatedBy: '',
+    isOverlay: false,
+    headerIsSticky: true,
+    headerHeight: 80,
+    headerLogoWidth: 150,
+    headerLinkColor: 'black',
+    headerLinkColorHex: undefined, // bevares hvis sat via CMS
+
+    logo: {
+        src: 'https://i.postimg.cc/pL55xDxd/DIGIFLY-black-wo-bg.png',
+        scrolledSrc: undefined,
+        alt: 'Digifly logo – digitalt konsulenthus med fokus på AI, automatisering og skalering',
+        maxWidth: 150,
+    },
+
+    border: {
+        enabled: false,
+        widthPx: 1,
+        colorHex: '#000000',
+        color: { h: 0, s: 0, l: 0, opacity: 100 },
+    },
+
+    topBg: { h: 0, s: 0, l: 100, opacity: 100 },
+    scrolledBg: { h: 0, s: 0, l: 100, opacity: 100 },
+
+    navLinks: [],
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'system',
+    version: 0,
+    cta: {
+        enabled: false,
+        label: "Book et møde",
+        linkType: "external",
+        href: "#",
+        variant: "default",
+        size: "lg",
+        mobileFloating: {
+            enabled: false,
+            position: 'br',
+            offsetX: 16,
+            offsetY: 16
+        }
+    }
 };
 
 export const getGeneralSettings = unstable_cache(
   async (): Promise<GeneralSettings | null> => {
+    
     function normalizeHeader(h?: Partial<HeaderSettings>): HeaderSettings {
         const overlay = typeof h?.isOverlay === "boolean" ? h.isOverlay : headerDefaults.isOverlay;
         const sticky = typeof h?.headerIsSticky === "boolean" ? h.headerIsSticky : headerDefaults.headerIsSticky;
         const height = typeof h?.headerHeight === "number" ? h.headerHeight : headerDefaults.headerHeight;
+        const logoWidth = typeof h?.headerLogoWidth === "number" ? h.headerLogoWidth : headerDefaults.headerLogoWidth;
         const linkColor = h?.headerLinkColor ?? headerDefaults.headerLinkColor;
 
         const border = {
@@ -46,16 +77,16 @@ export const getGeneralSettings = unstable_cache(
 
         const bg = {
             initial: {
-            h: (h?.topBg as any)?.h ?? headerDefaults.topBg.h,
-            s: (h?.topBg as any)?.s ?? headerDefaults.topBg.s,
-            l: (h?.topBg as any)?.l ?? headerDefaults.topBg.l,
-            opacity: (h?.topBg as any)?.opacity ?? headerDefaults.topBg.opacity,
+                h: (h?.topBg as any)?.h ?? headerDefaults.topBg.h,
+                s: (h?.topBg as any)?.s ?? headerDefaults.topBg.s,
+                l: (h?.topBg as any)?.l ?? headerDefaults.topBg.l,
+                opacity: (h?.topBg as any)?.opacity ?? headerDefaults.topBg.opacity,
             },
             scrolled: {
-            h: (h?.scrolledBg as any)?.h ?? headerDefaults.scrolledBg.h,
-            s: (h?.scrolledBg as any)?.s ?? headerDefaults.scrolledBg.s,
-            l: (h?.scrolledBg as any)?.l ?? headerDefaults.scrolledBg.l,
-            opacity: (h?.scrolledBg as any)?.opacity ?? headerDefaults.scrolledBg.opacity,
+                h: (h?.scrolledBg as any)?.h ?? headerDefaults.scrolledBg.h,
+                s: (h?.scrolledBg as any)?.s ?? headerDefaults.scrolledBg.s,
+                l: (h?.scrolledBg as any)?.l ?? headerDefaults.scrolledBg.l,
+                opacity: (h?.scrolledBg as any)?.opacity ?? headerDefaults.scrolledBg.opacity,
             },
         };
         
@@ -66,7 +97,22 @@ export const getGeneralSettings = unstable_cache(
             maxWidth: h?.logo?.maxWidth ?? headerDefaults.logo.maxWidth,
         };
 
-      return { isOverlay: overlay, headerIsSticky: sticky, headerHeight: height, logo, headerLinkColor: linkColor, border, topBg: bg.initial, scrolledBg: bg.scrolled, navLinks: h?.navLinks ?? [] } as any;
+        const cta = {
+            enabled: h?.cta?.enabled ?? headerDefaults.cta.enabled,
+            label: h?.cta?.label ?? headerDefaults.cta.label,
+            linkType: h?.cta?.linkType ?? headerDefaults.cta.linkType,
+            href: h?.cta?.href ?? headerDefaults.cta.href,
+            variant: h?.cta?.variant ?? headerDefaults.cta.variant,
+            size: h?.cta?.size ?? headerDefaults.cta.size,
+            mobileFloating: {
+                enabled: h?.cta?.mobileFloating?.enabled ?? headerDefaults.cta.mobileFloating.enabled,
+                position: h?.cta?.mobileFloating?.position ?? headerDefaults.cta.mobileFloating.position,
+                offsetX: h?.cta?.mobileFloating?.offsetX ?? headerDefaults.cta.mobileFloating.offsetX,
+                offsetY: h?.cta?.mobileFloating?.offsetY ?? headerDefaults.cta.mobileFloating.offsetY,
+            },
+        };
+
+      return { ...headerDefaults, isOverlay: overlay, headerIsSticky: sticky, headerHeight: height, headerLogoWidth: logoWidth, logo, linkColor, border, topBg: bg.initial, scrolledBg: bg.scrolled, navLinks: h?.navLinks ?? [], cta } as any;
     }
 
     try {

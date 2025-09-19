@@ -1,51 +1,71 @@
 
 // lib/design/mapToCssVars.ts
-import type { GeneralSettings, HSLColor, ButtonSettings, HeaderSettings } from '@/types/settings';
+import type { HeaderSettings, ButtonSettings, HSLColor } from '@/types/settings';
 
-function hToHex(h?: Partial<HSLColor>){
-    if (!h || typeof h.h !== 'number' || typeof h.s !== 'number' || typeof h.l !== 'number') return '#FFFFFF';
-    const {h:hue,s,l} = h;
-    const lFix = l/100;
-    const a = s * Math.min(lFix, 1 - lFix) / 100;
-    const f = (n:number) => {
-        const k = (n + hue / 30) % 12;
-        const color = lFix - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color).toString(16).padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
+type ThemeColors = {
+    primary: HSLColor;
+    background: HSLColor;
+    accent: HSLColor;
+};
+
+// Hjælpere — antag at du allerede har en hToHex/hslaToCss funktion et andet sted.
+// Hvis ikke, kan disse simple fallback-funktioner bruges:
+function hslaToCss(h?: number, s?: number, l?: number, opacity?: number) {
+  const _h = typeof h === 'number' ? h : 0;
+  const _s = typeof s === 'number' ? s : 0;
+  const _l = typeof l === 'number' ? l : 100;
+  // Opacity er 0-100 i vores settings
+  const _o = typeof opacity === 'number' ? opacity / 100 : 1;
+  return `hsla(${_h} ${_s}% ${_l}% / ${_o})`;
 }
 
-type Hsla = { h: number; s: number; l: number; opacity?: number };
-type HeaderDefaults = Partial<HeaderSettings>;
+export function mapToCssVars(
+  header: Partial<HeaderSettings> | undefined,
+  buttonSettings: Partial<ButtonSettings> | undefined,
+  themeColors?: Partial<ThemeColors>
+): Record<string, string> {
+  const h = (header ?? {}) as any;
+  const btn = (buttonSettings ?? {}) as any;
+  const ctaFloat = (h?.cta?.mobileFloating ?? {}) as any;
+  const border = (h?.border ?? {}) as any;
+  const logo = (h?.logo ?? {}) as any;
+  const bgInit = (h?.bg?.initial ?? {}) as any;
+  const bgScroll = (h?.bg?.scrolled ?? {}) as any;
+  const btnColors = (btn?.colors ?? {}) as any;
 
-export function mapToCssVars(settings: Partial<GeneralSettings> = {}) {
-  const header: HeaderDefaults = settings.header ?? {};
-  const buttonSettings: Partial<ButtonSettings> = settings.buttonSettings ?? {};
+  const vars: Record<string, string> = {
+    '--header-height': `${h?.headerHeight ?? h?.height ?? 72}px`,
+    '--logo-max-width': `${logo?.maxWidth ?? 140}px`,
 
-  const logo = header.logo ?? {};
-  const border = header.border ?? {};
-  const bg = header.bg ?? {};
-  const initialBg = (bg.initial || {}) as Partial<Hsla>;
-  const scrolledBg = (bg.scrolled || {}) as Partial<Hsla>;
-  const ctaFloating = header.cta?.mobileFloating ?? {};
-  const buttonColors = buttonSettings.colors ?? {};
+    '--header-border-width': border?.enabled ? `${border?.widthPx ?? 1}px` : '0px',
+    '--header-border-color': border?.enabled
+      ? (border?.colorHex ? `#${border.colorHex.replace('#', '')}` : hslaToCss(border?.color?.h, border?.color?.s, border?.color?.l, border?.color?.opacity))
+      : 'transparent',
 
-  return {
-    "--header-height": `${header.height ?? 72}px`,
-    '--logo-max-width': `${logo.maxWidth || 140}px`,
-    "--header-border-width": (border.enabled ? `${(border as any).widthPx || 1}px` : '0px'),
-    "--header-border-color": border.enabled ? hToHex(border.color) : 'transparent',
-    "--header-bg": `hsla(${initialBg.h ?? 0} ${initialBg.s ?? 0}% ${initialBg.l ?? 100}% / ${initialBg.opacity ?? 1})`,
-    "--header-bg-scrolled": `hsla(${scrolledBg.h ?? 0} ${scrolledBg.s ?? 0}% ${scrolledBg.l ?? 100}% / ${scrolledBg.opacity ?? 1})`,
+    '--cta-float-offset-x': `${ctaFloat?.offsetX ?? 16}px`,
+    '--cta-float-offset-y': `${ctaFloat?.offsetY ?? 16}px`,
+    
+    '--header-bg': hslaToCss(bgInit?.h, bgInit?.s, bgInit?.l, bgInit?.opacity),
+    '--header-bg-scrolled': hslaToCss(bgScroll?.h, bgScroll?.s, bgScroll?.l, bgScroll?.opacity),
 
-    '--cta-float-offset-x': `${ctaFloating.offsetX ?? 16}px`,
-    '--cta-float-offset-y': `${ctaFloating.offsetY ?? 16}px`,
+    '--btn-primary-bg': btnColors?.primary ?? '#2563EB',
+    '--btn-primary-text': btnColors?.text ?? '#FFFFFF',
+    '--btn-color-hover': btnColors?.hover ?? btnColors?.primary ?? '#1D4ED8',
+    '--btn-font-family': btn?.fontFamily ?? 'Inter, ui-sans-serif, system-ui',
+    '--btn-font-weight': String(btn?.fontWeight ?? 600),
+    '--btn-radius': (btn?.designType ?? 'default') === 'pill' ? '9999px' : '0.5rem',
+  };
 
-    '--btn-radius': buttonSettings.designType === 'pill' ? '9999px' : '0.5rem',
-    '--btn-font-family': buttonSettings.fontFamily || 'Inter, ui-sans-serif, system-ui',
-    '--btn-font-weight': String(buttonSettings.fontWeight || 600),
-    '--btn-primary-bg': buttonColors.primary || '#2563EB',
-    '--btn-primary-text': buttonColors.text || '#FFFFFF',
-    '--btn-color-hover': buttonColors.hover || buttonColors.primary || '#1D4ED8',
-  } as Record<string, string>;
+  // Theme fallback – hvis tilstede
+  if (themeColors?.primary) {
+    vars['--primary'] = `${themeColors.primary.h} ${themeColors.primary.s}% ${themeColors.primary.l}%`;
+  }
+  if (themeColors?.accent) {
+    vars['--accent'] = `${themeColors.accent.h} ${themeColors.accent.s}% ${themeColors.accent.l}%`;
+  }
+  if (themeColors?.background) {
+    vars['--background'] = `${themeColors.background.h} ${themeColors.background.s}% ${themeColors.background.l}%`;
+  }
+
+  return vars;
 }

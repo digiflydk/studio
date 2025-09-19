@@ -2,7 +2,7 @@
 // lib/firestore/settings.ts
 import { adminDb } from '@/lib/server/firebaseAdmin';
 import type { GeneralSettings } from '@/types/settings';
-import type { HeaderSettings } from '@/lib/validators/headerAppearance.zod';
+import type { HeaderSettings } from '@/types/settings';
 import { unstable_cache } from 'next/cache';
 
 const SETTINGS_COLLECTION_ID = 'settings';
@@ -11,17 +11,32 @@ const SETTINGS_DOC_ID = 'general';
 export const headerDefaults: HeaderSettings = {
     isOverlay: false,
     headerIsSticky: true,
-    headerHeight: 72,
-    headerLogoWidth: 140,
-    headerLinkColor: "text-black",
-    logo: { src: undefined, scrolledSrc: undefined, alt: undefined, maxWidth: 140 },
-    border: { enabled: false, widthPx: 1, color: { h: 220, s: 13, l: 91, opacity: 100 } },
-    topBg: { h: 0, s: 0, l: 100, opacity: 1 },
-    scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
+    headerHeight: 80,
+    headerLogoWidth: 150,
+    headerLinkColor: 'black',
+    headerLinkColorHex: undefined,
+    logo: { src: 'https://i.postimg.cc/pL55xDxd/DIGIFLY-black-wo-bg.png', scrolledSrc: undefined, alt: 'Digifly logo – digitalt konsulenthus med fokus på AI, automatisering og skalering', maxWidth: 150 },
+    border: { enabled: false, widthPx: 1, colorHex: '#000000', color: { h: 0, s: 0, l: 0, opacity: 100 } },
+    topBg: { h: 0, s: 0, l: 100, opacity: 100 },
+    scrolledBg: { h: 0, s: 0, l: 100, opacity: 100 },
     navLinks: [],
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'system',
     version: 0,
-    updatedAt: '',
-    updatedBy: '',
+    cta: {
+        enabled: false,
+        label: "Book et møde",
+        linkType: "external",
+        href: "#",
+        variant: "default",
+        size: "lg",
+        mobileFloating: {
+            enabled: false,
+            position: 'br',
+            offsetX: 16,
+            offsetY: 16
+        }
+    }
 };
 
 export const getGeneralSettings = unstable_cache(
@@ -37,7 +52,7 @@ export const getGeneralSettings = unstable_cache(
 
             console.log("Settings document not found, creating with defaults.");
             const defaultData: Partial<GeneralSettings> = { 
-                header: headerDefaults as any, // Cast to any to satisfy TS here
+                header: headerDefaults,
             };
             await settingsDocRef.set(defaultData);
             return defaultData as GeneralSettings;
@@ -45,7 +60,7 @@ export const getGeneralSettings = unstable_cache(
         } catch (error) {
             console.error("SETTINGS_SERVICE_ERROR: Error fetching general settings: ", error);
             const minimalDefaults: Partial<GeneralSettings> = {
-                header: headerDefaults as any, // Cast to any
+                header: headerDefaults,
             };
             return minimalDefaults as GeneralSettings;
         }
