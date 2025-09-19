@@ -1,4 +1,3 @@
-
 'use server';
 
 import { adminDb } from '@/lib/server/firebaseAdmin';
@@ -44,6 +43,9 @@ const headerDefaults: HeaderSettings = {
     navLinks: [],
     updatedAt: new Date().toISOString(),
     updatedBy: 'system',
+    version: 1,
+    topBg: { h: 0, s: 0, l: 100, opacity: 100 },
+    scrolledBg: { h: 0, s: 0, l: 100, opacity: 100 },
 };
 
 export const getGeneralSettings = unstable_cache(
