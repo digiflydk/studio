@@ -26,7 +26,7 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
         <Template settings={settings}>
-            <SiteHeader appearance={settings?.header} settings={settings} />
+            <SiteHeader />
             <main className="flex-1">{children}</main>
         </Template>
         <CookieSettingsModal

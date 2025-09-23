@@ -1,113 +1,96 @@
-
+// src/components/site/Header.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import MobileMenu from "@/components/site/MobileMenu";
-import IconButton from "@/components/ui/IconButton";
-import { getGeneralSettings } from "@/services/settings";
-import { getHeaderAppearance } from "@/lib/server/header";
+import * as React from "react";
+import { fetchHeaderAppearance, computeHeaderStyles } from "@/services/header";
+import SiteContainer from "@/components/ui/SiteContainer";
 
-export default function SiteHeader({ appearance, settings }: { appearance: any, settings: any }) {
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+export default function SiteHeader() {
+  const FALLBACK_LOGO = `data:image/svg+xml;utf8,` +
+  encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='140' height='28' viewBox='0 0 140 28'>
+  <rect width='140' height='28' rx='6' fill='#111827'/>
+  <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter,system-ui' font-size='14' font-weight='700'>Logo</text>
+</svg>`);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+  // 1) Hooks først — altid samme rækkefølge
+  const [styles, setStyles] = React.useState<ReturnType<typeof computeHeaderStyles> | null>(null);
+  const [links, setLinks] = React.useState<{label:string; href:string}[]>([]);
+  const [activeLogoSrc, setActiveLogoSrc] = React.useState<string>(FALLBACK_LOGO);
+  const [logoOk, setLogoOk] = React.useState(true);
+
+  // 2) Effects
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const a = await fetchHeaderAppearance();
+      if (!mounted) return;
+      const s = computeHeaderStyles(a);
+      setStyles(s);
+      setLinks(Array.isArray((a as any).navLinks) ? (a as any).navLinks : []);
+      setActiveLogoSrc(s.logoSrc ?? FALLBACK_LOGO);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  React.useEffect(() => {
+    if (!styles) return;
+    const el = document.getElementById("site-header");
+    if (!el) return;
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const bg = y > 10 ? styles.scrolledBg : (styles.root.background as string);
+      el.style.background = bg;
+      el.style.backgroundColor = bg;                // sikrer solid farve
+      setActiveLogoSrc(y > 10 ? (styles.logoScrolledSrc ?? styles.logoSrc ?? FALLBACK_LOGO)
+                              : (styles.logoSrc ?? FALLBACK_LOGO));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [styles]);
 
-  // 1) Primært fra settings/general
-  const sgLogo = settings?.logoUrl as string | undefined;
-  const sgLogoScrolled = settings?.logoScrolledUrl as string | undefined;
-  const sgAlt = settings?.logoAlt ?? "Logo";
+  // 3) Første conditional return kommer først HER
+  if (!styles) return <div id="site-header" style={{ height: 72 }} />;
 
-  // 2) Fallback fra cms/pages/header
-  const cmsLogo = appearance?.logo?.src || appearance?.logoUrl;
-  const cmsAlt = appearance?.logo?.alt || settings?.logoAlt || "Logo";
-
-  const chosenLogo = scrolled
-    ? sgLogoScrolled || sgLogo || cmsLogo
-    : sgLogo || cmsLogo;
-  
-  const navLinks = appearance?.navLinks ?? [];
-  const cta = appearance?.cta ?? undefined;
-  const linkColor = appearance?.headerLinkColor === "white" ? "text-white" : "text-black";
-
-  const maxW =
-    appearance?.headerLogoWidth ??
-    settings?.headerLogoWidth ??
-    150;
-  
+  // 4) Render logik
   return (
-    <>
-      <header
-        className={cn(
-          "sticky top-0 z-50 w-full bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60"
-        )}
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Left: Logo */}
-          <Link href="/" className="shrink-0 inline-flex items-center gap-2">
-             {chosenLogo ? (
-                <img src={chosenLogo} alt={sgAlt || cmsAlt} style={{ maxWidth: maxW, height: "auto" }} />
-             ) : (
-                <span className="text-base font-semibold">Logo</span>
-             )}
-          </Link>
+    <header
+      id="site-header"
+      // VIGTIGT: ingen px-* her — padding styres af SiteContainer
+      className="sticky top-0 z-50 border-b"
+      style={styles.root}
+    >
+      <SiteContainer>
+        <div className="flex h-full items-center justify-between gap-6">
+          {/* VENSTRE: LOGO */}
+          <a href="/" className="block shrink-0" aria-label={styles.logoAlt}>
+            <img
+              src={activeLogoSrc}
+              alt={styles.logoAlt}
+              className="block object-contain"
+              style={{ maxWidth: styles.logoMaxWidth, height: "auto" }}
+              onError={() => { setLogoOk(false); setActiveLogoSrc(FALLBACK_LOGO); }}
+            />
+          </a>
 
-          {/* Center: Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-6">
-            {navLinks.map((l: any) => (
-              <Link key={l.href} href={l.href} className={cn("text-sm font-medium", linkColor)}>
-                {l.label}
-              </Link>
-            ))}
+          {/* HØJRE: NAV */}
+          <nav className="ml-0">
+            <ul className="flex items-center gap-8">
+              {links?.map((l: any) => (
+                <li key={`${l.href}-${l.label}`}>
+                  <a
+                    href={l.href}
+                    className="inline-flex items-center font-medium"
+                    style={{ color: styles.linkColor }}
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
-
-          {/* Right: CTA (desktop) + Burger (mobil) */}
-          <div className="flex items-center gap-3">
-            {/* Desktop CTA */}
-            {cta?.enabled && (
-              <Link
-                href={cta.href}
-                className={cn(
-                  "hidden lg:inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold",
-                  cta.variant === "outline"
-                    ? "border border-neutral-300"
-                    : "bg-black text-white"
-                )}
-              >
-                {cta.label}
-              </Link>
-            )}
-
-            {/* Burger (mobil) */}
-            <div className="lg:hidden">
-              <IconButton
-                aria-label="Åbn menu"
-                onClick={() => setOpen(true)}
-                className="border-neutral-300"
-              >
-                {/* simple burger */}
-                <span aria-hidden>☰</span>
-              </IconButton>
-            </div>
-          </div>
         </div>
-      </header>
-
-      {/* Mobile slide-in menu */}
-      <MobileMenu
-        open={open}
-        onClose={() => setOpen(false)}
-        links={navLinks}
-        cta={cta}
-        headerLinkColor={linkColor}
-      />
-    </>
+      </SiteContainer>
+    </header>
   );
 }
