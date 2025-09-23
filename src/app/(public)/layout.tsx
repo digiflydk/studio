@@ -29,6 +29,7 @@ export default function PublicLayout({
             <SiteHeader />
             <main className="flex-1">{children}</main>
         </Template>
+         <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
         <CookieSettingsModal
             isOpen={cookieOpen}
             onOpenChange={setCookieOpen}
