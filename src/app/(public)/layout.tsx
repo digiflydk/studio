@@ -25,7 +25,17 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
       <Template settings={settings}>
-        <Header settings={settings} />
+        <Header
+          settings={settings}
+          navLinks={settings?.header?.navLinks ?? []}
+          brand={undefined}
+          logoUrl={settings?.logoUrl ?? settings?.header?.logo?.src ?? null}
+          logoAlt={settings?.logoAlt ?? settings?.companyName ?? "Digifly"}
+          linkClass={undefined}
+          heightPx={settings?.header?.height ?? 80}
+          logoWidthPx={settings?.header?.logo?.maxWidth ?? 120}
+          sticky={settings?.header?.sticky ?? true}
+        />
         <main className="flex-1">{children}</main>
       </Template>
       <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
