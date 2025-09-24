@@ -5,8 +5,8 @@ import { getGeneralSettings } from "@/services/settings";
 type AnyObj = Record<string, any>;
 
 export async function POST() {
-  const data = await getGeneralSettings();
-  const src: AnyObj = (data as any)?.header ?? {};
+  const data = (await getGeneralSettings()) as AnyObj;
+  const src: AnyObj = (data?.header ?? {}) as AnyObj;
 
   const payload: AnyObj = {
     headerHeight: src.headerHeight ?? data?.headerHeight ?? 80,

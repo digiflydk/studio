@@ -1,57 +1,57 @@
-'use client';
-
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { Header } from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import type { GeneralSettings, NavLink } from "@/types/settings";
+import { getGeneralSettings } from "@/services/settings";
 import { ThemeProvider } from "@/context/ThemeContext";
-import CookieSettingsModal from "@/components/cookies/CookieSettingsModal";
-import type { HeaderSettings } from "@/lib/validators/headerAppearance.zod";
 
-export default function PublicLayout({
+type AnyObj = Record<string, any>;
+
+export default async function PublicLayout({
   children,
-  settings,
 }: {
   children: ReactNode;
-  settings: GeneralSettings | null;
 }) {
-  const [cookieOpen, setCookieOpen] = useState(false);
+  const settings = await getGeneralSettings();
+  const header: AnyObj = ((settings as AnyObj)?.header ?? {}) as AnyObj;
 
-  const header: Partial<HeaderSettings> = (settings as any)?.header ?? {};
-  const navLinks: NavLink[] =
-    (Array.isArray((header as any).navLinks) && (header as any).navLinks.length > 0
-      ? (header as any).navLinks
-      : settings?.headerNavLinks) || [];
+  const navLinks =
+    (Array.isArray((header as AnyObj).navLinks) && (header as AnyObj).navLinks.length > 0
+      ? (header as AnyObj).navLinks
+      : (settings as AnyObj)?.headerNavLinks) || [];
 
-  const headerHeight = (header as any).height ?? settings?.headerHeight ?? 80;
-  const logoUrl = settings?.logoUrl ?? (header as any)?.logo?.src ?? undefined;
-  const logoAlt = settings?.logoAlt ?? (header as any)?.logo?.alt ?? "Digifly";
-  const logoWidth = (header as any)?.logo?.maxWidth ?? settings?.headerLogoWidth ?? 150;
-  const sticky = (header as any)?.sticky ?? settings?.headerIsSticky ?? true;
+  const headerHeight =
+    (header as AnyObj).height ?? (settings as AnyObj)?.headerHeight ?? 80;
+
+  const logoUrl =
+    (settings as AnyObj)?.logoUrl ?? (header as AnyObj)?.logo?.src ?? undefined;
+
+  const logoAlt =
+    (settings as AnyObj)?.logoAlt ?? (header as AnyObj)?.logo?.alt ?? "Digifly";
+
+  const logoWidth =
+    (header as AnyObj)?.logo?.maxWidth ??
+    (settings as AnyObj)?.headerLogoWidth ??
+    150;
+
+  const sticky =
+    (header as AnyObj)?.sticky ?? (settings as AnyObj)?.headerIsSticky ?? true;
 
   return (
     <ThemeProvider settings={settings}>
-       <Header
+      <Header
         settings={settings}
         navLinks={navLinks}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
         heightPx={headerHeight}
+        logoUrl={logoUrl || undefined}
+        logoAlt={logoAlt}
         logoWidthPx={logoWidth}
-        sticky={sticky}
+        sticky={!!sticky}
         linkClass="text-black hover:text-primary"
       />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">{children}</main>
-        <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
+        <Footer settings={settings} />
       </div>
-       <CookieSettingsModal
-        isOpen={cookieOpen}
-        onOpenChange={setCookieOpen}
-        settings={settings?.cookies || null}
-        onSave={() => {}}
-        initialConsent={{ necessary: true, preferences: false, analytics: false, marketing: false }}
-      />
     </ThemeProvider>
   );
 }
