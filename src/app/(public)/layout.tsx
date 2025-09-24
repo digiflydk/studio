@@ -6,6 +6,7 @@ import Footer from "@/components/layout/footer";
 import type { GeneralSettings, NavLink } from "@/types/settings";
 import { ThemeProvider } from "@/context/ThemeContext";
 import CookieSettingsModal from "@/components/cookies/CookieSettingsModal";
+import type { HeaderSettings } from "@/lib/validators/headerAppearance.zod";
 
 export default function PublicLayout({
   children,
@@ -16,11 +17,11 @@ export default function PublicLayout({
 }) {
   const [cookieOpen, setCookieOpen] = useState(false);
 
-  const header = settings?.header ?? {};
+  const header: Partial<HeaderSettings> = (settings as any)?.header ?? {};
   const navLinks: NavLink[] =
-    (header.navLinks && header.navLinks.length > 0
-      ? header.navLinks
-      : settings?.headerNavLinks) ?? [];
+    (Array.isArray((header as any).navLinks) && (header as any).navLinks.length > 0
+      ? (header as any).navLinks
+      : settings?.headerNavLinks) || [];
 
   const headerHeight = (header as any).height ?? settings?.headerHeight ?? 80;
   const logoUrl = settings?.logoUrl ?? (header as any)?.logo?.src ?? undefined;
@@ -38,6 +39,7 @@ export default function PublicLayout({
         heightPx={headerHeight}
         logoWidthPx={logoWidth}
         sticky={sticky}
+        linkClass="text-black hover:text-primary"
       />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">{children}</main>

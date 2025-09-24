@@ -24,7 +24,7 @@ const socialIcons = {
   tiktokUrl: { icon: Clapperboard, label: 'TikTok' },
 } as const;
 
-interface FooterProps {
+export interface FooterProps {
     settings: GeneralSettings | null,
     onOpenCookieSettings?: () => void;
 }
