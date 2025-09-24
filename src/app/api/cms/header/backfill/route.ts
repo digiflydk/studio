@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/firebaseAdmin";
 import type { GeneralSettings, HeaderSettings } from "@/types/settings";
