@@ -28,13 +28,9 @@ export default function PublicLayout({
         <Header
           settings={settings}
           navLinks={settings?.header?.navLinks ?? []}
-          brand={undefined}
-          logoUrl={settings?.logoUrl ?? settings?.header?.logo?.src ?? null}
-          logoAlt={settings?.logoAlt ?? settings?.companyName ?? "Digifly"}
-          linkClass={undefined}
-          heightPx={settings?.header?.height ?? 80}
-          logoWidthPx={settings?.header?.logo?.maxWidth ?? 120}
-          sticky={settings?.header?.sticky ?? true}
+          heightPx={settings?.header?.headerHeight ?? 80}
+          logoWidthPx={settings?.header?.headerLogoWidth ?? 120}
+          sticky={settings?.header?.headerIsSticky ?? true}
         />
         <main className="flex-1">{children}</main>
       </Template>
