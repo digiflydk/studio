@@ -133,6 +133,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     src={settings?.heroGridImage1Url || `https://picsum.photos/400/300?random=11`}
                     alt="Hero image 1"
                     fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage1AiHint || ''}
                 />
@@ -142,6 +143,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     src={settings?.heroGridImage2Url || `https://picsum.photos/400/300?random=12`}
                     alt="Hero image 2"
                     fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage2AiHint || ''}
                 />
@@ -151,6 +153,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     src={settings?.heroGridImage3Url || `https://picsum.photos/400/300?random=13`}
                     alt="Hero image 3"
                     fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage3AiHint || ''}
                 />
@@ -160,6 +163,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     src={settings?.heroGridImage4Url || `https://picsum.photos/400/300?random=14`}
                     alt="Hero image 4"
                     fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage4AiHint || ''}
                 />
@@ -202,6 +206,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     alt={headline}
                     fill
                     priority
+                    sizes="100vw"
                     className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50" />
