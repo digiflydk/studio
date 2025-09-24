@@ -1,23 +1,40 @@
-import CmsLayout from "@/app/cms/layout";
-import { getCmsHeaderDoc } from "@/services/cmsHeader";
+'use client';
 
-function toInitial(loaded: any) {
-  if (!loaded) return null;
-  if (loaded.appearance) return loaded.appearance;
-  return loaded;
-}
+import { useEffect, useState } from 'react';
+import { getCmsHeaderDoc } from '@/services/cmsHeader';
 
-export default async function CmsHeaderPage() {
-  const loaded = await getCmsHeaderDoc();
-  const initial = toInitial(loaded);
+export default function CmsHeaderPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    const fetchData = async () => {
+        const res = await getCmsHeaderDoc();
+        if (!alive) return;
+        setData(res);
+        setLoading(false);
+    }
+    fetchData();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (loading) return <div>Loading…</div>;
+  
+  const initial = (() => {
+    if (!data) return null;
+    if (data.appearance) return data.appearance;
+    return data;
+  })();
+
   return (
-    <CmsLayout>
-      <div className="mx-auto max-w-3xl p-6">
-        <h1 className="mb-4 text-2xl font-semibold">Header</h1>
-        <div data-testid="header-initial-json" className="mb-6 rounded border p-4 text-sm">
-          <pre className="whitespace-pre-wrap break-words">{JSON.stringify(initial ?? {}, null, 2)}</pre>
-        </div>
-      </div>
-    </CmsLayout>
+    <div className="space-y-4">
+      <h1 className="text-xl font-semibold">Header Settings</h1>
+      <pre className="rounded border bg-white p-4 shadow-sm">
+        {JSON.stringify(initial, null, 2)}
+      </pre>
+    </div>
   );
 }
