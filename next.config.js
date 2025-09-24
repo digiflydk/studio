@@ -10,6 +10,13 @@ const nextConfig = {
     ],
   },
   devIndicators: { buildActivity: true },
+  experimental: {
+    serverComponentsExternalPackages: [
+      'firebase-admin',
+      '@google-cloud/firestore',
+      'google-auth-library'
+    ],
+  },
 };
 
 module.exports = nextConfig;
