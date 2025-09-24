@@ -1,12 +1,19 @@
-"use server";
-import { unstable_noStore as noStore } from "next/cache";
 import { adminDb } from "@/lib/server/firebaseAdmin";
-import type { HeaderAppearance } from "@/lib/validators/headerAppearance.zod";
 
-const DOC_PATH = ["cms", "pages", "header", "header"];
+type AnyObj = Record<string, any>;
 
-export async function getCmsHeader(): Promise<HeaderAppearance | null> {
-  noStore();
-  const snap = await adminDb.doc(DOC_PATH.join("/")).get();
-  return snap.exists ? (snap.data() as HeaderAppearance) : null;
+export async function getCmsHeaderDoc(): Promise<AnyObj | null> {
+  const p1 = adminDb.doc("cms/pages/header/header");
+  const snap1 = await p1.get();
+  if (snap1.exists) {
+    const d = snap1.data() as AnyObj;
+    return d || null;
+  }
+  const p2 = adminDb.doc("cms/pages/header");
+  const snap2 = await p2.get();
+  if (snap2.exists) {
+    const d = snap2.data() as AnyObj;
+    return d || null;
+  }
+  return null;
 }
