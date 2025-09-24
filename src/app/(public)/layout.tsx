@@ -22,11 +22,11 @@ export default function PublicLayout({
       ? header.navLinks
       : settings?.headerNavLinks) ?? [];
 
-  const headerHeight = header.height ?? settings?.headerHeight ?? 80;
-  const logoUrl = settings?.logoUrl ?? header.logo?.src ?? undefined;
-  const logoAlt = settings?.logoAlt ?? header.logo?.alt ?? "Digifly";
-  const logoWidth = header.logo?.maxWidth ?? settings?.headerLogoWidth ?? 150;
-  const sticky = header.sticky ?? settings?.headerIsSticky ?? true;
+  const headerHeight = (header as any).height ?? settings?.headerHeight ?? 80;
+  const logoUrl = settings?.logoUrl ?? (header as any)?.logo?.src ?? undefined;
+  const logoAlt = settings?.logoAlt ?? (header as any)?.logo?.alt ?? "Digifly";
+  const logoWidth = (header as any)?.logo?.maxWidth ?? settings?.headerLogoWidth ?? 150;
+  const sticky = (header as any)?.sticky ?? settings?.headerIsSticky ?? true;
 
   return (
     <ThemeProvider settings={settings}>

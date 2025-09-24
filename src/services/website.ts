@@ -1,7 +1,8 @@
+
 "use server";
 import { unstable_noStore as noStore } from "next/cache";
 import { getGeneralSettings } from "@/services/settings";
-import { getCmsHeader } from "@/services/cmsHeader";
+import { getCmsHeaderDoc } from "@/services/cmsHeader";
 import { linkClassFromInput } from "@/lib/colors";
 import type { NavLink } from '@/types/settings';
 
@@ -21,8 +22,8 @@ export interface WebsiteHeaderConfig {
 
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   noStore();
-  const [cms, fallback] = await Promise.all([getCmsHeader(), getGeneralSettings()]);
-  const a = cms;
+  const [cms, fallback] = await Promise.all([getCmsHeaderDoc(), getGeneralSettings()]);
+  const a = cms?.appearance as any;
 
   if (a) {
     return {
@@ -48,25 +49,27 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     };
   }
 
+  const fallbackHeader = fallback?.header ?? {};
+
   return {
     isOverlay: true,
-    sticky: fallback?.headerIsSticky ?? true,
-    heightPx: fallback?.headerHeight ?? 80,
-    logoWidthPx: fallback?.headerLogoWidth ?? 120,
+    sticky: fallbackHeader?.sticky ?? true,
+    heightPx: fallbackHeader?.height ?? 80,
+    logoWidthPx: fallbackHeader?.logo?.maxWidth ?? 120,
     topBg: {
-      h: fallback?.headerInitialBackgroundColor?.h ?? 0,
-      s: fallback?.headerInitialBackgroundColor?.s ?? 0,
-      l: fallback?.headerInitialBackgroundColor?.l ?? 100,
-      opacity: fallback?.headerInitialBackgroundOpacity ?? 0,
+      h: (fallbackHeader as any)?.bg?.initial?.h ?? 0,
+      s: (fallbackHeader as any)?.bg?.initial?.s ?? 0,
+      l: (fallbackHeader as any)?.bg?.initial?.l ?? 100,
+      opacity: (fallbackHeader as any)?.bg?.initial?.opacity * 100 ?? 0,
     },
     scrolledBg: {
-      h: fallback?.headerScrolledBackgroundColor?.h ?? 210,
-      s: fallback?.headerScrolledBackgroundColor?.s ?? 100,
-      l: fallback?.headerScrolledBackgroundColor?.l ?? 95,
-      opacity: fallback?.headerScrolledBackgroundOpacity ?? 98,
+      h: (fallbackHeader as any)?.bg?.scrolled?.h ?? 210,
+      s: (fallbackHeader as any)?.bg?.scrolled?.s ?? 100,
+      l: (fallbackHeader as any)?.bg?.scrolled?.l ?? 95,
+      opacity: (fallbackHeader as any)?.bg?.scrolled?.opacity * 100 ?? 98,
     },
-    linkClass: linkClassFromInput(fallback?.headerLinkColor),
-    logoUrl: fallback?.logoUrl,
-    navLinks: fallback?.headerNavLinks || [],
+    linkClass: linkClassFromInput(fallbackHeader?.linkColor),
+    logoUrl: fallbackHeader?.logo?.src,
+    navLinks: fallbackHeader?.navLinks || [],
   };
 }

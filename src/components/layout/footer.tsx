@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Linkedin, Facebook, Instagram, Twitter, Clapperboard, type LucideIcon } from 'lucide-react';
@@ -27,7 +26,7 @@ const socialIcons = {
 
 interface FooterProps {
     settings: GeneralSettings | null,
-    onOpenCookieSettings: () => void;
+    onOpenCookieSettings?: () => void;
 }
 
 export default function Footer({ settings, onOpenCookieSettings }: FooterProps) {
@@ -122,9 +121,11 @@ export default function Footer({ settings, onOpenCookieSettings }: FooterProps) 
             )}
             <div className='flex flex-col items-center md:items-end gap-2 mt-4'>
                 <p className={cn("text-xs", mutedTextColorClass)}>&copy; {currentYear} {companyName}. Alle rettigheder forbeholdes.</p>
-                <Button variant='link' className={cn('p-0 h-auto text-xs', mutedTextColorClass)} onClick={onOpenCookieSettings}>
-                    Cookie-indstillinger
-                </Button>
+                {onOpenCookieSettings && (
+                  <Button variant='link' className={cn('p-0 h-auto text-xs', mutedTextColorClass)} onClick={onOpenCookieSettings}>
+                      Cookie-indstillinger
+                  </Button>
+                )}
             </div>
           </div>
         </div>
