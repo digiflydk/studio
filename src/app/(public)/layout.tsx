@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, Suspense, ReactNode } from 'react';
+import { useState, ReactNode } from 'react';
 import type { GeneralSettings } from "@/types/settings";
 import Template from "./template";
-import SiteHeader from "@/components/site/SiteHeader";
+import { Header } from "@/components/layout/header";
 import Footer from '@/components/layout/footer';
 import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 
@@ -22,21 +22,20 @@ export default function PublicLayout({
     "--of-footer-text": footerTheme.textColor ?? "#e5e7eb",
   } as React.CSSProperties;
 
-
   return (
     <div className="flex min-h-screen flex-col bg-[#f3f7fd]" style={footerStyle}>
-        <Template settings={settings}>
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-        </Template>
-         <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
-        <CookieSettingsModal
-            isOpen={cookieOpen}
-            onOpenChange={setCookieOpen}
-            settings={settings?.cookies ?? null}
-            onSave={() => {}}
-            initialConsent={{ necessary: true, preferences: false, analytics: false, marketing: false }}
-        />
+      <Template settings={settings}>
+        <Header settings={settings} />
+        <main className="flex-1">{children}</main>
+      </Template>
+      <Footer settings={settings} onOpenCookieSettings={() => setCookieOpen(true)} />
+      <CookieSettingsModal
+        isOpen={cookieOpen}
+        onOpenChange={setCookieOpen}
+        settings={settings?.cookies ?? null}
+        onSave={() => {}}
+        initialConsent={{ necessary: true, preferences: false, analytics: false, marketing: false }}
+      />
     </div>
   );
 }
