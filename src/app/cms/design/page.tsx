@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DiffDialog } from "@/components/admin/DiffDialog";
 import { ConflictDialog } from "@/components/admin/ConflictDialog";
 import { simpleDiff } from "@/lib/utils/diff";
-import { getGeneralSettings } from "@/services/settings";
+import { getGeneralSettings, saveGeneralSettings } from "@/app/actions";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -194,7 +194,7 @@ function CmsDesignPageContent() {
   const { isLoaded: isThemeLoaded, ...themeCtx } = useTheme();
   const [serverSettings, setServerSettings] = useState<GeneralSettings|null>(null);
   
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, startSaving] = useTransition();
   const [showDiff, setShowDiff] = useState(false);
   const [version, setVersion] = useState(0);
   const [conflict, setConflict] = useState<any>(null);
@@ -214,74 +214,71 @@ function CmsDesignPageContent() {
   
 
   const handleSaveChanges = async (force = false, useVersion?: number) => {
-    setIsSaving(true);
-    setShowDiff(false);
-    setConflict(null);
+    startSaving(async () => {
+        setShowDiff(false);
+        setConflict(null);
 
-    const settingsToSave: Partial<GeneralSettings> & { version?: number } = {
-        themeColors: themeCtx.theme.colors,
-        typography: themeCtx.typography,
-        buttonSettings: themeCtx.buttonSettings,
-        version: useVersion ?? version,
-    };
-    
-    const diff = simpleDiff(serverSettings || {}, settingsToSave);
-    const criticalKeysRemoved = ['themeColors', 'typography', 'buttonSettings'].some(key => key in diff.removed);
-
-    if (criticalKeysRemoved && !force) {
-        setShowDiff(true);
-        setIsSaving(false);
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/design-settings/save', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
-            body: JSON.stringify(settingsToSave),
-            cache: 'no-store',
-        });
+        const settingsToSave: Partial<GeneralSettings> & { version?: number } = {
+            themeColors: themeCtx.theme.colors,
+            typography: themeCtx.typography,
+            buttonSettings: themeCtx.buttonSettings,
+            version: useVersion ?? version,
+        };
         
-        const json = await res.json();
-        
-        if (res.status === 409) {
-            setConflict({ server: json.data, serverVersion: json.version });
-            toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
-            setIsSaving(false);
+        const diff = simpleDiff(serverSettings || {}, settingsToSave);
+        const criticalKeysRemoved = ['themeColors', 'typography', 'buttonSettings'].some(key => key in diff.removed);
+
+        if (criticalKeysRemoved && !force) {
+            setShowDiff(true);
             return;
         }
 
-        if (!res.ok || !json?.ok) {
-            throw new Error(json.error || 'Save failed');
+        try {
+            const res = await fetch('/api/design-settings/save', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
+                body: JSON.stringify(settingsToSave ?? {}),
+                cache: 'no-store',
+            });
+            
+            const json = await res.json().catch(() => null);
+            
+            if (res.status === 409) {
+                setConflict({ server: json.data, serverVersion: json.version });
+                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
+                return;
+            }
+
+            if (!res.ok || !json?.ok) {
+                throw new Error(json?.error || 'Save failed');
+            }
+
+            window.dispatchEvent(new CustomEvent('design:updated', { 
+                 detail: { buttonSettings: json.data }
+            }));
+            
+            setServerSettings(json.data);
+            
+            if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
+            if(json.data.typography) themeCtx.setTypography(json.data.typography);
+            if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
+            if(json.data.version) setVersion(json.data.version);
+
+            toast({
+                title: "Saved!",
+                description: "Design settings have been saved.",
+                variant: "default",
+            });
+
+        } catch (error: any) {
+            console.error("Error saving settings:", error);
+            toast({
+                title: "Error!",
+                description: error.message || "An error occurred during saving.",
+                variant: "destructive",
+            });
         }
-
-        window.dispatchEvent(new CustomEvent('design:updated', { 
-             detail: { buttonSettings: json.data }
-        }));
-        
-        setServerSettings(json.data);
-        
-        if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
-        if(json.data.typography) themeCtx.setTypography(json.data.typography);
-        if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
-        if(json.data.version) setVersion(json.data.version);
-
-        toast({
-            title: "Saved!",
-            description: "Design settings have been saved.",
-            variant: "default",
-        });
-
-    } catch (error: any) {
-        console.error("Error saving settings:", error);
-        toast({
-            title: "Error!",
-            description: error.message || "An error occurred during saving.",
-            variant: "destructive",
-        });
-    } finally {
-        setIsSaving(false);
-    }
+    });
   }
 
   const handleReset = () => {
