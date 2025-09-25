@@ -1,5 +1,4 @@
 
-
 "use client";
 import { useTheme, defaultTheme, ThemeProvider } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DiffDialog } from "@/components/admin/DiffDialog";
 import { ConflictDialog } from "@/components/admin/ConflictDialog";
 import { simpleDiff } from "@/lib/utils/diff";
-import { getGeneralSettings, saveGeneralSettings } from "@/app/actions";
+import { getSettingsAction as getGeneralSettings, saveSettingsAction as saveGeneralSettings } from "@/app/actions";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -234,35 +233,24 @@ function CmsDesignPageContent() {
         }
 
         try {
-            const res = await fetch('/api/design-settings/save', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json', 'x-user': 'cms-user' },
-                body: JSON.stringify(settingsToSave ?? {}),
-                cache: 'no-store',
-            });
+            const res = await saveGeneralSettings(settingsToSave);
             
-            const json = await res.json().catch(() => null);
-            
-            if (res.status === 409) {
-                setConflict({ server: json.data, serverVersion: json.version });
-                toast({ title: 'Conflict', description: 'Settings have been updated by someone else.', variant: 'destructive' });
-                return;
+            if (!res.success) {
+                throw new Error(res.message || 'Save failed');
             }
 
-            if (!res.ok || !json?.ok) {
-                throw new Error(json?.error || 'Save failed');
+            // This part seems to expect data back, but the action might not return it.
+            // Let's rely on re-fetching or optimistic updates.
+            // For now, let's just show a success message.
+            const newSettings = await getGeneralSettings();
+            setServerSettings(newSettings);
+            if (newSettings) {
+                if(newSettings.themeColors) themeCtx.setTheme({ colors: newSettings.themeColors });
+                if(newSettings.typography) themeCtx.setTypography(newSettings.typography);
+                if(newSettings.buttonSettings) themeCtx.setButtonSettings(newSettings.buttonSettings);
+                setVersion((newSettings as any).version || 0);
             }
-
-            window.dispatchEvent(new CustomEvent('design:updated', { 
-                 detail: { buttonSettings: json.data }
-            }));
             
-            setServerSettings(json.data);
-            
-            if(json.data.themeColors) themeCtx.setTheme({ colors: json.data.themeColors });
-            if(json.data.typography) themeCtx.setTypography(json.data.typography);
-            if(json.data.buttonSettings) themeCtx.setButtonSettings(json.data.buttonSettings);
-            if(json.data.version) setVersion(json.data.version);
 
             toast({
                 title: "Saved!",
@@ -493,3 +481,5 @@ export default function CmsDesignPage() {
         </ThemeProvider>
     )
 }
+
+    
