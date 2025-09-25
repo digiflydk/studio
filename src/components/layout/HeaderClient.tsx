@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import type { WebsiteHeaderConfig } from '@/services/website.server';
+import SiteContainer from '@/components/ui/SiteContainer';
 
 function hsla(bg: WebsiteHeaderConfig['topBg']) {
   return `hsla(${bg.h} ${bg.s}% ${bg.l}% / ${bg.opacity})`;
@@ -29,7 +30,10 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
         borderBottom: config.border.enabled ? `${config.border.widthPx}px solid ${config.border.colorHex}` : 'none',
       }}
     >
-      <div className="mx-auto flex items-center justify-between px-4" style={{ height: config.heightPx, maxWidth: 1140 }}>
+      <SiteContainer
+        className="flex items-center justify-between"
+        style={{ height: config.heightPx }}
+      >
         <Link href="/" className="flex items-center gap-2" aria-label="Gå til forsiden">
           <Image
             src={config.logoUrl || '/digifly-logo-dark.svg'}
@@ -47,7 +51,7 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
             </Link>
           ))}
         </nav>
-      </div>
+      </SiteContainer>
     </header>
   );
 }
