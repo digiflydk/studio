@@ -1,73 +1,98 @@
 import "server-only";
-import { getGeneralSettings } from "@/services/settings";
+import { getGeneralSettings } from '@/services/settings';
+import { getCmsHeaderDoc } from '@/services/cmsHeader';
 
+export type Hsl = { h: number; s: number; l: number; opacity: number };
 export type WebsiteHeaderConfig = {
-  sticky: boolean;
   heightPx: number;
+  sticky: boolean;
   logoWidthPx: number;
-  linkClass: string;
   logoUrl?: string;
+  logoAlt?: string;
   navLinks: { label: string; href: string }[];
-  border: {
-    enabled: boolean;
-    widthPx: number;
-    colorHex: string;
-    color: { h: number; s: number; l: number; opacity: number };
-  };
-  topBg: { h: number; s: number; l: number; opacity: number };
-  scrolledBg: { h: number; s: number; l: number; opacity: number };
+  linkClass: string;
+  topBg: Hsl;
+  scrolledBg: Hsl;
+  border: { enabled: boolean; widthPx: number; colorHex: string };
 };
 
-function normalizeOpacity(v: number | undefined) {
-  if (v == null) return 100;
-  if (v <= 1) return Math.round(v * 100);
-  return Math.round(v);
-}
-
-function linkClassFromInput(c?: string) {
-  if (!c) return "text-black hover:text-gray-700";
-  return c.includes("white")
-    ? "text-white hover:text-gray-200"
-    : "text-black hover:text-gray-700";
+function pickLinkClass(color?: string) {
+  if (!color) return 'text-black hover:text-gray-700';
+  const c = color.toLowerCase();
+  if (c.includes('white')) return 'text-white hover:text-gray-200';
+  if (c.includes('black')) return 'text-black hover:text-gray-700';
+  return 'text-foreground hover:text-muted-foreground';
 }
 
 export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
-  const g = await getGeneralSettings();
-  const header = (g as any)?.header ?? {};
-  const initial = header?.bg?.initial ?? { h: 0, s: 0, l: 100, opacity: 1 };
-  const scrolled = header?.bg?.scrolled ?? { h: 0, s: 0, l: 100, opacity: 1 };
-  const border = header?.border ?? {};
-  const borderColor = border?.color ?? { h: 0, s: 0, l: 0, opacity: 100 };
+  const settings = await getGeneralSettings();
+  const cms = await getCmsHeaderDoc();
+  const a = (cms?.appearance as any) ?? {};
+
+  const heightPx =
+    a.headerHeight ??
+    settings?.headerHeight ??
+    80;
+
+  const sticky =
+    a.headerIsSticky ??
+    settings?.headerIsSticky ??
+    true;
+
+  const logoWidthPx =
+    a.headerLogoWidth ??
+    settings?.headerLogoWidth ??
+    120;
+
+  const logoUrl =
+    a.logo?.src ??
+    settings?.logoUrl ??
+    undefined;
+
+  const logoAlt =
+    a.logo?.alt ??
+    settings?.logoAlt ??
+    'Digifly';
+
+  const navLinks: { label: string; href: string }[] =
+    Array.isArray(a.navLinks) && a.navLinks.length > 0
+      ? a.navLinks
+      : Array.isArray(settings?.headerNavLinks)
+      ? settings!.headerNavLinks
+      : [];
+
+  const topBg: Hsl = {
+    h: a.topBg?.h ?? settings?.headerInitialBackgroundColor?.h ?? 0,
+    s: a.topBg?.s ?? settings?.headerInitialBackgroundColor?.s ?? 0,
+    l: a.topBg?.l ?? settings?.headerInitialBackgroundColor?.l ?? 100,
+    opacity: a.topBg?.opacity ?? (settings?.headerInitialBackgroundOpacity ?? 100) / 100,
+  };
+
+  const scrolledBg: Hsl = {
+    h: a.scrolledBg?.h ?? settings?.headerScrolledBackgroundColor?.h ?? topBg.h,
+    s: a.scrolledBg?.s ?? settings?.headerScrolledBackgroundColor?.s ?? topBg.s,
+    l: a.scrolledBg?.l ?? settings?.headerScrolledBackgroundColor?.l ?? topBg.l,
+    opacity: a.scrolledBg?.opacity ?? (settings?.headerScrolledBackgroundOpacity ?? 100) / 100,
+  };
+
+  const border = {
+    enabled: a.border?.enabled ?? a.border?.visible ?? true,
+    widthPx: a.border?.widthPx ?? settings?.headerTopBorderHeight ?? 1,
+    colorHex: a.border?.colorHex ?? '#000000',
+  };
+
+  const linkClass = pickLinkClass(a.headerLinkColor ?? settings?.headerLinkColor);
 
   return {
-    sticky: header?.sticky ?? g?.headerIsSticky ?? true,
-    heightPx: header?.height ?? g?.headerHeight ?? 80,
-    logoWidthPx: header?.logo?.maxWidth ?? g?.headerLogoWidth ?? 120,
-    linkClass: linkClassFromInput(header?.linkColor ?? g?.headerLinkColor),
-    logoUrl: header?.logo?.src ?? g?.logoUrl,
-    navLinks: Array.isArray(header?.navLinks) ? header.navLinks : g?.headerNavLinks ?? [],
-    border: {
-      enabled: !!border?.enabled,
-      widthPx: Number(border?.width ?? border?.widthPx ?? 1),
-      colorHex: border?.colorHex ?? "#000000",
-      color: {
-        h: Number(borderColor?.h ?? 0),
-        s: Number(borderColor?.s ?? 0),
-        l: Number(borderColor?.l ?? 0),
-        opacity: normalizeOpacity(borderColor?.opacity),
-      },
-    },
-    topBg: {
-      h: Number(initial?.h ?? 0),
-      s: Number(initial?.s ?? 0),
-      l: Number(initial?.l ?? 100),
-      opacity: normalizeOpacity(initial?.opacity),
-    },
-    scrolledBg: {
-      h: Number(scrolled?.h ?? 0),
-      s: Number(scrolled?.s ?? 0),
-      l: Number(scrolled?.l ?? 100),
-      opacity: normalizeOpacity(scrolled?.opacity),
-    },
+    heightPx,
+    sticky,
+    logoWidthPx,
+    logoUrl,
+    logoAlt,
+    navLinks,
+    linkClass,
+    topBg,
+    scrolledBg,
+    border,
   };
 }

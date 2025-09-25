@@ -1,92 +1,53 @@
+'use client';
 
-"use client";
-import { useEffect, useState, useMemo } from "react";
-import { Header } from "./header";
-import type { GeneralSettings, Brand, NavLink } from "@/types/settings";
-import { usePathname } from "next/navigation";
-import type { WebsiteHeaderConfig } from "@/services/website";
+import Link from 'next/link';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import type { WebsiteHeaderConfig } from '@/services/website.server';
 
-function toHsla(h: number, s: number, l: number, opacity: number) {
-  const a = Math.max(0, Math.min(1, opacity / 100));
-  return `hsla(${h} ${s}% ${l}% / ${a})`;
+function hsla(bg: WebsiteHeaderConfig['topBg']) {
+  return `hsla(${bg.h} ${bg.s}% ${bg.l}% / ${bg.opacity})`;
 }
 
-export default function HeaderClient({
-  brand,
-  settings,
-  config,
-}: {
-  brand?: Brand;
-  settings: GeneralSettings | null;
-  config: WebsiteHeaderConfig;
-}) {
+export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }) {
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const bgTop = useMemo(() => toHsla(config.topBg.h, config.topBg.s, config.topBg.l, config.topBg.opacity), [config]);
-  const bgScrolled = useMemo(() => toHsla(config.scrolledBg.h, config.scrolledBg.s, config.scrolledBg.l, config.scrolledBg.opacity), [config]);
-
-  const vars = useMemo(() => {
-    return {
-      ["--header-height" as any]: `${config.heightPx}px`,
-      ["--logo-width" as any]: `${config.logoWidthPx}px`,
-      ["--bg-top" as any]: bgTop,
-      ["--bg-scrolled" as any]: bgScrolled,
-    } as React.CSSProperties;
-  }, [config, bgTop, bgScrolled]);
-
-  const isStickyActive = !!config.sticky && scrolled;
-
-  const navLinks: NavLink[] = (settings?.header?.navLinks?.length ? settings.header.navLinks : [
-    { href: "/#services", label: "Services" },
-    { href: "/#cases", label: "Cases" },
-    { href: "/#om-os", label: "Om os" },
-    { href: "/#kontakt", label: "Kontakt" },
-  ]);
-
-  const isHomepage = pathname === "/";
-  const logoUrl = isHomepage ? settings?.logoUrl : brand?.logoUrl;
-  const logoAlt = isHomepage ? (settings?.websiteTitle || "Digifly") : (brand?.name || "Digifly");
-  const linkClass = config.linkClass || "text-white hover:text-primary";
-
-  const configKey = useMemo(() => {
-    return [
-      config.heightPx,
-      config.logoWidthPx,
-      config.linkClass,
-      config.topBg.h, config.topBg.s, config.topBg.l, config.topBg.opacity,
-      config.scrolledBg.h, config.scrolledBg.s, config.scrolledBg.l, config.scrolledBg.opacity,
-    ].join("|");
-  }, [config]);
+  const bg = scrolled ? config.scrolledBg : config.topBg;
 
   return (
-    <div key={configKey} style={vars}>
-      {isStickyActive && <div aria-hidden style={{ height: `var(--header-height)` }} />}
-      <div
-        data-header-wrap
-        className={isStickyActive ? "fixed top-0 left-0 right-0 z-[60]" : ""}
-        style={isStickyActive ? { background: "var(--bg-scrolled)" } : { background: 'var(--bg-top)' }}
-      >
-        <Header
-          brand={brand}
-          logoUrl={logoUrl || "/digifly-logo-dark.svg"}
-          logoAlt={logoAlt}
-          settings={settings}
-          navLinks={navLinks}
-          linkClass={linkClass}
-          heightPx={config.heightPx}
-          logoWidthPx={config.logoWidthPx}
-          sticky={!!config.sticky}
-        />
+    <header
+      className={`w-full z-50 ${config.sticky ? 'sticky top-0' : ''}`}
+      style={{
+        background: hsla(bg),
+        borderBottom: config.border.enabled ? `${config.border.widthPx}px solid ${config.border.colorHex}` : 'none',
+      }}
+    >
+      <div className="mx-auto flex items-center justify-between px-4" style={{ height: config.heightPx, maxWidth: 1140 }}>
+        <Link href="/" className="flex items-center gap-2" aria-label="Gå til forsiden">
+          <Image
+            src={config.logoUrl || '/digifly-logo-dark.svg'}
+            alt={config.logoAlt || 'Digifly'}
+            width={config.logoWidthPx}
+            height={Math.round(config.logoWidthPx / 3)}
+            priority
+            style={{ height: 'auto' }}
+          />
+        </Link>
+        <nav className="hidden gap-6 md:flex">
+          {config.navLinks.map((l) => (
+            <Link key={l.href} href={l.href} className={`text-sm font-medium transition-colors ${config.linkClass}`}>
+              {l.label}
+            </Link>
+          ))}
+        </nav>
       </div>
-
-    </div>
+    </header>
   );
 }
