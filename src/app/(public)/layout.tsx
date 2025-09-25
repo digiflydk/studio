@@ -1,57 +1,62 @@
-import { ReactNode } from "react";
-import { Header } from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import { getGeneralSettings } from "@/services/settings";
-import { ThemeProvider } from "@/context/ThemeContext";
+'use client';
 
-type AnyObj = Record<string, any>;
+import { ReactNode, useState } from 'react';
+import { Header } from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+import type { GeneralSettings, NavLink } from '@/types/settings';
+import { ThemeProvider } from '@/context/ThemeContext';
+import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
+import CookieBanner from '@/components/cookies/CookieBanner';
+import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
+import { useCookieConsent } from '@/hooks/useCookieConsent';
+import { getWebsiteHeaderConfig } from '@/services/website.server';
+import type { WebsiteHeaderConfig } from '@/services/website';
 
-export default async function PublicLayout({
+export default function PublicLayout({
   children,
+  settings,
+  headerConfig,
 }: {
   children: ReactNode;
+  settings: GeneralSettings | null;
+  headerConfig: WebsiteHeaderConfig;
 }) {
-  const settings = await getGeneralSettings();
-  const header: AnyObj = ((settings as AnyObj)?.header ?? {}) as AnyObj;
-
-  const navLinks =
-    (Array.isArray((header as AnyObj).navLinks) && (header as AnyObj).navLinks.length > 0
-      ? (header as AnyObj).navLinks
-      : (settings as AnyObj)?.headerNavLinks) || [];
-
-  const headerHeight =
-    (header as AnyObj).height ?? (settings as AnyObj)?.headerHeight ?? 80;
-
-  const logoUrl =
-    (settings as AnyObj)?.logoUrl ?? (header as AnyObj)?.logo?.src ?? undefined;
-
-  const logoAlt =
-    (settings as AnyObj)?.logoAlt ?? (header as AnyObj)?.logo?.alt ?? "Digifly";
-
-  const logoWidth =
-    (header as AnyObj)?.logo?.maxWidth ??
-    (settings as AnyObj)?.headerLogoWidth ??
-    150;
-
-  const sticky =
-    (header as AnyObj)?.sticky ?? (settings as AnyObj)?.headerIsSticky ?? true;
+  const [showCookieSettings, setShowCookieSettings] = useState(false);
+  const { cookieConsent, showBanner, handleAcceptAll, handleAcceptNecessary, handleSaveConsent } = useCookieConsent(settings);
 
   return (
     <ThemeProvider settings={settings}>
       <Header
         settings={settings}
-        navLinks={navLinks}
-        heightPx={headerHeight}
-        logoUrl={logoUrl || undefined}
-        logoAlt={logoAlt}
-        logoWidthPx={logoWidth}
-        sticky={!!sticky}
-        linkClass="text-black hover:text-primary"
+        navLinks={headerConfig.navLinks}
+        heightPx={headerConfig.heightPx}
+        logoUrl={headerConfig.logoUrl}
+        logoAlt={settings?.logoAlt ?? 'Digifly'}
+        logoWidthPx={headerConfig.logoWidthPx}
+        sticky={headerConfig.sticky}
+        linkClass={headerConfig.linkClass}
       />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">{children}</main>
-        <Footer settings={settings} />
+        <Footer settings={settings} onOpenCookieSettings={() => setShowCookieSettings(true)} />
       </div>
+      <MobileFloatingCTA settings={settings} />
+
+      {showBanner && (
+        <CookieBanner
+          settings={settings?.cookies || null}
+          onAcceptAll={handleAcceptAll}
+          onAcceptNecessary={handleAcceptNecessary}
+          onCustomize={() => setShowCookieSettings(true)}
+        />
+      )}
+      <CookieSettingsModal
+        isOpen={showCookieSettings}
+        onOpenChange={setShowCookieSettings}
+        settings={settings?.cookies || null}
+        onSave={handleSaveConsent}
+        initialConsent={cookieConsent}
+      />
     </ThemeProvider>
   );
 }
