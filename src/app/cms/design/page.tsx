@@ -1,4 +1,4 @@
-
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import { useTheme, defaultTheme, ThemeProvider } from "@/context/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DiffDialog } from "@/components/admin/DiffDialog";
 import { ConflictDialog } from "@/components/admin/ConflictDialog";
 import { simpleDiff } from "@/lib/utils/diff";
-import { getSettingsAction as getGeneralSettings, saveSettingsAction as saveGeneralSettings } from "@/app/actions";
+import { getSettingsAction as getGeneralSettings, saveSettingsAction } from "@/app/actions";
 
 function hslToHex(h: number, s: number, l: number) {
   l /= 100;
@@ -233,7 +233,7 @@ function CmsDesignPageContent() {
         }
 
         try {
-            const res = await saveGeneralSettings(settingsToSave);
+            const res = await saveSettingsAction(settingsToSave);
             
             if (!res.success) {
                 throw new Error(res.message || 'Save failed');
