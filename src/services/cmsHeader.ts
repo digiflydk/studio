@@ -1,26 +1,17 @@
+
 import { adminDb } from "@/lib/server/firebaseAdmin";
+import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
 
-type AnyObj = Record<string, any>;
+const DOC_PATH = "cms/pages/header/header";
 
-export async function getCmsHeaderDoc(): Promise<AnyObj | null> {
-  const p1 = adminDb.doc("cms/pages/header/header");
-  const snap1 = await p1.get();
-  if (snap1.exists) {
-    const d = snap1.data() as AnyObj;
-    return d || null;
-  }
-  const p2 = adminDb.doc("cms/pages/header");
-  const snap2 = await p2.get();
-  if (snap2.exists) {
-    const d = snap2.data() as AnyObj;
-    return d || null;
-  }
-  return null;
+export async function getCmsHeaderDoc(): Promise<CmsHeaderDoc | null> {
+  const snap = await adminDb.doc(DOC_PATH).get();
+  return snap.exists ? (snap.data() as CmsHeaderDoc) : null;
 }
 
-export async function getCmsHeaderAppearance(): Promise<any | null> {
-  const res = await fetch('/api/cms/pages/header/appearance', { cache: 'no-store' });
-  if (!res.ok) return null;
-  const json = await res.json();
-  return json?.data ?? null;
+export async function saveCmsHeaderDoc(payload: CmsHeaderDoc) {
+  await adminDb.doc(DOC_PATH).set(
+    { ...payload, updatedAt: new Date() },
+    { merge: true }
+  );
 }

@@ -1,3 +1,4 @@
+
 export async function getCmsHeaderClient() {
   const res = await fetch("/api/cms/header", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load CMS header");

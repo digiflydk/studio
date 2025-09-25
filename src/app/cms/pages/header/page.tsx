@@ -1,31 +1,43 @@
-"use client";
 
-import { useEffect, useState } from "react";
-import { getCmsHeaderClient } from "@/services/cmsHeader.client";
+import { loadHeaderAction } from "./actions";
+import CmsHeaderForm from "@/components/cms/CmsHeaderForm";
+import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
 
-export default function CmsHeaderPage() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    let alive = true;
-    getCmsHeaderClient()
-      .then((d) => { if (alive) { setData(d); setLoading(false); } })
-      .catch((e) => { if (alive) { setErr(e?.message || "Error"); setLoading(false); } });
-    return () => { alive = false; };
-  }, []);
+export default async function CmsHeaderPage() {
+  const doc = (await loadHeaderAction()) as CmsHeaderDoc | null;
 
-  if (loading) return <div className="p-6">Indlæser...</div>;
-  if (err) return <div className="p-6 text-red-600">Fejl: {err}</div>;
-  if (!data) return <div className="p-6">Ingen data i cms/pages/header</div>;
+  // Fallback hvis dokument ikke findes
+  const initial: CmsHeaderDoc =
+    doc ?? {
+      version: 1,
+      appearance: {
+        headerHeight: 80,
+        headerIsSticky: true,
+        headerLinkColor: "black",
+        isOverlay: false,
+        headerLogoWidth: 150,
+        logo: { src: "", alt: "Logo", maxWidth: 150 },
+        topBg: { h: 0, s: 0, l: 100, opacity: 1 },
+        scrolledBg: { h: 0, s: 0, l: 100, opacity: 1 },
+        border: {
+          enabled: true,
+          widthPx: 1,
+          colorHex: "#E5E7EB",
+          color: { h: 220, s: 13, l: 91, opacity: 100 },
+        },
+        navLinks: [],
+      },
+    };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold mb-4">CMS Header</h1>
-      <pre className="text-sm bg-muted p-4 rounded overflow-auto">
-        {JSON.stringify(data, null, 2)}
-      </pre>
+    <div className="px-4 py-6 md:px-6 md:py-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-2">Header Settings</h1>
+        <p className="text-muted-foreground mb-6">Manage the appearance and content of the website header.</p>
+        <CmsHeaderForm initial={initial} />
+      </div>
     </div>
   );
 }

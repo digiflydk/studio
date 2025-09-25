@@ -1,7 +1,10 @@
+
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 let app: App;
+let db: Firestore;
+
 if (getApps().length === 0) {
   try {
     const serviceAccount = process.env.FIREBASE_PRIVATE_KEY
@@ -18,12 +21,13 @@ if (getApps().length === 0) {
   } catch (e: any) {
      console.error('Firebase Admin Initialization Error', e.stack);
      // If it fails here, it's a server configuration issue.
-     // Let's not throw, but Firestore calls will fail.
+     // Fallback to existing app if available.
      app = getApps()[0]!;
   }
-
 } else {
   app = getApps()[0]!;
 }
 
-export const adminDb: Firestore = getFirestore(app);
+db = getFirestore(app);
+
+export { db as adminDb };
