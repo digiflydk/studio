@@ -1,23 +1,30 @@
-
-"use client";
-
-import Link from "next/link";
-import Logo from "@/components/logo";
-import { Brush, Settings, ChevronDown, Building, Search, Share2, MousePointerClick, Cookie, FileText, Sparkles, Users, HeartHandshake, LayoutDashboard } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState, useEffect, Suspense } from "react";
-import { getGeneralSettings } from "@/services/settings";
-import type { GeneralSettings } from "@/types/settings";
+'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import {
+  Home,
+  FileText,
+  Brush,
+  Users,
+  HeartHandshake,
+  Settings,
+  ChevronDown,
+  LayoutDashboard
+} from 'lucide-react';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { useState, useEffect, Suspense } from 'react';
+import type { GeneralSettings } from '@/types/settings';
+import Logo from '@/components/logo';
+import { getGeneralSettings } from '@/services/settings';
 
 const settingsNavLinks = [
     { href: "/cms/settings/general", label: "General", icon: Settings },
-    { href: "/cms/settings/ai", label: "AI Prompt", icon: Sparkles },
-    { href: "/cms/settings/seo", label: "SEO", icon: Search },
-    { href: "/cms/settings/social", label: "Social Share", icon: Share2 },
-    { href: "/cms/settings/tracking", label: "Tracking", icon: MousePointerClick },
-    { href: "/cms/settings/cookies", label: "Cookies", icon: Cookie },
+    { href: "/cms/settings/ai", label: "AI Prompt", icon: Brush },
+    { href: "/cms/settings/seo", label: "SEO", icon: Users },
+    { href: "/cms/settings/social", label: "Social Share", icon: HeartHandshake },
+    { href: "/cms/settings/tracking", label: "Tracking", icon: Home },
+    { href: "/cms/settings/cookies", label: "Cookies", icon: Home },
 ]
 
 function SidebarInner() {

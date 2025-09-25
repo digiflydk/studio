@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { getCmsHeaderAppearance } from '@/services/cmsHeader';
+import { getCmsHeaderDoc } from '@/services/cmsHeader';
 
 export default function CmsHeaderPage() {
   const [data, setData] = useState<any>(null);
@@ -8,7 +8,7 @@ export default function CmsHeaderPage() {
 
   useEffect(() => {
     let alive = true;
-    getCmsHeaderAppearance().then((d) => {
+    getCmsHeaderDoc().then((d) => {
       if (!alive) return;
       setData(d);
       setLoading(false);
@@ -16,7 +16,7 @@ export default function CmsHeaderPage() {
     return () => { alive = false; };
   }, []);
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <div>Loading…</div>
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Header Settings</h1>
