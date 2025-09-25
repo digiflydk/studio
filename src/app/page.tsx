@@ -1,13 +1,9 @@
+import PublicLayout from "./(public)/layout";
+import Home from "./(public)/page";
 
-import PublicLayout from './(public)/layout';
-import { getGeneralSettings } from '@/services/settings';
-import Home from './(public)/page';
-
-export default async function Page() {
-  const settings = await getGeneralSettings();
-
+export default function Page() {
   return (
-    <PublicLayout settings={settings}>
+    <PublicLayout>
       <Home />
     </PublicLayout>
   );
