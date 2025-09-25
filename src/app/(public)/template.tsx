@@ -1,4 +1,3 @@
-
 'use client';
 
 import { ReactNode, Suspense, useEffect, useState } from 'react';
@@ -23,7 +22,8 @@ const firebaseConfig = {
 };
 
 
-export default function Template({ children, settings }: { children: ReactNode, settings: GeneralSettings | null }) {
+export default function Template({ children }: { children: ReactNode }) {
+    const [settings, setSettings] = useState<GeneralSettings | null>(null);
     const {
         cookieConsent,
         showBanner,
@@ -39,7 +39,8 @@ export default function Template({ children, settings }: { children: ReactNode, 
         const db = getFirestore();
         const ref = doc(db, 'settings/general');
         const unsub = onSnapshot(ref, (snap) => {
-          const data = (snap.data() || {}) as any;
+          const data = (snap.data() || {}) as GeneralSettings;
+          setSettings(data);
           const vars = mapToCssVars(data.header, data.buttonSettings, data.themeColors);
           const root = document.documentElement;
           for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, String(v));
@@ -62,7 +63,7 @@ export default function Template({ children, settings }: { children: ReactNode, 
     return (
         <>
             <AnnouncementBanner />
-            <main>
+            <main className="flex-1">
                 {children}
             </main>
             <Suspense fallback={null}>
