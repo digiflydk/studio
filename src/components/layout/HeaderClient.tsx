@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -44,7 +45,7 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
             style={{ height: 'auto' }}
           />
         </Link>
-        <nav className="hidden gap-6 md:flex">
+        <nav className="hidden h-full items-center gap-6 md:flex">
           {config.navLinks.map((l) => (
             <Link key={l.href} href={l.href} className={`text-sm font-medium transition-colors ${config.linkClass}`}>
               {l.label}
