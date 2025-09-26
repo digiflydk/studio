@@ -1,6 +1,8 @@
 import { getGeneralSettingsServer } from "@/services/settings.server";
 import { getCmsHeaderAppearanceServer } from "@/services/cms.server";
 import { HeaderSettingsZ, type HeaderSettings } from "@/lib/validators/header.zod";
+import { serializeFirestore } from "@/lib/firestore/serialize";
+import { adminDb } from "@/lib/server/firebaseAdmin";
 
 function normalizeOpacity(v: number | undefined | null) {
   if (v == null) return 1;
@@ -11,6 +13,21 @@ function pickNum(...vals: Array<number | undefined>): number | undefined {
   for (const v of vals) if (typeof v === "number") return v;
   return undefined;
 }
+
+export type CmsHeaderDoc = {
+  appearance: any;
+  version?: number;
+  updatedAt?: string; // after serialization
+};
+
+export async function getCmsHeader(): Promise<CmsHeaderDoc | null> {
+  const snap = await adminDb.doc("cms/pages/header/header").get();
+  if (!snap.exists) return null;
+  const data = snap.data();
+  // make JSON-safe for Client Components
+  return serializeFirestore<CmsHeaderDoc>(data as CmsHeaderDoc);
+}
+
 
 export type WebsiteHeaderConfig = {
   heightPx: number;

@@ -1,5 +1,4 @@
-
-import { loadHeaderAction } from "./actions";
+import { getCmsHeader } from "@/services/website.server";
 import CmsHeaderForm from "@/components/cms/CmsHeaderForm";
 import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
 import FirestoreProbeClient from "../../debug/FirestoreProbeClient";
@@ -7,11 +6,11 @@ import FirestoreProbeClient from "../../debug/FirestoreProbeClient";
 export const dynamic = "force-dynamic";
 
 export default async function CmsHeaderPage() {
-  const doc = (await loadHeaderAction()) as CmsHeaderDoc | null;
+  const header = (await getCmsHeader()) as CmsHeaderDoc | null;
 
   // Fallback hvis dokument ikke findes
   const initial: CmsHeaderDoc =
-    doc ?? {
+    header ?? {
       version: 1,
       appearance: {
         headerHeight: 80,
