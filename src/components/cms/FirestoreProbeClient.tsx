@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { getDb } from "@/lib/client/firebase";
+import { db as getDb } from "@/lib/client/firebase";
 
 type ProbeResult =
   | { ok: true }
   | { ok: false; code?: string; name?: string; message?: string };
 
-export default function FirestoreProbe() {
+export default function FirestoreProbeClient() {
   const [result, setResult] = useState<ProbeResult | null>(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function FirestoreProbe() {
   }, []);
 
   return (
-    <pre className="rounded-md bg-blue-50 p-4 text-xs leading-5">
+    <pre className="text-xs p-3 bg-muted rounded overflow-auto">
       {JSON.stringify(result ?? { ok: false, message: "pending" }, null, 2)}
     </pre>
   );

@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { db } from "@/lib/client/firebase";
+import { getDb } from "@/lib/client/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { AdminHomeDoc } from "@/lib/types/admin";
 
 export default function AdminHomePage() {
   const [data, setData] = useState<AdminHomeDoc | null>(null);
-  const ref = doc(db, "admin/pages/home", "home");
+  const _db = getDb();
+  const ref = doc(_db, "admin/pages/home", "home");
 
   useEffect(() => {
     (async () => {

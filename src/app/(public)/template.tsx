@@ -28,8 +28,8 @@ export default function Template({ children }: { children: ReactNode }) {
     const [showCookieSettings, setShowCookieSettings] = useState(false);
     
     useEffect(() => {
-        const db = getDb();
-        const ref = doc(db, 'settings/general');
+        const _db = getDb();
+        const ref = doc(_db, 'settings/general');
         const unsub = onSnapshot(ref, (snap) => {
           const data = (snap.data() || {}) as GeneralSettings;
           setSettings(data);

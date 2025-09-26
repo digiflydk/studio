@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { db } from "@/lib/client/firebase";
+import { getDb } from "@/lib/client/firebase";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import type { AdminHeaderDoc } from "@/lib/types/admin";
 
 export default function AdminHeaderPage() {
   const [data, setData] = useState<AdminHeaderDoc | null>(null);
-  const ref = doc(db, "admin/pages/header", "header");
+  const _db = getDb();
+  const ref = doc(_db, "admin/pages/header", "header");
 
   useEffect(() => {
     (async () => {
