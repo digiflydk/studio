@@ -35,9 +35,29 @@ export default async function Home() {
   
   return (
     <>
-      {order.map(sectionKey => sections[sectionKey] ? (
-        <div key={sectionKey}>{sections[sectionKey]}</div>
-      ) : null)}
+      {order.map(sectionKey => {
+        if (visibility[sectionKey as keyof typeof visibility] === false) return null;
+        switch (sectionKey) {
+            case 'hero':
+                return <HeroSection key="hero" settings={settings} />;
+            case 'feature':
+                return <FeatureSection key="feature" settings={settings} />;
+            case 'services':
+                return <ServicesSection key="services" settings={settings} />;
+            case 'aiProject':
+                return <AiProjectSection key="aiProject" settings={settings} />;
+            case 'cases':
+                return <CasesSection key="cases" settings={settings} />;
+            case 'about':
+                return <AboutSection key="about" settings={settings} />;
+            case 'customers':
+                return <CustomersSection key="customers" settings={settings} />;
+            case 'tabs':
+                return <TabsSection key="tabs" settings={settings} />;
+            default:
+                return null;
+        }
+      })}
       <ContactSection settings={settings} />
       <StickyCta />
     </>

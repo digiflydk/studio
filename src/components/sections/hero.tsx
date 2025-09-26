@@ -54,6 +54,8 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     const sectionStyle: React.CSSProperties = {
         paddingTop: `${topPad}px`,
         paddingBottom: `${bottomPad}px`,
+        position: 'relative',
+        zIndex: 0,
     };
 
      if (settings?.heroLayout === 'textWithImageGrid' && settings?.heroSectionBackgroundColor) {
@@ -215,7 +217,6 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     return (
         <section
             id="hero"
-            className="relative w-full text-primary-foreground z-0"
             style={sectionStyle}
         >
             <div className="absolute inset-0 z-[-1]">

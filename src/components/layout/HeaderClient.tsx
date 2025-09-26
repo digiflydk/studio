@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -45,7 +46,7 @@ export default function HeaderClient({ config }: Props) {
   return (
     <div className={wrapperClass}>
       {/* HØJDE sættes på en almindelig div (så TS ikke brokker sig over style-prop) */}
-      <div className="site-container" style={{ height }}>
+      <div className="site-container mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8" style={{ height }}>
         <div className="h-full flex items-center justify-between gap-6">
           {/* Logo venstre */}
           <Link href="/" aria-label="Til forsiden" className="shrink-0 flex items-center">
