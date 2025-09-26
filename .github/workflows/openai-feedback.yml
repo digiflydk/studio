@@ -3,7 +3,7 @@ name: OpenAI PR Review for Digifly (DGF)
 on:
   pull_request:
     types: [closed]
-    branches: [ main ]  # skift hvis I merger til andre branches
+    branches: [ main ]
 
 jobs:
   review:
@@ -48,7 +48,6 @@ jobs:
           ID="${{ steps.task.outputs.task_id }}"
           FOUND=""
           if [ -n "$ID" ]; then
-            # typiske placeringer – tilpas efter behov
             for p in \
               "docs/specs/$ID.md" \
               "docs/specs/dgf/$ID.md" \
@@ -71,7 +70,6 @@ jobs:
           BASE="${{ steps.meta.outputs.pr_base_sha }}"
           HEAD="${{ steps.meta.outputs.pr_head_sha }}"
           git diff --unified=0 "$BASE" "$HEAD" > code_diff.txt || true
-          # truncate to keep payload small
           head -c 12000 code_diff.txt > code_diff_trunc.txt && mv code_diff_trunc.txt code_diff.txt
           echo -e "\n\n[Truncated if large]" >> code_diff.txt
 
@@ -116,7 +114,7 @@ jobs:
             echo '```'
             echo
             echo "Please review the implementation **against the DGF task context/spec above** and return:"
-            echo "1) Does it meet the acceptance criteria (cite lines/sections from the spec/PR)?"
+            echo "1) Does it meet the acceptance criteria (cite spec/PR lines/sections)?"
             echo "2) Risks & bugs/smells"
             echo "3) Breaking changes/migrations"
             echo "4) 3 concrete fixes/improvements (with file/line hints)"
@@ -156,8 +154,9 @@ jobs:
             payload.json
             response.json
             code_diff.txt
+            feedback.txt
 
-      - name: Post to Microsoft Teams
+      - name: Post to Microsoft Teams (with DGF header)
         if: ${{ success() && env.TEAMS_WEBHOOK_URL != '' }}
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
@@ -166,9 +165,21 @@ jobs:
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           REPO="${{ github.repository }}"
           BRANCH="${{ github.ref_name }}"
+          TASK_ID="${{ steps.task.outputs.task_id }}"
+          PR_TITLE="${{ steps.meta.outputs.pr_title }}"
+
+          # Build a descriptive title that includes DGF-XXX (or fallback)
+          if [ -z "$TASK_ID" ]; then
+            TITLE="ChatGPT DGF review: (no task id) — ${PR_TITLE}"
+          else
+            TITLE="ChatGPT DGF review: ${TASK_ID} — ${PR_TITLE}"
+          fi
+
+          # Truncate feedback to fit Teams payload limits
           head -c 6000 feedback.txt > feedback_trunc.txt
 
           jq -n \
+            --arg title "$TITLE" \
             --arg repo "$REPO" \
             --arg branch "$BRANCH" \
             --arg sha "$SHORT_SHA" \
@@ -179,7 +190,7 @@ jobs:
               "@context":"https://schema.org/extensions",
               "summary":"DGF PR review",
               "themeColor":"7A4ED9",
-              "title": ("ChatGPT DGF review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
+              "title": $title,
               "sections":[{"text": $feedback}],
               "potentialAction":[
                 {"@type":"OpenUri","name":"View workflow run","targets":[{"os":"default","uri": $run_url}]}
