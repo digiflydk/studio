@@ -2,33 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/client/firebase";
-import { doc, onSnapshot, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 export function useHeaderDoc() {
   const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
-    const ref = doc(db, "cms/pages/header", "header");
-
-    // Realtime subscription
-    const unsub = onSnapshot(
-      ref,
-      (snap) => setData(snap.data() ?? null),
-      async (err) => {
-        // Hvis stream fejler (fx 'unavailable'), fald tilbage til engangslæsning
-        // så UI stadig har data
-        console.error("header onSnapshot error:", err?.code || err?.message);
-        try {
-          const once = await getDoc(ref);
-          setData(once.data() ?? null);
-        } catch (e) {
-          console.error("header getDoc fallback failed:", (e as any)?.code || e);
-        }
+    (async () => {
+      try {
+        const ref = doc(db, "cms/pages/header", "header");
+        const snap = await getDoc(ref);      // one-shot read
+        setData(snap.exists() ? snap.data() : null);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
       }
-    );
-
-    return () => unsub();
+    })();
   }, []);
 
-  return data;
+  return { data, loading, error };
 }
