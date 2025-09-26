@@ -1,0 +1,34 @@
+name: OpenAI Feedback on Code Changes
+
+on:
+  push:
+    branches: [main]  # Eller den branch, du vil overvåge
+
+jobs:
+  get-feedback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get diff
+        run: |
+          git fetch origin ${{ github.event.before }} --depth=1
+          git diff ${{ github.event.before }} ${{ github.sha }} > code_diff.txt
+
+      - name: Ask ChatGPT for feedback
+        run: |
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "gpt-4o",
+              "messages": [
+                {"role": "system", "content": "You are a helpful code review assistant."},
+                {"role": "user", "content": "Please review the following code changes and give feedback:\n\n"},
+                {"role": "user", "content": "'"$(cat code_diff.txt)"'"}
+              ]
+            }')
+          echo "$RESPONSE"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
