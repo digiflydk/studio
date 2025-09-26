@@ -65,10 +65,20 @@ export default function Hero({ settings }: { settings: any }) {
 
           {/* Images */}
           <div className="grid grid-cols-2 grid-rows-2 gap-6">
-            {g1 && <Image src={g1} alt="" width={640} height={480} priority className="rounded-xl shadow-xl object-cover w-full h-auto" />}
-            {g2 && <Image src={g2} alt="" width={640} height={480} className="rounded-xl shadow-xl object-cover w-full h-auto" />}
-            {g3 && <Image src={g3} alt="" width={640} height={480} className="rounded-xl shadow-xl object-cover w-full h-auto" />}
-            {g4 && <Image src={g4} alt="" width={640} height={480} className="rounded-xl shadow-xl object-cover w-full h-auto" />}
+            {[g1, g2, g3, g4].map(
+              (url, i) =>
+                url && (
+                  <div key={i} className="relative w-full aspect-[4/3] overflow-hidden rounded-xl shadow-xl">
+                    <Image
+                      src={url}
+                      alt=""
+                      fill
+                      priority={i === 0} // første billede = LCP priority
+                      className="object-cover"
+                    />
+                  </div>
+                )
+            )}
           </div>
         </div>
       </div>
