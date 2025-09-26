@@ -1,6 +1,5 @@
-
 import { ReactNode } from 'react';
-import HeaderClient from '@/components/layout/HeaderClient';
+import SiteHeader from '@/components/layout/SiteHeader';
 import { getGeneralSettings } from '@/services/settings';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { getAdminHeader } from '@/services/admin.server';
@@ -31,7 +30,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
 
   return (
     <ThemeProvider settings={settings}>
-      <HeaderClient config={headerConfig} />
+      <SiteHeader />
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">{children}</main>
       </div>

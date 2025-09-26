@@ -1,8 +1,8 @@
 
 
 import { getAdminHome } from "@/services/admin.server";
-import { getSettingsAction } from "@/app/actions";
 import Hero from "@/components/sections/Hero";
+import { getSettingsAction } from "@/app/actions";
 import FeatureSection from '@/components/sections/feature';
 import ServicesSection from '@/components/sections/services';
 import AiProjectSection from '@/components/sections/ai-project';
@@ -15,8 +15,8 @@ import TabsSection from '@/components/sections/tabs-section';
 
 
 export default async function HomePage() {
-  const settings = await getSettingsAction();
   const home = await getAdminHome();
+  const settings = await getSettingsAction();
   const s = settings ?? {};
 
   // Combine settings for Hero
@@ -39,31 +39,8 @@ export default async function HomePage() {
   }
 
   return (
-    <main>
-      {order.map((key) => {
-        switch (key) {
-          case "hero":
-            return s.sectionVisibility?.hero ? <Hero key="hero" settings={heroSettings} /> : null;
-          case 'feature':
-                return s.sectionVisibility?.feature !== false ? <FeatureSection key="feature" settings={s} /> : null;
-            case 'services':
-                return s.sectionVisibility?.services !== false ? <ServicesSection key="services" settings={s} /> : null;
-            case 'aiProject':
-                return s.sectionVisibility?.aiProject !== false ? <AiProjectSection key="aiProject" settings={s} /> : null;
-            case 'cases':
-                return s.sectionVisibility?.cases !== false ? <CasesSection key="cases" settings={s} /> : null;
-            case 'about':
-                return s.sectionVisibility?.about !== false ? <AboutSection key="about" settings={s} /> : null;
-            case 'customers':
-                return s.sectionVisibility?.customers !== false ? <CustomersSection key="customers" settings={s} /> : null;
-            case 'tabs':
-                return s.sectionVisibility?.tabs !== false ? <TabsSection key="tabs" settings={s} /> : null;
-          default:
-            return null;
-        }
-      })}
-      <ContactSection settings={s} />
-      <StickyCta />
-    </main>
+    <>
+      {home ? <Hero home={home} /> : null}
+    </>
   );
 }

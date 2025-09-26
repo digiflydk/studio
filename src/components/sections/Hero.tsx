@@ -1,98 +1,94 @@
 
 import Image from "next/image";
+import Link from "next/link";
+import type { AdminHomeDoc } from "@/lib/types/admin";
 
-type Color = { h: number; s: number; l: number };
-type Padding = { top?: number; bottom?: number; topMobile?: number; bottomMobile?: number };
+type Props = { home: AdminHomeDoc };
 
-export default function Hero({ settings }: { settings: any }) {
-  const s = settings ?? {};
-  const pad: Padding = s.sectionPadding?.hero ?? {};
-  const pt = pad.top ?? 80;
-  const pb = pad.bottom ?? 80;
-  const ptM = pad.topMobile ?? 64;
-  const pbM = pad.bottomMobile ?? 64;
+export default function Hero({ home }: Props) {
+  const hero = home?.hero;
+  if (!hero?.enabled) return null;
 
-  const bg: Color = s.heroSectionBackgroundColor ?? { h: 0, s: 0, l: 100 };
-
-  const headline = s.heroHeadline ?? "Flow. Automatisér. Skalér.";
-  const desc = s.heroDescription ?? "";
-  const ctaEnabled = s.heroCtaEnabled ?? true;
-  const ctaText = s.heroCtaText ?? "Book et møde";
-  const ctaHref = s.heroCtaLink ?? "#contact";
-
-  const hDesktop = s.heroHeadlineSize ?? 55;
-  const hMobile = s.heroHeadlineSizeMobile ?? 40;
-  const textMax = s.heroTextMaxWidth ?? 700;
-
-  const g1 = s.heroGridImage1Url;
-  const g2 = s.heroGridImage2Url;
-  const g3 = s.heroGridImage3Url;
-  const g4 = s.heroGridImage4Url;
-  
   return (
     <section
+      className="w-full"
       style={{
-        backgroundColor: `hsl(${bg.h} ${bg.s}% ${bg.l}%)`,
-        paddingTop: ptM,
-        paddingBottom: pbM,
+        paddingTop: hero.spacing?.top ?? 80,
+        paddingBottom: hero.spacing?.bottom ?? 80,
       }}
-      className="sm:pt-0 sm:pb-0"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" style={{ paddingTop: pt, paddingBottom: pb }}>
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          {/* Text */}
-          <div>
-            <h1 className="font-extrabold tracking-tight text-slate-900" style={{ fontSize: `${hMobile}px` }}>
-              <span className="hidden sm:inline" style={{ fontSize: `${hDesktop}px` }}>
-                {headline}
-              </span>
-              <span className="sm:hidden">{headline}</span>
-            </h1>
-
-            <p className="mt-6 text-slate-700" style={{ maxWidth: textMax, fontSize: s.heroDescriptionSize ?? 22 }}>
-              {desc}
+      <div className="mx-auto max-w-7xl px-4 md:px-6 grid md:grid-cols-2 gap-12 items-center">
+        <div className={hero.align === "center" ? "text-center" : "text-left"}>
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight max-w-[900px]">
+            {hero.headline}
+          </h1>
+          {hero.description ? (
+            <p className="mt-6 text-lg text-slate-600 max-w-[700px]">
+              {hero.description}
             </p>
+          ) : null}
+          {hero.ctaText && hero.ctaLink ? (
+            <Link
+              href={hero.ctaLink}
+              className="mt-8 inline-flex rounded-full bg-black text-white px-6 py-3 font-medium"
+            >
+              {hero.ctaText}
+            </Link>
+          ) : null}
+        </div>
 
-            {ctaEnabled && ctaHref && (
-              <a
-                href={ctaHref}
-                className="mt-8 inline-flex items-center rounded-full bg-slate-900 px-6 py-3 text-white hover:bg-slate-800"
-                style={{ fontSize: s.heroCtaTextSize ?? 16 }}
-              >
-                {ctaText}
-              </a>
-            )}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="rounded-2xl shadow-xl overflow-hidden">
+            {hero.images?.tl ? (
+              <Image
+                src={hero.images.tl}
+                alt=""
+                width={600}
+                height={800}
+                priority
+                style={{ height: "auto", width: "100%" }}
+                sizes="(max-width: 768px) 100vw, 25vw"
+              />
+            ) : null}
           </div>
 
-          {/* Images */}
-          <div className="grid grid-cols-2 grid-rows-2 gap-6">
-            {/* TL = Portrait */}
-            {g1 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                <Image src={g1} alt="Hero image 1" fill priority sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
-              </div>
-            )}
+          <div className="rounded-2xl shadow-xl overflow-hidden">
+            {hero.images?.tr ? (
+              <Image
+                src={hero.images.tr}
+                alt=""
+                width={600}
+                height={600}
+                style={{ height: "auto", width: "100%" }}
+                sizes="(max-width: 768px) 100vw, 25vw"
+              />
+            ) : null}
+          </div>
 
-            {/* TR = Square */}
-            {g2 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-square">
-                <Image src={g2} alt="Hero image 2" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
-              </div>
-            )}
+          <div className="rounded-2xl shadow-xl overflow-hidden">
+            {hero.images?.bl ? (
+              <Image
+                src={hero.images.bl}
+                alt=""
+                width={600}
+                height={600}
+                style={{ height: "auto", width: "100%" }}
+                sizes="(max-width: 768px) 100vw, 25vw"
+              />
+            ) : null}
+          </div>
 
-            {/* BL = Square */}
-            {g3 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-square">
-                 <Image src={g3} alt="Hero image 3" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
-              </div>
-            )}
-
-            {/* BR = Portrait */}
-            {g4 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                <Image src={g4} alt="Hero image 4" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
-              </div>
-            )}
+          <div className="rounded-2xl shadow-xl overflow-hidden">
+            {hero.images?.br ? (
+              <Image
+                src={hero.images.br}
+                alt=""
+                width={600}
+                height={800}
+                style={{ height: "auto", width: "100%" }}
+                sizes="(max-width: 768px) 100vw, 25vw"
+              />
+            ) : null}
           </div>
         </div>
       </div>
