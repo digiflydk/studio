@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 
 type Color = { h: number; s: number; l: number };
@@ -68,28 +69,28 @@ export default function Hero({ settings }: { settings: any }) {
             {/* TL = Portrait */}
             {g1 && (
               <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                <Image src={g1} alt="" width={600} height={800} priority style={{height:"auto"}} sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
+                <Image src={g1} alt="Hero image 1" fill priority sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
               </div>
             )}
 
-            {/* TR = Landscape */}
+            {/* TR = Square */}
             {g2 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
-                <Image src={g2} alt="" width={600} height={600} style={{height:"auto"}} sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
+              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-square">
+                <Image src={g2} alt="Hero image 2" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
               </div>
             )}
 
-            {/* BL = Landscape */}
+            {/* BL = Square */}
             {g3 && (
-              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
-                 <Image src={g3} alt="" width={600} height={600} style={{height:"auto"}} sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
+              <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-square">
+                 <Image src={g3} alt="Hero image 3" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
               </div>
             )}
 
             {/* BR = Portrait */}
             {g4 && (
               <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                <Image src={g4} alt="" width={600} height={800} style={{height:"auto"}} sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
+                <Image src={g4} alt="Hero image 4" fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
               </div>
             )}
           </div>

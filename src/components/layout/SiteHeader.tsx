@@ -72,14 +72,18 @@ export default function SiteHeader({
         style={heightStyle}
       >
         <Link href="/" className="flex items-center">
-          <Image
-            src={config.logo?.src ?? "/logo.svg"}
-            alt={config.logo?.alt ?? "Logo"}
-            width={config.logo?.maxWidth ?? 150}
-            height={Math.round((config.logo?.maxWidth ?? 150) * 0.27)}
-            priority
-            style={{ width: "100%", height: "auto", maxWidth: config.logo?.maxWidth ?? 150 }}
-          />
+          {config.logo?.src ? (
+            <Image
+              src={config.logo.src}
+              alt={config.logo.alt ?? "Logo"}
+              width={config.logo.maxWidth ?? 150}
+              height={Math.round((config.logo.maxWidth ?? 150) * 0.27)}
+              priority
+              style={{ width: "100%", height: "auto", maxWidth: config.logo.maxWidth ?? 150 }}
+            />
+          ) : (
+            <span className="font-semibold">{config.logo?.alt ?? "Digifly"}</span>
+          )}
         </Link>
 
         <nav className="ml-auto hidden items-center gap-6 md:flex">
