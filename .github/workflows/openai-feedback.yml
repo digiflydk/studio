@@ -50,14 +50,29 @@ jobs:
           sudo apt-get update -y >/dev/null 2>&1 || true
           sudo apt-get install -y jq >/dev/null 2>&1 || true
 
-      - name: Build JSON payload (escaped)
+      - name: Build JSON payload (escaped, safe)
         run: |
-          jq -n --arg diff "$(cat code_diff.txt)" \
+          # Byg prompt i en fil for at undgå shell-/jq-quoting problemer
+          {
+            echo "Review these changes."
+            echo "1) Risks"
+            echo "2) Bugs/smells"
+            echo "3) Breaking changes/migrations"
+            echo "4) Give 3 concrete fixes with file/line hints."
+            echo
+            echo "Diff:"
+            echo '```diff'
+            cat code_diff.txt
+            echo '```'
+          } > prompt.txt
+
+          # Brug --rawfile for at indlæse hele prompten korrekt escaped
+          jq -n --rawfile prompt prompt.txt \
             '{
                model: "gpt-4o",
                messages: [
                  {role:"system", content:"You are a senior code review assistant. Be concise, actionable, and return markdown."},
-                 {role:"user", content: "Review these changes. 1) Risks, 2) bugs/smells, 3) breaking changes/migrations, 4) 3 concrete fixes with file/line hints.\n\n```diff\n"+$diff+"\n```"}
+                 {role:"user", content: $prompt}
                ]
              }' > payload.json
           echo "Payload built."
@@ -82,11 +97,12 @@ jobs:
           name: openai-feedback
           path: |
             code_diff.txt
+            prompt.txt
             payload.json
             response.json
             feedback.txt
 
-      # Teams-posting (rettet if: brug env i stedet for secrets)
+      # Teams-posting (brug env i if:)
       - name: Post feedback to Microsoft Teams
         if: ${{ success() && env.TEAMS_WEBHOOK_URL != '' }}
         env:
