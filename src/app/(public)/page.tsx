@@ -1,6 +1,7 @@
 
 
-import HeroSection from '@/components/sections/hero';
+import { getSettingsAction } from "@/app/actions";
+import Hero from "@/components/sections/Hero";
 import FeatureSection from '@/components/sections/feature';
 import ServicesSection from '@/components/sections/services';
 import AiProjectSection from '@/components/sections/ai-project';
@@ -8,58 +9,46 @@ import CasesSection from '@/components/sections/cases';
 import AboutSection from '@/components/sections/about';
 import ContactSection from '@/components/sections/contact';
 import StickyCta from '@/components/sticky-cta';
-import { getGeneralSettings } from '@/services/settings';
 import CustomersSection from '@/components/sections/customers';
 import TabsSection from '@/components/sections/tabs-section';
 
-const defaultSectionOrder = ['hero', 'feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'tabs'];
 
-export default async function Home() {
-  const settings = await getGeneralSettings();
-  const visibility = settings?.sectionVisibility ?? {};
-  
-  const order = settings?.homePageSectionOrder && settings.homePageSectionOrder.length > 0 
-    ? settings.homePageSectionOrder.filter(id => id !== 'blog')
-    : defaultSectionOrder;
+export default async function HomePage() {
+  const settings = await getSettingsAction();
+  const s = (settings as any) ?? {};
 
-  const sections: Record<string, React.ReactNode> = {
-    hero: visibility.hero !== false ? <HeroSection settings={settings} /> : null,
-    feature: visibility.feature !== false ? <FeatureSection settings={settings} /> : null,
-    services: visibility.services !== false ? <ServicesSection settings={settings} /> : null,
-    aiProject: visibility.aiProject !== false ? <AiProjectSection settings={settings} /> : null,
-    cases: visibility.cases !== false ? <CasesSection settings={settings} /> : null,
-    about: visibility.about !== false ? <AboutSection settings={settings} /> : null,
-    customers: visibility.customers !== false ? <CustomersSection settings={settings} /> : null,
-    tabs: visibility.tabs !== false ? <TabsSection settings={settings} /> : null,
-  };
-  
+  // Respekter CMS-rækkefølge, men tving hero først hvis slået til
+  let order: string[] = s.homePageSectionOrder ?? ["hero", "feature", "services", "aiProject", "cases", "about", "customers"];
+  if (s.sectionVisibility?.hero && order[0] !== "hero") {
+    order = ["hero", ...order.filter((x) => x !== "hero")];
+  }
+
   return (
-    <>
-      {order.map(sectionKey => {
-        if (visibility[sectionKey as keyof typeof visibility] === false) return null;
-        switch (sectionKey) {
-            case 'hero':
-                return <HeroSection key="hero" settings={settings} />;
-            case 'feature':
-                return <FeatureSection key="feature" settings={settings} />;
+    <main>
+      {order.map((key) => {
+        switch (key) {
+          case "hero":
+            return s.sectionVisibility?.hero ? <Hero key="hero" settings={s} /> : null;
+          case 'feature':
+                return s.sectionVisibility?.feature !== false ? <FeatureSection key="feature" settings={s} /> : null;
             case 'services':
-                return <ServicesSection key="services" settings={settings} />;
+                return s.sectionVisibility?.services !== false ? <ServicesSection key="services" settings={s} /> : null;
             case 'aiProject':
-                return <AiProjectSection key="aiProject" settings={settings} />;
+                return s.sectionVisibility?.aiProject !== false ? <AiProjectSection key="aiProject" settings={s} /> : null;
             case 'cases':
-                return <CasesSection key="cases" settings={settings} />;
+                return s.sectionVisibility?.cases !== false ? <CasesSection key="cases" settings={s} /> : null;
             case 'about':
-                return <AboutSection key="about" settings={settings} />;
+                return s.sectionVisibility?.about !== false ? <AboutSection key="about" settings={s} /> : null;
             case 'customers':
-                return <CustomersSection key="customers" settings={settings} />;
+                return s.sectionVisibility?.customers !== false ? <CustomersSection key="customers" settings={s} /> : null;
             case 'tabs':
-                return <TabsSection key="tabs" settings={settings} />;
-            default:
-                return null;
+                return s.sectionVisibility?.tabs !== false ? <TabsSection key="tabs" settings={s} /> : null;
+          default:
+            return null;
         }
       })}
-      <ContactSection settings={settings} />
+      <ContactSection settings={s} />
       <StickyCta />
-    </>
+    </main>
   );
 }

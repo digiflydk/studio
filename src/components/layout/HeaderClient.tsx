@@ -1,26 +1,40 @@
-
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import type { WebsiteHeaderConfig } from "@/services/website.server";
 
-/**
- * Forventet shape i WebsiteHeaderConfig:
- * - heightPx?: number
- * - logoUrl?: string
- * - logoAlt?: string
- * - logoWidthPx?: number
- * - navLinks?: { label: string; href: string }[]
- * - cta?: { enabled?: boolean; label?: string; href?: string }
- */
-type Props = { config: WebsiteHeaderConfig };
+type NavLink = { label: string; href: string };
+type HeaderCTA = {
+  enabled?: boolean;
+  label?: string;
+  href?: string;
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "pill" | "outline";
+};
 
-export default function HeaderClient({ config }: Props) {
+export type WebsiteHeaderConfig = {
+  heightPx?: number;
+  sticky?: boolean;
+  overlay?: boolean;
+  linkColor?: "black" | "white";
+  logoUrl?: string;
+  logoAlt?: string;
+  logoMaxWidth?: number;
+  navLinks?: NavLink[];
+  border?: { enabled?: boolean; widthPx?: number; color?: { h: number; s: number; l: number } };
+  topBg?: { h: number; s: number; l: number; opacity?: number };
+  scrolledBg?: { h: number; s: number; l: number; opacity?: number };
+  cta?: HeaderCTA;
+};
+
+function hslCss({ h, s, l, opacity }: { h: number; s: number; l: number; opacity?: number }) {
+  const a = typeof opacity === "number" ? opacity : 1;
+  return `hsla(${h} ${s}% ${l}% / ${a})`;
+}
+
+export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }) {
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 2);
     onScroll();
@@ -29,68 +43,75 @@ export default function HeaderClient({ config }: Props) {
   }, []);
 
   const height = config.heightPx ?? 80;
-  const logoW = config.logoWidthPx ?? 150;
-  const logoH = Math.round(logoW * 0.27); // vandret logo, sikrer width+height-props
+  const stickyCls = config.sticky ? "sticky top-0 z-50" : "";
+  const borderWidth = config.border?.widthPx ?? 1;
+  const borderColor = config.border?.color ? hslCss({ ...config.border.color, opacity: 1 }) : "rgba(0,0,0,0.08)";
 
-  const wrapperClass = cn(
-    // sticky + overlay ovenpå hero
-    "sticky top-0 z-50",
-    // light bg + blur når man scroller
-    scrolled
-      ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70"
-      : "bg-white/90",
-    // tynd bundkant
-    "border-b border-black/10"
-  );
+  const bg = scrolled ? config.scrolledBg ?? config.topBg : config.topBg;
+  const bgStyle =
+    bg ? { backgroundColor: hslCss(bg) } : config.overlay ? { backgroundColor: "transparent" } : { backgroundColor: "white" };
+
+  const linkBase =
+    config.linkColor === "white" ? "text-white hover:text-white/80" : "text-slate-800 hover:text-slate-950";
+
+  const LOGO_W = config.logoMaxWidth ?? 150;
+  const LOGO_H = Math.max(1, Math.round(LOGO_W * 0.27)); // ratio-sikker
 
   return (
-    <div className={wrapperClass}>
-      {/* HØJDE sættes på en almindelig div (så TS ikke brokker sig over style-prop) */}
-      <div className="site-container mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8" style={{ height }}>
-        <div className="h-full flex items-center justify-between gap-6">
-          {/* Logo venstre */}
-          <Link href="/" aria-label="Til forsiden" className="shrink-0 flex items-center">
-            <Image
-              src={config.logoUrl ?? "/logo.svg"}
-              alt={config.logoAlt ?? "Digifly"}
-              width={logoW}
-              height={logoH}
-              priority
-              // CSS for at undgå Next/Image advarsel:
-              style={{ height: "auto", width: "100%", maxWidth: logoW }}
-            />
-          </Link>
+    <header
+      className={`${stickyCls}`}
+      style={{
+        borderBottom: config.border?.enabled ? `${borderWidth}px solid ${borderColor}` : undefined,
+      }}
+    >
+      <div className="w-full backdrop-blur-md" style={bgStyle}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" style={{ height }}>
+          <div className="flex h-full items-center justify-between">
+            {/* Logo */}
+            <Link href="/" aria-label="Forside" className="shrink-0 flex items-center gap-3">
+              <Image
+                src={config.logoUrl ?? "/logo.svg"}
+                alt={config.logoAlt ?? "Logo"}
+                width={LOGO_W}
+                height={LOGO_H}
+                priority
+                style={{ width: "100%", maxWidth: LOGO_W, height: "auto" }}
+              />
+            </Link>
 
-          {/* Navigation højre — inden for samme container-bredde */}
-          <nav className="ml-auto hidden md:block">
-            <ul className="flex items-center gap-6 text-[15px]">
-              {(config.navLinks ?? []).map((l) => (
-                <li key={l.href}>
-                  {l.href.startsWith("/") || l.href.startsWith("#") ? (
-                    <Link href={l.href} className="hover:underline">
-                      {l.label}
-                    </Link>
-                  ) : (
-                    <a href={l.href} className="hover:underline" rel="noopener noreferrer">
-                      {l.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-              {config.cta?.enabled && (
-                <li>
-                  <a
-                    href={config.cta.href ?? "#"}
-                    className="inline-flex items-center rounded-full px-4 py-2 border border-black/10 hover:border-black/30 transition"
+            {/* Nav + CTA */}
+            <div className="flex items-center gap-8">
+              <nav className="hidden md:flex items-center gap-8">
+                {(config.navLinks ?? []).map((l) => (
+                  <Link
+                    key={`${l.href}|${l.label}`}
+                    href={l.href}
+                    className={`${linkBase} text-sm font-medium relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all hover:after:w-full`}
                   >
-                    {config.cta.label ?? "Kontakt"}
-                  </a>
-                </li>
+                    {l.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {config.cta?.enabled && config.cta?.href && config.cta?.label && (
+                <Link
+                  href={config.cta.href}
+                  className={`inline-flex items-center justify-center rounded-full border border-transparent px-5 py-2 text-sm font-semibold transition
+                  ${
+                    config.cta.variant === "outline"
+                      ? "bg-transparent text-slate-900 border-slate-300 hover:bg-slate-50"
+                      : config.cta.variant === "pill"
+                      ? "bg-slate-900 text-white hover:bg-slate-800 rounded-full"
+                      : "bg-slate-900 text-white hover:bg-slate-800"
+                  }`}
+                >
+                  {config.cta.label}
+                </Link>
               )}
-            </ul>
-          </nav>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
