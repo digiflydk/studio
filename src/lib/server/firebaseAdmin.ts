@@ -1,4 +1,3 @@
-
 import { getApps, getApp, initializeApp, applicationDefault, cert, App } from "firebase-admin/app";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
 
@@ -8,16 +7,21 @@ export function initAdmin(): App {
   if (_adminApp) return _adminApp;
 
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
-  const svc = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const json = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const b64  = process.env.GOOGLE_APPLICATION_CREDENTIALS_B64;
+
+  let credentials: any = null;
+  if (json) credentials = JSON.parse(json);
+  else if (b64) credentials = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
 
   if (getApps().length) {
-    _adminApp = getApp(); // brug eksisterende
+    _adminApp = getApp();
     return _adminApp;
   }
 
   _adminApp = initializeApp(
-    svc
-      ? { credential: cert(JSON.parse(svc)), projectId }
+    credentials
+      ? { credential: cert(credentials), projectId }
       : { credential: applicationDefault(), projectId }
   );
 
