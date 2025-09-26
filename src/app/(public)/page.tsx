@@ -26,10 +26,10 @@ export default async function HomePage() {
       heroDescription: home?.hero.description ?? s.heroDescription,
       heroCtaText: home?.hero.ctaText ?? s.heroCtaText,
       heroCtaLink: home?.hero.ctaLink ?? s.heroCtaLink,
-      heroGridImage1Url: home?.hero.images.tl,
-      heroGridImage2Url: home?.hero.images.tr,
-      heroGridImage3Url: home?.hero.images.bl,
-      heroGridImage4Url: home?.hero.images.br,
+      heroGridImage1Url: home?.hero.images?.tl,
+      heroGridImage2Url: home?.hero.images?.tr,
+      heroGridImage3Url: home?.hero.images?.bl,
+      heroGridImage4Url: home?.hero.images?.br,
       heroLayout: 'textWithImageGrid', // Force this layout for now
   }
 

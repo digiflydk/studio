@@ -34,15 +34,17 @@ export type WebsiteHeaderConfig = {
   sticky: boolean;
   overlay?: boolean;
   linkColor?: "black" | "white";
-  logoUrl?: string;
-  logoAlt?: string;
-  logoWidthPx?: number;
-  logoScrolledUrl?: string;
-  bg: {
-    top: { h: number; s: number; l: number; opacity: number };
-    scrolled: { h: number; s: number; l: number; opacity: number };
+  logo?: {
+    src?: string;
+    alt?: string;
+    maxWidth?: number;
+    scrolledSrc?: string;
   };
-  border: {
+  bg?: {
+    initial?: { h: number; s: number; l: number; opacity: number };
+    scrolled?: { h: number; s: number; l: number; opacity: number };
+  };
+  border?: {
     enabled: boolean;
     widthPx: number;
     color: { h: number; s: number; l: number; opacity?: number };
@@ -143,12 +145,14 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     sticky,
     overlay,
     linkColor,
-    logoUrl,
-    logoAlt,
-    logoWidthPx: logoWidthPx,
-    logoScrolledUrl,
+    logo: {
+      src: logoUrl,
+      alt: logoAlt,
+      maxWidth: logoWidthPx,
+      scrolledSrc: logoScrolledUrl
+    },
     bg: {
-      top: { h: topH, s: topS, l: topL, opacity: topOpacity },
+      initial: { h: topH, s: topS, l: topL, opacity: topOpacity },
       scrolled: { h: scH, s: scS, l: scL, opacity: scOpacity },
     },
     border: {
