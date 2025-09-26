@@ -11,7 +11,7 @@ import { useCookieConsent } from '@/hooks/useCookieConsent';
 import type { GeneralSettings } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { db } from '@/lib/client/firebase';
 import { mapToCssVars } from '@/lib/design/mapToCssVars';
 
 
