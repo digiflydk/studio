@@ -1,20 +1,17 @@
-// ⚠️ Kun midlertidigt under udvikling
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // cms pages read
-    match /cms/pages/{page}/{docId} {
-      allow read: if true;            // <-- ÅBEN LÆSNING midlertidigt
-      allow write: if request.auth != null; // skriv stadig kræver auth
-    }
-
-    // settings læsning
     match /settings/{doc=**} {
-      allow read: if true; // eller begræns til specifikke dokumenter
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
-    // alt andet (mere restriktivt som før)
+    match /cms/{col=**}/{doc=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

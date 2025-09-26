@@ -1,7 +1,12 @@
 import { getCmsHeader } from "@/services/website.server";
 import CmsHeaderForm from "@/components/cms/CmsHeaderForm";
 import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
-import FirestoreProbeClient from "../../debug/FirestoreProbeClient";
+import dynamic from "next/dynamic";
+const FirestoreProbe = dynamic(
+  () => import("@/components/cms/FirestoreProbe"),
+  { ssr: false }
+);
+
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +44,13 @@ export default async function CmsHeaderPage() {
           <p className="text-muted-foreground mb-6">Manage the appearance and content of the website header.</p>
         </div>
         
-        <div className="p-4 border rounded-lg bg-background">
-            <h2 className="text-lg font-semibold mb-2">Firestore Client Probe</h2>
-            <p className="text-sm text-muted-foreground mb-4">This panel shows the result of a direct client-side read from Firestore to debug connection or permission issues.</p>
-            <FirestoreProbeClient />
-        </div>
+        <section className="rounded-lg bg-blue-50 p-4">
+          <h3 className="mb-2 text-lg font-semibold">Firestore Client Probe</h3>
+          <p className="mb-3 text-sm">
+            Dette viser resultatet af et direkte read fra Firestore i browseren.
+          </p>
+          <FirestoreProbe />
+        </section>
 
         <CmsHeaderForm initial={initial} />
       </div>

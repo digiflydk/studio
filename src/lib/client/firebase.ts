@@ -1,13 +1,8 @@
 "use client";
 
 import { initializeApp, getApps, getApp } from "firebase/app";
-import {
-  initializeFirestore,
-  type Firestore,
-  setLogLevel,
-} from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 
-// Læs fra NEXT_PUBLIC_* envs
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -17,15 +12,8 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Skru ned for støj fra SDK (valgfri: "error" eller "silent")
-setLogLevel("error");
-
-// I miljøer (App Hosting/proxy/corporate) fejler streaming → brug long-polling
-export const db: Firestore = initializeFirestore(app, {
-  // Lad SDK selv vælge long-polling, eller tving det i prod
+export const db = initializeFirestore(app, {
   experimentalAutoDetectLongPolling: true,
-  ...(process.env.NODE_ENV === "production" ? { experimentalForceLongPolling: true } : {}),
-  ignoreUndefinedProperties: true,
 });
