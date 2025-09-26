@@ -38,18 +38,30 @@ export default async function Home() {
   return (
     <>
       <div 
-        style={{ paddingTop: `${padTopMobile}px`, paddingBottom: `${padBottomMobile}px` }}
-        className="hero-pad-wrapper"
+        style={{ paddingTop: `${padTopMobile}px` }}
+        className="hero-pad-wrapper-mobile"
       >
+         <div 
+            className="hero-pad-wrapper-desktop"
+            style={{ paddingTop: `${padTop}px`}}
+          >
+            <HeroSection settings={settings} />
+        </div>
         <style>{`
+          .hero-pad-wrapper-desktop {
+             padding-top: ${padTop}px;
+          }
+          @media (max-width: 639px) {
+            .hero-pad-wrapper-desktop {
+                display: none;
+            }
+          }
           @media (min-width: 640px) {
-            .hero-pad-wrapper { 
-              padding-top: ${padTop}px; 
-              padding-bottom: ${padBottom}px;
+            .hero-pad-wrapper-mobile {
+                display: none;
             }
           }
         `}</style>
-        <HeroSection settings={settings} />
       </div>
 
       {order.map(sectionKey => sections[sectionKey] ? (

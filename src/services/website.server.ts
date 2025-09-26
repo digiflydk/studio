@@ -32,7 +32,7 @@ export type WebsiteHeaderConfig = {
     colorHex?: string;
   };
   navLinks: { label: string; href: string }[];
-  cta?: { enabled?: boolean; label?: string; href?: string };
+  cta?: { enabled?: boolean; label?: string; href?: string; linkType?: "internal" | "external"; };
 };
 
 function parseHeader(input: unknown): HeaderSettings | null {
