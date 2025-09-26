@@ -2,7 +2,7 @@ name: OpenAI Feedback on Code Changes
 
 on:
   push:
-    branches: [ main ]   # evt. skift til andre branches
+    branches: [ main ]  # skift hvis du vil overvåge andre branches
 
 jobs:
   get-feedback:
@@ -21,7 +21,7 @@ jobs:
         run: |
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
-          # Fallback når BEFORE er tom/0000… (fx første push)
+          # Fallback hvis BEFORE er tom/0000… (fx første push på branchen)
           if [ -z "$BEFORE" ] || [[ "$BEFORE" == 0000000000000000000000000000000000000000 ]]; then
             BEFORE="$(git rev-parse "$AFTER~1" || true)"
           fi
@@ -86,8 +86,9 @@ jobs:
             response.json
             feedback.txt
 
+      # Teams-posting (rettet if: brug env i stedet for secrets)
       - name: Post feedback to Microsoft Teams
-        if: ${{ success() && secrets.TEAMS_WEBHOOK_URL != '' }}
+        if: ${{ success() && env.TEAMS_WEBHOOK_URL != '' }}
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
         run: |
@@ -111,9 +112,7 @@ jobs:
               "summary":"OpenAI code review",
               "themeColor":"0078D7",
               "title": ("ChatGPT code review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
-              "sections":[
-                {"text": $feedback}
-              ],
+              "sections":[{"text": $feedback}],
               "potentialAction":[
                 {"@type":"OpenUri","name":"View workflow run","targets":[{"os":"default","uri": $run_url}]}
               ]
