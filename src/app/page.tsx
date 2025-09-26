@@ -4,10 +4,8 @@ import Template from "./(public)/template";
 
 export default function Page() {
   return (
-    <PublicLayout>
-      <Template>
+    <Template>
         <Home />
-      </Template>
-    </PublicLayout>
+    </Template>
   );
 }

@@ -1,31 +1,24 @@
 // src/services/admin.server.ts
 import "server-only";
 import type { AdminHeaderDoc, AdminHomeDoc } from "@/lib/types/admin";
-import { adminDb } from "@/lib/server/firebaseAdmin";
 import { Timestamp } from "firebase-admin/firestore";
 
 export async function getAdminHeader(): Promise<AdminHeaderDoc | null> {
   try {
-    const snap = await adminDb.doc("admin/pages/header/header").get();
-    if (!snap.exists) return null;
-    const data = snap.data() as any;
-    if (data?.updatedAt instanceof Timestamp) data.updatedAt = data.updatedAt.toDate().toISOString();
-    return data as AdminHeaderDoc;
-  } catch (err) {
-    console.error("Failed to get admin header:", err);
+    const res = await fetch(`/api/admin/header`, { cache: "no-store" });
+    if (!res?.ok) return null;
+    return await res.json();
+  } catch {
     return null;
   }
 }
 
 export async function getAdminHome(): Promise<AdminHomeDoc | null> {
   try {
-    const snap = await adminDb.doc("admin/pages/home/home").get();
-    if (!snap.exists) return null;
-    const data = snap.data() as any;
-    if (data?.updatedAt instanceof Timestamp) data.updatedAt = data.updatedAt.toDate().toISOString();
-    return data as AdminHomeDoc;
-  } catch (err) {
-    console.error("Failed to get admin home:", err);
+    const res = await fetch(`/api/admin/home`, { cache: "no-store" });
+    if (!res?.ok) return null;
+    return await res.json();
+  } catch {
     return null;
   }
 }
