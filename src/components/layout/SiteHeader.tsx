@@ -5,7 +5,19 @@ import { getAdminHeader } from "@/services/admin.server";
 
 export default async function SiteHeader() {
   const header = await getAdminHeader();
-  if (!header) return null;
+  
+  // If no header data, render a minimal fallback
+  if (!header) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b" style={{ height: 72 }}>
+        <div className="mx-auto max-w-7xl px-4 md:px-6 h-full flex items-center justify-between gap-6">
+          <Link href="/" aria-label="Forside" className="flex items-center">
+            <span className="text-lg font-semibold">Digifly</span>
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   const { logo, nav, cta, height, sticky, overlay, linkColor, border, bg } = header;
 
