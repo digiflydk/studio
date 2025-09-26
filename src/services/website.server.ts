@@ -16,7 +16,7 @@ export type WebsiteHeaderConfig = {
   heightPx: number;
   sticky: boolean;
   overlay?: boolean;
-  linkClass?: string;
+  linkColor?: "black" | "white";
   logoUrl?: string;
   logoAlt?: string;
   logoWidthPx?: number;
@@ -32,11 +32,11 @@ export type WebsiteHeaderConfig = {
     colorHex?: string;
   };
   navLinks: { label: string; href: string }[];
-  cta?: { 
-    enabled?: boolean; 
-    label?: string; 
-    href?: string; 
-    linkType?: "internal" | "external"; 
+  cta?: {
+    enabled?: boolean;
+    label?: string;
+    href?: string;
+    linkType?: "internal" | "external";
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "pill";
     size?: "default" | "sm" | "lg" | "icon";
   };
@@ -72,7 +72,6 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
 
   // FARVER/LINKS
   const linkColor = a.headerLinkColor ?? a.linkColor ?? sh.headerLinkColor ?? sh.linkColor;
-  const linkClass = linkColor === "white" ? "text-white" : "text-black";
 
   // STICKY/OVERLAY
   const sticky = (a.headerIsSticky ?? a.sticky ?? sh.headerIsSticky ?? sh.sticky ?? true) as boolean;
@@ -110,16 +109,26 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     (Array.isArray(a.navLinks) && a.navLinks.length > 0) ? a.navLinks :
     (Array.isArray((settings as any)?.headerNavLinks)) ? (settings as any).headerNavLinks : [];
 
-  const cta = a.cta ?? sh.cta ?? undefined;
+  const ctaSettings = sh?.cta ?? (settings as any)?.header?.cta ?? {};
+  const cta = ctaSettings.enabled
+    ? {
+        enabled: true,
+        label: ctaSettings.label ?? "Book et møde",
+        href: ctaSettings.href ?? "/#contact",
+        variant: ctaSettings.variant ?? "pill",
+        size: ctaSettings.size ?? "lg",
+        linkType: ctaSettings.linkType ?? "internal",
+      }
+    : undefined;
 
   return {
     heightPx,
     sticky,
     overlay,
-    linkClass,
+    linkColor,
     logoUrl,
     logoAlt,
-    logoWidthPx,
+    logoWidthPx: logoWidthPx,
     logoScrolledUrl,
     bg: {
       top: { h: topH, s: topS, l: topL, opacity: topOpacity },
