@@ -9,6 +9,7 @@ export type WebsiteHeaderConfig = {
   sticky: boolean;
   logoWidthPx: number;
   logoUrl?: string;
+  logoScrolledUrl?: string;
   logoAlt?: string;
   navLinks: { label: string; href: string }[];
   linkClass: string;
@@ -56,6 +57,11 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     a.logo?.src ??
     settings?.logoUrl ??
     undefined;
+  
+  const logoScrolledUrl = 
+    (a.logo as any)?.scrolledSrc ??
+    (settings as any)?.logoScrolledUrl ??
+    logoUrl;
 
   const logoAlt =
     a.logo?.alt ??
@@ -96,6 +102,7 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     sticky,
     logoWidthPx,
     logoUrl,
+    logoScrolledUrl,
     logoAlt,
     navLinks,
     linkClass,

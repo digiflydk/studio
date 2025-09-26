@@ -51,7 +51,7 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
               width={logoWidth}
               height={logoHeight}
               priority
-              style={{ height: 'auto', width: '100%', maxWidth: logoWidth }}
+              style={{ height: 'auto', width: 'auto', maxWidth: logoWidth }}
             />
           </Link>
           <nav className="hidden h-full items-center gap-6 md:flex">

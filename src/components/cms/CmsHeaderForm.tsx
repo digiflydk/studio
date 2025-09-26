@@ -2,7 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { useForm, useFieldArray, useTransition } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { useTransition } from "react";
 import type { CmsHeaderDoc, CmsNavLink } from "@/lib/types/cmsHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,7 @@ type Props = { initial: CmsHeaderDoc };
 export default function CmsHeaderForm({ initial }: Props) {
   const [isSaving, startTransition] = useTransition();
   const { toast } = useToast();
-  const { register, handleSubmit, control, watch } = useForm<CmsHeaderDoc>({
+  const { register, handleSubmit, control, watch, setValue } = useForm<CmsHeaderDoc>({
     defaultValues: initial,
   });
 
@@ -71,7 +72,7 @@ export default function CmsHeaderForm({ initial }: Props) {
 
           <Label className="flex flex-col gap-2">
             <span>Link farve</span>
-            <Select onValueChange={(v) => control.setValue("appearance.headerLinkColor", v as "black"|"white")} defaultValue={watch("appearance.headerLinkColor")}>
+            <Select onValueChange={(v) => setValue("appearance.headerLinkColor", v as "black"|"white")} defaultValue={watch("appearance.headerLinkColor")}>
               <SelectTrigger>
                 <SelectValue placeholder="Vælg farve" />
               </SelectTrigger>
