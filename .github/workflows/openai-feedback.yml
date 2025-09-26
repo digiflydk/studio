@@ -1,4 +1,4 @@
-name: OpenAI PR Review with Task Context
+name: OpenAI PR Review for Digifly (DGF)
 
 on:
   pull_request:
@@ -32,23 +32,30 @@ jobs:
           echo "pr_base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
           echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
 
-      - name: Derive Task ID (OF-/DGF-/DF- patterns)
+      - name: Detect DGF task ID (e.g., DGF-123)
         id: task
         run: |
           set -e
           T="${{ steps.meta.outputs.pr_title }} ${{ steps.meta.outputs.pr_body }} ${{ steps.meta.outputs.pr_head_ref }}"
-          TASK_ID="$(printf '%s' "$T" | grep -oE '(OF|DGF|DF)-[0-9]+' | head -n1 || true)"
+          TASK_ID="$(printf '%s' "$T" | grep -oE 'DGF-[0-9]+' | head -n1 || true)"
           echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
           echo "Detected task: ${TASK_ID:-<none>}"
 
-      - name: Locate spec file for task (optional)
+      - name: Locate DGF spec file (optional)
         id: spec
         run: |
           set -e
           ID="${{ steps.task.outputs.task_id }}"
           FOUND=""
           if [ -n "$ID" ]; then
-            for p in "docs/specs/$ID.md" ".github/tasks/$ID.md" "specs/$ID.md" "requirements/$ID.md"; do
+            # typiske placeringer – tilpas efter behov
+            for p in \
+              "docs/specs/$ID.md" \
+              "docs/specs/dgf/$ID.md" \
+              ".github/tasks/$ID.md" \
+              "specs/$ID.md" \
+              "requirements/$ID.md"
+            do
               if [ -f "$p" ]; then FOUND="$p"; break; fi
             done
           fi
@@ -64,7 +71,7 @@ jobs:
           BASE="${{ steps.meta.outputs.pr_base_sha }}"
           HEAD="${{ steps.meta.outputs.pr_head_sha }}"
           git diff --unified=0 "$BASE" "$HEAD" > code_diff.txt || true
-          # Truncate to keep payload manageable
+          # truncate to keep payload small
           head -c 12000 code_diff.txt > code_diff_trunc.txt && mv code_diff_trunc.txt code_diff.txt
           echo -e "\n\n[Truncated if large]" >> code_diff.txt
 
@@ -73,7 +80,7 @@ jobs:
           sudo apt-get update -y >/dev/null 2>&1 || true
           sudo apt-get install -y jq >/dev/null 2>&1 || true
 
-      - name: Build prompt (PR context + spec + diff)
+      - name: Build prompt (DGF context + spec + diff)
         run: |
           PR_NUM="${{ steps.meta.outputs.pr_number }}"
           PR_TITLE="${{ steps.meta.outputs.pr_title }}"
@@ -82,8 +89,8 @@ jobs:
           SPEC_PATH="${{ steps.spec.outputs.spec_path }}"
 
           {
-            echo "Task context"
-            echo "-------------"
+            echo "DGF task context"
+            echo "-----------------"
             echo "PR #$PR_NUM — $PR_TITLE"
             echo
             echo "PR description:"
@@ -108,12 +115,12 @@ jobs:
             cat code_diff.txt
             echo '```'
             echo
-            echo "Please review the changes **against the task context/spec above** and return:"
-            echo "1) Does the implementation satisfy the acceptance criteria? (cite lines or sections)"
+            echo "Please review the implementation **against the DGF task context/spec above** and return:"
+            echo "1) Does it meet the acceptance criteria (cite lines/sections from the spec/PR)?"
             echo "2) Risks & bugs/smells"
             echo "3) Breaking changes/migrations"
             echo "4) 3 concrete fixes/improvements (with file/line hints)"
-            echo "Return concise markdown."
+            echo "Reply as concise markdown."
           } > prompt.txt
 
       - name: Build JSON payload
@@ -122,8 +129,8 @@ jobs:
             '{
                model: "gpt-4o",
                messages: [
-                 {role:"system", "content":"You are a senior reviewer. Be precise, pragmatic, and brief."},
-                 {role:"user", "content": $prompt}
+                 {role:"system","content":"You are a senior reviewer for Digifly (DGF). Be precise, pragmatic, and brief."},
+                 {role:"user","content": $prompt}
                ]
              }' > payload.json
 
@@ -143,7 +150,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: openai-pr-review
+          name: dgf-pr-review
           path: |
             prompt.txt
             payload.json
@@ -170,9 +177,9 @@ jobs:
             '{
               "@type":"MessageCard",
               "@context":"https://schema.org/extensions",
-              "summary":"OpenAI PR review",
-              "themeColor":"0078D7",
-              "title": ("ChatGPT PR review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
+              "summary":"DGF PR review",
+              "themeColor":"7A4ED9",
+              "title": ("ChatGPT DGF review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
               "sections":[{"text": $feedback}],
               "potentialAction":[
                 {"@type":"OpenUri","name":"View workflow run","targets":[{"os":"default","uri": $run_url}]}
