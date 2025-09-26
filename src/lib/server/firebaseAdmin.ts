@@ -2,26 +2,35 @@
 import { initializeApp, getApps, cert, applicationDefault, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
-let _app: App | null = null;
+let _adminApp: App | null = null;
 
 export function initAdmin(): App {
-  if (_app) return _app;
-  if (getApps().length) {
-    _app = getApps()[0]!;
-    return _app;
+  if (_adminApp) return _adminApp;
+
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
+  // Hvis du har service account som JSON i env:
+  const svcJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+
+  if (getApps().length === 0) {
+    if (svcJson) {
+      const creds = JSON.parse(svcJson);
+      _adminApp = initializeApp({
+        credential: cert(creds),
+        projectId,
+      });
+    } else {
+      _adminApp = initializeApp({
+        credential: applicationDefault(),
+        projectId,
+      });
+    }
+  } else {
+    _adminApp = getApps()[0]!;
   }
 
-  const inline = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (inline) {
-    const json = JSON.parse(inline);
-    _app = initializeApp({ credential: cert(json) });
-    return _app;
-  }
-
-  // Fallback til ADC (Google-miljøer: Cloud, Workstations, etc.)
-  _app = initializeApp({ credential: applicationDefault() });
-  return _app;
+  return _adminApp!;
 }
+
 
 let adminDbInstance: Firestore | null = null;
 
