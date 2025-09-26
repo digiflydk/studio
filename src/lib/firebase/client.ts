@@ -1,7 +1,7 @@
 "use client";
 
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { initializeFirestore } from "firebase/firestore";
+import { initializeFirestore, setLogLevel } from "firebase/firestore";
 
 const cfg = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -14,9 +14,13 @@ const cfg = {
 
 export const app = getApps().length ? getApp() : initializeApp(cfg);
 
-// Auto-detekter long-polling i “svære” miljøer:
+// 🔒 Slå den HELT over på long-polling (mere aggressivt end auto-detect)
 export const db = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true,
-  // Fjern kommentaren herunder hvis log-støj fortsætter:
-  // experimentalForceLongPolling: true,
+  experimentalForceLongPolling: true,
+  // ingen andre custom flags her – hold det minimalt for stabilitet
 });
+
+// midlertidigt: mere støj i konsollen for at se rigtige fejl
+if (process.env.NODE_ENV !== "production") {
+  setLogLevel("debug");
+}

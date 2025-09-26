@@ -2,6 +2,7 @@
 import { loadHeaderAction } from "./actions";
 import CmsHeaderForm from "@/components/cms/CmsHeaderForm";
 import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
+import FirestoreProbeClient from "../../debug/FirestoreProbeClient";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +34,18 @@ export default async function CmsHeaderPage() {
 
   return (
     <div className="px-4 py-6 md:px-6 md:py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Header Settings</h1>
-        <p className="text-muted-foreground mb-6">Manage the appearance and content of the website header.</p>
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">Header Settings</h1>
+          <p className="text-muted-foreground mb-6">Manage the appearance and content of the website header.</p>
+        </div>
+        
+        <div className="p-4 border rounded-lg bg-background">
+            <h2 className="text-lg font-semibold mb-2">Firestore Client Probe</h2>
+            <p className="text-sm text-muted-foreground mb-4">This panel shows the result of a direct client-side read from Firestore to debug connection or permission issues.</p>
+            <FirestoreProbeClient />
+        </div>
+
         <CmsHeaderForm initial={initial} />
       </div>
     </div>
