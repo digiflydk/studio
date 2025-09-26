@@ -195,8 +195,6 @@ function CmsDesignPageContent() {
   
   const [isSaving, startSaving] = useTransition();
   const [showDiff, setShowDiff] = useState(false);
-  const [version, setVersion] = useState(0);
-  const [conflict, setConflict] = useState<any>(null);
   
   const { toast } = useToast();
 
@@ -204,24 +202,19 @@ function CmsDesignPageContent() {
     async function load() {
         const s = await getGeneralSettings();
         setServerSettings(s);
-        if (s) {
-            setVersion((s as any).version || 0);
-        }
     }
     load();
   }, []);
   
 
-  const handleSaveChanges = async (force = false, useVersion?: number) => {
+  const handleSaveChanges = async (force = false) => {
     startSaving(async () => {
         setShowDiff(false);
-        setConflict(null);
 
-        const settingsToSave: Partial<GeneralSettings> & { version?: number } = {
+        const settingsToSave: Partial<GeneralSettings> = {
             themeColors: themeCtx.theme.colors,
             typography: themeCtx.typography,
             buttonSettings: themeCtx.buttonSettings,
-            version: useVersion ?? version,
         };
         
         const diff = simpleDiff(serverSettings || {}, settingsToSave);
@@ -239,16 +232,12 @@ function CmsDesignPageContent() {
                 throw new Error(res.message || 'Save failed');
             }
 
-            // This part seems to expect data back, but the action might not return it.
-            // Let's rely on re-fetching or optimistic updates.
-            // For now, let's just show a success message.
             const newSettings = await getGeneralSettings();
             setServerSettings(newSettings);
             if (newSettings) {
                 if(newSettings.themeColors) themeCtx.setTheme({ colors: newSettings.themeColors });
                 if(newSettings.typography) themeCtx.setTypography(newSettings.typography);
                 if(newSettings.buttonSettings) themeCtx.setButtonSettings(newSettings.buttonSettings);
-                setVersion((newSettings as any).version || 0);
             }
             
 
@@ -306,20 +295,6 @@ function CmsDesignPageContent() {
             onOpenChange={setShowDiff}
             diff={diff}
             onConfirm={() => handleSaveChanges(true)}
-        />
-        <ConflictDialog
-            isOpen={!!conflict}
-            onOpenChange={() => setConflict(null)}
-            onReload={(serverData, serverVersion) => {
-                if(serverData.themeColors) themeCtx.setTheme({ colors: serverData.themeColors });
-                if(serverData.typography) themeCtx.setTypography(serverData.typography);
-                if(serverData.buttonSettings) themeCtx.setButtonSettings(serverData.buttonSettings);
-                setVersion(serverVersion);
-                setConflict(null);
-            }}
-            onOverwrite={(serverVersion) => handleSaveChanges(true, serverVersion)}
-            serverData={conflict?.server}
-            serverVersion={conflict?.serverVersion}
         />
         <div className="flex justify-between items-start">
             <div>
@@ -481,5 +456,3 @@ export default function CmsDesignPage() {
         </ThemeProvider>
     )
 }
-
-    
