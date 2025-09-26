@@ -27,6 +27,8 @@ export default function Hero({ settings }: { settings: any }) {
   const g2 = s.heroGridImage2Url;
   const g3 = s.heroGridImage3Url;
   const g4 = s.heroGridImage4Url;
+  
+  const images = [g1, g2, g3, g4].filter(Boolean) as string[];
 
   return (
     <section
@@ -64,60 +66,20 @@ export default function Hero({ settings }: { settings: any }) {
           </div>
 
           {/* Images */}
-          <div className="grid grid-cols-2 grid-rows-2 gap-6">
-              {/* TL = Portrait */}
-              {g1 && (
-                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                  <Image
-                    src={g1}
-                    alt=""
-                    fill
-                    priority
-                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-
-              {/* TR = Landscape */}
-              {g2 && (
-                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
-                  <Image
-                    src={g2}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-
-              {/* BL = Landscape */}
-              {g3 && (
-                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
-                  <Image
-                    src={g3}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-
-              {/* BR = Portrait */}
-              {g4 && (
-                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
-                  <Image
-                    src={g4}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-            </div>
+          <div className="grid grid-cols-2 gap-6">
+            {images.map((src, i) => (
+              <div key={i} className="relative aspect-square rounded-xl shadow-xl overflow-hidden">
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  className="object-cover"
+                  priority={i === 0}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
