@@ -11,7 +11,8 @@ export async function getAdminHeader(): Promise<AdminHeaderDoc | null> {
     const data = snap.data() as any;
     if (data?.updatedAt instanceof Timestamp) data.updatedAt = data.updatedAt.toDate().toISOString();
     return data as AdminHeaderDoc;
-  } catch {
+  } catch (err) {
+    console.error("Failed to get admin header:", err);
     return null;
   }
 }
@@ -23,7 +24,8 @@ export async function getAdminHome(): Promise<AdminHomeDoc | null> {
     const data = snap.data() as any;
     if (data?.updatedAt instanceof Timestamp) data.updatedAt = data.updatedAt.toDate().toISOString();
     return data as AdminHomeDoc;
-  } catch {
+  } catch (err) {
+    console.error("Failed to get admin home:", err);
     return null;
   }
 }
