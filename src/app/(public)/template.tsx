@@ -10,16 +10,9 @@ import CookieSettingsModal from '@/components/cookies/CookieSettingsModal';
 import { useCookieConsent } from '@/hooks/useCookieConsent';
 import type { GeneralSettings } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, doc, onSnapshot, initializeFirestore } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { mapToCssVars } from '@/lib/design/mapToCssVars';
-
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-};
 
 
 export default function Template({ children }: { children: ReactNode }) {
@@ -35,12 +28,6 @@ export default function Template({ children }: { children: ReactNode }) {
     const [showCookieSettings, setShowCookieSettings] = useState(false);
     
     useEffect(() => {
-        const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-        const db = initializeFirestore(app, {
-          experimentalAutoDetectLongPolling: true,
-          useFetchStreams: false,
-        });
-        
         const ref = doc(db, 'settings/general');
         const unsub = onSnapshot(ref, (snap) => {
           const data = (snap.data() || {}) as GeneralSettings;

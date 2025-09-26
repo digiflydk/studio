@@ -27,6 +27,9 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
 
   const bg = scrolled ? config.scrolledBg : config.topBg;
   const logo = scrolled ? (config.logoScrolledUrl || config.logoUrl) : config.logoUrl;
+  const logoAlt = config.logoAlt || 'Digifly';
+  const logoWidth = config.logoWidthPx || 150;
+  const logoHeight = Math.max(24, Math.round(logoWidth * 0.27));
 
   return (
     <>
@@ -44,11 +47,11 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
           <Link href="/" className="flex items-center gap-2" aria-label="Gå til forsiden">
             <Image
               src={logo || '/digifly-logo-dark.svg'}
-              alt={config.logoAlt || 'Digifly'}
-              width={config.logoWidthPx}
-              height={Math.round(config.logoWidthPx * 0.27)}
+              alt={logoAlt}
+              width={logoWidth}
+              height={logoHeight}
               priority
-              style={{ height: 'auto' }}
+              style={{ height: 'auto', width: '100%', maxWidth: logoWidth }}
             />
           </Link>
           <nav className="hidden h-full items-center gap-6 md:flex">

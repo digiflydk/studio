@@ -136,6 +136,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage1AiHint || ''}
+                    priority
                 />
             </div>
              <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
@@ -146,6 +147,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
                     sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint={settings?.heroGridImage2AiHint || ''}
+                    priority
                 />
             </div>
              <div className="relative aspect-square rounded-lg overflow-hidden shadow-lg">
