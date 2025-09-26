@@ -64,22 +64,60 @@ export default function Hero({ settings }: { settings: any }) {
           </div>
 
           {/* Images */}
-          <div className="grid grid-cols-2 grid-rows-2 gap-6">
-            {[g1, g2, g3, g4].map(
-              (url, i) =>
-                url && (
-                  <div key={i} className="relative w-full aspect-[4/3] overflow-hidden rounded-xl shadow-xl">
-                    <Image
-                      src={url}
-                      alt=""
-                      fill
-                      priority={i === 0} // første billede = LCP priority
-                      className="object-cover"
-                    />
-                  </div>
-                )
-            )}
-          </div>
+            <div className="grid grid-cols-2 grid-rows-2 gap-6">
+              {/* TL = Portrait */}
+              {g1 && (
+                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
+                  <Image
+                    src={g1}
+                    alt=""
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              {/* TR = Landscape */}
+              {g2 && (
+                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
+                  <Image
+                    src={g2}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              {/* BL = Landscape */}
+              {g3 && (
+                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[16/10]">
+                  <Image
+                    src={g3}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              {/* BR = Portrait */}
+              {g4 && (
+                <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
+                  <Image
+                    src={g4}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 32vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+            </div>
         </div>
       </div>
     </section>

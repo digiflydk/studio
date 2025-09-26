@@ -21,6 +21,7 @@ export type WebsiteHeaderConfig = {
   logoUrl?: string;
   logoAlt?: string;
   logoMaxWidth?: number;
+  logoScrolledUrl?: string;
   navLinks?: NavLink[];
   border?: { enabled?: boolean; widthPx?: number; color?: { h: number; s: number; l: number } };
   topBg?: { h: number; s: number; l: number; opacity?: number };
@@ -57,6 +58,9 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
   const LOGO_W = config.logoMaxWidth ?? 150;
   const LOGO_H = Math.max(1, Math.round(LOGO_W * 0.27)); // ratio-sikker
 
+  const logoSrc = scrolled ? config.logoScrolledUrl || config.logoUrl : config.logoUrl;
+
+
   return (
     <header
       className={`${stickyCls}`}
@@ -70,7 +74,7 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
             {/* Logo */}
             <Link href="/" aria-label="Forside" className="shrink-0 flex items-center gap-3">
               <Image
-                src={config.logoUrl ?? "/logo.svg"}
+                src={logoSrc ?? "/logo.svg"}
                 alt={config.logoAlt ?? "Logo"}
                 width={LOGO_W}
                 height={LOGO_H}
