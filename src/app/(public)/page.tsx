@@ -1,5 +1,6 @@
 
 
+import { getAdminHome } from "@/services/admin.server";
 import { getSettingsAction } from "@/app/actions";
 import Hero from "@/components/sections/Hero";
 import FeatureSection from '@/components/sections/feature';
@@ -15,10 +16,24 @@ import TabsSection from '@/components/sections/tabs-section';
 
 export default async function HomePage() {
   const settings = await getSettingsAction();
-  const s = (settings as any) ?? {};
+  const home = await getAdminHome();
+  const s = settings ?? {};
 
-  // Respekter CMS-rækkefølge, men tving hero først hvis slået til
-  let order: string[] = s.homePageSectionOrder ?? ["hero", "feature", "services", "aiProject", "cases", "about", "customers"];
+  // Combine settings for Hero
+  const heroSettings = {
+      ...s,
+      heroHeadline: home?.hero.headline ?? s.heroHeadline,
+      heroDescription: home?.hero.description ?? s.heroDescription,
+      heroCtaText: home?.hero.ctaText ?? s.heroCtaText,
+      heroCtaLink: home?.hero.ctaLink ?? s.heroCtaLink,
+      heroGridImage1Url: home?.hero.images.tl,
+      heroGridImage2Url: home?.hero.images.tr,
+      heroGridImage3Url: home?.hero.images.bl,
+      heroGridImage4Url: home?.hero.images.br,
+      heroLayout: 'textWithImageGrid', // Force this layout for now
+  }
+
+  let order: string[] = home?.sectionOrder ?? s.homePageSectionOrder ?? ["hero", "feature", "services", "aiProject", "cases", "about", "customers"];
   if (s.sectionVisibility?.hero && order[0] !== "hero") {
     order = ["hero", ...order.filter((x) => x !== "hero")];
   }
@@ -28,7 +43,7 @@ export default async function HomePage() {
       {order.map((key) => {
         switch (key) {
           case "hero":
-            return s.sectionVisibility?.hero ? <Hero key="hero" settings={s} /> : null;
+            return s.sectionVisibility?.hero ? <Hero key="hero" settings={heroSettings} /> : null;
           case 'feature':
                 return s.sectionVisibility?.feature !== false ? <FeatureSection key="feature" settings={s} /> : null;
             case 'services':
