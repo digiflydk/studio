@@ -4,23 +4,22 @@ import type { AdminHeaderDoc, AdminHomeDoc } from "@/lib/types/admin";
 import { adminDb } from "@/lib/server/firebaseAdmin";
 import { Timestamp } from "firebase-admin/firestore";
 
-function baseUrl(): string {
-  // Lokal dev fallback
-  const fallback = "http://localhost:3000";
-  // Vercel / Cloud: brug VERCEL_URL hvis sat
-  const vercel = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
-  // Evt. manuel override
-  const manual = process.env.NEXT_PUBLIC_SITE_ORIGIN || null;
-  return manual || vercel || fallback;
+const ORIGIN =
+  process.env.NEXT_PUBLIC_SITE_ORIGIN ||
+  (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+  "http://localhost:3000";
+
+async function getJson(path: string) {
+  const url = path.startsWith("http") ? path : `${ORIGIN}${path}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
 }
 
 
 export async function getAdminHeader(): Promise<AdminHeaderDoc | null> {
   try {
-    const url = `${baseUrl()}/api/admin/header`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as AdminHeaderDoc;
+    return await getJson("/api/admin/header");
   } catch {
     return null;
   }
@@ -28,10 +27,7 @@ export async function getAdminHeader(): Promise<AdminHeaderDoc | null> {
 
 export async function getAdminHome(): Promise<AdminHomeDoc | null> {
   try {
-    const url = `${baseUrl()}/api/admin/home`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as AdminHomeDoc;
+    return await getJson("/api/admin/home");
   } catch {
     return null;
   }

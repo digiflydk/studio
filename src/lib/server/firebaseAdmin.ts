@@ -1,41 +1,42 @@
-import { getApps, getApp, initializeApp, applicationDefault, cert, App } from "firebase-admin/app";
-import { getFirestore, Firestore } from "firebase-admin/firestore";
+import { getApps, initializeApp, cert, applicationDefault, App } from "firebase-admin/app";
 
-let _adminApp: App | null = null;
+let _app: App | null = null;
 
 export function initAdmin(): App {
-  if (_adminApp) return _adminApp;
+  if (_app) return _app;
 
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
-  const json = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-  const b64  = process.env.GOOGLE_APPLICATION_CREDENTIALS_B64;
+  const projectId =
+    process.env.FIREBASE_ADMIN_PROJECT_ID ||
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
-  let credentials: any = null;
-  if (json) credentials = JSON.parse(json);
-  else if (b64) credentials = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
-
-  if (getApps().length) {
-    _adminApp = getApp();
-    return _adminApp;
+  if (getApps().length > 0) {
+    _app = getApps()[0];
+    return _app;
+  }
+  
+  if (process.env.FIREBASE_ADMIN_KEY) {
+    _app = initializeApp({
+      credential: cert(JSON.parse(process.env.FIREBASE_ADMIN_KEY)),
+      projectId,
+    });
+  } else {
+    _app = initializeApp({
+      credential: applicationDefault(),
+      projectId,
+    });
   }
 
-  _adminApp = initializeApp(
-    credentials
-      ? { credential: cert(credentials), projectId }
-      : { credential: applicationDefault(), projectId }
-  );
-
-  return _adminApp;
+  return _app;
 }
 
+let adminDbInstance: import("firebase-admin/firestore").Firestore | null = null;
 
-let adminDbInstance: Firestore | null = null;
-
-function getAdminDb(): Firestore {
+function getAdminDb(): import("firebase-admin/firestore").Firestore {
     if (adminDbInstance) {
         return adminDbInstance;
     }
     const app = initAdmin();
+    const { getFirestore } = require("firebase-admin/firestore");
     adminDbInstance = getFirestore(app);
     return adminDbInstance;
 }
