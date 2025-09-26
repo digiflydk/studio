@@ -2,6 +2,8 @@
 import "server-only";
 import { getGeneralSettings } from '@/services/settings';
 import { getCmsHeaderDoc } from '@/services/cmsHeader';
+import type { HeaderCTASettings } from "@/types/settings";
+
 
 export type Hsl = { h: number; s: number; l: number; opacity: number };
 export type WebsiteHeaderConfig = {
@@ -16,6 +18,7 @@ export type WebsiteHeaderConfig = {
   topBg: Hsl;
   scrolledBg: Hsl;
   border: { enabled: boolean; widthPx: number; colorHex: string };
+  cta?: HeaderCTASettings;
 };
 
 function pickLinkClass(color?: string) {
@@ -39,18 +42,18 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
 
   const heightPx =
     a.headerHeight ??
-    settings?.headerHeight ??
+    settings?.header?.height ??
     80;
 
   const sticky =
     a.headerIsSticky ??
-    settings?.headerIsSticky ??
+    settings?.header?.sticky ??
     true;
 
   const logoWidthPx =
     a.headerLogoWidth ??
     a.logo?.maxWidth ??
-    settings?.headerLogoWidth ??
+    settings?.header?.logo?.maxWidth ??
     150;
 
   const logoUrl =
@@ -71,31 +74,33 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   const navLinks: { label: string; href: string }[] =
     Array.isArray(a.navLinks) && a.navLinks.length > 0
       ? a.navLinks
-      : Array.isArray(settings?.headerNavLinks)
-      ? settings!.headerNavLinks
+      : Array.isArray(settings?.header?.navLinks)
+      ? settings!.header!.navLinks
       : [];
 
   const topBg: Hsl = {
-    h: a.topBg?.h ?? settings?.headerInitialBackgroundColor?.h ?? 0,
-    s: a.topBg?.s ?? settings?.headerInitialBackgroundColor?.s ?? 0,
-    l: a.topBg?.l ?? settings?.headerInitialBackgroundColor?.l ?? 100,
-    opacity: normalizeOpacity(a.topBg?.opacity ?? settings?.headerInitialBackgroundOpacity),
+    h: a.topBg?.h ?? settings?.header?.bg?.initial?.h ?? 0,
+    s: a.topBg?.s ?? settings?.header?.bg?.initial?.s ?? 0,
+    l: a.topBg?.l ?? settings?.header?.bg?.initial?.l ?? 100,
+    opacity: normalizeOpacity(a.topBg?.opacity ?? settings?.header?.bg?.initial?.opacity),
   };
 
   const scrolledBg: Hsl = {
-    h: a.scrolledBg?.h ?? settings?.headerScrolledBackgroundColor?.h ?? topBg.h,
-    s: a.scrolledBg?.s ?? settings?.headerScrolledBackgroundColor?.s ?? topBg.s,
-    l: a.scrolledBg?.l ?? settings?.headerScrolledBackgroundColor?.l ?? topBg.l,
-    opacity: normalizeOpacity(a.scrolledBg?.opacity ?? settings?.headerScrolledBackgroundOpacity),
+    h: a.scrolledBg?.h ?? settings?.header?.bg?.scrolled?.h ?? topBg.h,
+    s: a.scrolledBg?.s ?? settings?.header?.bg?.scrolled?.s ?? topBg.s,
+    l: a.scrolledBg?.l ?? settings?.header?.bg?.scrolled?.l ?? topBg.l,
+    opacity: normalizeOpacity(a.scrolledBg?.opacity ?? settings?.header?.bg?.scrolled?.opacity),
   };
 
   const border = {
-    enabled: a.border?.enabled ?? a.border?.visible ?? settings?.headerTopBorderEnabled ?? true,
-    widthPx: a.border?.widthPx ?? settings?.headerTopBorderHeight ?? 1,
-    colorHex: a.border?.colorHex ?? settings?.headerBorderColorHex ?? '#000000',
+    enabled: a.border?.enabled ?? a.border?.visible ?? settings?.header?.border?.enabled ?? true,
+    widthPx: a.border?.widthPx ?? settings?.header?.border?.width ?? 1,
+    colorHex: a.border?.colorHex ?? '#000000',
   };
 
   const linkClass = pickLinkClass(a.headerLinkColor ?? settings?.headerLinkColor);
+  
+  const cta = settings?.header?.cta;
 
   return {
     heightPx,
@@ -109,5 +114,6 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
     topBg,
     scrolledBg,
     border,
+    cta,
   };
 }
