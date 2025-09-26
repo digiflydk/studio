@@ -2,33 +2,83 @@ name: OpenAI Feedback on Code Changes
 
 on:
   push:
-    branches: [main]  # Eller den branch, du vil overvåge
+    branches: [ main ]  # ændr hvis du vil overvåge andre branches
 
 jobs:
   get-feedback:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Get diff
+      - name: Determine base and head SHAs
+        id: shas
         run: |
-          git fetch origin ${{ github.event.before }} --depth=1
-          git diff ${{ github.event.before }} ${{ github.sha }} > code_diff.txt
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          # Fallback hvis BEFORE er 0000… (fx første commit på branchen)
+          if [ -z "$BEFORE" ] || [[ "$BEFORE" == 0000000000000000000000000000000000000000 ]]; then
+            BEFORE="$(git rev-parse "$AFTER~1" || true)"
+          fi
+          echo "before=$BEFORE" >> $GITHUB_OUTPUT
+          echo "after=$AFTER" >> $GITHUB_OUTPUT
 
-      - name: Ask ChatGPT for feedback
+      - name: Get diff (compact, truncated)
         run: |
-          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
-            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+          BEFORE="${{ steps.shas.outputs.before }}"
+          AFTER="${{ steps.shas.outputs.after }}"
+          if [ -n "$BEFORE" ]; then
+            # unified=0 for kort diff; max ~12k tegn så payload ikke bliver for stor
+            git diff --unified=0 "$BEFORE" "$AFTER" > code_diff.txt || true
+          else
+            echo "No previous commit found; showing last 200 lines." > code_diff.txt
+            git show --stat "$AFTER" >> code_diff.txt || true
+          fi
+          # Truncér meget store diffs
+          head -c 12000 code_diff.txt > code_diff_trunc.txt
+          mv code_diff_trunc.txt code_diff.txt
+          echo -e "\n\n[Truncated if large]" >> code_diff.txt
+          echo "----- Preview -----"
+          tail -n 40 code_diff.txt || true
+
+      - name: Build JSON payload safely (jq)
+        run: |
+          sudo apt-get update -y >/dev/null 2>&1 || true
+          sudo apt-get install -y jq >/dev/null 2>&1
+          jq -n --arg diff "$(cat code_diff.txt)" \
+            '{
+               model: "gpt-4o",
+               messages: [
+                 {role:"system", content:"You are a senior code review assistant. Be concise, practical. Return markdown."},
+                 {role:"user", content: "Review these changes. 1) Summarize risks, 2) point out bugs/smells, 3) note breaking changes/migrations, 4) give 3 concrete fixes with file/line hints.\n\n```diff\n"+$diff+"\n```"}
+               ]
+             }' > payload.json
+          echo "Payload built."
+
+      - name: Ask ChatGPT for feedback (OpenAI)
+        id: openai
+        run: |
+          set -e
+          RESPONSE=$(curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
             -H "Content-Type: application/json" \
-            -d '{
-              "model": "gpt-4o",
-              "messages": [
-                {"role": "system", "content": "You are a helpful code review assistant."},
-                {"role": "user", "content": "Please review the following code changes and give feedback:\n\n"},
-                {"role": "user", "content": "'"$(cat code_diff.txt)"'"}
-              ]
-            }')
-          echo "$RESPONSE"
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            --data @payload.json)
+          echo "$RESPONSE" > response.json
+          echo "raw=$(jq -c '.' response.json)" >> $GITHUB_OUTPUT
+          jq -r '.choices[0].message.content' response.json > feedback.txt || echo "No content" > feedback.txt
+          echo "------- ChatGPT feedback (preview) -------"
+          head -n 80 feedback.txt
+
+      - name: Upload feedback as artifact (nice to keep)
+        uses: actions/upload-artifact@v4
+        with:
+          name: openai-feedback
+          path: |
+            code_diff.txt
+            payload.json
+            response.json
+            feedback.txt
