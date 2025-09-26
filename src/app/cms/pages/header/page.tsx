@@ -1,11 +1,7 @@
 import { getCmsHeader } from "@/services/website.server";
 import CmsHeaderForm from "@/components/cms/CmsHeaderForm";
 import type { CmsHeaderDoc } from "@/lib/types/cmsHeader";
-import dynamic from "next/dynamic";
-const FirestoreProbe = dynamic(
-  () => import("@/components/cms/FirestoreProbe"),
-  { ssr: false }
-);
+import FirestoreProbe from "@/components/cms/FirestoreProbe";
 
 
 export const dynamic = "force-dynamic";
