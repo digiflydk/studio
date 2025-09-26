@@ -1,11 +1,13 @@
-name: OpenAI Feedback on Code Changes
+name: OpenAI PR Review with Task Context
 
 on:
-  push:
-    branches: [ main ]  # skift hvis du vil overvåge andre branches
+  pull_request:
+    types: [closed]
+    branches: [ main ]  # skift hvis I merger til andre branches
 
 jobs:
-  get-feedback:
+  review:
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -16,66 +18,114 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine base and head SHAs
-        id: shas
+      - name: Collect PR metadata
+        id: meta
         run: |
-          BEFORE="${{ github.event.before }}"
-          AFTER="${{ github.sha }}"
-          # Fallback hvis BEFORE er tom/0000… (fx første push på branchen)
-          if [ -z "$BEFORE" ] || [[ "$BEFORE" == 0000000000000000000000000000000000000000 ]]; then
-            BEFORE="$(git rev-parse "$AFTER~1" || true)"
-          fi
-          echo "before=$BEFORE" >> $GITHUB_OUTPUT
-          echo "after=$AFTER" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.number }}" >> $GITHUB_OUTPUT
+          echo "pr_title<<EOF" >> $GITHUB_OUTPUT
+          echo "${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "pr_body<<EOF" >> $GITHUB_OUTPUT
+          echo "${{ github.event.pull_request.body }}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "pr_head_sha=${{ github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          echo "pr_base_sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
 
-      - name: Get diff (compact, truncated)
+      - name: Derive Task ID (OF-/DGF-/DF- patterns)
+        id: task
         run: |
-          BEFORE="${{ steps.shas.outputs.before }}"
-          AFTER="${{ steps.shas.outputs.after }}"
-          if [ -n "$BEFORE" ]; then
-            git diff --unified=0 "$BEFORE" "$AFTER" > code_diff.txt || true
-          else
-            echo "No previous commit found; showing last 200 lines." > code_diff.txt
-            git show --stat "$AFTER" >> code_diff.txt || true
+          set -e
+          T="${{ steps.meta.outputs.pr_title }} ${{ steps.meta.outputs.pr_body }} ${{ steps.meta.outputs.pr_head_ref }}"
+          TASK_ID="$(printf '%s' "$T" | grep -oE '(OF|DGF|DF)-[0-9]+' | head -n1 || true)"
+          echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
+          echo "Detected task: ${TASK_ID:-<none>}"
+
+      - name: Locate spec file for task (optional)
+        id: spec
+        run: |
+          set -e
+          ID="${{ steps.task.outputs.task_id }}"
+          FOUND=""
+          if [ -n "$ID" ]; then
+            for p in "docs/specs/$ID.md" ".github/tasks/$ID.md" "specs/$ID.md" "requirements/$ID.md"; do
+              if [ -f "$p" ]; then FOUND="$p"; break; fi
+            done
           fi
-          # Truncér store diffs for at holde payload lille
-          head -c 12000 code_diff.txt > code_diff_trunc.txt
-          mv code_diff_trunc.txt code_diff.txt
+          echo "spec_path=$FOUND" >> $GITHUB_OUTPUT
+          if [ -n "$FOUND" ]; then
+            echo "Using spec file: $FOUND"
+          else
+            echo "No spec file found (optional)."
+          fi
+
+      - name: Build diff between base and merge commit
+        run: |
+          BASE="${{ steps.meta.outputs.pr_base_sha }}"
+          HEAD="${{ steps.meta.outputs.pr_head_sha }}"
+          git diff --unified=0 "$BASE" "$HEAD" > code_diff.txt || true
+          # Truncate to keep payload manageable
+          head -c 12000 code_diff.txt > code_diff_trunc.txt && mv code_diff_trunc.txt code_diff.txt
           echo -e "\n\n[Truncated if large]" >> code_diff.txt
-          echo "----- Diff preview (last 40 lines) -----"
-          tail -n 40 code_diff.txt || true
 
       - name: Install jq
         run: |
           sudo apt-get update -y >/dev/null 2>&1 || true
           sudo apt-get install -y jq >/dev/null 2>&1 || true
 
-      - name: Build JSON payload (escaped, safe)
+      - name: Build prompt (PR context + spec + diff)
         run: |
-          # Byg prompt i en fil for at undgå shell-/jq-quoting problemer
+          PR_NUM="${{ steps.meta.outputs.pr_number }}"
+          PR_TITLE="${{ steps.meta.outputs.pr_title }}"
+          PR_BODY="${{ steps.meta.outputs.pr_body }}"
+          TASK_ID="${{ steps.task.outputs.task_id }}"
+          SPEC_PATH="${{ steps.spec.outputs.spec_path }}"
+
           {
-            echo "Review these changes."
-            echo "1) Risks"
-            echo "2) Bugs/smells"
-            echo "3) Breaking changes/migrations"
-            echo "4) Give 3 concrete fixes with file/line hints."
+            echo "Task context"
+            echo "-------------"
+            echo "PR #$PR_NUM — $PR_TITLE"
             echo
-            echo "Diff:"
+            echo "PR description:"
+            echo "$PR_BODY"
+            echo
+            if [ -n "$TASK_ID" ]; then
+              echo "Detected task ID: $TASK_ID"
+            else
+              echo "Detected task ID: <none>"
+            fi
+            echo
+            if [ -n "$SPEC_PATH" ]; then
+              echo "Task spec ($SPEC_PATH):"
+              echo '```markdown'
+              sed -e 's/\r$//' "$SPEC_PATH"
+              echo '```'
+              echo
+            fi
+            echo "Diff"
+            echo "----"
             echo '```diff'
             cat code_diff.txt
             echo '```'
+            echo
+            echo "Please review the changes **against the task context/spec above** and return:"
+            echo "1) Does the implementation satisfy the acceptance criteria? (cite lines or sections)"
+            echo "2) Risks & bugs/smells"
+            echo "3) Breaking changes/migrations"
+            echo "4) 3 concrete fixes/improvements (with file/line hints)"
+            echo "Return concise markdown."
           } > prompt.txt
 
-          # Brug --rawfile for at indlæse hele prompten korrekt escaped
+      - name: Build JSON payload
+        run: |
           jq -n --rawfile prompt prompt.txt \
             '{
                model: "gpt-4o",
                messages: [
-                 {role:"system", content:"You are a senior code review assistant. Be concise, actionable, and return markdown."},
-                 {role:"user", content: $prompt}
+                 {role:"system", "content":"You are a senior reviewer. Be precise, pragmatic, and brief."},
+                 {role:"user", "content": $prompt}
                ]
              }' > payload.json
-          echo "Payload built."
 
       - name: Ask ChatGPT for feedback (OpenAI)
         id: openai
@@ -86,24 +136,21 @@ jobs:
             -H "Content-Type: application/json" \
             --data @payload.json)
           echo "$RESPONSE" > response.json
-          # Print kun selve svaret
           jq -r '.choices[0].message.content // "No content returned"' response.json > feedback.txt
           echo "------- ChatGPT feedback (preview) -------"
-          head -n 80 feedback.txt
+          head -n 100 feedback.txt
 
-      - name: Upload artifacts (diff + response + feedback)
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: openai-feedback
+          name: openai-pr-review
           path: |
-            code_diff.txt
             prompt.txt
             payload.json
             response.json
-            feedback.txt
+            code_diff.txt
 
-      # Teams-posting (brug env i if:)
-      - name: Post feedback to Microsoft Teams
+      - name: Post to Microsoft Teams
         if: ${{ success() && env.TEAMS_WEBHOOK_URL != '' }}
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
@@ -112,8 +159,6 @@ jobs:
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           REPO="${{ github.repository }}"
           BRANCH="${{ github.ref_name }}"
-
-          # Begræns længde (Teams payload-grænser)
           head -c 6000 feedback.txt > feedback_trunc.txt
 
           jq -n \
@@ -125,9 +170,9 @@ jobs:
             '{
               "@type":"MessageCard",
               "@context":"https://schema.org/extensions",
-              "summary":"OpenAI code review",
+              "summary":"OpenAI PR review",
               "themeColor":"0078D7",
-              "title": ("ChatGPT code review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
+              "title": ("ChatGPT PR review: " + $repo + "@" + $branch + " (#" + $sha + ")"),
               "sections":[{"text": $feedback}],
               "potentialAction":[
                 {"@type":"OpenUri","name":"View workflow run","targets":[{"os":"default","uri": $run_url}]}
@@ -135,3 +180,8 @@ jobs:
             }' > teams.json
 
           curl -sS -H "Content-Type: application/json" -d @teams.json "$TEAMS_WEBHOOK_URL" || true
+
+      - name: Clean up temp files
+        if: always()
+        run: |
+          rm -f prompt.txt payload.json response.json feedback.txt feedback_trunc.txt teams.json code_diff.txt || true
