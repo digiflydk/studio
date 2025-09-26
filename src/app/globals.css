@@ -280,3 +280,12 @@ html { scroll-padding-top: var(--hero-top-offset); } /* for ankerlinks */
   .cta-pos--bottom-left  { left: var(--cta-float-offset-x); bottom: var(--cta-float-offset-y); transform: none; }
   .cta-pos--bottom-center{ left: 50%; bottom: var(--cta-float-offset-y); }
 }
+
+/* Global side-container der matcher resten af sitet */
+.site-container {
+  max-width: 1200px; /* justér til jeres standard (fx 1280px) */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}

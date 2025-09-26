@@ -1,4 +1,5 @@
 
+
 import HeroSection from '@/components/sections/hero';
 import FeatureSection from '@/components/sections/feature';
 import ServicesSection from '@/components/sections/services';
@@ -18,6 +19,12 @@ export default async function Home() {
   const visibility = settings?.sectionVisibility;
   const order = (settings?.homePageSectionOrder || defaultSectionOrder).filter(id => id !== 'blog');
 
+  const heroPad = settings?.sectionPadding?.hero;
+  const padTop = heroPad?.top ?? 80;
+  const padBottom = heroPad?.bottom ?? 80;
+  const padTopMobile = heroPad?.topMobile ?? 64;
+  const padBottomMobile = heroPad?.bottomMobile ?? 64;
+
   const sections: Record<string, React.ReactNode> = {
     feature: visibility?.feature !== false ? <FeatureSection settings={settings} /> : null,
     services: visibility?.services !== false ? <ServicesSection settings={settings} /> : null,
@@ -30,7 +37,17 @@ export default async function Home() {
   
   return (
     <>
-      <HeroSection settings={settings} />
+      <div style={{ paddingTop: padTopMobile, paddingBottom: padBottomMobile }}
+          className="hero-pad-wrapper"
+        >
+          <style>{`
+            @media (min-width: 640px) {
+              .hero-pad-wrapper { padding-top: ${padTop}px; padding-bottom: ${padBottom}px; }
+            }
+          `}</style>
+          <HeroSection settings={settings} />
+      </div>
+
       {order.map(sectionKey => sections[sectionKey] ? (
         <div key={sectionKey}>{sections[sectionKey]}</div>
       ) : null)}

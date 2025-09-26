@@ -9,9 +9,6 @@ import { Menu } from "lucide-react";
 import MobileDrawer from "../site/MobileDrawer";
 import SiteContainer from "../ui/SiteContainer";
 
-// Valgfri fallback hvis logo mangler
-const FALLBACK_LOGO = "/logo.svg";
-
 type Props = {
   config: WebsiteHeaderConfig;
 };
@@ -32,64 +29,72 @@ export default function HeaderClient({ config }: Props) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const bg = scrolled ? config.scrolledBg : config.topBg;
   const logoUrl = scrolled
-    ? (config as any)?.logoScrolledUrl || config.logoUrl || FALLBACK_LOGO
-    : config.logoUrl || FALLBACK_LOGO;
+    ? config.logoScrolledUrl || config.logoUrl
+    : config.logoUrl;
 
   const logoW = config.logoWidthPx ?? 150;
   const logoH = Math.round(logoW * 0.27); // bevar aspektforhold
 
+  const wrapperClass = [
+    "sticky top-0 z-50",
+    scrolled
+      ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70"
+      : "bg-white/90",
+    "border-b border-black/10"
+  ].join(" ");
+
   return (
     <>
-      <header
-        className={[
-          "w-full border-b",
-          config.sticky ? "sticky top-0 z-50" : "",
-          scrolled ? "bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60" : "bg-transparent",
-        ].join(" ")}
-        style={{ 
-          height: config.heightPx,
-          borderColor: scrolled ? (config.border?.colorHex ?? 'transparent') : 'transparent',
-          transition: 'background-color 0.3s ease, border-color 0.3s ease',
-        }}
-      >
-        <SiteContainer className="flex h-full items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="shrink-0" aria-label="Digifly – Forside">
-              <Image
-                src={logoUrl}
-                alt={config.logoAlt ?? "Digifly"}
-                width={logoW}
-                height={logoH}
-                priority
-                style={{ height: "auto", width: "auto", maxWidth: logoW }}
-              />
-            </Link>
+    <div className={wrapperClass}>
+      <div className="site-container" style={{ height: config.heightPx }}>
+        <div className="h-full flex items-center justify-between gap-6">
+          <Link href="/" aria-label="Til forsiden" className="shrink-0 flex items-center">
+            <Image
+              src={logoUrl ?? "/logo.svg"}
+              alt={config.logoAlt ?? "Digifly"}
+              width={logoW}
+              height={logoH}
+              priority
+              style={{ height: "auto", width: "100%", maxWidth: logoW }}
+            />
+          </Link>
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex ml-auto">
+             <ul className="flex items-center gap-6 text-[15px]">
               {(config.navLinks ?? []).map((l) => (
-                <Link
-                  key={`${l.href}-${l.label}`}
-                  href={l.href}
-                  className={config.linkClass ?? "text-sm font-medium text-foreground hover:opacity-80"}
-                >
-                  {l.label}
-                </Link>
+                <li key={l.href}>
+                  {l.href.startsWith("/") || l.href.startsWith("#") ? (
+                    <Link href={l.href} className="hover:underline">
+                      {l.label}
+                    </Link>
+                  ) : (
+                    <a href={l.href} className="hover:underline" rel="noopener noreferrer">
+                      {l.label}
+                    </a>
+                  )}
+                </li>
               ))}
-            </nav>
-
-            {/* CTA */}
-            <div className="hidden md:block">
-                <HeaderCTA />
-            </div>
+              {config.cta?.enabled && (
+                <li>
+                  <a
+                    href={config.cta.href ?? "#"}
+                    className="inline-flex items-center rounded-full px-4 py-2 border border-black/10 hover:border-black/30 transition"
+                  >
+                    {config.cta.label ?? "Kontakt"}
+                  </a>
+                </li>
+              )}
+            </ul>
+          </nav>
+            
              <button className="md:hidden" onClick={() => setMobileMenuOpen(true)} aria-label="Open menu">
                 <Menu className={config.linkClass}/>
             </button>
-        </SiteContainer>
-      </header>
-      <MobileDrawer 
+        </div>
+      </div>
+    </div>
+     <MobileDrawer 
          open={isMobileMenuOpen}
          onClose={() => setMobileMenuOpen(false)}
          navLinks={config.navLinks}
