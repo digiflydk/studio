@@ -3,14 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { mapSize, mapVariant } from '@/lib/ui/mapButtonProps';
+
 
 type NavLink = { label: string; href: string };
 type HeaderCTA = {
   enabled?: boolean;
   label?: string;
   href?: string;
-  size?: "sm" | "md" | "lg";
-  variant?: "default" | "pill" | "outline";
+  size?: "sm" | "md" | "lg" | "icon" | "default";
+  variant?: "default" | "pill" | "outline" | "destructive" | "secondary" | "ghost" | "link";
+  linkType?: "internal" | "external";
 };
 
 export type WebsiteHeaderConfig = {
@@ -100,14 +105,12 @@ export default function HeaderClient({ config }: { config: WebsiteHeaderConfig }
               {config.cta?.enabled && config.cta?.href && config.cta?.label && (
                 <Link
                   href={config.cta.href}
-                  className={`inline-flex items-center justify-center rounded-full border border-transparent px-5 py-2 text-sm font-semibold transition
-                  ${
-                    config.cta.variant === "outline"
-                      ? "bg-transparent text-slate-900 border-slate-300 hover:bg-slate-50"
-                      : config.cta.variant === "pill"
-                      ? "bg-slate-900 text-white hover:bg-slate-800 rounded-full"
-                      : "bg-slate-900 text-white hover:bg-slate-800"
-                  }`}
+                   target={config.cta.linkType === 'external' ? '_blank' : undefined}
+                   rel={config.cta.linkType === 'external' ? 'noopener noreferrer' : undefined}
+                  className={cn(buttonVariants({ 
+                      variant: mapVariant(config.cta.variant), 
+                      size: mapSize(config.cta.size) 
+                  }))}
                 >
                   {config.cta.label}
                 </Link>

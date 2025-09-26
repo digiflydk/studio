@@ -32,7 +32,14 @@ export type WebsiteHeaderConfig = {
     colorHex?: string;
   };
   navLinks: { label: string; href: string }[];
-  cta?: { enabled?: boolean; label?: string; href?: string; linkType?: "internal" | "external"; };
+  cta?: { 
+    enabled?: boolean; 
+    label?: string; 
+    href?: string; 
+    linkType?: "internal" | "external"; 
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "pill";
+    size?: "default" | "sm" | "lg" | "icon";
+  };
 };
 
 function parseHeader(input: unknown): HeaderSettings | null {
