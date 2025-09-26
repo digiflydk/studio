@@ -11,7 +11,7 @@ import { useCookieConsent } from '@/hooks/useCookieConsent';
 import type { GeneralSettings } from '@/types/settings';
 import MobileFloatingCTA from '@/components/layout/MobileFloatingCTA';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/client/firebase';
+import { getDb } from '@/lib/client/firebase';
 import { mapToCssVars } from '@/lib/design/mapToCssVars';
 
 
@@ -28,6 +28,7 @@ export default function Template({ children }: { children: ReactNode }) {
     const [showCookieSettings, setShowCookieSettings] = useState(false);
     
     useEffect(() => {
+        const db = getDb();
         const ref = doc(db, 'settings/general');
         const unsub = onSnapshot(ref, (snap) => {
           const data = (snap.data() || {}) as GeneralSettings;
