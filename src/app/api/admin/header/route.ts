@@ -1,15 +1,13 @@
 
 import { NextResponse } from "next/server";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { initAdmin } from "@/lib/server/firebaseAdmin";
+import { adminDb } from "@/lib/server/firebaseAdmin";
+import { Timestamp } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  initAdmin();
-  const db = getFirestore();
-  const snap = await db.doc("admin/pages/header/header").get();
+  const snap = await adminDb.doc("admin/pages/header/header").get();
   if (!snap.exists) return NextResponse.json({}, { status: 404 });
   const data = snap.data()!;
   return NextResponse.json(data);

@@ -1,6 +1,6 @@
 
-import { getApps, initializeApp, cert, applicationDefault, App } from "firebase-admin/app";
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getApps, getApp, initializeApp, applicationDefault, cert, App } from "firebase-admin/app";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
 
 let _adminApp: App | null = null;
 
@@ -8,27 +8,20 @@ export function initAdmin(): App {
   if (_adminApp) return _adminApp;
 
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
-  // Hvis du har service account som JSON i env:
-  const svcJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const svc = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 
-  if (getApps().length === 0) {
-    if (svcJson) {
-      const creds = JSON.parse(svcJson);
-      _adminApp = initializeApp({
-        credential: cert(creds),
-        projectId,
-      });
-    } else {
-      _adminApp = initializeApp({
-        credential: applicationDefault(),
-        projectId,
-      });
-    }
-  } else {
-    _adminApp = getApps()[0]!;
+  if (getApps().length) {
+    _adminApp = getApp(); // brug eksisterende
+    return _adminApp;
   }
 
-  return _adminApp!;
+  _adminApp = initializeApp(
+    svc
+      ? { credential: cert(JSON.parse(svc)), projectId }
+      : { credential: applicationDefault(), projectId }
+  );
+
+  return _adminApp;
 }
 
 
