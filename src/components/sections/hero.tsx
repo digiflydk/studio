@@ -9,11 +9,40 @@ import { ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import SiteContainer from "@/components/ui/SiteContainer";
 import { mapVariant, mapSize } from '@/lib/ui/mapButtonProps';
+import { useMemo } from 'react';
+
+function computeHeroTopPadding(settings: GeneralSettings | null) {
+  const sp = settings?.sectionPadding?.hero ?? {};
+  // desktop default 80, mobil 64 – samme som i CMS
+  if (typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches) {
+    return sp.topMobile ?? 64;
+  }
+  return sp.top ?? 80;
+}
+function computeHeroBottomPadding(settings: GeneralSettings | null) {
+  const sp = settings?.sectionPadding?.hero ?? {};
+  if (typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches) {
+    return sp.bottomMobile ?? 64;
+  }
+  return sp.bottom ?? 80;
+}
+
 
 export default function HeroSection({ settings }: { settings: GeneralSettings | null }) {
     const pathname = usePathname();
+
+    const topPad = useMemo(() => computeHeroTopPadding(settings), [settings]);
+    const bottomPad = useMemo(() => computeHeroBottomPadding(settings), [settings]);
+
     const headline = settings?.heroHeadline ?? 'Flow. Automatisér. Skalér.';
     const description = settings?.heroDescription ?? 'Vi hjælper virksomheder med at bygge skalerbare digitale løsninger, der optimerer processer og driver vækst.';
+    const imageUrl = settings?.heroImageUrl ?? "";
+
+    const hasAnyContent = Boolean(headline || description || imageUrl);
+
+    if (!hasAnyContent) {
+      return <section aria-label="hero" className="relative z-0" style={{ paddingTop: topPad, paddingBottom: bottomPad }} />;
+    }
     
     const headlineStyle: React.CSSProperties = {
         color: settings?.heroHeadlineColor ? `var(--${settings.heroHeadlineColor.replace('text-', '')})` : undefined,
@@ -21,26 +50,13 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     const descriptionStyle: React.CSSProperties = {
         color: settings?.heroDescriptionColor ? `var(--${settings.heroDescriptionColor.replace('text-', '')})` : undefined,
     };
-    
-    const pad = settings?.sectionPadding?.hero ?? {};
-    const pt = 'top' in pad && typeof pad.top === 'number' ? pad.top : 192;
-    const pb = 'bottom' in pad && typeof pad.bottom === 'number' ? pad.bottom : 192;
-    const ptM = 'topMobile' in pad && typeof pad.topMobile === 'number' ? pad.topMobile : 128;
-    const pbM = 'bottomMobile' in pad && typeof pad.bottomMobile === 'number' ? pad.bottomMobile : 128;
 
-
-    const sectionStyle: React.CSSProperties & { [key: string]: string } = {
-        '--hero-headline-size-mobile': settings?.heroHeadlineSizeMobile ? `${settings.heroHeadlineSizeMobile}px` : '40px',
-        '--hero-headline-size': settings?.heroHeadlineSize ? `${settings.heroHeadlineSize}px` : '64px',
-        '--hero-description-size-mobile': settings?.heroDescriptionSizeMobile ? `${settings.heroDescriptionSizeMobile}px` : '16px',
-        '--hero-description-size': settings?.heroDescriptionSize ? `${settings.heroDescriptionSize}px` : '18px',
-        '--hero-padding-top-mobile': `${ptM}px`,
-        '--hero-padding-bottom-mobile': `${pbM}px`,
-        '--hero-padding-top': `${pt}px`,
-        '--hero-padding-bottom': `${pb}px`,
+    const sectionStyle: React.CSSProperties = {
+        paddingTop: `${topPad}px`,
+        paddingBottom: `${bottomPad}px`,
     };
 
-    if (settings?.heroLayout === 'textWithImageGrid' && settings?.heroSectionBackgroundColor) {
+     if (settings?.heroLayout === 'textWithImageGrid' && settings?.heroSectionBackgroundColor) {
         const { h, s, l } = settings.heroSectionBackgroundColor;
         sectionStyle.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
     }
@@ -175,7 +191,7 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
 
     if (settings?.heroLayout === 'textWithImageGrid') {
         return (
-            <section id="hero" style={sectionStyle} className="pt-[var(--hero-padding-top-mobile)] md:pt-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]">
+            <section id="hero" style={sectionStyle} className="relative z-0">
                  <SiteContainer>
                      <div className={cn("grid md:grid-cols-2 gap-12 items-center")}>
                          {horizontalAlign === 'right' ? (
@@ -199,12 +215,12 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
     return (
         <section
             id="hero"
-            className="relative w-full text-primary-foreground"
+            className="relative w-full text-primary-foreground z-0"
             style={sectionStyle}
         >
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 z-[-1]">
                 <Image
-                    src={settings?.heroImageUrl || 'https://picsum.photos/1920/1280'}
+                    src={imageUrl || 'https://picsum.photos/1920/1280'}
                     alt={headline}
                     fill
                     priority
@@ -219,7 +235,6 @@ export default function HeroSection({ settings }: { settings: GeneralSettings | 
             )}>
                  <SiteContainer className={cn(
                     "flex",
-                    "py-[var(--hero-padding-top-mobile)] md:py-[var(--hero-padding-top)] pb-[var(--hero-padding-bottom-mobile)] md:pb-[var(--hero-padding-bottom)]",
                     {
                         'justify-start': horizontalAlign === 'left',
                         'justify-center': horizontalAlign === 'center',

@@ -40,7 +40,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { ensureAllSectionPadding, SectionKey } from '@/lib/settings-utils';
 
-const defaultSectionOrder = ['feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'tabs'];
+const defaultSectionOrder = ['hero', 'feature', 'services', 'aiProject', 'cases', 'about', 'customers', 'tabs'];
 
 const defaultServices: Service[] = [
   {
@@ -763,6 +763,17 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-6 pt-6">
+                         <div className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="hero-visible" className="text-base">Aktivér sektion</Label>
+                                <p className="text-sm text-muted-foreground">Hvis slået fra, vil denne sektion ikke blive vist på forsiden.</p>
+                            </div>
+                            <Switch
+                                id="hero-visible"
+                                checked={settings.sectionVisibility?.hero}
+                                onCheckedChange={(value) => handleVisibilityChange('hero', value)}
+                            />
+                        </div>
                          <div className="space-y-2">
                             <Label htmlFor="hero-layout">Layout</Label>
                             <Select value={settings.heroLayout || 'fullWidthImage'} onValueChange={(v) => handleInputChange('heroLayout', v)}>
@@ -1857,7 +1868,6 @@ export default function CmsHomePage() {
             value={activeAccordionItem} 
             onValueChange={setActiveAccordionItem}
         >
-            {sectionComponents['hero']}
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
