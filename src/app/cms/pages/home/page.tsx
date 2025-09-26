@@ -720,32 +720,6 @@ export default function CmsHomePage() {
     });
   };
   
-  const handleHeroPaddingSave = () => {
-      startSaving(async () => {
-        try {
-            const res = await fetch("/api/settings/section-padding/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ hero: settings.sectionPadding?.hero }),
-            });
-            const json = await res.json();
-            if (!json.ok) throw new Error(json.message || 'Save failed');
-            toast({
-                title: "Gemt!",
-                description: "Hero padding er blevet gemt.",
-                variant: "default",
-            });
-        } catch (e: any) {
-            toast({
-                title: "Fejl!",
-                description: e.message || "Kunne ikke gemme hero padding.",
-                variant: "destructive",
-            });
-        }
-      });
-  }
-
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -1779,55 +1753,12 @@ export default function CmsHomePage() {
                 </AccordionTrigger>
                 <AccordionContent className="border-t">
                     <CardContent className="space-y-4 pt-6">
-                        <section className="rounded-lg border p-4 mt-4">
-                            <h4 className="text-base font-semibold mb-3">Fremhævet Sektion (Hero) · Afstand</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium">Afstand i toppen (desktop)</label>
-                                    <input
-                                        type="range" min={0} max={192} step={1}
-                                        value={settings.sectionPadding?.hero?.top ?? 64}
-                                        onChange={(e) => handlePaddingChange('hero', Number(e.target.value), 'top')}
-                                        className="w-full"
-                                    />
-                                    <div className="text-xs text-muted-foreground">{settings.sectionPadding?.hero?.top ?? 64}px</div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium">Afstand i bunden (desktop)</label>
-                                    <input
-                                        type="range" min={0} max={192} step={1}
-                                        value={settings.sectionPadding?.hero?.bottom ?? 64}
-                                        onChange={(e) => handlePaddingChange('hero', Number(e.target.value), 'bottom')}
-                                        className="w-full"
-                                    />
-                                    <div className="text-xs text-muted-foreground">{settings.sectionPadding?.hero?.bottom ?? 64}px</div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium">Afstand i toppen (mobil)</label>
-                                    <input
-                                        type="range" min={0} max={160} step={1}
-                                        value={settings.sectionPadding?.hero?.topMobile ?? settings.sectionPadding?.hero?.top ?? 64}
-                                        onChange={(e) => handlePaddingChange('hero', Number(e.target.value), 'topMobile')}
-                                        className="w-full"
-                                    />
-                                    <div className="text-xs text-muted-foreground">{settings.sectionPadding?.hero?.topMobile ?? settings.sectionPadding?.hero?.top ?? 64}px</div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium">Afstand i bunden (mobil)</label>
-                                    <input
-                                        type="range" min={0} max={160} step={1}
-                                        value={settings.sectionPadding?.hero?.bottomMobile ?? settings.sectionPadding?.hero?.bottom ?? 64}
-                                        onChange={(e) => handlePaddingChange('hero', Number(e.target.value), 'bottomMobile')}
-                                        className="w-full"
-                                    />
-                                    <div className="text-xs text-muted-foreground">{settings.sectionPadding?.hero?.bottomMobile ?? settings.sectionPadding?.hero?.bottom ?? 64}px</div>
-                                </div>
-                            </div>
-                            <Button onClick={handleHeroPaddingSave} disabled={isSaving} size="sm" className="mt-4">
-                                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
-                                Gem Hero Afstand
-                            </Button>
-                        </section>
+                        <SpacingEditor
+                            label="Fremhævet Sektion (Hero)"
+                            padding={settings.sectionPadding?.hero || defaultHeroPadding}
+                            onPaddingChange={(v, p) => handlePaddingChange('hero', v, p)}
+                            previewMode={previewMode}
+                        />
                         <SpacingEditor
                             label="Fremhævet Sektion"
                             padding={settings.sectionPadding?.feature || defaultPadding}

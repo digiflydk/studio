@@ -1,105 +1,109 @@
 "use client";
 
-import Image from "next/image";
+import * as React from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 import type { WebsiteHeaderConfig } from "@/services/website.server";
-import HeaderCTA from "../common/HeaderCTA";
-import { Menu } from "lucide-react";
-import MobileDrawer from "../site/MobileDrawer";
-import SiteContainer from "../ui/SiteContainer";
 
-type Props = {
-  config: WebsiteHeaderConfig;
-};
+// Valgfri fallback hvis logo mangler
+const FALLBACK_LOGO = "/logo.svg";
 
-function hsla(bg: WebsiteHeaderConfig['topBg']) {
-  if (!bg) return 'transparent';
-  return `hsla(${bg.h} ${bg.s}% ${bg.l}% / ${bg.opacity})`;
+function hslBg({ h, s, l, opacity }: { h: number; s: number; l: number; opacity: number }) {
+  const a = Math.max(0, Math.min(1, opacity));
+  return `hsla(${h} ${s}% ${l}% / ${a})`;
 }
 
-export default function HeaderClient({ config }: Props) {
-  const [scrolled, setScrolled] = useState(false);
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+function hslBorder({ h, s, l, opacity }: { h: number; s: number; l: number; opacity?: number }) {
+  const a = opacity == null ? 1 : Math.max(0, Math.min(1, opacity / 100));
+  return `hsla(${h} ${s}% ${l}% / ${a})`;
+}
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 2);
+type Props = { config: WebsiteHeaderConfig };
+
+export default function HeaderClient({ config }: Props) {
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const logoUrl = scrolled
-    ? config.logoScrolledUrl || config.logoUrl
-    : config.logoUrl;
+  const bg = scrolled ? config.bg.scrolled : config.bg.top;
+  const headerStyle: React.CSSProperties = {
+    background: hslBg(bg),
+    borderBottom: config.border.enabled
+      ? `${config.border.widthPx}px solid ${hslBorder(config.border.color)}`
+      : undefined,
+    height: config.heightPx,
+  };
 
-  const logoW = config.logoWidthPx ?? 150;
-  const logoH = Math.round(logoW * 0.27); // bevar aspektforhold
+  const positionClass = config.overlay
+    ? "absolute top-0 left-0 right-0"
+    : config.sticky
+    ? "sticky top-0"
+    : "";
 
-  const wrapperClass = [
-    "sticky top-0 z-50",
-    scrolled
-      ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70"
-      : "bg-white/90",
-    "border-b border-black/10"
-  ].join(" ");
+  const containerClass =
+    "mx-auto w-full max-w-7xl px-4 md:px-6";
+
+  const logoW = Math.max(24, Math.min(config.logoWidthPx ?? 150, 320));
+  const logoH = Math.round(logoW * 0.27);
+
+  const logoUrl = scrolled ? (config.logoScrolledUrl || config.logoUrl) : config.logoUrl;
 
   return (
-    <>
-    <div className={wrapperClass}>
-      <div className="site-container" style={{ height: config.heightPx }}>
-        <div className="h-full flex items-center justify-between gap-6">
-          <Link href="/" aria-label="Til forsiden" className="shrink-0 flex items-center">
-            <Image
-              src={logoUrl ?? "/logo.svg"}
-              alt={config.logoAlt ?? "Digifly"}
-              width={logoW}
-              height={logoH}
-              priority
-              style={{ height: "auto", width: "100%", maxWidth: logoW }}
-            />
+    <div className={cn(positionClass, "z-50 w-full")} style={headerStyle}>
+      <div className={containerClass}>
+        <div
+          className="flex items-center gap-4"
+          style={{
+            minHeight: config.heightPx,
+          }}
+        >
+          <Link href="/" className="shrink-0" aria-label="Gå til forsiden">
+            {logoUrl ? (
+              <Image
+                src={logoUrl}
+                alt={config.logoAlt ?? "Logo"}
+                width={logoW}
+                height={logoH}
+                priority
+                style={{ width: "100%", maxWidth: logoW, height: "auto" }}
+              />
+            ) : (
+              <span className="font-semibold">Brand</span>
+            )}
           </Link>
 
-          <nav className="hidden md:flex ml-auto">
-             <ul className="flex items-center gap-6 text-[15px]">
-              {(config.navLinks ?? []).map((l) => (
-                <li key={l.href}>
-                  {l.href.startsWith("/") || l.href.startsWith("#") ? (
-                    <Link href={l.href} className="hover:underline">
+          <div className="ml-auto flex items-center gap-6">
+            <nav aria-label="Main" className="hidden md:block">
+              <ul className={cn("flex items-center gap-6", config.linkClass ?? "")}>
+                {config.navLinks?.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="hover:opacity-80 transition-opacity text-sm">
                       {l.label}
                     </Link>
-                  ) : (
-                    <a href={l.href} className="hover:underline" rel="noopener noreferrer">
-                      {l.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-              {config.cta?.enabled && (
-                <li>
-                  <a
-                    href={config.cta.href ?? "#"}
-                    className="inline-flex items-center rounded-full px-4 py-2 border border-black/10 hover:border-black/30 transition"
-                  >
-                    {config.cta.label ?? "Kontakt"}
-                  </a>
-                </li>
-              )}
-            </ul>
-          </nav>
-            
-             <button className="md:hidden" onClick={() => setMobileMenuOpen(true)} aria-label="Open menu">
-                <Menu className={config.linkClass}/>
-            </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {config.cta?.enabled && config.cta.href && config.cta.label ? (
+              <Link
+                href={config.cta.href}
+                target={config.cta.href.startsWith("http") ? "_blank" : undefined}
+                rel={config.cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="hidden md:inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold bg-foreground text-background hover:opacity-90 transition"
+              >
+                {config.cta.label}
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
-     <MobileDrawer 
-         open={isMobileMenuOpen}
-         onClose={() => setMobileMenuOpen(false)}
-         navLinks={config.navLinks}
-         title="Navigation"
-       />
-    </>
   );
 }

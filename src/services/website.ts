@@ -2,16 +2,26 @@ import { getGeneralSettings } from "@/services/settings";
 import type { NavLink } from "@/types/settings";
 
 export type HslA = { h: number; s: number; l: number; opacity: number };
-export type WebsiteHeaderConfig = {
+
+export interface WebsiteHeaderConfig {
+  isOverlay: boolean;
   sticky: boolean;
   heightPx: number;
   logoWidthPx: number;
-  linkClass: string;
   logoUrl?: string;
+  logoScrolledUrl?: string;
+  logoAlt?: string;
+  linkClass: string;
   navLinks: NavLink[];
   topBg: HslA;
   scrolledBg: HslA;
-};
+  cta?: {
+    enabled?: boolean;
+    label?: string;
+    href?: string;
+    linkType?: "internal" | "external";
+  };
+}
 
 function linkClassFromInput(color?: string) {
   if (!color) return "text-black hover:text-primary";
@@ -41,17 +51,25 @@ export async function getWebsiteHeaderConfig(): Promise<WebsiteHeaderConfig> {
   };
 
   const logoUrl = s?.logoUrl ?? header.logo?.src ?? undefined;
+  const logoScrolledUrl = s?.logoScrolledUrl ?? header.logo?.scrolledSrc ?? undefined;
+  const logoAlt = s?.logoAlt ?? header.logo?.alt ?? 'Digifly';
   const linkClass = linkClassFromInput(s?.headerLinkColor);
   const navLinks = Array.isArray(s?.headerNavLinks) ? s!.headerNavLinks : (header.navLinks ?? []);
+  
+  const cta = header.cta ?? s?.headerCtaSettings;
 
   return {
+    isOverlay: header.overlay ?? s?.isOverlay ?? false,
     sticky,
     heightPx,
     logoWidthPx,
-    linkClass,
     logoUrl,
+    logoScrolledUrl,
+    logoAlt,
+    linkClass,
     navLinks,
     topBg,
     scrolledBg,
+    cta,
   };
 }
