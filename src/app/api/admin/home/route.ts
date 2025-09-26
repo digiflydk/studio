@@ -1,8 +1,10 @@
+
 import { NextResponse } from "next/server";
 import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/server/firebaseAdmin";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   const snap = await adminDb.doc("admin/pages/home/home").get();

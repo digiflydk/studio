@@ -1,33 +1,55 @@
 
-import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
+import { initializeApp, getApps, cert, applicationDefault, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
-let app: App;
-let db: Firestore;
+// Singleton-instanser for at undgå re-initialisering
+let adminApp: App | null = null;
+let adminDbInstance: Firestore | null = null;
 
-if (getApps().length === 0) {
-  try {
-    const serviceAccount = process.env.FIREBASE_PRIVATE_KEY
-      ? {
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-        }
-      : null;
-
-    app = initializeApp({
-      credential: serviceAccount ? cert(serviceAccount) : undefined,
-    });
-  } catch (e: any) {
-     console.error('Firebase Admin Initialization Error', e.stack);
-     // If it fails here, it's a server configuration issue.
-     // Fallback to existing app if available.
-     app = getApps()[0]!;
+/**
+ * Initialiserer Firebase Admin App'en, hvis den ikke allerede eksisterer.
+ * Denne funktion er designet til at være sikker at kalde flere gange.
+ * @returns Den initialiserede Firebase App-instans.
+ */
+function initAdminApp(): App {
+  if (adminApp) {
+    return adminApp;
   }
-} else {
-  app = getApps()[0]!;
+
+  if (getApps().length > 0) {
+    adminApp = getApps()[0];
+    return adminApp;
+  }
+  
+  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+    : null;
+
+  adminApp = initializeApp({
+    credential: serviceAccount ? cert(serviceAccount) : applicationDefault(),
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  });
+
+  return adminApp;
 }
 
-db = getFirestore(app);
+/**
+ * Giver adgang til en singleton Firestore-databaseinstans.
+ * Initialiserer app'en, hvis det er nødvendigt.
+ * @returns Firestore-instansen.
+ */
+function getAdminDb(): Firestore {
+    if (adminDbInstance) {
+        return adminDbInstance;
+    }
+    const app = initAdminApp();
+    adminDbInstance = getFirestore(app);
+    return adminDbInstance;
+}
 
-export { db as adminDb };
+// Eksporter den singleton-databaseinstans til brug i hele applikationen.
+export const adminDb = getAdminDb();
+
+// Eksporter init-funktionen, hvis den skal bruges direkte (bør generelt ikke være nødvendigt).
+export const initAdmin = initAdminApp;
