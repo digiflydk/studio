@@ -64,7 +64,7 @@ export default function Hero({ settings }: { settings: any }) {
           </div>
 
           {/* Images */}
-            <div className="grid grid-cols-2 grid-rows-2 gap-6">
+          <div className="grid grid-cols-2 grid-rows-2 gap-6">
               {/* TL = Portrait */}
               {g1 && (
                 <div className="relative w-full overflow-hidden rounded-xl shadow-xl aspect-[3/4]">
